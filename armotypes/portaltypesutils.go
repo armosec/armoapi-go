@@ -1,7 +1,8 @@
 package armotypes
 
 import (
-	"github.com/armosec/capacketsgo/cautils"
+	wlidpkg "github.com/armosec/utils-k8s-go/wlid"
+
 	"github.com/golang/glog"
 )
 
@@ -37,7 +38,7 @@ func (designator *PortalDesignator) DigestPortalDesignator() (string, string, st
 	case DesignatorAttributes, DesignatorAttribute:
 		return designator.DigestAttributesDesignator()
 	case DesignatorWlid, DesignatorWildWlid:
-		return cautils.GetClusterFromWlid(designator.WLID), cautils.GetNamespaceFromWlid(designator.WLID), cautils.GetKindFromWlid(designator.WLID), cautils.GetNameFromWlid(designator.WLID), map[string]string{}
+		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), map[string]string{}
 	// case DesignatorSid: // TODO
 	default:
 		glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
@@ -83,7 +84,7 @@ func DigestPortalDesignator(designator *PortalDesignator) (string, string, map[s
 	case DesignatorAttributes, DesignatorAttribute:
 		return DigestAttributesDesignator(designator.Attributes)
 	case DesignatorWlid, DesignatorWildWlid:
-		return cautils.GetClusterFromWlid(designator.WLID), cautils.GetNamespaceFromWlid(designator.WLID), map[string]string{}
+		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), map[string]string{}
 	// case DesignatorSid: // TODO
 	default:
 		glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
