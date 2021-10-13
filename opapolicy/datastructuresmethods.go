@@ -114,7 +114,7 @@ func (ruleReport *RuleReport) GetNumberOfWarningResources() int {
 	sum := 0
 	for i := range ruleReport.RuleResponses {
 		if ruleReport.RuleResponses[i].GetSingleResultStatus() == "warning" {
-			sum += 1
+			sum += len(ruleReport.RuleResponses[i].AlertObject.K8SApiObjects)
 		}
 	}
 	return sum
@@ -176,9 +176,7 @@ func (ruleReport *RuleReport) GetNumberOfFailedResources() int {
 	sum := 0
 	for i := len(ruleReport.RuleResponses) - 1; i >= 0; i-- {
 		if ruleReport.RuleResponses[i].GetSingleResultStatus() == "failed" {
-			//if !ruleReport.DeleteIfRedundantResponse(&ruleReport.RuleResponses[i], i) {
 			sum += len(ruleReport.RuleResponses[i].AlertObject.K8SApiObjects)
-			//}
 		}
 	}
 	return sum
@@ -251,7 +249,3 @@ func StringInSlice(strSlice []string, str string) bool {
 	}
 	return false
 }
-
-// func RemoveResponse(slice []RuleResponse, index int) []RuleResponse {
-// 	return append(slice[:index], slice[index+1:]...)
-// }
