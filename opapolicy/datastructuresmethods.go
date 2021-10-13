@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"hash/fnv"
 
-	"github.com/armosec/armopa/rego"
 	"github.com/golang/glog"
+	"github.com/open-policy-agent/opa/rego"
 )
 
 func (pn *PolicyNotification) ToJSONBytesBuffer() (*bytes.Buffer, error) {
