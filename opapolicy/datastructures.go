@@ -41,15 +41,15 @@ type FrameworkReport struct {
 }
 type ControlReport struct {
 	armotypes.PortalBase `json:",inline"`
-	ControlID            string `json:"id"`
-
-	Name            string       `json:"name"`
-	RuleReports     []RuleReport `json:"ruleReports"`
-	Remediation     string       `json:"remediation"`
-	Description     string       `json:"description"`
-	Score           float32      `json:"score,omitempty"`
-	BaseScore       float32      `json:"baseScore,omitempty"`
-	ARMOImprovement float32      `json:"ARMOImprovement,omitempty"`
+	Control_ID           string       `json:"id,omitempty"` // to be Deprecated
+	ControlID            string       `json:"controlID"`
+	Name                 string       `json:"name"`
+	RuleReports          []RuleReport `json:"ruleReports"`
+	Remediation          string       `json:"remediation"`
+	Description          string       `json:"description"`
+	Score                float32      `json:"score"`
+	BaseScore            float32      `json:"baseScore,omitempty"`
+	ARMOImprovement      float32      `json:"ARMOImprovement,omitempty"`
 }
 type RuleReport struct {
 	Name               string                   `json:"name"`
@@ -57,6 +57,7 @@ type RuleReport struct {
 	RuleStatus         RuleStatus               `json:"ruleStatus"` // did we run the rule or not (if there where compile errors, the value will be failed)
 	RuleResponses      []RuleResponse           `json:"ruleResponses"`
 	ListInputResources []map[string]interface{} `json:"-"`
+	ListInputKinds     []string                 `json:"-"`
 }
 type RuleStatus struct {
 	Status  string `json:"status"`
@@ -101,12 +102,12 @@ type PolicyRule struct {
 // Control represents a collection of rules which are combined together to single purpose
 type Control struct {
 	armotypes.PortalBase `json:",inline"`
-	ControlID            string `json:"id"`
-
-	CreationTime string       `json:"creationTime"`
-	Description  string       `json:"description"`
-	Remediation  string       `json:"remediation"`
-	Rules        []PolicyRule `json:"rules"`
+	Control_ID           string       `json:"id,omitempty"` // to be Deprecated
+	ControlID            string       `json:"controlID"`
+	CreationTime         string       `json:"creationTime"`
+	Description          string       `json:"description"`
+	Remediation          string       `json:"remediation"`
+	Rules                []PolicyRule `json:"rules"`
 	// for new list of  rules in POST/UPADTE requests
 	RulesIDs *[]string `json:"rulesIDs,omitempty"`
 }

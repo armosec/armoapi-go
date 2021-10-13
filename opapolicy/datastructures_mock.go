@@ -33,7 +33,8 @@ func MockFrameworkReportA() *FrameworkReport {
 		Name: AMockFrameworkName,
 		ControlReports: []ControlReport{
 			{
-				Name: AMockControlName,
+				ControlID: "C-0010",
+				Name:      AMockControlName,
 				RuleReports: []RuleReport{
 					{
 						Name:        AMockRuleName,
@@ -205,29 +206,14 @@ func MockTemp() string {
 	package armo_builtins
 	import data.kubernetes.api.client as client
 	deny[msga] {
-		object := input[_]
-		# object := client.query_all("pods")
-		# obj := object.body.items[_]
+		#object := input[_]
+		object := client.query_all("pods")
+		obj := object.body.items[_]
 		msga := {
 			"packagename": "armo_builtins",
 			"alertMessage": "found object",
 			"alertScore": 3,
-			"alertObject": {"k8sApiObjects": [object]},
-		}
-	}
-	`
-}
-
-func MockUseData() string {
-	return `
-	package armo_builtins
-	import data
-	deny[msga] {
-		public_registries := data.postureControlInputs.public_registries
-		reg := public_registries[_]
-		msga := {
-			"alertMessage": "found public_registries",
-			"alertObject": {"k8SApiObjects": [{reg: ""}]},
+			"alertObject": {"object": obj},
 		}
 	}
 	`

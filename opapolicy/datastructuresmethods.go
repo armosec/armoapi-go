@@ -54,6 +54,23 @@ func (ruleReport *RuleReport) GetRuleStatus() (string, []RuleResponse, []RuleRes
 	}
 	return status, failed, exceptions
 }
+
+
+func (controlReport *ControlReport) GetNumberOfResources() int {
+	sum := 0
+	for i := range controlReport.RuleReports {
+		sum += controlReport.RuleReports[i].GetNumberOfResources()
+	}
+	return sum
+}
+
+func (controlReport *ControlReport) GetNumberOfFailedResources() int {
+	sum := 0
+	for i := range controlReport.RuleReports {
+		sum += controlReport.RuleReports[i].GetNumberOfFailedResources()
+	}
+	return sum
+}
 func ParseRegoResult(regoResult *rego.ResultSet) ([]RuleResponse, error) {
 	var errs error
 	ruleResponses := []RuleResponse{}
@@ -93,6 +110,21 @@ func (controlReport *ControlReport) GetNumberOfResources() int {
 	return sum
 }
 
+func (controlReport *ControlReport) GetNumberOfWarningResources() int {
+	sum := 0
+	for i := range controlReport.RuleReports {
+		sum += controlReport.RuleReports[i].GetNumberOfWarningResources()
+	}
+	return sum
+}
+func (controlReport *ControlReport) ListControlsInputKinds() []string {
+	listControlsInputKinds := []string{}
+	for i := range controlReport.RuleReports {
+		listControlsInputKinds = append(listControlsInputKinds, controlReport.RuleReports[i].ListInputKinds...)
+	}
+	return listControlsInputKinds
+}
+
 func (controlReport *ControlReport) Passed() bool {
 	for i := range controlReport.RuleReports {
 		if len(controlReport.RuleReports[i].RuleResponses) != 0 {
@@ -126,6 +158,21 @@ func (controlReport *ControlReport) Failed() bool {
 	return false
 }
 
+func (ruleReport *RuleReport) GetNumberOfResources() int {
+	return len(ruleReport.ListInputResources)
+}
+
+func (ruleReport *RuleReport) GetNumberOfFailedResources() int {
+	sum := 0
+	for i := len(ruleReport.RuleResponses) - 1; i >= 0; i-- {
+		if ruleReport.RuleResponses[i].GetSingleResultStatus() == "failed" {
+			//if !ruleReport.DeleteIfRedundantResponse(&ruleReport.RuleResponses[i], i) {
+			sum += len(ruleReport.RuleResponses[i].AlertObject.K8SApiObjects)
+			//}
+		}
+	}
+	return sum
+}
 func (ctrl *ControlReport) GetID() string {
 	h := fnv.New32a()
 	h.Write([]byte(ctrl.Name))
@@ -133,3 +180,14 @@ func (ctrl *ControlReport) GetID() string {
 
 	return "C-" + s
 }
+
+
+func (ruleReport *RuleReport) DeleteIfRedundantResponse(RuleResponse *RuleResponse, index int) bool {
+	if b, rr := ruleReport.IsDuplicateResponseOfResource(RuleResponse, index); b {
+		rr.AddMessageToResponse(RuleResponse.AlertMessage)
+		ruleReport.RuleResponses = removeResponse(ruleReport.RuleResponses, index)
+		return true
+	}
+	return false
+}
+

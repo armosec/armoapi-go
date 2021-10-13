@@ -37,7 +37,7 @@ func (designator *PortalDesignator) DigestPortalDesignator() (string, string, st
 	switch designator.DesignatorType {
 	case DesignatorAttributes, DesignatorAttribute:
 		return designator.DigestAttributesDesignator()
-	case DesignatorWlid, DesignatorWildWlid:
+	case DesignatorWlid.ToLower(), DesignatorWildWlid.ToLower():
 		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), map[string]string{}
 	// case DesignatorSid: // TODO
 	default:
