@@ -191,6 +191,67 @@ func (ctrl *ControlReport) GetID() string {
 	return "C-" + s
 }
 
+func RemoveResponse(slice []RuleResponse, index int) []RuleResponse {
+	return append(slice[:index], slice[index+1:]...)
+}
+
+// TODO - receive list full json paths
+func (postureReport *PostureReport) RemoveData(keepFields, keepMetadataFields []string) {
+	for i := range postureReport.FrameworkReports {
+		postureReport.FrameworkReports[i].RemoveData(keepFields, keepMetadataFields)
+	}
+}
+func (frameworkReport *FrameworkReport) RemoveData(keepFields, keepMetadataFields []string) {
+	for i := range frameworkReport.ControlReports {
+		frameworkReport.ControlReports[i].RemoveData(keepFields, keepMetadataFields)
+	}
+}
+func (controlReport *ControlReport) RemoveData(keepFields, keepMetadataFields []string) {
+	for i := range controlReport.RuleReports {
+		controlReport.RuleReports[i].RemoveData(keepFields, keepMetadataFields)
+	}
+}
+
+func (ruleReport *RuleReport) RemoveData(keepFields, keepMetadataFields []string) {
+	for i := range ruleReport.RuleResponses {
+		ruleReport.RuleResponses[i].RemoveData(keepFields, keepMetadataFields)
+	}
+}
+
+func (r *RuleResponse) RemoveData(keepFields, keepMetadataFields []string) {
+	r.AlertObject.ExternalObjects = nil
+
+	for i := range r.AlertObject.K8SApiObjects {
+		deleteFromMap(r.AlertObject.K8SApiObjects[i], keepFields)
+		for k := range r.AlertObject.K8SApiObjects[i] {
+			if k == "metadata" {
+				if b, ok := r.AlertObject.K8SApiObjects[i][k].(map[string]interface{}); ok {
+					deleteFromMap(b, keepMetadataFields)
+					r.AlertObject.K8SApiObjects[i][k] = b
+				}
+			}
+		}
+	}
+}
+
+func deleteFromMap(m map[string]interface{}, keepFields []string) {
+	for k := range m {
+		if StringInSlice(keepFields, k) {
+			continue
+		}
+		delete(m, k)
+	}
+}
+
+func StringInSlice(strSlice []string, str string) bool {
+	for i := range strSlice {
+		if strSlice[i] == str {
+			return true
+		}
+	}
+	return false
+}
+
 // func RemoveResponse(slice []RuleResponse, index int) []RuleResponse {
 // 	return append(slice[:index], slice[index+1:]...)
 // }
