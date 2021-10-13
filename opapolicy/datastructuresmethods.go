@@ -55,15 +55,6 @@ func (ruleReport *RuleReport) GetRuleStatus() (string, []RuleResponse, []RuleRes
 	return status, failed, exceptions
 }
 
-
-func (controlReport *ControlReport) GetNumberOfResources() int {
-	sum := 0
-	for i := range controlReport.RuleReports {
-		sum += controlReport.RuleReports[i].GetNumberOfResources()
-	}
-	return sum
-}
-
 func (controlReport *ControlReport) GetNumberOfFailedResources() int {
 	sum := 0
 	for i := range controlReport.RuleReports {
@@ -71,6 +62,15 @@ func (controlReport *ControlReport) GetNumberOfFailedResources() int {
 	}
 	return sum
 }
+
+// func (controlReport *ControlReport) GetNumberOfResources() int {
+// 	sum := 0
+// 	for i := range controlReport.RuleReports {
+// 		sum += controlReport.RuleReports[i].GetNumberOfResources()
+// 	}
+// 	return sum
+// }
+
 func ParseRegoResult(regoResult *rego.ResultSet) ([]RuleResponse, error) {
 	var errs error
 	ruleResponses := []RuleResponse{}
@@ -105,6 +105,16 @@ func (controlReport *ControlReport) GetNumberOfResources() int {
 	for i := range controlReport.RuleReports {
 		if controlReport.RuleReports[i].ListInputResources != nil {
 			sum += len(controlReport.RuleReports[i].ListInputResources)
+		}
+	}
+	return sum
+}
+
+func (ruleReport *RuleReport) GetNumberOfWarningResources() int {
+	sum := 0
+	for i := range ruleReport.RuleResponses {
+		if ruleReport.RuleResponses[i].GetSingleResultStatus() == "warning" {
+			sum += 1
 		}
 	}
 	return sum
@@ -181,13 +191,6 @@ func (ctrl *ControlReport) GetID() string {
 	return "C-" + s
 }
 
-
-func (ruleReport *RuleReport) DeleteIfRedundantResponse(RuleResponse *RuleResponse, index int) bool {
-	if b, rr := ruleReport.IsDuplicateResponseOfResource(RuleResponse, index); b {
-		rr.AddMessageToResponse(RuleResponse.AlertMessage)
-		ruleReport.RuleResponses = removeResponse(ruleReport.RuleResponses, index)
-		return true
-	}
-	return false
-}
-
+// func RemoveResponse(slice []RuleResponse, index int) []RuleResponse {
+// 	return append(slice[:index], slice[index+1:]...)
+// }
