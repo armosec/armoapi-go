@@ -12,6 +12,7 @@ type Settings struct {
 	PostureControlInputs    map[string][]string     `json:"postureControlInputs"`
 	PostureScanConfig       PostureScanConfig       `json:"postureScanConfig"`
 	VulnerabilityScanConfig VulnerabilityScanConfig `json:"vulnerabilityScanConfig"`
+	SlackConfigurations     SlackSettings           `json:"slackConfigurations,omitempty"`
 }
 
 type PostureScanConfig struct {
