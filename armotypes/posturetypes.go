@@ -73,7 +73,11 @@ type PostureControlSummary struct {
 	ControlGUID                    string           `json:"guid"`
 	Name                           string           `json:"name"`
 	AffectedResourcesCount         int              `json:"affectedResourcesCount"`
+	FailedResourcesCount           int              `json:"failedResourcesCount"`
+	WarningResourcesCount          int              `json:"warningResourcesCount"`
 	PreviousAffectedResourcesCount int              `json:"previousAffectedResourcesCount"`
+	PreviousFailedResourcesCount   int              `json:"previousFailedResourcesCount"`
+	PreviousWarningResourcesCount  int              `json:"previousWarningResourcesCount"`
 	Framework                      string           `json:"frameworkName"`
 	Remediation                    string           `json:"remediation"`
 	Status                         int              `json:"status"`
