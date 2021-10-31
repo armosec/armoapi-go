@@ -99,7 +99,7 @@ type PostureResource struct {
 	ControlName          string                    `json:"controlName"`
 	ControlID            string                    `json:"controlID"`
 	FrameworkName        string                    `json:"frameworkName"`
-	ControlStatus        int                       `json:"controlStatus"`
+	ControlStatus        int                       `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
 	ControlStatusText    string                    `json:"controlStatusText"`
 	RelatedExceptions    []PostureExceptionPolicy  `json:"relatedExceptions"` // configured in portal
 	ExceptionApplied     []PostureExceptionPolicy  `json:"exceptionApplied"`  //actual ruleResponse
