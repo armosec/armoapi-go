@@ -3,9 +3,10 @@ package armotypes
 type ScanFrequency string
 
 type CustomerConfig struct {
-	Name     string           `json:"name"`
-	Scope    PortalDesignator `json:"scope"`
-	Settings Settings         `json:"settings"`
+	Name       string                 `json:"name"`
+	Attributes map[string]interface{} `json:"attributes,omitempty"` // could be string
+	Scope      PortalDesignator       `json:"scope"`
+	Settings   Settings               `json:"settings"`
 }
 
 type Settings struct {
