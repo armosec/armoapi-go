@@ -87,6 +87,9 @@ type PostureControlSummary struct {
 	Timestamp                      time.Time        `json:"timestamp"`
 	ReportID                       string           `json:"reportGUID"`
 	DeleteStatus                   RecordStatus     `json:"deletionStatus,omitempty"`
+	Score                          float32          `json:"score"`
+	ScoreFactor                    float32          `json:"baseScore"`
+	ARMOImprovement                float32          `json:"ARMOimprovement"`
 }
 
 //---------/api/v1/posture/resources
