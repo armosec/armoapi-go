@@ -56,7 +56,8 @@ type RecommendationAssociation struct {
 	// this is about to be useless
 	Designators PortalDesignator `json:"designators"`
 	// guid of the recommendation in recommendation DB
-	RecommendationPrototypeGUID string `json:"recommendationPrototypeGUID"`
+	RecommendationPrototypeGUID string                   `json:"recommendationPrototypeGUID"`
+	RecommendationDetails       RecommendationSkeletonV1 `json:"recommendationDetails"`
 	// current status of this recommendation for the given resource
 	Status AssociationStatus `json:"status"`
 }
