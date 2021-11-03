@@ -56,35 +56,8 @@ type RecommendationAssociation struct {
 	// this is about to be useless
 	Designators PortalDesignator `json:"designators"`
 	// guid of the recommendation in recommendation DB
-	RecommendationPrototypeGUID string `json:"recommendationPrototypeGUID"`
+	RecommendationPrototypeGUID string                   `json:"recommendationPrototypeGUID"`
+	RecommendationDetails       RecommendationSkeletonV1 `json:"recommendationDetails"`
 	// current status of this recommendation for the given resource
 	Status AssociationStatus `json:"status"`
 }
-
-// {
-//     "customerGUID": "",
-//     "designators": { // designator object as we have in current resources represntaion.
-//         // limitation of this structure is that we need separate "sub-index" for each attribute and we
-//         // don't have any extra information regarding this attributes (like source, equlity and so on)
-//         "designatorsType": "attributes",
-//         "attributes": {
-//             "lbl1": "val11"
-//         }
-//     },
-//     "context": [ // more flexible structure for attributes
-//         {
-//             "attributeName": "",
-//             "attributeValue": "",
-//             "attributesource": ""
-//         }
-//     ],
-//     "actionPrototypeID": "<guid>", //guid of the recommendation in recommendation DB
-//     "status": 2, // current status of this recommendation for the given resource. (e.g. 1- attached ,2- ignored, 3- applied, 4- another remediation, ...)
-//     "updatesAudit": [
-//         {
-//             "time": "",
-//             "userName": "",
-//             "status": 3
-//         }
-//     ]
-// }
