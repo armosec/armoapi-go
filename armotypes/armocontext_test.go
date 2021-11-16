@@ -15,8 +15,8 @@ func TestIsDesignatorsMatchContext(t *testing.T) {
 	if !IsDesignatorsMatchContext(ctxSlice, desi, "some2") {
 		t.Errorf("excpected match")
 	}
-	if IsDesignatorsMatchContext(ctxSlice, desi, "some222") {
-		t.Errorf("excpected missmatch")
+	if !IsDesignatorsMatchContext(ctxSlice, desi, "some222") {
+		t.Errorf("excpected match")
 	}
 
 	desi.Attributes["bbb"] = "vxcvcx"

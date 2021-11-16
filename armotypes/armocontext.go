@@ -60,6 +60,9 @@ func IsDesignatorsMatchContext(ctxSlice []ArmoContext, designator *PortalDesigna
 					desiredMatches--
 				}
 			}
+		default:
+			// not a designator attribute
+			desiredMatches--
 		}
 
 	}

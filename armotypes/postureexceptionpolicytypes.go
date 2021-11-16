@@ -16,8 +16,9 @@ type PostureExceptionPolicy struct {
 
 type PosturePolicy struct {
 	FrameworkName string `json:"frameworkName"`
-	ControlName   string `json:"controlName"`
-	RuleName      string `json:"ruleName"`
+	ControlName   string `json:"controlName,omitempty"`
+	ControlID     string `json:"controlID,omitempty"`
+	RuleName      string `json:"ruleName,omitempty"`
 }
 
 func (exceptionPolicy *PostureExceptionPolicy) IsAlertOnly() bool {

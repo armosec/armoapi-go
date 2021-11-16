@@ -96,21 +96,22 @@ type PostureControlSummary struct {
 
 //1 resource per 1 control
 type PostureResource struct {
-	UniqueResourceResult string                    `json:"uniqueResourceResult"` // vnf(name + framework + reportID) to allow fast search for aggregation
-	Designators          PortalDesignator          `json:"designators"`
-	Name                 string                    `json:"name"` // wlid/sid and etc.
-	ControlName          string                    `json:"controlName"`
-	ControlID            string                    `json:"controlID"`
-	FrameworkName        string                    `json:"frameworkName"`
-	ControlStatus        int                       `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
-	ControlStatusText    string                    `json:"controlStatusText"`
-	RelatedExceptions    []PostureExceptionPolicy  `json:"relatedExceptions"` // configured in portal
-	ExceptionApplied     []PostureExceptionPolicy  `json:"exceptionApplied"`  //actual ruleResponse
-	ResourceKind         string                    `json:"kind"`
-	ResourceNamespace    string                    `json:"namespace"`
-	Remediation          string                    `json:"remediation"`
-	Images               []PostureContainerSummary `json:"containers,omitempty"`
-	DeleteStatus         RecordStatus              `json:"deletionStatus,omitempty"`
+	UniqueResourceResult string                      `json:"uniqueResourceResult"` // vnf(name + framework + reportID) to allow fast search for aggregation
+	Designators          PortalDesignator            `json:"designators"`
+	Name                 string                      `json:"name"` // wlid/sid and etc.
+	ControlName          string                      `json:"controlName"`
+	ControlID            string                      `json:"controlID"`
+	FrameworkName        string                      `json:"frameworkName"`
+	ControlStatus        int                         `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
+	ControlStatusText    string                      `json:"controlStatusText"`
+	RelatedExceptions    []PostureExceptionPolicy    `json:"relatedExceptions"` // configured in portal
+	ExceptionApplied     []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
+	ResourceKind         string                      `json:"kind"`
+	ResourceNamespace    string                      `json:"namespace"`
+	Remediation          string                      `json:"remediation"`
+	Images               []PostureContainerSummary   `json:"containers,omitempty"`
+	DeleteStatus         RecordStatus                `json:"deletionStatus,omitempty"`
+	Recommendations      []RecommendationAssociation `json:"recommendations"`
 
 	Timestamp time.Time `json:"timestamp"`
 	ReportID  string    `json:"reportGUID"`
@@ -128,15 +129,16 @@ type PostureResourceSummary struct {
 	FailedControlCount  int `json:"failedControlsCount"`
 	WarningControlCount int `json:"warningControlsCount"`
 
-	Status                 int                       `json:"status"`
-	StatusText             string                    `json:"statusText"`
-	Remediation            []string                  `json:"remediation"`
-	ResourceKind           string                    `json:"resourceKind"`
-	FrameworkName          string                    `json:"frameworkName"`
-	ExceptionRecommendaion string                    `json:"exceptionRecommendaion"`
-	RelatedExceptions      []PostureExceptionPolicy  `json:"relatedExceptions"` // configured in portal
-	ExceptionApplied       []PostureExceptionPolicy  `json:"exceptionApplied"`  //actual ruleResponse
-	Images                 []PostureContainerSummary `json:"containers,omitempty"`
+	Status                 int                         `json:"status"`
+	StatusText             string                      `json:"statusText"`
+	Remediation            []string                    `json:"remediation"`
+	ResourceKind           string                      `json:"resourceKind"`
+	FrameworkName          string                      `json:"frameworkName"`
+	ExceptionRecommendaion string                      `json:"exceptionRecommendaion"`
+	RelatedExceptions      []PostureExceptionPolicy    `json:"relatedExceptions"` // configured in portal
+	ExceptionApplied       []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
+	Images                 []PostureContainerSummary   `json:"containers,omitempty"`
+	Recommendations        []RecommendationAssociation `json:"recommendations"`
 
 	Timestamp    time.Time    `json:"timestamp"`
 	ReportID     string       `json:"reportGUID"`
