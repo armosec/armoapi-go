@@ -42,7 +42,7 @@ type RecommendationSkeletonV1 struct {
 	// the context to show this recommendation in
 	Context []ArmoContext `json:"context"`
 	// the approvement status. Do we should show this recommendation to users?
-	Approvement ApprovementStatus `json:"approvement"`
+	Approvement ApprovementState `json:"approvement"`
 }
 
 // this structure is dedicated to connect between recommendation and specific resource and trace the user actions taken due to this recommendation
