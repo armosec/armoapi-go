@@ -1,6 +1,7 @@
 package armotypes
 
 import (
+	"sort"
 	"testing"
 )
 
@@ -41,6 +42,9 @@ func TestDesignatorToArmoContext(t *testing.T) {
 		"cc34":  "ert56",
 		"mmn90": "zvbnvb",
 	}}, "some")
+	sort.SliceStable(desiCtx, func(i, j int) bool {
+		return desiCtx[i].Attribute < desiCtx[j].Attribute
+	})
 	if desiCtx[0].Value != "bbb" || desiCtx[1].Attribute != "cc34" || desiCtx[2].Source != "some.attributes" {
 		t.Errorf("wrong ctx:%v", desiCtx)
 	}
@@ -50,6 +54,9 @@ func TestDesignatorToArmoContext(t *testing.T) {
 		"cc34":  "ert56",
 		"mmn90": "zvbnvb",
 	}}, "")
+	sort.SliceStable(desiCtx, func(i, j int) bool {
+		return desiCtx[i].Attribute < desiCtx[j].Attribute
+	})
 	if desiCtx[0].Value != "bbb" || desiCtx[1].Attribute != "cc34" || desiCtx[2].Source != "attributes" {
 		t.Errorf("wrong ctx:%v", desiCtx)
 	}
@@ -58,6 +65,9 @@ func TestDesignatorToArmoContext(t *testing.T) {
 		WLID:     "aaabdd",
 		WildWLID: "fdsfdsd",
 		SID:      "sssioop"}, "some1")
+	sort.SliceStable(desiCtx, func(i, j int) bool {
+		return desiCtx[i].Attribute > desiCtx[j].Attribute
+	})
 	if desiCtx[0].Value != "aaabdd" || desiCtx[0].Attribute != "wlid" || desiCtx[0].Source != "some1" {
 		t.Errorf("wrong WLID ctx:%v", desiCtx)
 	}
