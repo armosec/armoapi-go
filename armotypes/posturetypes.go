@@ -1,6 +1,7 @@
 package armotypes
 
 import (
+	"encoding/json"
 	"time"
 )
 
@@ -153,4 +154,9 @@ type PostureSummary struct {
 	Designators                  PortalDesignator `json:"designators"`
 
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
+}
+
+type RawResource struct {
+	Designators PortalDesignator `json:"designators"`
+	RAW         json.RawMessage  `json:"object"`
 }
