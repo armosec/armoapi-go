@@ -157,9 +157,11 @@ type PostureSummary struct {
 }
 
 type RawResource struct {
-	Designators     PortalDesignator `json:"designators"`
-	ResourceID      string           `json:"resourceID"`
-	PostureReportID string           `json:"postureReportID,omitempty"`
-	SPIFFE          string           `json:"spiffe"`
-	RAW             json.RawMessage  `json:"object"`
+	Designators         PortalDesignator          `json:"designators"`
+	ResourceID          string                    `json:"resourceID"`
+	PostureReportID     string                    `json:"postureReportID,omitempty"`
+	SPIFFE              string                    `json:"spiffe"`
+	Containers          []PostureContainerSummary `json:"containers,omitempty"`
+	RelatedResourcesIDs []string                  `json:"relatedResourcesID,omitempty"`
+	RAW                 json.RawMessage           `json:"object"`
 }
