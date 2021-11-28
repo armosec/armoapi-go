@@ -157,7 +157,10 @@ type PostureSummary struct {
 }
 
 type RawResource struct {
-	Designators         PortalDesignator          `json:"designators"`
+	Designators  PortalDesignator `json:"designators"`
+	Timestamp    time.Time        `json:"timestamp"`
+	DeleteStatus RecordStatus     `json:"deletionStatus,omitempty"`
+
 	ResourceID          string                    `json:"resourceID"`
 	PostureReportID     string                    `json:"postureReportID,omitempty"`
 	SPIFFE              string                    `json:"spiffe"`
