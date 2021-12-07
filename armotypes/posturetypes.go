@@ -101,6 +101,7 @@ type PostureResource struct {
 	Designators          PortalDesignator            `json:"designators"`
 	Name                 string                      `json:"name"` // wlid/sid and etc.
 	ControlName          string                      `json:"controlName"`
+	HighlightPaths       []string                    `json:"highlightPaths"` // specifies "failedPath" - where exactly in the raw resources the control failed
 	ControlID            string                      `json:"controlID"`
 	FrameworkName        string                      `json:"frameworkName"`
 	ControlStatus        int                         `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
