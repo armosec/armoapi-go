@@ -8,6 +8,27 @@ import (
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
 
+func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
+	wlidSlices := wlidpkg.RestoreMicroserviceIDs(wlid)
+	pd := &PortalDesignator{
+		DesignatorType: DesignatorAttributes,
+		Attributes:     make(map[string]string, 4),
+	}
+	if len(wlidSlices) > 0 {
+		pd.Attributes[AttributeCluster] = wlidSlices[0]
+	}
+	if len(wlidSlices) > 1 {
+		pd.Attributes[AttributeNamespace] = wlidSlices[1]
+	}
+	if len(wlidSlices) > 2 {
+		pd.Attributes[AttributeKind] = wlidSlices[2]
+	}
+	if len(wlidSlices) > 3 {
+		pd.Attributes[AttributeName] = wlidSlices[3]
+	}
+	return pd
+}
+
 func (designator *PortalDesignator) GetCluster() string {
 	cluster, _, _, _, _ := designator.DigestPortalDesignator()
 	return cluster
