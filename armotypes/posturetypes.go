@@ -119,18 +119,23 @@ type PostureResource struct {
 	ReportID  string    `json:"reportGUID"`
 }
 
+type HighlightsByControl struct {
+	ControlID  string   `json:"controlID"`
+	Highlights []string `json:"highlights"`
+}
+
 type PostureResourceSummary struct {
 	Designators PortalDesignator `json:"designators"`
 	Name        string           `json:"name"` // wlid/sid and etc.
 
 	//gives upto PostureResourceMaxCtrls controls as an example
-	FailedControl   []string `json:"failedControls"` // failed+warning controls
-	WarningControls []string `json:"warningControls"`
+	FailedControl     []string              `json:"failedControls"` // failed+warning controls
+	WarningControls   []string              `json:"warningControls"`
+	HighlightsPerCtrl []HighlightsByControl `json:"highlightsPerControl"`
 
 	//totalcount (including the failed/warning controls slices)
-	FailedControlCount  int `json:"failedControlsCount"`
-	WarningControlCount int `json:"warningControlsCount"`
-
+	FailedControlCount     int                         `json:"failedControlsCount"`
+	WarningControlCount    int                         `json:"warningControlsCount"`
 	Status                 int                         `json:"status"`
 	StatusText             string                      `json:"statusText"`
 	Remediation            []string                    `json:"remediation"`
