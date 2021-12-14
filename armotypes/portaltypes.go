@@ -3,7 +3,7 @@ package armotypes
 import "strings"
 
 const (
-	CostumerGuidQuery   = "costumerGUID"
+	CustomerGuidQuery   = "customerGUID"
 	ClusterNameQuery    = "cluster"
 	DatacenterNameQuery = "datacenter"
 	NamespaceQuery      = "namespace"
@@ -50,6 +50,8 @@ func (dt DesignatorType) ToLower() DesignatorType {
 
 // attributes
 const (
+	AttributeCustomerGUID = "customerGUID"
+
 	AttributeCluster   = "cluster"
 	AttributeNamespace = "namespace"
 	AttributeKind      = "kind"
