@@ -3,6 +3,8 @@ package apis
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/armosec/armoapi-go/armotypes"
 )
 
 // Commands list of commands received from websocket
@@ -20,6 +22,8 @@ type Command struct {
 	WildSid     string                 `json:"wildSid,omitempty"`
 	JobTracking JobTracking            `json:"jobTracking"`
 	Args        map[string]interface{} `json:"args,omitempty"`
+
+	Designators []armotypes.PortalDesignator `json:"designators,omitempty"`
 }
 
 type JobTracking struct {
@@ -34,6 +38,7 @@ func (c *Command) DeepCopy() *Command {
 	newCommand.ResponseID = c.ResponseID
 	newCommand.Wlid = c.Wlid
 	newCommand.WildWlid = c.WildWlid
+	newCommand.Designators = c.Designators
 	if c.Args != nil {
 		newCommand.Args = make(map[string]interface{})
 		for i, j := range c.Args {
@@ -86,6 +91,9 @@ func (c *Command) SetFieldSelector(labels map[string]string) {
 }
 
 func (c *Command) GetID() string {
+	if len(c.Designators) > 0 {
+		return armotypes.DesignatorsToken
+	}
 	if c.WildWlid != "" {
 		return c.WildWlid
 	}
@@ -103,7 +111,7 @@ func (c *Command) GetID() string {
 
 func (c *Command) Json() string {
 	b, _ := json.Marshal(*c)
-	return fmt.Sprintf("%s", b)
+	return string(b)
 }
 
 func SIDFallback(c *Command) {

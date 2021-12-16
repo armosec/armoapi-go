@@ -18,7 +18,8 @@ type WebsocketScanCommand struct {
 	JobID         string `json:"jobID,omitempty"`
 	LastAction    int    `json:"actionIDN"`
 	// ImageHash     string `json:"imageHash"`
-	Credentials *types.AuthConfig `json:"credentials,omitempty"`
+	Credentials     *types.AuthConfig  `json:"credentials,omitempty"`
+	Credentialslist []types.AuthConfig `json:"credentialsList,omitempty"`
 }
 
 //taken from BE
