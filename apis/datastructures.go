@@ -11,14 +11,16 @@ import (
 // WebsocketScanCommand trigger scan thru the websocket
 type WebsocketScanCommand struct {
 	// CustomerGUID string `json:"customerGUID"`
-	ImageTag      string `json:"imageTag"`
-	Wlid          string `json:"wlid"`
-	IsScanned     bool   `json:"isScanned"`
-	ContainerName string `json:"containerName"`
-	JobID         string `json:"jobID,omitempty"`
-	LastAction    int    `json:"actionIDN"`
-	// ImageHash     string `json:"imageHash"`
-	Credentials *types.AuthConfig `json:"credentials,omitempty"`
+	ImageTag        string             `json:"imageTag"`
+	Wlid            string             `json:"wlid"`
+	IsScanned       bool               `json:"isScanned"`
+	ContainerName   string             `json:"containerName"`
+	JobID           string             `json:"jobID,omitempty"`
+	ParentJobID     string             `json:"parentJobID,omitempty"`
+	LastAction      int                `json:"actionIDN"`
+	ImageHash       string             `json:"imageHash"`
+	Credentials     *types.AuthConfig  `json:"credentials,omitempty"`
+	Credentialslist []types.AuthConfig `json:"credentialsList,omitempty"`
 }
 
 //taken from BE
