@@ -3,7 +3,6 @@ module github.com/armosec/armoapi-go
 go 1.17
 
 require (
-	github.com/armosec/armo-interfaces v0.0.3
 	github.com/armosec/utils-k8s-go v0.0.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/docker/docker v20.10.9+incompatible
