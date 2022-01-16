@@ -97,7 +97,7 @@ type PostureControlSummary struct {
 
 //1 resource per 1 control
 type PostureResource struct {
-	UniqueResourceResult string           `json:"uniqueResourceResult"` // vnf(resourceID + framework + reportID) to allow fast search for aggregation
+	UniqueResourceResult string           `json:"uniqueResourceResult"` // FNV(customerGUID + cluster+resourceID+frameworkName + resource.ReportID) to allow fast search for aggregation
 	Designators          PortalDesignator `json:"designators"`
 	Name                 string           `json:"name"`       // wlid/sid and etc.
 	ResourceID           string           `json:"resourceID"` //as given by kscape
@@ -132,8 +132,11 @@ type PostureResourceSummary struct {
 	ResourceID  string           `json:"resourceID"` //as given by kscape
 
 	//gives upto PostureResourceMaxCtrls controls as an example
-	FailedControl     []string              `json:"failedControls"` // failed+warning controls
-	WarningControls   []string              `json:"warningControls"`
+	FailedControl   []string `json:"failedControls"` // failed+warning controls
+	WarningControls []string `json:"warningControls"`
+	//maps statusText 2 list of controlIDs
+	StatusToControls map[string][]string `json:"statusToControls"`
+
 	HighlightsPerCtrl []HighlightsByControl `json:"highlightsPerControl"`
 
 	//totalcount (including the failed/warning controls slices)
@@ -155,16 +158,32 @@ type PostureResourceSummary struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 
+type PostureAttributesList struct {
+	Attribute string   `json:"attributeName"`
+	Values    []string `json:"values"`
+}
+
 //--------/api/v1/posture/summary
 type PostureSummary struct {
-	RuntimeImprovementPercentage float32          `json:"runtimeImprovementPercentage"`
-	LastRun                      time.Time        `json:"lastRun"`
-	ReportID                     string           `json:"reportGUID"`
-	Designators                  PortalDesignator `json:"designators"`
+	RuntimeImprovementPercentage float32               `json:"runtimeImprovementPercentage"`
+	LastRun                      time.Time             `json:"lastRun"`
+	ReportID                     string                `json:"reportGUID"`
+	Designators                  PortalDesignator      `json:"designators"`
+	PostureAttributes            PostureAttributesList `json:"postureAttributes"`
+	ClusterCloudProvider         string                `json:"clusterCloudProvider"`
 
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
+type PosturePaths struct {
+	FailedPath string `json:"failedPath"`
+}
 
+type PostureReportResultRaw struct {
+	ResourceID            string                `json:"resourceID"`
+	ControlID             string                `json:"controlID"`
+	ControlConfigurations []map[string][]string `json:"controlConfigurations,omitempty"`
+	HighlightsPaths       []PosturePaths        `json:"highlightsPaths"`
+}
 type RawResource struct {
 	Designators  PortalDesignator `json:"designators"`
 	Timestamp    time.Time        `json:"timestamp"`
