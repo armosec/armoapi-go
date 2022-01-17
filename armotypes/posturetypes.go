@@ -7,10 +7,10 @@ import (
 
 const (
 	PostureControlStatusUnknown = 0
-	PostureControlStatusPassed  = iota + 1
-	PostureControlStatusWarning
-	PostureControlStatusFailed
-	PostureControlStatusSkipped
+	PostureControlStatusPassed  = 1
+	PostureControlStatusWarning = 2
+	PostureControlStatusFailed = 3
+	PostureControlStatusSkipped = 4
 
 	PostureResourceMaxCtrls = 4
 )
