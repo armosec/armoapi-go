@@ -9,7 +9,7 @@ const (
 	PostureControlStatusUnknown = 0
 	PostureControlStatusPassed  = 1
 	PostureControlStatusWarning = 2
-	PostureControlStatusFailed = 3
+	PostureControlStatusFailed  = 3
 	PostureControlStatusSkipped = 4
 
 	PostureResourceMaxCtrls = 4
@@ -69,6 +69,11 @@ type PostureContainerSummary struct {
 	ImageTag      string `json:"image,omitempty"`
 }
 
+type ControlInputs struct {
+	Rulename string
+	Inputs   []PostureAttributesList // Attribute = input list name, Values = list values
+}
+
 //----/api/v1/posture/controls
 type PostureControlSummary struct {
 	Designators                    PortalDesignator `json:"designators"`
@@ -93,6 +98,8 @@ type PostureControlSummary struct {
 	Score                          float32          `json:"score"`
 	ScoreFactor                    float32          `json:"baseScore"`
 	ARMOImprovement                float32          `json:"ARMOimprovement"`
+	RelevantCloudProvides          []string         `json:"relevantCloudProvides"`
+	ControlInputs                  []ControlInputs  `json:"controlInputs"`
 }
 
 //---------/api/v1/posture/resources
