@@ -188,10 +188,13 @@ type PosturePaths struct {
 }
 
 type PostureReportResultRaw struct {
-	ResourceID            string                `json:"resourceID"`
-	ControlID             string                `json:"controlID"`
-	ControlConfigurations []map[string][]string `json:"controlConfigurations,omitempty"`
-	HighlightsPaths       []PosturePaths        `json:"highlightsPaths"`
+	Designators           PortalDesignator `json:"designators"`
+	Timestamp             time.Time        `json:"timestamp"`
+	ReportID              string           `json:"reportGUID"`
+	ResourceID            string           `json:"resourceID"`
+	ControlID             string           `json:"controlID"`
+	ControlConfigurations []ControlInputs  `json:"controlConfigurations,omitempty"`
+	HighlightsPaths       []PosturePaths   `json:"highlightsPaths"`
 }
 type RawResource struct {
 	Designators  PortalDesignator `json:"designators"`
