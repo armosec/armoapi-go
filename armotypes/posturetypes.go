@@ -184,9 +184,14 @@ type PostureSummary struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 type PosturePaths struct {
-	FailedPath string `json:"failedPath"`
+	// must have FailedPath or FixPath, not both
+	FailedPath string  `json:"failedPath,omitempty"`
+	FixPath    FixPath `json:"fixPath,omitempty"`
 }
-
+type FixPath struct {
+	Path  string `json:"path"`
+	Value string `json:"value"`
+}
 type PostureReportResultRaw struct {
 	Designators           PortalDesignator `json:"designators"`
 	Timestamp             time.Time        `json:"timestamp"`
