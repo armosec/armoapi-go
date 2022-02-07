@@ -113,6 +113,7 @@ type PostureResource struct {
 
 	ControlName       string                      `json:"controlName"`
 	HighlightPaths    []string                    `json:"highlightPaths"` // specifies "failedPath" - where exactly in the raw resources the control failed
+	FixPaths          []FixPath                   `json:"fixPaths"`       // specifies "fixPaths" - what in the raw resources needs to be added by user
 	ControlID         string                      `json:"controlID"`
 	FrameworkName     string                      `json:"frameworkName"`
 	ControlStatus     int                         `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
@@ -131,8 +132,9 @@ type PostureResource struct {
 }
 
 type HighlightsByControl struct {
-	ControlID  string   `json:"controlID"`
-	Highlights []string `json:"highlights"`
+	ControlID  string    `json:"controlID"`
+	Highlights []string  `json:"highlights"`
+	FixPaths   []FixPath `json:"fixPaths"`
 }
 
 type PostureResourceSummary struct {
