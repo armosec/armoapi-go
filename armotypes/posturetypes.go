@@ -100,6 +100,7 @@ type PostureControlSummary struct {
 	ARMOImprovement                float32          `json:"ARMOimprovement"`
 	RelevantCloudProvides          []string         `json:"relevantCloudProvides"`
 	ControlInputs                  []ControlInputs  `json:"controlInputs"`
+	RBACQuery                      string           `json:"rbacQuery"`
 }
 
 //---------/api/v1/posture/resources
