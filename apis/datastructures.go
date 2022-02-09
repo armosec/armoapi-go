@@ -4,13 +4,49 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/docker/docker/api/types"
 )
 
+/*
+SessionChain
+hold up all related jobIDs, earliest timestamp(command was issued/websocket started to handle it)
+and action title
+
+goal is to provide
+for e.g in vulnerability scan context:
+
+BE/cluster sends websocket request(With jobID ofc - jobid#1)
+websocket takes all the cluster workloads and for each workload it creates jobID_i
+for each container in workload_i it creates jobid_j
+
+so when it sends the scan it sends the normal command object(pre sessionchain) to vulnscan
++
+session: {
+     jobIDs: [jobID#1,jobID_i,jobID_j]
+	 timestamp: <jobID#1 timestamp>
+	 rootJobID: jobID#1
+}
+
+WHy?
+----
+each scan will hold it's own unique sessionChain
+rootJobID will allow customers to find their latest scans issues by cluster/other
+jobIDs will allow them to take all specific workload related for that specific scan
+
+*/
+type SessionChain struct {
+	JobIDs      []string  `json:"jobIDs"`              // all related JobIds in order: eg. grandparent,parent,this
+	Timestamp   time.Time `json:"timestamp"`           //earliest/ timestamp
+	RootJobID   string    `json:"rootJobID,omitempty"` //e,g grandparent
+	ActionTitle string    `json:"action,omitempty"`    //e,g vulnerability-scan
+}
+
 // WebsocketScanCommand trigger scan thru the websocket
 type WebsocketScanCommand struct {
 	// CustomerGUID string `json:"customerGUID"`
+	Session         SessionChain       `json:"session,omitempty"`
 	ImageTag        string             `json:"imageTag"`
 	Wlid            string             `json:"wlid"`
 	IsScanned       bool               `json:"isScanned"`
