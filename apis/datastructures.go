@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/armosec/armoapi-go/armotypes"
 	"github.com/docker/docker/api/types"
 )
 
@@ -41,6 +42,11 @@ type SessionChain struct {
 	Timestamp   time.Time `json:"timestamp"`           //earliest/ timestamp
 	RootJobID   string    `json:"rootJobID,omitempty"` //e,g grandparent
 	ActionTitle string    `json:"action,omitempty"`    //e,g vulnerability-scan
+}
+
+type SessionChainWrapper struct {
+	SessionChain `json:",inline"`
+	Designators  armotypes.PortalDesignator `json:"designators"`
 }
 
 // WebsocketScanCommand trigger scan thru the websocket
