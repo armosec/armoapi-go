@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 
 	oidc "github.com/coreos/go-oidc"
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 
 	// "go.uber.org/zap"
 	"context"
@@ -132,12 +132,12 @@ func getCustomerGUID(tkn *oidc.IDToken, loginDetails *CustomerLoginDetails) (uui
 
 	// if customer name not provided - use default customer
 	if loginDetails.CustomerName == "" && len(customers) > 0 {
-		return uuid.FromString(customers[0].CustomerGUID)
+		return uuid.FromBytes([]byte(customers[0].CustomerGUID))
 	}
 
 	for _, i := range customers {
 		if i.CustomerName == loginDetails.CustomerName {
-			return uuid.FromString(i.CustomerGUID)
+			return uuid.FromBytes([]byte(i.CustomerGUID))
 		}
 	}
 	return uuid.UUID{}, fmt.Errorf("customer name not found in customer list")
