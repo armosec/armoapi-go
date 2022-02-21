@@ -1,9 +1,8 @@
 package apis
 
 import (
+	"github.com/google/uuid"
 	"time"
-
-	"github.com/gofrs/uuid"
 )
 
 // AuthenticationCookie is what it is
