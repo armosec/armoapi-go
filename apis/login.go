@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 
 	oidc "github.com/coreos/go-oidc"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	// "go.uber.org/zap"
 	"context"
