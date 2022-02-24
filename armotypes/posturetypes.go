@@ -6,9 +6,11 @@ import (
 )
 
 const (
-	PostureControlStatusPassed = iota + 1
-	PostureControlStatusWarning
-	PostureControlStatusFailed
+	PostureControlStatusUnknown = 0
+	PostureControlStatusPassed  = 1
+	PostureControlStatusWarning = 2
+	PostureControlStatusFailed  = 3
+	PostureControlStatusSkipped = 4
 
 	PostureResourceMaxCtrls = 4
 )
@@ -67,6 +69,11 @@ type PostureContainerSummary struct {
 	ImageTag      string `json:"image,omitempty"`
 }
 
+type ControlInputs struct {
+	Rulename string
+	Inputs   []PostureAttributesList // Attribute = input list name, Values = list values
+}
+
 //----/api/v1/posture/controls
 type PostureControlSummary struct {
 	Designators                    PortalDesignator `json:"designators"`
@@ -91,46 +98,56 @@ type PostureControlSummary struct {
 	Score                          float32          `json:"score"`
 	ScoreFactor                    float32          `json:"baseScore"`
 	ARMOImprovement                float32          `json:"ARMOimprovement"`
+	RelevantCloudProvides          []string         `json:"relevantCloudProvides"`
+	ControlInputs                  []ControlInputs  `json:"controlInputs"`
 }
 
 //---------/api/v1/posture/resources
 
 //1 resource per 1 control
 type PostureResource struct {
-	UniqueResourceResult string                      `json:"uniqueResourceResult"` // vnf(name + framework + reportID) to allow fast search for aggregation
-	Designators          PortalDesignator            `json:"designators"`
-	Name                 string                      `json:"name"` // wlid/sid and etc.
-	ControlName          string                      `json:"controlName"`
-	HighlightPaths       []string                    `json:"highlightPaths"` // specifies "failedPath" - where exactly in the raw resources the control failed
-	ControlID            string                      `json:"controlID"`
-	FrameworkName        string                      `json:"frameworkName"`
-	ControlStatus        int                         `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
-	ControlStatusText    string                      `json:"controlStatusText"`
-	RelatedExceptions    []PostureExceptionPolicy    `json:"relatedExceptions"` // configured in portal
-	ExceptionApplied     []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
-	ResourceKind         string                      `json:"kind"`
-	ResourceNamespace    string                      `json:"namespace"`
-	Remediation          string                      `json:"remediation"`
-	Images               []PostureContainerSummary   `json:"containers,omitempty"`
-	DeleteStatus         RecordStatus                `json:"deletionStatus,omitempty"`
-	Recommendations      []RecommendationAssociation `json:"recommendations"`
+	UniqueResourceResult string           `json:"uniqueResourceResult"` // FNV(customerGUID + cluster+resourceID+frameworkName + resource.ReportID) to allow fast search for aggregation
+	Designators          PortalDesignator `json:"designators"`
+	Name                 string           `json:"name"`       // wlid/sid and etc.
+	ResourceID           string           `json:"resourceID"` //as given by kscape
+
+	ControlName       string                      `json:"controlName"`
+	HighlightPaths    []string                    `json:"highlightPaths"` // specifies "failedPath" - where exactly in the raw resources the control failed
+	FixPaths          []FixPath                   `json:"fixPaths"`       // specifies "fixPaths" - what in the raw resources needs to be added by user
+	ControlID         string                      `json:"controlID"`
+	FrameworkName     string                      `json:"frameworkName"`
+	ControlStatus     int                         `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
+	ControlStatusText string                      `json:"controlStatusText"`
+	RelatedExceptions []PostureExceptionPolicy    `json:"relatedExceptions"` // configured in portal
+	ExceptionApplied  []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
+	ResourceKind      string                      `json:"kind"`
+	ResourceNamespace string                      `json:"namespace"`
+	Remediation       string                      `json:"remediation"`
+	Images            []PostureContainerSummary   `json:"containers,omitempty"`
+	DeleteStatus      RecordStatus                `json:"deletionStatus,omitempty"`
+	Recommendations   []RecommendationAssociation `json:"recommendations"`
 
 	Timestamp time.Time `json:"timestamp"`
 	ReportID  string    `json:"reportGUID"`
 }
 
 type HighlightsByControl struct {
-	ControlID  string   `json:"controlID"`
-	Highlights []string `json:"highlights"`
+	ControlID  string    `json:"controlID"`
+	Highlights []string  `json:"highlights"`
+	FixPaths   []FixPath `json:"fixPaths"`
 }
 
 type PostureResourceSummary struct {
 	Designators PortalDesignator `json:"designators"`
-	Name        string           `json:"name"` // wlid/sid and etc.
+	Name        string           `json:"name"`       // wlid/sid and etc.
+	ResourceID  string           `json:"resourceID"` //as given by kscape
 
 	//gives upto PostureResourceMaxCtrls controls as an example
-	FailedControl     []string              `json:"failedControls"` // failed+warning controls
-	WarningControls   []string              `json:"warningControls"`
+	FailedControl   []string `json:"failedControls"` // failed+warning controls
+	WarningControls []string `json:"warningControls"`
+	//maps statusText 2 list of controlIDs
+	StatusToControls map[string][]string `json:"statusToControls"`
+
 	HighlightsPerCtrl []HighlightsByControl `json:"highlightsPerControl"`
 
 	//totalcount (including the failed/warning controls slices)
@@ -152,16 +169,40 @@ type PostureResourceSummary struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 
+type PostureAttributesList struct {
+	Attribute string   `json:"attributeName"`
+	Values    []string `json:"values"`
+}
+
 //--------/api/v1/posture/summary
 type PostureSummary struct {
-	RuntimeImprovementPercentage float32          `json:"runtimeImprovementPercentage"`
-	LastRun                      time.Time        `json:"lastRun"`
-	ReportID                     string           `json:"reportGUID"`
-	Designators                  PortalDesignator `json:"designators"`
+	RuntimeImprovementPercentage float32               `json:"runtimeImprovementPercentage"`
+	LastRun                      time.Time             `json:"lastRun"`
+	ReportID                     string                `json:"reportGUID"`
+	Designators                  PortalDesignator      `json:"designators"`
+	PostureAttributes            PostureAttributesList `json:"postureAttributes"`
+	ClusterCloudProvider         string                `json:"clusterCloudProvider"`
 
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
-
+type PosturePaths struct {
+	// must have FailedPath or FixPath, not both
+	FailedPath string  `json:"failedPath,omitempty"`
+	FixPath    FixPath `json:"fixPath,omitempty"`
+}
+type FixPath struct {
+	Path  string `json:"path"`
+	Value string `json:"value"`
+}
+type PostureReportResultRaw struct {
+	Designators           PortalDesignator `json:"designators"`
+	Timestamp             time.Time        `json:"timestamp"`
+	ReportID              string           `json:"reportGUID"`
+	ResourceID            string           `json:"resourceID"`
+	ControlID             string           `json:"controlID"`
+	ControlConfigurations []ControlInputs  `json:"controlConfigurations,omitempty"`
+	HighlightsPaths       []PosturePaths   `json:"highlightsPaths"`
+}
 type RawResource struct {
 	Designators  PortalDesignator `json:"designators"`
 	Timestamp    time.Time        `json:"timestamp"`

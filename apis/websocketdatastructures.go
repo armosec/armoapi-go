@@ -3,6 +3,7 @@ package apis
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/armosec/armoapi-go/armotypes"
 )
@@ -27,9 +28,10 @@ type Command struct {
 }
 
 type JobTracking struct {
-	JobID            string `json:"jobID,omitempty"`
-	ParentID         string `json:"parentAction,omitempty"`
-	LastActionNumber int    `json:"numSeq,omitempty"`
+	JobID            string    `json:"jobID,omitempty"`
+	ParentID         string    `json:"parentAction,omitempty"`
+	LastActionNumber int       `json:"numSeq,omitempty"`
+	Timestamp        time.Time `json:"timestamp,omitempty"`
 }
 
 func (c *Command) DeepCopy() *Command {
