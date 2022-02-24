@@ -6,7 +6,6 @@ require (
 	github.com/armosec/utils-k8s-go v0.0.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/docker/docker v20.10.9+incompatible
-	github.com/golang/glog v1.0.0
 	github.com/google/uuid v1.3.0
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 )
