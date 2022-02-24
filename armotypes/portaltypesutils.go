@@ -2,8 +2,6 @@ package armotypes
 
 import (
 	wlidpkg "github.com/armosec/utils-k8s-go/wlid"
-
-	"github.com/golang/glog"
 )
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
@@ -62,7 +60,8 @@ func (designator *PortalDesignator) DigestPortalDesignator() (string, string, st
 		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), map[string]string{}
 	// case DesignatorSid: // TODO
 	default:
-		glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
+		// TODO - Do not print from here!
+		// glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
 	}
 	return "", "", "", "", nil
 }
@@ -108,7 +107,8 @@ func DigestPortalDesignator(designator *PortalDesignator) (string, string, map[s
 		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), map[string]string{}
 	// case DesignatorSid: // TODO
 	default:
-		glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
+		// TODO - Do not print from here!
+		// glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
 	}
 	return "", "", nil
 }
