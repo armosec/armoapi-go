@@ -166,9 +166,10 @@ type PostureResourceSummary struct {
 	Images                 []PostureContainerSummary   `json:"containers,omitempty"`
 	Recommendations        []RecommendationAssociation `json:"recommendations"`
 
-	Timestamp    time.Time    `json:"timestamp"`
-	ReportID     string       `json:"reportGUID"`
-	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
+	Timestamp     time.Time    `json:"timestamp"`
+	ReportID      string       `json:"reportGUID"`
+	DeleteStatus  RecordStatus `json:"deletionStatus,omitempty"`
+	ArmoBestScore int64        `json:"armoBestScore"`
 }
 
 type PostureAttributesList struct {
