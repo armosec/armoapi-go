@@ -97,9 +97,11 @@ type PostureControlSummary struct {
 	DeleteStatus                   RecordStatus     `json:"deletionStatus,omitempty"`
 	Score                          float32          `json:"score"`
 	ScoreFactor                    float32          `json:"baseScore"`
+	ScoreWeight                    float32          `json:"scoreWeight"`
 	ARMOImprovement                float32          `json:"ARMOimprovement"`
 	RelevantCloudProvides          []string         `json:"relevantCloudProvides"`
 	ControlInputs                  []ControlInputs  `json:"controlInputs"`
+	IsLastScan                     int              `json:"isLastScan"`
 }
 
 //---------/api/v1/posture/resources
@@ -164,9 +166,10 @@ type PostureResourceSummary struct {
 	Images                 []PostureContainerSummary   `json:"containers,omitempty"`
 	Recommendations        []RecommendationAssociation `json:"recommendations"`
 
-	Timestamp    time.Time    `json:"timestamp"`
-	ReportID     string       `json:"reportGUID"`
-	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
+	Timestamp     time.Time    `json:"timestamp"`
+	ReportID      string       `json:"reportGUID"`
+	DeleteStatus  RecordStatus `json:"deletionStatus,omitempty"`
+	ArmoBestScore int64        `json:"armoBestScore"`
 }
 
 type PostureAttributesList struct {
