@@ -22,4 +22,5 @@ const (
 	ENCRYPT           string = "encryptSecret"
 	DECRYPT           string = "decryptSecret"
 	SCAN              string = "scan"
+	SCAN_REGISTRY     string = "scanRegistry"
 )

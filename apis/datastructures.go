@@ -52,17 +52,18 @@ type SessionChainWrapper struct {
 // WebsocketScanCommand trigger scan thru the websocket
 type WebsocketScanCommand struct {
 	// CustomerGUID string `json:"customerGUID"`
-	Session         SessionChain       `json:"session,omitempty"`
-	ImageTag        string             `json:"imageTag"`
-	Wlid            string             `json:"wlid"`
-	IsScanned       bool               `json:"isScanned"`
-	ContainerName   string             `json:"containerName"`
-	JobID           string             `json:"jobID,omitempty"`
-	ParentJobID     string             `json:"parentJobID,omitempty"`
-	LastAction      int                `json:"actionIDN"`
-	ImageHash       string             `json:"imageHash"`
-	Credentials     *types.AuthConfig  `json:"credentials,omitempty"`
-	Credentialslist []types.AuthConfig `json:"credentialsList,omitempty"`
+	Session         SessionChain           `json:"session,omitempty"`
+	ImageTag        string                 `json:"imageTag"`
+	Wlid            string                 `json:"wlid"`
+	IsScanned       bool                   `json:"isScanned"`
+	ContainerName   string                 `json:"containerName"`
+	JobID           string                 `json:"jobID,omitempty"`
+	ParentJobID     string                 `json:"parentJobID,omitempty"`
+	LastAction      int                    `json:"actionIDN"`
+	ImageHash       string                 `json:"imageHash"`
+	Credentials     *types.AuthConfig      `json:"credentials,omitempty"`
+	Credentialslist []types.AuthConfig     `json:"credentialsList,omitempty"`
+	Args            map[string]interface{} `json:"args,omitempty"`
 }
 
 //taken from BE
