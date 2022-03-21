@@ -12,8 +12,9 @@ const (
 	PostureControlStatusFailed     = 3
 	PostureControlStatusSkipped    = 4
 	PostureControlStatusIrrelevant = 5
+	PostureControlStatusError      = 6
 
-	PostureResourceMaxCtrls = 5
+	PostureResourceMaxCtrls = 6
 )
 
 //-------- /api/v1/posture/clustersOvertime response datastructures
