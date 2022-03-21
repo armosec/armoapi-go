@@ -6,13 +6,14 @@ import (
 )
 
 const (
-	PostureControlStatusUnknown = 0
-	PostureControlStatusPassed  = 1
-	PostureControlStatusWarning = 2
-	PostureControlStatusFailed  = 3
-	PostureControlStatusSkipped = 4
+	PostureControlStatusUnknown    = 0
+	PostureControlStatusPassed     = 1
+	PostureControlStatusWarning    = 2
+	PostureControlStatusFailed     = 3
+	PostureControlStatusSkipped    = 4
+	PostureControlStatusIrrelevant = 5
 
-	PostureResourceMaxCtrls = 4
+	PostureResourceMaxCtrls = 5
 )
 
 //-------- /api/v1/posture/clustersOvertime response datastructures
