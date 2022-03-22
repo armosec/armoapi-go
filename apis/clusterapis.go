@@ -4,6 +4,7 @@ package apis
 const (
 	WebsocketScanCommandVersion string = "v1"
 	WebsocketScanCommandPath    string = "scanImage"
+	DBCommandPath               string = "DBCommand"
 )
 
 // commands send via websocket

@@ -66,6 +66,10 @@ type WebsocketScanCommand struct {
 	Args            map[string]interface{} `json:"args,omitempty"`
 }
 
+type DBCommand struct {
+	Commands map[string]interface{} `json:"commands"`
+}
+
 //taken from BE
 // ElasticRespTotal holds the total struct in Elastic array response
 type ElasticRespTotal struct {
