@@ -53,10 +53,11 @@ const (
 	DesignatorsToken      = "designators"
 	AttributeCustomerGUID = "customerGUID"
 
-	AttributeCluster   = "cluster"
-	AttributeNamespace = "namespace"
-	AttributeKind      = "kind"
-	AttributeName      = "name"
+	AttributeCluster       = "cluster"
+	AttributeNamespace     = "namespace"
+	AttributeKind          = "kind"
+	AttributeName          = "name"
+	AttributeContainerName = "containerName"
 )
 
 // PortalDesignator represented single designation options
