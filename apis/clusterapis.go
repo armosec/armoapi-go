@@ -25,3 +25,16 @@ const (
 	SCAN              string = "scan"
 	SCAN_REGISTRY     string = "scanRegistry"
 )
+
+// Supported NotificationTypes
+type NotificationPolicyType string
+
+const (
+	TypeValidateRules          NotificationPolicyType = "validateRules"
+	TypeExecPostureScan        NotificationPolicyType = "execPostureScan"
+	TypeUpdateRules            NotificationPolicyType = "updateRules"
+	TypeRunKubescapeJob        NotificationPolicyType = "runKubescapeJob"
+	TypeSetKubescapeCronJob    NotificationPolicyType = "setKubescapeCronJob"
+	TypeUpdateKubescapeCronJob NotificationPolicyType = "updateKubescapeCronJob"
+	TypeDeleteKubescapeCronJob NotificationPolicyType = "deleteKubescapeCronJob"
+)
