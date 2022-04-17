@@ -34,6 +34,7 @@ const (
 	TypeExecPostureScan        NotificationPolicyType = "execPostureScan"
 	TypeUpdateRules            NotificationPolicyType = "updateRules"
 	TypeRunKubescapeJob        NotificationPolicyType = "runKubescapeJob"
+	TypeRunKubescape           NotificationPolicyType = "kubescapeScan"
 	TypeSetKubescapeCronJob    NotificationPolicyType = "setKubescapeCronJob"
 	TypeUpdateKubescapeCronJob NotificationPolicyType = "updateKubescapeCronJob"
 	TypeDeleteKubescapeCronJob NotificationPolicyType = "deleteKubescapeCronJob"
