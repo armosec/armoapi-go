@@ -39,3 +39,13 @@ const (
 	TypeUpdateKubescapeCronJob NotificationPolicyType = "updateKubescapeCronJob"
 	TypeDeleteKubescapeCronJob NotificationPolicyType = "deleteKubescapeCronJob"
 )
+
+// KubescapeJobParams kubescape triggering cronJob params
+type KubescapeJobParams struct {
+	Name            string `json:"name,omitempty"`
+	ID              string `json:"id,omitempty"`
+	ClusterName     string `json:"clusterName"`
+	FrameworkName   string `json:"frameworkName"`
+	CronTabSchedule string `json:"cronTabSchedule,omitempty"`
+	JobID           string `json:"jobID,omitempty"`
+}
