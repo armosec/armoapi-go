@@ -139,6 +139,7 @@ type HighlightsByControl struct {
 	ControlID  string    `json:"controlID"`
 	Highlights []string  `json:"highlights"`
 	FixPaths   []FixPath `json:"fixPaths"`
+	FixCommand string    `json:"fixCommand"`
 }
 
 type PostureResourceSummary struct {
@@ -194,6 +195,7 @@ type PosturePaths struct {
 	// must have FailedPath or FixPath, not both
 	FailedPath string  `json:"failedPath,omitempty"`
 	FixPath    FixPath `json:"fixPath,omitempty"`
+	FixCommand string  `json:"fixCommand,omitempty"`
 }
 type FixPath struct {
 	Path  string `json:"path"`
