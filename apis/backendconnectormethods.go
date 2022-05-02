@@ -7,7 +7,31 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 )
+
+var globalPublicBackendClient *http.Client
+var globalPublicBackendClientLock = &sync.Mutex{}
+
+func getPublicBackendClient() *http.Client {
+	if globalPublicBackendClient == nil {
+		globalPublicBackendClientLock.Lock()
+		defer globalPublicBackendClientLock.Unlock()
+		if globalPublicBackendClient == nil {
+			globalPublicBackendClient = &http.Client{}
+		}
+	}
+	return globalPublicBackendClient
+}
+
+func MakePublicBackendConnector(baseURL string) (*BackendConnector, error) {
+	publicBackendClient := getPublicBackendClient()
+	if err := ValidatePublicBEConnectorMakerInput(publicBackendClient, baseURL); err != nil {
+		return nil, err
+	}
+	conn := &BackendConnector{BaseURL: baseURL, HTTPClient: publicBackendClient}
+	return conn, nil
+}
 
 func MakeBackendConnector(client *http.Client, baseURL string, loginDetails *CustomerLoginDetails) (*BackendConnector, error) {
 	if err := ValidateBEConnectorMakerInput(client, baseURL, loginDetails); err != nil {
@@ -19,19 +43,25 @@ func MakeBackendConnector(client *http.Client, baseURL string, loginDetails *Cus
 	return conn, err
 }
 
-func ValidateBEConnectorMakerInput(client *http.Client, baseURL string, loginDetails *CustomerLoginDetails) error {
+func ValidatePublicBEConnectorMakerInput(client *http.Client, baseURL string) error {
 	if client == nil {
-		fmt.Errorf("You must provide an initialized httpclient")
+		return fmt.Errorf("You must provide an initialized httpclient")
 	}
 	if len(baseURL) == 0 {
 		return fmt.Errorf("you must provide a valid backend url")
 	}
+	return nil
+}
 
+func ValidateBEConnectorMakerInput(client *http.Client, baseURL string, loginDetails *CustomerLoginDetails) error {
+	var err error
+	if err = ValidatePublicBEConnectorMakerInput(client, baseURL); err != nil {
+		return err
+	}
 	if loginDetails == nil || (len(loginDetails.Email) == 0 && len(loginDetails.Password) == 0) {
 		return fmt.Errorf("you must provide valid login details")
 	}
 	return nil
-
 }
 
 func (r *BackendConnector) Login() error {
@@ -103,10 +133,10 @@ func (r *BackendConnector) HTTPSend(httpverb string,
 
 	loginobj := r.GetLoginObj()
 	req.Header.Set("Authorization", loginobj.Authorization)
-	f(req, qryData)
 	q := req.URL.Query()
 	q.Set("customerGUID", loginobj.GUID)
 	req.URL.RawQuery = q.Encode()
+	f(req, qryData)
 
 	for _, cookie := range loginobj.Cookies {
 		req.AddCookie(cookie)
