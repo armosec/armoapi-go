@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 // HTTPReqFunc allows you to insert query params and more to aggregation message while using update aggregator
@@ -35,6 +37,31 @@ func MapQuery(req *http.Request, qryData interface{}) {
 
 	}
 	req.URL.RawQuery = q.Encode()
+}
+
+func MapQueryWithoutSortKeys(req *http.Request, qryData interface{}) {
+	if qryMap, isok := qryData.(map[string]string); isok {
+		var buf strings.Builder
+		keys := make([]string, 0, len(qryMap))
+		keys = append(keys, "customerGUID")
+		for k := range qryMap {
+			if k == "customerGUID" {
+				continue
+			}
+			keys = append(keys, k)
+		}
+		for _, k := range keys {
+			vs := qryMap[k]
+			keyEscaped := url.QueryEscape(k)
+			if buf.Len() > 0 {
+				buf.WriteByte('&')
+			}
+			buf.WriteString(keyEscaped)
+			buf.WriteByte('=')
+			buf.WriteString(url.QueryEscape(vs))
+		}
+		req.URL.RawQuery = buf.String()
+	}
 }
 
 func BEHttpRequest(loginobj *LoginObject, beURL,

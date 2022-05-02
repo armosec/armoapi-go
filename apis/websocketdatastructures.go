@@ -1,11 +1,10 @@
 package apis
 
 import (
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/armosec/armoapi-go/armotypes"
+	"github.com/docker/docker/api/types"
 )
 
 // Commands list of commands received from websocket
@@ -34,109 +33,38 @@ type JobTracking struct {
 	Timestamp        time.Time `json:"timestamp,omitempty"`
 }
 
-func (c *Command) DeepCopy() *Command {
-	newCommand := &Command{}
-	newCommand.CommandName = c.CommandName
-	newCommand.ResponseID = c.ResponseID
-	newCommand.Wlid = c.Wlid
-	newCommand.WildWlid = c.WildWlid
-	newCommand.Designators = c.Designators
-	if c.Args != nil {
-		newCommand.Args = make(map[string]interface{})
-		for i, j := range c.Args {
-			newCommand.Args[i] = j
-		}
-	}
-	return newCommand
+// WebsocketScanCommand trigger scan thru the websocket
+type WebsocketScanCommand struct {
+	// CustomerGUID string `json:"customerGUID"`
+	Session         SessionChain           `json:"session,omitempty"`
+	ImageTag        string                 `json:"imageTag"`
+	Wlid            string                 `json:"wlid"`
+	IsScanned       bool                   `json:"isScanned"`
+	ContainerName   string                 `json:"containerName"`
+	JobID           string                 `json:"jobID,omitempty"`
+	ParentJobID     string                 `json:"parentJobID,omitempty"`
+	LastAction      int                    `json:"actionIDN"`
+	ImageHash       string                 `json:"imageHash"`
+	Credentials     *types.AuthConfig      `json:"credentials,omitempty"`
+	Credentialslist []types.AuthConfig     `json:"credentialsList,omitempty"`
+	Args            map[string]interface{} `json:"args,omitempty"`
 }
 
-func (c *Command) GetLabels() map[string]string {
-	if c.Args != nil {
-		if ilabels, ok := c.Args["labels"]; ok {
-			labels := map[string]string{}
-			if b, e := json.Marshal(ilabels); e == nil {
-				if e = json.Unmarshal(b, &labels); e == nil {
-					return labels
-				}
-			}
-		}
-	}
-	return map[string]string{}
-}
-
-func (c *Command) SetLabels(labels map[string]string) {
-	if c.Args == nil {
-		c.Args = make(map[string]interface{})
-	}
-	c.Args["labels"] = labels
-}
-
-func (c *Command) GetFieldSelector() map[string]string {
-	if c.Args != nil {
-		if ilabels, ok := c.Args["fieldSelector"]; ok {
-			labels := map[string]string{}
-			if b, e := json.Marshal(ilabels); e == nil {
-				if e = json.Unmarshal(b, &labels); e == nil {
-					return labels
-				}
-			}
-		}
-	}
-	return map[string]string{}
-}
-
-func (c *Command) SetFieldSelector(labels map[string]string) {
-	if c.Args == nil {
-		c.Args = make(map[string]interface{})
-	}
-	c.Args["fieldSelector"] = labels
-}
-
-func (c *Command) GetID() string {
-	if len(c.Designators) > 0 {
-		return armotypes.DesignatorsToken
-	}
-	if c.WildWlid != "" {
-		return c.WildWlid
-	}
-	if c.WildSid != "" {
-		return c.WildSid
-	}
-	if c.Wlid != "" {
-		return c.Wlid
-	}
-	if c.Sid != "" {
-		return c.Sid
-	}
-	return ""
-}
-
-func (c *Command) Json() string {
-	b, _ := json.Marshal(*c)
-	return string(b)
-}
-
-func SIDFallback(c *Command) {
-	if c.GetID() == "" {
-		sid, err := getSIDFromArgs(c.Args)
-		if err != nil || sid == "" {
-			return
-		}
-		c.Sid = sid
-	}
-}
-
-func getSIDFromArgs(args map[string]interface{}) (string, error) {
-	sidInterface, ok := args["sid"]
-	if !ok {
-		return "", nil
-	}
-	sid, ok := sidInterface.(string)
-	if !ok || sid == "" {
-		return "", fmt.Errorf("sid found in args but empty")
-	}
-	// if _, err := secrethandling.SplitSecretID(sid); err != nil {
-	// 	return "", err
-	// }
-	return sid, nil
+type SafeMode struct {
+	Reporter        string `json:"reporter"`                // "Agent"
+	Action          string `json:"action,omitempty"`        // "action"
+	Wlid            string `json:"wlid"`                    // CAA_WLID
+	PodName         string `json:"podName"`                 // CAA_POD_NAME
+	InstanceID      string `json:"instanceID"`              // CAA_POD_NAME
+	ContainerName   string `json:"containerName,omitempty"` // CAA_CONTAINER_NAME
+	ProcessName     string `json:"processName,omitempty"`
+	ProcessID       int    `json:"processID,omitempty"`
+	ProcessCMD      string `json:"processCMD,omitempty"`
+	ComponentGUID   string `json:"componentGUID,omitempty"` // CAA_GUID
+	StatusCode      int    `json:"statusCode"`              // 0/1/2
+	ProcessExitCode int    `json:"processExitCode"`         // 0 +
+	Timestamp       int64  `json:"timestamp"`
+	Message         string `json:"message,omitempty"` // any string
+	JobID           string `json:"jobID,omitempty"`   // any string
+	Compatible      *bool  `json:"compatible,omitempty"`
 }
