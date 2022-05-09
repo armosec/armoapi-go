@@ -68,3 +68,14 @@ type PortalDesignator struct {
 	SID            string            `json:"sid,omitempty"`
 	Attributes     map[string]string `json:"attributes"`
 }
+
+// Worker nodes attribute related consts
+const (
+	WorkerNodesmax                   = "max"
+	WorkerNodeslastReported          = "lastReported"
+	WorkerNodeslastReportDate        = "lastReportDate"
+	WorkerNodesmaxPerMonth           = "maxPerMonth"
+	WorkerNodesmaxReportGUID         = "maxReportGUID"
+	WorkerNodesmaxPerMonthReportGUID = "maxPerMonthReportGUID"
+	WorkerNodeslastReportGUID        = "lastReportGUID"
+)
