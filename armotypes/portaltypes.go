@@ -71,6 +71,7 @@ type PortalDesignator struct {
 
 // Worker nodes attribute related consts
 const (
+	AttributeWorkerNodes             = "workerNodes"
 	WorkerNodesmax                   = "max"
 	WorkerNodeslastReported          = "lastReported"
 	WorkerNodeslastReportDate        = "lastReportDate"
