@@ -104,6 +104,7 @@ type PostureControlSummary struct {
 	RelevantCloudProvides          []string         `json:"relevantCloudProvides"`
 	ControlInputs                  []ControlInputs  `json:"controlInputs"`
 	IsLastScan                     int              `json:"isLastScan"`
+	HighlightPathsCount            int64            `json:"highlightPathsCount"`
 }
 
 //---------/api/v1/posture/resources
