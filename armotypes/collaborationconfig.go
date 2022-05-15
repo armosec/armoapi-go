@@ -5,15 +5,15 @@ package armotypes
 type CollaborationConfigOptionType struct {
 	// Name of the type
 	// Example: cloud
-	Name string `java:"name"`
+	Name string `json:"name"`
 
 	// This is a mandatory option or not
 	// Example: true
-	Required bool `java:"required"`
+	Required bool `json:"required"`
 
 	// Custom input available or not
 	// Example: false
-	CustomInput bool `java:"customInput"`
+	CustomInput bool `json:"customInput"`
 }
 
 // Collaboration provider config option
