@@ -33,7 +33,13 @@ func (c *Command) DeepCopy() *Command {
 func (c *Command) GetLabels() map[string]string {
 	labels := map[string]string{}
 	if f := c.GetArg(commandArgsLabels); f != nil {
-		labels, _ = f.(map[string]string)
+		b, err := json.Marshal(f)
+		if err != nil {
+			return labels
+		}
+		if err := json.Unmarshal(b, &labels); err != nil {
+			return labels
+		}
 	}
 	return labels
 
@@ -46,7 +52,13 @@ func (c *Command) SetLabels(labels map[string]string) {
 func (c *Command) GetFieldSelector() map[string]string {
 	fieldSelector := map[string]string{}
 	if f := c.GetArg(commandArgsFieldSelector); f != nil {
-		fieldSelector, _ = f.(map[string]string)
+		b, err := json.Marshal(f)
+		if err != nil {
+			return fieldSelector
+		}
+		if err := json.Unmarshal(b, &fieldSelector); err != nil {
+			return fieldSelector
+		}
 	}
 	return fieldSelector
 }
@@ -61,7 +73,13 @@ func (c *Command) SetCronJobParams(cjParams CronJobParams) {
 func (c *Command) GetCronJobParams() *CronJobParams {
 	cjParams := &CronJobParams{}
 	if icjParams := c.GetArg(commandArgsJobParams); icjParams != nil {
-		*cjParams, _ = icjParams.(CronJobParams)
+		b, err := json.Marshal(icjParams)
+		if err != nil {
+			return cjParams
+		}
+		if err := json.Unmarshal(b, cjParams); err != nil {
+			return cjParams
+		}
 	}
 	return cjParams
 }
