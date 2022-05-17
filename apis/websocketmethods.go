@@ -6,6 +6,14 @@ import (
 	"github.com/armosec/armoapi-go/armotypes"
 )
 
+const (
+	CommandDeprecatedArgsJobParams string = "kubescapeJobParams"
+
+	commandArgsJobParams     string = "jobParams"
+	commandArgsLabels        string = "labels"
+	commandArgsFieldSelector string = "fieldSelector"
+)
+
 func (c *Command) DeepCopy() *Command {
 	newCommand := &Command{}
 	newCommand.CommandName = c.CommandName
@@ -24,7 +32,7 @@ func (c *Command) DeepCopy() *Command {
 
 func (c *Command) GetLabels() map[string]string {
 	if c.Args != nil {
-		if ilabels, ok := c.Args["labels"]; ok {
+		if ilabels, ok := c.Args[commandArgsLabels]; ok {
 			labels := map[string]string{}
 			if b, e := json.Marshal(ilabels); e == nil {
 				if e = json.Unmarshal(b, &labels); e == nil {
@@ -40,12 +48,12 @@ func (c *Command) SetLabels(labels map[string]string) {
 	if c.Args == nil {
 		c.Args = make(map[string]interface{})
 	}
-	c.Args["labels"] = labels
+	c.Args[commandArgsLabels] = labels
 }
 
 func (c *Command) GetFieldSelector() map[string]string {
 	if c.Args != nil {
-		if ilabels, ok := c.Args["fieldSelector"]; ok {
+		if ilabels, ok := c.Args[commandArgsFieldSelector]; ok {
 			labels := map[string]string{}
 			if b, e := json.Marshal(ilabels); e == nil {
 				if e = json.Unmarshal(b, &labels); e == nil {
@@ -57,11 +65,31 @@ func (c *Command) GetFieldSelector() map[string]string {
 	return map[string]string{}
 }
 
+func (c *Command) SetCronJobParams(cjParams CronJobParams) {
+	if c.Args == nil {
+		c.Args = make(map[string]interface{})
+	}
+	c.Args[commandArgsJobParams] = cjParams
+}
+
+func (c *Command) GetCronJobParams() *CronJobParams {
+	cjParams := &CronJobParams{}
+	if c.Args == nil {
+		return cjParams
+	}
+	icjParams, ok := c.Args[commandArgsJobParams]
+	if !ok {
+		return cjParams
+	}
+	*cjParams, _ = icjParams.(CronJobParams)
+	return cjParams
+}
+
 func (c *Command) SetFieldSelector(labels map[string]string) {
 	if c.Args == nil {
 		c.Args = make(map[string]interface{})
 	}
-	c.Args["fieldSelector"] = labels
+	c.Args[commandArgsFieldSelector] = labels
 }
 
 func (c *Command) GetID() string {
