@@ -31,65 +31,57 @@ func (c *Command) DeepCopy() *Command {
 }
 
 func (c *Command) GetLabels() map[string]string {
-	if c.Args != nil {
-		if ilabels, ok := c.Args[commandArgsLabels]; ok {
-			labels := map[string]string{}
-			if b, e := json.Marshal(ilabels); e == nil {
-				if e = json.Unmarshal(b, &labels); e == nil {
-					return labels
-				}
-			}
-		}
+	labels := map[string]string{}
+	if f := c.GetArg(commandArgsLabels); f != nil {
+		labels, _ = f.(map[string]string)
 	}
-	return map[string]string{}
+	return labels
+
 }
 
 func (c *Command) SetLabels(labels map[string]string) {
-	if c.Args == nil {
-		c.Args = make(map[string]interface{})
-	}
-	c.Args[commandArgsLabels] = labels
+	c.SetArg(commandArgsLabels, labels)
 }
 
 func (c *Command) GetFieldSelector() map[string]string {
-	if c.Args != nil {
-		if ilabels, ok := c.Args[commandArgsFieldSelector]; ok {
-			labels := map[string]string{}
-			if b, e := json.Marshal(ilabels); e == nil {
-				if e = json.Unmarshal(b, &labels); e == nil {
-					return labels
-				}
-			}
-		}
+	fieldSelector := map[string]string{}
+	if f := c.GetArg(commandArgsFieldSelector); f != nil {
+		fieldSelector, _ = f.(map[string]string)
 	}
-	return map[string]string{}
+	return fieldSelector
 }
 
+func (c *Command) SetFieldSelector(labels map[string]string) {
+	c.SetArg(commandArgsFieldSelector, labels)
+}
 func (c *Command) SetCronJobParams(cjParams CronJobParams) {
-	if c.Args == nil {
-		c.Args = make(map[string]interface{})
-	}
-	c.Args[commandArgsJobParams] = cjParams
+	c.SetArg(commandArgsJobParams, cjParams)
 }
 
 func (c *Command) GetCronJobParams() *CronJobParams {
 	cjParams := &CronJobParams{}
-	if c.Args == nil {
-		return cjParams
+	if icjParams := c.GetArg(commandArgsJobParams); icjParams != nil {
+		*cjParams, _ = icjParams.(CronJobParams)
 	}
-	icjParams, ok := c.Args[commandArgsJobParams]
-	if !ok {
-		return cjParams
-	}
-	*cjParams, _ = icjParams.(CronJobParams)
 	return cjParams
 }
 
-func (c *Command) SetFieldSelector(labels map[string]string) {
+func (c *Command) SetArg(key string, value interface{}) {
 	if c.Args == nil {
 		c.Args = make(map[string]interface{})
 	}
-	c.Args[commandArgsFieldSelector] = labels
+	c.Args[key] = value
+}
+
+func (c *Command) GetArg(key string) interface{} {
+	if c.Args == nil {
+		return nil
+	}
+	v, ok := c.Args[key]
+	if !ok {
+		return nil
+	}
+	return v
 }
 
 func (c *Command) GetID() string {

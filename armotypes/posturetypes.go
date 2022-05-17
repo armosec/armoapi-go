@@ -223,3 +223,12 @@ type RawResource struct {
 	RelatedResourcesIDs []string                  `json:"relatedResourcesID,omitempty"`
 	RAW                 json.RawMessage           `json:"object"`
 }
+
+type PostureJobParams struct {
+	Name            string `json:"name,omitempty"`
+	ID              string `json:"id,omitempty"`
+	ClusterName     string `json:"clusterName"`
+	FrameworkName   string `json:"frameworkName"`
+	CronTabSchedule string `json:"cronTabSchedule,omitempty"`
+	JobID           string `json:"jobID,omitempty"`
+}

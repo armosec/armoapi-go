@@ -73,14 +73,6 @@ type SafeMode struct {
 	Compatible      *bool  `json:"compatible,omitempty"`
 }
 
-// // V1KubescapeCronJob object passed as args to kubescape
-// type CronJobParams struct {
-// 	JobParams   JobParams              `json:"jobParams"`             // object for cronJob params
-
-// 	// DEPRECATED
-// 	KubescapeJobParams JobParams              `json:"kubescapeJobParams"` // deprecated
-// }
-
 // CronJobParams parmas for cronJob
 type CronJobParams struct {
 	CronTabSchedule string `json:"cronTabSchedule"`

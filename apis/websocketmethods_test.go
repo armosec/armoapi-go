@@ -17,3 +17,27 @@ func TestCronJobParams(t *testing.T) {
 	cjpr := c.GetCronJobParams()
 	assert.Equal(t, "* * * * *", cjpr.CronTabSchedule)
 }
+
+func TestLabels(t *testing.T) {
+	c := Command{
+		CommandName: TypeAttachWorkload,
+	}
+	cjp := map[string]string{
+		"app": "game",
+	}
+	c.SetLabels(cjp)
+	cjpr := c.GetLabels()
+	assert.Equal(t, "game", cjpr["app"])
+}
+
+func TestFieldSelector(t *testing.T) {
+	c := Command{
+		CommandName: TypeAttachWorkload,
+	}
+	cjp := map[string]string{
+		"app": "game",
+	}
+	c.SetFieldSelector(cjp)
+	cjpr := c.GetFieldSelector()
+	assert.Equal(t, "game", cjpr["app"])
+}
