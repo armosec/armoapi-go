@@ -8,6 +8,7 @@ const (
 )
 
 // commands send via websocket
+// DEPRECATED
 const (
 	UPDATE            string = "update"
 	ATTACH            string = "Attach"
@@ -30,14 +31,29 @@ const (
 type NotificationPolicyType string
 
 const (
-	TypeValidateRules          NotificationPolicyType = "validateRules"
-	TypeExecPostureScan        NotificationPolicyType = "execPostureScan"
-	TypeUpdateRules            NotificationPolicyType = "updateRules"
-	TypeRunKubescapeJob        NotificationPolicyType = "runKubescapeJob"
-	TypeRunKubescape           NotificationPolicyType = "kubescapeScan"
-	TypeSetKubescapeCronJob    NotificationPolicyType = "setKubescapeCronJob"
-	TypeUpdateKubescapeCronJob NotificationPolicyType = "updateKubescapeCronJob"
-	TypeDeleteKubescapeCronJob NotificationPolicyType = "deleteKubescapeCronJob"
+	TypeValidateRules              NotificationPolicyType = "validateRules"
+	TypeExecPostureScan            NotificationPolicyType = "execPostureScan"
+	TypeUpdateRules                NotificationPolicyType = "updateRules"
+	TypeRunKubescapeJob            NotificationPolicyType = "runKubescapeJob"
+	TypeRunKubescape               NotificationPolicyType = "kubescapeScan"
+	TypeSetKubescapeCronJob        NotificationPolicyType = "setKubescapeCronJob"
+	TypeUpdateKubescapeCronJob     NotificationPolicyType = "updateKubescapeCronJob"
+	TypeDeleteKubescapeCronJob     NotificationPolicyType = "deleteKubescapeCronJob"
+	TypeUpdateWorkload             NotificationPolicyType = "update"
+	TypeAttachWorkload             NotificationPolicyType = "Attach"
+	TypeRemoveWorkload             NotificationPolicyType = "remove"
+	TypeDetachWorkload             NotificationPolicyType = "Detach"
+	TypeWorkloadIncompatible       NotificationPolicyType = "Incompatible"
+	TypeSignWorkload               NotificationPolicyType = "sign"
+	TypeClusterUnregistered        NotificationPolicyType = "unregistered"
+	TypeReplaceHeadersInWorkload   NotificationPolicyType = "ReplaceHeaders"
+	TypeImageUnreachableInWorkload NotificationPolicyType = "ImageUnreachable"
+	TypeInjectToWorkload           NotificationPolicyType = "inject"
+	TypeRestartWorkload            NotificationPolicyType = "restart"
+	TypeEncryptSecret              NotificationPolicyType = "encryptSecret"
+	TypeDecryptSecret              NotificationPolicyType = "encryptSecret"
+	TypeScanImages                 NotificationPolicyType = "scan"
+	TypeScanRegistry               NotificationPolicyType = "scanRegistry"
 )
 
 // KubescapeJobParams kubescape triggering cronJob params
