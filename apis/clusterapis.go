@@ -5,6 +5,7 @@ const (
 	WebsocketScanCommandVersion string = "v1"
 	WebsocketScanCommandPath    string = "scanImage"
 	DBCommandPath               string = "DBCommand"
+	ServerReady                 string = "ready"
 )
 
 // commands send via websocket
