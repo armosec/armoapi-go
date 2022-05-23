@@ -58,6 +58,7 @@ const (
 	AttributeKind          = "kind"
 	AttributeName          = "name"
 	AttributeContainerName = "containerName"
+	AttributeApiVersion    = "apiVersion"
 )
 
 // PortalDesignator represented single designation options
