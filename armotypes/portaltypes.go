@@ -59,6 +59,24 @@ const (
 	AttributeName          = "name"
 	AttributeContainerName = "containerName"
 	AttributeApiVersion    = "apiVersion"
+
+	// Repository scan related attributes
+	AttributeRepoName               = "repoName"
+	AttributeRepoOwner              = "repoOwner"
+	AttributeRepoHash               = "repoHash"
+	AttributeBranchName             = "branch"
+	AttributeProvider               = "provider"
+	AttributeRemoteURL              = "remoteURL"
+	AttributeLastCommitHash         = "lastCommitHash"
+	AttributeLastCommitterName      = "lastCommitterName"
+	AttributeLastCommitterEmail     = "lastCommitterEmail"
+	AttributeLastCommitTime         = "lastCommitTime"
+	AttributeDefaultBranch          = "defaultBranch"
+	AttributeFilePath               = "filePath"
+	AttributeLastFileCommitHash     = "lastFileCommitHash"
+	AttributeLastFileCommitterName  = "lastFileCommitterName"
+	AttributeLastFileCommitterEmail = "LastFileCommitterEmail"
+	AttributeLastFileCommitTime     = "lastFileCommitTime"
 )
 
 // PortalDesignator represented single designation options
