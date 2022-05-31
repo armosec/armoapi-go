@@ -39,7 +39,7 @@ type RepoEntitySummary struct {
 	// The key is the status of the control (`failed`, `passed`, etc).
 	// The value is the number of controls
 	// Example: {"failed": 3, "passed": 4}
-	ControlsStats map[string]int
+	ControlsStats map[string]int `json:"controlsStats"`
 
 	// Frameworks that were run.
 	// In multi-frameworks-summary, this property is
