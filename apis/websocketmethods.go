@@ -6,6 +6,14 @@ import (
 	"github.com/armosec/armoapi-go/armotypes"
 )
 
+const (
+	CommandDeprecatedArgsJobParams string = "kubescapeJobParams"
+
+	commandArgsJobParams     string = "jobParams"
+	commandArgsLabels        string = "labels"
+	commandArgsFieldSelector string = "fieldSelector"
+)
+
 func (c *Command) DeepCopy() *Command {
 	newCommand := &Command{}
 	newCommand.CommandName = c.CommandName
@@ -23,45 +31,75 @@ func (c *Command) DeepCopy() *Command {
 }
 
 func (c *Command) GetLabels() map[string]string {
-	if c.Args != nil {
-		if ilabels, ok := c.Args["labels"]; ok {
-			labels := map[string]string{}
-			if b, e := json.Marshal(ilabels); e == nil {
-				if e = json.Unmarshal(b, &labels); e == nil {
-					return labels
-				}
-			}
+	labels := map[string]string{}
+	if f := c.GetArg(commandArgsLabels); f != nil {
+		b, err := json.Marshal(f)
+		if err != nil {
+			return labels
+		}
+		if err := json.Unmarshal(b, &labels); err != nil {
+			return labels
 		}
 	}
-	return map[string]string{}
+	return labels
+
 }
 
 func (c *Command) SetLabels(labels map[string]string) {
-	if c.Args == nil {
-		c.Args = make(map[string]interface{})
-	}
-	c.Args["labels"] = labels
+	c.SetArg(commandArgsLabels, labels)
 }
 
 func (c *Command) GetFieldSelector() map[string]string {
-	if c.Args != nil {
-		if ilabels, ok := c.Args["fieldSelector"]; ok {
-			labels := map[string]string{}
-			if b, e := json.Marshal(ilabels); e == nil {
-				if e = json.Unmarshal(b, &labels); e == nil {
-					return labels
-				}
-			}
+	fieldSelector := map[string]string{}
+	if f := c.GetArg(commandArgsFieldSelector); f != nil {
+		b, err := json.Marshal(f)
+		if err != nil {
+			return fieldSelector
+		}
+		if err := json.Unmarshal(b, &fieldSelector); err != nil {
+			return fieldSelector
 		}
 	}
-	return map[string]string{}
+	return fieldSelector
 }
 
 func (c *Command) SetFieldSelector(labels map[string]string) {
+	c.SetArg(commandArgsFieldSelector, labels)
+}
+func (c *Command) SetCronJobParams(cjParams CronJobParams) {
+	c.SetArg(commandArgsJobParams, cjParams)
+}
+
+func (c *Command) GetCronJobParams() *CronJobParams {
+	cjParams := &CronJobParams{}
+	if icjParams := c.GetArg(commandArgsJobParams); icjParams != nil {
+		b, err := json.Marshal(icjParams)
+		if err != nil {
+			return cjParams
+		}
+		if err := json.Unmarshal(b, cjParams); err != nil {
+			return cjParams
+		}
+	}
+	return cjParams
+}
+
+func (c *Command) SetArg(key string, value interface{}) {
 	if c.Args == nil {
 		c.Args = make(map[string]interface{})
 	}
-	c.Args["fieldSelector"] = labels
+	c.Args[key] = value
+}
+
+func (c *Command) GetArg(key string) interface{} {
+	if c.Args == nil {
+		return nil
+	}
+	v, ok := c.Args[key]
+	if !ok {
+		return nil
+	}
+	return v
 }
 
 func (c *Command) GetID() string {

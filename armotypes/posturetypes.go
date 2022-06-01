@@ -104,6 +104,7 @@ type PostureControlSummary struct {
 	RelevantCloudProvides          []string         `json:"relevantCloudProvides"`
 	ControlInputs                  []ControlInputs  `json:"controlInputs"`
 	IsLastScan                     int              `json:"isLastScan"`
+	HighlightPathsCount            int64            `json:"highlightPathsCount"`
 }
 
 //---------/api/v1/posture/resources
@@ -221,4 +222,13 @@ type RawResource struct {
 	Containers          []PostureContainerSummary `json:"containers,omitempty"`
 	RelatedResourcesIDs []string                  `json:"relatedResourcesID,omitempty"`
 	RAW                 json.RawMessage           `json:"object"`
+}
+
+type PostureJobParams struct {
+	Name            string `json:"name,omitempty"`
+	ID              string `json:"id,omitempty"`
+	ClusterName     string `json:"clusterName"`
+	FrameworkName   string `json:"frameworkName"`
+	CronTabSchedule string `json:"cronTabSchedule,omitempty"`
+	JobID           string `json:"jobID,omitempty"`
 }

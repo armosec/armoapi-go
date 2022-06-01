@@ -146,8 +146,7 @@ func (r *BackendConnector) HTTPSend(httpverb string,
 		return nil, err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		fmt.Printf("req:\n%v\nresp:%v\n", req, resp)
-		return nil, fmt.Errorf("Error #%v Due to: %v", resp.StatusCode, resp.Status)
+		return nil, fmt.Errorf("status code: %d, status: %s", resp.StatusCode, resp.Status)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)

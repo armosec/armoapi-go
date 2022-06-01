@@ -14,16 +14,20 @@ type Commands struct {
 
 // Command structure of command received from websocket
 type Command struct {
-	CommandName string                 `json:"commandName"`
-	ResponseID  string                 `json:"responseID"`
-	Wlid        string                 `json:"wlid,omitempty"`
-	WildWlid    string                 `json:"wildWlid,omitempty"`
-	Sid         string                 `json:"sid,omitempty"`
-	WildSid     string                 `json:"wildSid,omitempty"`
-	JobTracking JobTracking            `json:"jobTracking"`
-	Args        map[string]interface{} `json:"args,omitempty"`
+	// basic command
+	CommandName NotificationPolicyType `json:"commandName"`
+	ResponseID  string                 `json:"responseID,omitempty"`
 
+	// command designators
 	Designators []armotypes.PortalDesignator `json:"designators,omitempty"`
+	Wlid        string                       `json:"wlid,omitempty"`
+	WildWlid    string                       `json:"wildWlid,omitempty"`
+	Sid         string                       `json:"sid,omitempty"`
+	WildSid     string                       `json:"wildSid,omitempty"`
+	JobTracking JobTracking                  `json:"jobTracking,omitempty"`
+
+	// command extra data
+	Args map[string]interface{} `json:"args,omitempty"`
 }
 
 type JobTracking struct {
@@ -67,4 +71,10 @@ type SafeMode struct {
 	Message         string `json:"message,omitempty"` // any string
 	JobID           string `json:"jobID,omitempty"`   // any string
 	Compatible      *bool  `json:"compatible,omitempty"`
+}
+
+// CronJobParams parmas for cronJob
+type CronJobParams struct {
+	CronTabSchedule string `json:"cronTabSchedule"`
+	JobName         string `json:"name,omitempty"`
 }
