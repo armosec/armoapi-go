@@ -8,6 +8,6 @@ type CollabAssignee struct {
 	//example: #abuse(slack)
 	AssigneeName string `json:"assigneeName"`
 
-	//put here properties of the assignee
+	//put here properties of the assignee, ad
 	AdditionalInfo []ArmoContext `json:"additionalInfo"`
 }
