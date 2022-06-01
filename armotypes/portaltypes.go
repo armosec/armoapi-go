@@ -59,20 +59,27 @@ const (
 	AttributeName          = "name"
 	AttributeContainerName = "containerName"
 	AttributeApiVersion    = "apiVersion"
+)
 
-	// Repository scan related attributes
-	AttributeRepoName               = "repoName"
-	AttributeRepoOwner              = "repoOwner"
-	AttributeRepoHash               = "repoHash"
-	AttributeBranchName             = "branch"
-	AttributeProvider               = "provider"
-	AttributeRemoteURL              = "remoteURL"
-	AttributeLastCommitHash         = "lastCommitHash"
-	AttributeLastCommitterName      = "lastCommitterName"
-	AttributeLastCommitterEmail     = "lastCommitterEmail"
-	AttributeLastCommitTime         = "lastCommitTime"
-	AttributeDefaultBranch          = "defaultBranch"
-	AttributeFilePath               = "filePath"
+// Repository scan related attributes
+const (
+	AttributeRepoName      = "repoName"
+	AttributeRepoOwner     = "repoOwner"
+	AttributeRepoHash      = "repoHash"
+	AttributeBranchName    = "branch"
+	AttributeDefaultBranch = "defaultBranch"
+	AttributeProvider      = "provider"
+	AttributeRemoteURL     = "remoteURL"
+
+	AttributeLastCommitHash     = "lastCommitHash"
+	AttributeLastCommitterName  = "lastCommitterName"
+	AttributeLastCommitterEmail = "lastCommitterEmail"
+	AttributeLastCommitTime     = "lastCommitTime"
+
+	AttributeFilePath = "filePath"
+	AttributeFileType = "fileType"
+	AttributeFileDir  = "fileDirectory"
+
 	AttributeLastFileCommitHash     = "lastFileCommitHash"
 	AttributeLastFileCommitterName  = "lastFileCommitterName"
 	AttributeLastFileCommitterEmail = "LastFileCommitterEmail"
