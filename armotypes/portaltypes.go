@@ -50,9 +50,11 @@ func (dt DesignatorType) ToLower() DesignatorType {
 
 // attributes
 const (
-	DesignatorsToken      = "designators"
-	AttributeCustomerGUID = "customerGUID"
-
+	DesignatorsToken       = "designators"
+	AttributeCustomerGUID  = "customerGUID"
+	AttributeRegistryName  = "registryName"
+	AttributeRepository    = "repository"
+	AttributeTag           = "tag"
 	AttributeCluster       = "cluster"
 	AttributeNamespace     = "namespace"
 	AttributeKind          = "kind"

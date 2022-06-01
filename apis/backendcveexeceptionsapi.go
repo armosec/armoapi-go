@@ -9,7 +9,7 @@ import (
 func getCVEExceptionByDEsignator(backendConn *BackendConnector, cusGUID string, designators *armotypes.PortalDesignator) ([]armotypes.VulnerabilityExceptionPolicy, error) {
 
 	var vulnerabilityExceptionPolicy []armotypes.VulnerabilityExceptionPolicy
-	bytes, err := backendConn.HTTPSend("GET", "v1/armoVulnerabilityExceptions", nil, MapQueryWithoutSortKeys, designators.Attributes)
+	bytes, err := backendConn.HTTPSend("GET", "v1/armoVulnerabilityExceptions", nil, MapQueryWithoutSortKeys, false, designators.Attributes)
 	if err != nil {
 		return nil, err
 	}
