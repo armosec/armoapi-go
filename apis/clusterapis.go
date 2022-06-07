@@ -38,4 +38,7 @@ const (
 	TypeDecryptSecret              NotificationPolicyType = "decryptSecret"
 	TypeScanImages                 NotificationPolicyType = "scan"
 	TypeScanRegistry               NotificationPolicyType = "scanRegistry"
+	TypeSetRegistryScanCronJob     NotificationPolicyType = "setRegistryScanCronJob"
+	TypeUpdateRegistryScanCronJob  NotificationPolicyType = "updateRegistryScanCronJob"
+	TypeDeleteRegistryScanCronJob  NotificationPolicyType = "deleteRegistryScanCronJob"
 )
