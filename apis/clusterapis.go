@@ -6,7 +6,6 @@ const (
 	WebsocketScanCommandPath    string = "scanImage"
 	DBCommandPath               string = "DBCommand"
 	ServerReady                 string = "ready"
-	RegistryScanRequiredVersion string = "v1.7.9"
 )
 
 // Supported NotificationTypes

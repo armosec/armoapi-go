@@ -1,5 +1,9 @@
 package armotypes
 
+const (
+	LowestHelmVersionSupportedRegistryScan = "v1.7.9"
+	RegistriInfoArgKey                     = "registryInfo-v1"
+)
 
 type RegistryJobParams struct {
 	Name            string `json:"name,omitempty"`
@@ -13,5 +17,3 @@ type RegistryJobParams struct {
 type RegistriInfoArg struct {
 	RegistryName string `json:"registryName"`
 }
-
-const RegistriInfoArgKey = "registryInfo-v1"
