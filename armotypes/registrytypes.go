@@ -9,3 +9,9 @@ type RegistryJobParams struct {
 	CronTabSchedule string `json:"cronTabSchedule,omitempty"`
 	JobID           string `json:"jobID,omitempty"`
 }
+
+type RegistriInfoArg struct {
+	RegistryName string `json:"registryName"`
+}
+
+const RegistriInfoArgKey = "registryInfo-v1"
