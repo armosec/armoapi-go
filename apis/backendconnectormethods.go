@@ -119,6 +119,7 @@ func (r *BackendConnector) HTTPSend(httpverb string,
 	endpoint string,
 	payload []byte,
 	f HTTPReqFunc,
+	login bool,
 	qryData interface{}) ([]byte, error) {
 
 	beURL := fmt.Sprintf("%v/%v", r.GetBaseURL(), endpoint)
@@ -126,28 +127,29 @@ func (r *BackendConnector) HTTPSend(httpverb string,
 	if err != nil {
 		return nil, err
 	}
-
-	if r.IsExpired() {
-		r.Login()
+	q := req.URL.Query()
+	if login {
+		if r.IsExpired() {
+			if err := r.Login(); err != nil {
+				return nil, err
+			}
+		}
+		loginobj := r.GetLoginObj()
+		req.Header.Set("Authorization", loginobj.Authorization)
+		q.Set("customerGUID", loginobj.GUID)
+		for _, cookie := range loginobj.Cookies {
+			req.AddCookie(cookie)
+		}
 	}
 
-	loginobj := r.GetLoginObj()
-	req.Header.Set("Authorization", loginobj.Authorization)
-	q := req.URL.Query()
-	q.Set("customerGUID", loginobj.GUID)
 	req.URL.RawQuery = q.Encode()
 	f(req, qryData)
-
-	for _, cookie := range loginobj.Cookies {
-		req.AddCookie(cookie)
-	}
 	resp, err := r.GetClient().Do(req)
 	if err != nil {
 		return nil, err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		fmt.Printf("req:\n%v\nresp:%v\n", req, resp)
-		return nil, fmt.Errorf("Error #%v Due to: %v", resp.StatusCode, resp.Status)
+		return nil, fmt.Errorf("status code: %d, status: %s", resp.StatusCode, resp.Status)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)

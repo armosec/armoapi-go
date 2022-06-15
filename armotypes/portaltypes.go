@@ -50,14 +50,42 @@ func (dt DesignatorType) ToLower() DesignatorType {
 
 // attributes
 const (
-	DesignatorsToken      = "designators"
-	AttributeCustomerGUID = "customerGUID"
-
+	DesignatorsToken       = "designators"
+	AttributeCustomerGUID  = "customerGUID"
+	AttributeRegistryName  = "registryName"
+	AttributeRepository    = "repository"
+	AttributeTag           = "tag"
 	AttributeCluster       = "cluster"
 	AttributeNamespace     = "namespace"
 	AttributeKind          = "kind"
 	AttributeName          = "name"
 	AttributeContainerName = "containerName"
+	AttributeApiVersion    = "apiVersion"
+)
+
+// Repository scan related attributes
+const (
+	AttributeRepoName      = "repoName"
+	AttributeRepoOwner     = "repoOwner"
+	AttributeRepoHash      = "repoHash"
+	AttributeBranchName    = "branch"
+	AttributeDefaultBranch = "defaultBranch"
+	AttributeProvider      = "provider"
+	AttributeRemoteURL     = "remoteURL"
+
+	AttributeLastCommitHash     = "lastCommitHash"
+	AttributeLastCommitterName  = "lastCommitterName"
+	AttributeLastCommitterEmail = "lastCommitterEmail"
+	AttributeLastCommitTime     = "lastCommitTime"
+
+	AttributeFilePath = "filePath"
+	AttributeFileType = "fileType"
+	AttributeFileDir  = "fileDirectory"
+
+	AttributeLastFileCommitHash     = "lastFileCommitHash"
+	AttributeLastFileCommitterName  = "lastFileCommitterName"
+	AttributeLastFileCommitterEmail = "LastFileCommitterEmail"
+	AttributeLastFileCommitTime     = "lastFileCommitTime"
 )
 
 // PortalDesignator represented single designation options
@@ -68,3 +96,15 @@ type PortalDesignator struct {
 	SID            string            `json:"sid,omitempty"`
 	Attributes     map[string]string `json:"attributes"`
 }
+
+// Worker nodes attribute related consts
+const (
+	AttributeWorkerNodes             = "workerNodes"
+	WorkerNodesmax                   = "max"
+	WorkerNodeslastReported          = "lastReported"
+	WorkerNodeslastReportDate        = "lastReportDate"
+	WorkerNodesmaxPerMonth           = "maxPerMonth"
+	WorkerNodesmaxReportGUID         = "maxReportGUID"
+	WorkerNodesmaxPerMonthReportGUID = "maxPerMonthReportGUID"
+	WorkerNodeslastReportGUID        = "lastReportGUID"
+)
