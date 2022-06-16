@@ -3,7 +3,7 @@ package apis
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -17,7 +17,7 @@ func getCVEExceptionsURL(backendURL string, cusGUID string, designators *armotyp
 	if err != nil {
 		return nil, err
 	}
-	expURL.Scheme = "http"
+	expURL.Scheme = "https"
 	expURL.Path = path.Join(expURL.Path, "v1/armoVulnerabilityExceptions")
 	qValues := expURL.Query()
 	for k, v := range designators.Attributes {
@@ -45,12 +45,11 @@ func getCVEExceptionByDEsignator(backendURL string, cusGUID string, designators 
 		return nil, fmt.Errorf("getCVEExceptionByDEsignator: resp.StatusCode %d", resp.StatusCode)
 	}
 
-	bodyBytes, err := io.ReadAll(resp.Body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println(string(bodyBytes))
 	err = json.Unmarshal(bodyBytes, &vulnerabilityExceptionPolicy)
 	if err != nil {
 		return nil, err
