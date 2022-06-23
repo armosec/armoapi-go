@@ -78,3 +78,9 @@ type LoginObject struct {
 	Cookies       []*http.Cookie
 	Expires       string
 }
+
+//PaginationMarks for split documents
+type PaginationMarks struct {
+	ReportNumber int  `json:"chunkNumber"` // serial number of report, used in pagination
+	IsLastReport bool `json:"isLastChunk"` //specify this is the last report, used in pagination
+}
