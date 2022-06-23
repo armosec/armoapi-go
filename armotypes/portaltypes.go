@@ -61,6 +61,7 @@ const (
 	AttributeName          = "name"
 	AttributeContainerName = "containerName"
 	AttributeApiVersion    = "apiVersion"
+	AttributeWorkloadHash  = "workloadHash"
 )
 
 // Repository scan related attributes
