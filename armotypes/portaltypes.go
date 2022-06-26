@@ -89,13 +89,15 @@ const (
 	AttributeLastFileCommitTime     = "lastFileCommitTime"
 )
 
+type DesignatorAttributesMap map[string]string
+
 // PortalDesignator represented single designation options
 type PortalDesignator struct {
-	DesignatorType DesignatorType    `json:"designatorType"`
-	WLID           string            `json:"wlid,omitempty"`
-	WildWLID       string            `json:"wildwlid,omitempty"`
-	SID            string            `json:"sid,omitempty"`
-	Attributes     map[string]string `json:"attributes"`
+	DesignatorType DesignatorType          `json:"designatorType"`
+	WLID           string                  `json:"wlid,omitempty"`
+	WildWLID       string                  `json:"wildwlid,omitempty"`
+	SID            string                  `json:"sid,omitempty"`
+	Attributes     DesignatorAttributesMap `json:"attributes"`
 }
 
 // Worker nodes attribute related consts
