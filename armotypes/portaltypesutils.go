@@ -151,6 +151,8 @@ func (designatorMap DesignatorAttributesMap) NKeys() int {
 
 func (designator *PortalDesignator) UnmarshalJSONObject(dec *gojay.Decoder, key string) (err error) {
 	switch key {
+	case "designatorType":
+		err = dec.String((*string)(&designator.DesignatorType))
 	case "attributes":
 		designatorAttributes := DesignatorAttributesMap{}
 		if err = dec.Object(designatorAttributes); err == nil {
@@ -160,5 +162,5 @@ func (designator *PortalDesignator) UnmarshalJSONObject(dec *gojay.Decoder, key 
 	return err
 }
 func (designator *PortalDesignator) NKeys() int {
-	return 1
+	return 2
 }
