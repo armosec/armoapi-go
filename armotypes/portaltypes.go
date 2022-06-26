@@ -62,6 +62,7 @@ const (
 	AttributeContainerName = "containerName"
 	AttributeApiVersion    = "apiVersion"
 	AttributeWorkloadHash  = "workloadHash"
+	AttributeIsIncomplete  = "isIncomplete"
 )
 
 // Repository scan related attributes
