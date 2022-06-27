@@ -135,7 +135,9 @@ func DigestAttributesDesignator(attributes map[string]string) (string, string, m
 	return cluster, namespace, labels
 }
 
-func (designatorMap DesignatorAttributesMap) UnmarshalJSONObject(dec *gojay.Decoder, key string) (err error) {
+type mapString2String map[string]string
+
+func (designatorMap mapString2String) UnmarshalJSONObject(dec *gojay.Decoder, key string) (err error) {
 	str := ""
 	err = dec.AddString(&str)
 	if err != nil {
@@ -145,7 +147,7 @@ func (designatorMap DesignatorAttributesMap) UnmarshalJSONObject(dec *gojay.Deco
 	return nil
 }
 
-func (designatorMap DesignatorAttributesMap) NKeys() int {
+func (designatorMap mapString2String) NKeys() int {
 	return 0
 }
 
@@ -154,7 +156,7 @@ func (designator *PortalDesignator) UnmarshalJSONObject(dec *gojay.Decoder, key 
 	case "designatorType":
 		err = dec.String((*string)(&designator.DesignatorType))
 	case "attributes":
-		designatorAttributes := DesignatorAttributesMap{}
+		designatorAttributes := mapString2String{}
 		if err = dec.Object(designatorAttributes); err == nil {
 			designator.Attributes = designatorAttributes
 		}
