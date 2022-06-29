@@ -1,0 +1,12 @@
+ {
+  "designatorType": "Attributes",
+  "attributes": {
+   "cluster": "myCluster",
+   "containerName": "myContainer",
+   "customerGUID": "e57ec5a0-695f-4777-8366-1c64fada00a0",
+   "kind": "deployment",
+   "name": "myName",
+   "namespace": "myNS",
+   "workloadHash": "8190928904639901517"
+  }
+}

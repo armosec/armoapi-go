@@ -2,6 +2,7 @@ package armotypes
 
 import (
 	wlidpkg "github.com/armosec/utils-k8s-go/wlid"
+	"github.com/francoispqt/gojay"
 )
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
@@ -132,4 +133,36 @@ func DigestAttributesDesignator(attributes map[string]string) (string, string, m
 	}
 
 	return cluster, namespace, labels
+}
+
+type mapString2String map[string]string
+
+func (designatorMap mapString2String) UnmarshalJSONObject(dec *gojay.Decoder, key string) (err error) {
+	str := ""
+	err = dec.AddString(&str)
+	if err != nil {
+		return err
+	}
+	designatorMap[key] = str
+	return nil
+}
+
+func (designatorMap mapString2String) NKeys() int {
+	return 0
+}
+
+func (designator *PortalDesignator) UnmarshalJSONObject(dec *gojay.Decoder, key string) (err error) {
+	switch key {
+	case "designatorType":
+		err = dec.String((*string)(&designator.DesignatorType))
+	case "attributes":
+		designatorAttributes := mapString2String{}
+		if err = dec.Object(designatorAttributes); err == nil {
+			designator.Attributes = designatorAttributes
+		}
+	}
+	return err
+}
+func (designator *PortalDesignator) NKeys() int {
+	return 2
 }
