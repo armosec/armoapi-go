@@ -53,3 +53,47 @@ func TestDesignatorDecoding(t *testing.T) {
 	assert.Equal(t, "e57ec5a0-695f-4777-8366-1c64fada00a0", designator.Attributes[AttributeCustomerGUID])
 	assert.Equal(t, "myContainer", designator.Attributes[AttributeContainerName])
 }
+
+func TestAttributesDesignatorsFromImageTag(t *testing.T) {
+	deisgs := AttributesDesignatorsFromImageTag("docker.elastic.co/elasticsearch/elasticsearch:7.9.2")
+
+	assert.Equal(t, "docker.elastic.co/elasticsearch", deisgs.Attributes[AttributeRegistryName])
+	assert.Equal(t, "elasticsearch", deisgs.Attributes[AttributeRepository])
+	assert.Equal(t, "7.9.2", deisgs.Attributes[AttributeTag])
+	assert.Equal(t, 3, len(deisgs.Attributes))
+
+	deisgs = AttributesDesignatorsFromImageTag("docker.elastic.co/elasticsearch/elasticsearch")
+
+	assert.Equal(t, "docker.elastic.co/elasticsearch", deisgs.Attributes[AttributeRegistryName])
+	assert.Equal(t, "elasticsearch", deisgs.Attributes[AttributeRepository])
+	assert.Equal(t, "", deisgs.Attributes[AttributeTag])
+	assert.Equal(t, 2, len(deisgs.Attributes))
+
+	deisgs = AttributesDesignatorsFromImageTag("docker.elastic.co/elasticsearch")
+
+	assert.Equal(t, "docker.elastic.co", deisgs.Attributes[AttributeRegistryName])
+	assert.Equal(t, "elasticsearch", deisgs.Attributes[AttributeRepository])
+	assert.Equal(t, "", deisgs.Attributes[AttributeTag])
+	assert.Equal(t, 2, len(deisgs.Attributes))
+
+	deisgs = AttributesDesignatorsFromImageTag("docker.elastic.co/")
+
+	assert.Equal(t, "docker.elastic.co", deisgs.Attributes[AttributeRegistryName])
+	assert.Equal(t, "", deisgs.Attributes[AttributeRepository])
+	assert.Equal(t, "", deisgs.Attributes[AttributeTag])
+	assert.Equal(t, 1, len(deisgs.Attributes))
+
+	deisgs = AttributesDesignatorsFromImageTag("docker.elastic.co")
+
+	assert.Equal(t, "docker.elastic.co", deisgs.Attributes[AttributeRegistryName])
+	assert.Equal(t, "", deisgs.Attributes[AttributeRepository])
+	assert.Equal(t, "", deisgs.Attributes[AttributeTag])
+	assert.Equal(t, 1, len(deisgs.Attributes))
+
+	deisgs = AttributesDesignatorsFromImageTag("")
+
+	assert.Equal(t, "", deisgs.Attributes[AttributeRegistryName])
+	assert.Equal(t, "", deisgs.Attributes[AttributeRepository])
+	assert.Equal(t, "", deisgs.Attributes[AttributeTag])
+	assert.Equal(t, 1, len(deisgs.Attributes))
+}

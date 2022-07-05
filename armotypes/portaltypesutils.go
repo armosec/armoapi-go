@@ -1,6 +1,8 @@
 package armotypes
 
 import (
+	"strings"
+
 	wlidpkg "github.com/armosec/utils-k8s-go/wlid"
 	"github.com/francoispqt/gojay"
 )
@@ -165,4 +167,28 @@ func (designator *PortalDesignator) UnmarshalJSONObject(dec *gojay.Decoder, key 
 }
 func (designator *PortalDesignator) NKeys() int {
 	return 2
+}
+
+func AttributesDesignatorsFromImageTag(imageTag string) *PortalDesignator {
+	repoNameStart := strings.LastIndex(imageTag, "/")
+	if repoNameStart < 0 {
+		repoNameStart = len(imageTag)
+	}
+	tagNameStart := strings.LastIndex(imageTag, ":")
+	if tagNameStart < 0 || tagNameStart < repoNameStart {
+		tagNameStart = len(imageTag)
+	}
+	pd := &PortalDesignator{
+		DesignatorType: DesignatorAttributes,
+		Attributes:     make(map[string]string, 3),
+	}
+	pd.Attributes[AttributeRegistryName] = imageTag[:repoNameStart]
+
+	if repoNameStart < len(imageTag)-1 {
+		pd.Attributes[AttributeRepository] = imageTag[repoNameStart+1 : tagNameStart]
+		if tagNameStart < len(imageTag)-1 {
+			pd.Attributes[AttributeTag] = imageTag[tagNameStart+1:]
+		}
+	}
+	return pd
 }
