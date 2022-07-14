@@ -88,6 +88,9 @@ const (
 	AttributeLastFileCommitterName  = "lastFileCommitterName"
 	AttributeLastFileCommitterEmail = "LastFileCommitterEmail"
 	AttributeLastFileCommitTime     = "lastFileCommitTime"
+
+	AttributeUseHTTP       = "useHTTP"
+	AttributeSkipTLSVerify = "skipTLSVerify"
 )
 
 // PortalDesignator represented single designation options
