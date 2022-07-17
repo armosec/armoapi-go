@@ -93,6 +93,14 @@ const (
 	AttributeSkipTLSVerify = "skipTLSVerify"
 )
 
+// rego-library attributes
+const (
+	AttributeImageScanRelated     = "imageScanRelated"
+	AttributeImageRelatedControls = "imageRelatedControls"
+	AttributeHostSensorRule       = "hostSensorRule"
+	AttributeHostSensor           = "hostSensor"
+)
+
 // PortalDesignator represented single designation options
 type PortalDesignator struct {
 	DesignatorType DesignatorType    `json:"designatorType"`
