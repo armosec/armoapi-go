@@ -17,6 +17,24 @@ const (
 	PostureResourceMaxCtrls = 6
 )
 
+// TODO: use CommonSummaryFields in all of the summaries
+
+// swagger:model
+type CommonSummaryFields struct {
+	// The unique id of the report this summary belongs to
+	ReportID GUID `json:"reportGUID"`
+
+	// The designators of this summary
+	Designators *PortalDesignator `json:"designators"`
+
+	// Time of the scan that produced this summary
+	Timestamp time.Time `json:"timestamp"`
+
+	// swagger:ignore
+	// Indication if this summary is marked for deletetion
+	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
+}
+
 //-------- /api/v1/posture/clustersOvertime response datastructures
 type PostureClusterOverTime struct {
 	Designators  PortalDesignator           `json:"designators,omitempty"`
@@ -66,6 +84,35 @@ type PostureFrameworkSummary struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 
+type PostureFrameworkSubsectionSummary struct {
+	CommonSummaryFields `json:",inline"`
+
+	// The name (title) of the subsection
+	// Example: General Policies
+	Name string `json:"name"`
+
+	// The name of the framework this subsection belongs to
+	// Example: CIS
+	Framework string `json:"framework"`
+
+	// Unique id of the subsection inside it's framework
+	// Example: 5.7
+	ID string `json:"id"`
+
+	// Unique id of the parent of this subsection
+	// If this is a root section (means no parent), this field is empty
+	// Example: 5
+	ParentID string `json:"parentID"`
+
+	// Statistics about the controls that were run
+	// The key is the status of the control (`failed`, `passed`, etc).
+	// The value is the number of controls
+	// Example: {"failed": 3, "passed": 4}
+	ControlsStats map[string]uint `json:"controlsStats"`
+
+	// more fields in the future
+}
+
 type PostureContainerSummary struct {
 	ContainerName string `json:"containerName"`
 	ImageTag      string `json:"image,omitempty"`
@@ -89,6 +136,7 @@ type PostureControlSummary struct {
 	PreviousFailedResourcesCount   int              `json:"previousFailedResourcesCount"`
 	PreviousWarningResourcesCount  int              `json:"previousWarningResourcesCount"`
 	Framework                      string           `json:"frameworkName"`
+	FrameworkSubSectionID          []string         `json:"frameworkSubsectionID,omitempty"`
 	Remediation                    string           `json:"remediation"`
 	Status                         int              `json:"status"`
 	StatusText                     string           `json:"statusText"`
