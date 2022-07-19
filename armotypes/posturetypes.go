@@ -95,7 +95,7 @@ type PostureFrameworkSubsectionSummary struct {
 	// Example: CIS
 	Framework string `json:"framework"`
 
-	// Unique id of the subsection inside it's framework
+	// Unique id of the subsection inside its framework
 	// Example: 5.7
 	ID string `json:"id"`
 
