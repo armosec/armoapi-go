@@ -1,7 +1,7 @@
 package armotypes
 
 const (
-	LowestHelmVersionSupportedRegistryScan = "v1.7.9"
+	LowestHelmVersionSupportedRegistryScan = "v1.7.14"
 	RegistriInfoArgKey                     = "registryInfo-v1"
 )
 
