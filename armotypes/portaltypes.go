@@ -83,6 +83,7 @@ const (
 	AttributeFilePath = "filePath"
 	AttributeFileType = "fileType"
 	AttributeFileDir  = "fileDirectory"
+	AttributeFileUrl  = "fileUrl"
 
 	AttributeLastFileCommitHash     = "lastFileCommitHash"
 	AttributeLastFileCommitterName  = "lastFileCommitterName"
