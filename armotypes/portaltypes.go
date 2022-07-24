@@ -80,10 +80,11 @@ const (
 	AttributeLastCommitterEmail = "lastCommitterEmail"
 	AttributeLastCommitTime     = "lastCommitTime"
 
-	AttributeFilePath = "filePath"
-	AttributeFileType = "fileType"
-	AttributeFileDir  = "fileDirectory"
-	AttributeFileUrl  = "fileUrl"
+	AttributeFilePath          = "filePath"
+	AttributeFileType          = "fileType"
+	AttributeFileDir           = "fileDirectory"
+	AttributeFileUrl           = "fileUrl"
+	AttributeFileHelmChartName = "fileHelmChartName"
 
 	AttributeLastFileCommitHash     = "lastFileCommitHash"
 	AttributeLastFileCommitterName  = "lastFileCommitterName"
