@@ -85,8 +85,6 @@ type PostureFrameworkSummary struct {
 }
 
 type PostureFrameworkSubsectionSummary struct {
-	CommonSummaryFields `json:",inline"`
-
 	// The name (title) of the subsection
 	// Example: General Policies
 	Name string `json:"name"`
@@ -99,18 +97,11 @@ type PostureFrameworkSubsectionSummary struct {
 	// Example: 5.7
 	ID string `json:"id"`
 
-	// Unique id of the parent of this subsection
-	// If this is a root section (means no parent), this field is empty
-	// Example: 5
-	ParentID string `json:"parentID"`
-
 	// Statistics about the controls that were run
 	// The key is the status of the control (`failed`, `passed`, etc).
 	// The value is the number of controls
 	// Example: {"failed": 3, "passed": 4}
 	ControlsStats map[string]uint `json:"controlsStats"`
-
-	// more fields in the future
 }
 
 type PostureContainerSummary struct {
