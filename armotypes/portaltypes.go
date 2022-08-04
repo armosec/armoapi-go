@@ -63,7 +63,7 @@ const (
 	AttributeApiVersion    = "apiVersion"
 	AttributeWorkloadHash  = "workloadHash"
 	AttributeIsIncomplete  = "isIncomplete"
-	AttributeSensor        = "clusterName"
+	AttributeSensor        = "sensor"
 )
 
 // Repository scan related attributes
