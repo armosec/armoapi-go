@@ -13,7 +13,8 @@ type CollaborationConfigOptionType struct {
 
 	// Indicates if this option is a mandatory for sharing
 	// Example: true
-	ShareRequired bool `json:"shareRequired"`
+	ShareRequired bool `json:"-"`
+	//TODO set back to `json:"shareRequired"` after updating the schema in the portal
 
 	// Custom input available or not
 	// Example: false
