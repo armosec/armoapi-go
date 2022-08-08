@@ -7,34 +7,57 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
-// Commands list of commands received from websocket
+// Commands contains a collection of commands for the in-cluster components
 type Commands struct {
+	// A list of commands to execute
+	//
+	// Example: [ { "CommandName": "scanRegistry", "args": { "registryInfo-v1": { "registryName": "quay.io/armosec" } } } ]
 	Commands []Command `json:"commands"`
 }
 
-// Command structure of command received from websocket
+// Command describes an individual command for the in-cluster components
 type Command struct {
-	// basic command
+	// Name of the command
+	//
+	// Example: updateRules
 	CommandName NotificationPolicyType `json:"commandName"`
-	ResponseID  string                 `json:"responseID,omitempty"`
+	// ID of the response
+	//
+	// Example: 49cfe0a0-9fab-4e54-a6e4-7b27e566d3cd
+	ResponseID string `json:"responseID,omitempty"`
 
-	// command designators
+	// Designators for the command
+	//
+	// Designators select the targets to which the command applies.
 	Designators []armotypes.PortalDesignator `json:"designators,omitempty"`
 	Wlid        string                       `json:"wlid,omitempty"`
 	WildWlid    string                       `json:"wildWlid,omitempty"`
 	Sid         string                       `json:"sid,omitempty"`
 	WildSid     string                       `json:"wildSid,omitempty"`
-	JobTracking JobTracking                  `json:"jobTracking,omitempty"`
+	// Job tracking context for
+	JobTracking JobTracking `json:"jobTracking,omitempty"`
 
-	// command extra data
+	// Arguments for the command
 	Args map[string]interface{} `json:"args,omitempty"`
 }
 
+// JobTracking describes a context in which the job is executing
+// It is used to track job execution source and context: what spawned it, when and under what circumstances.
 type JobTracking struct {
-	JobID            string    `json:"jobID,omitempty"`
-	ParentID         string    `json:"parentAction,omitempty"`
-	LastActionNumber int       `json:"numSeq,omitempty"`
-	Timestamp        time.Time `json:"timestamp,omitempty"`
+	// ID of the current job
+	//
+	// Example: 0f2c8611-ba99-40e5-af21-2bc3823e3283
+	JobID string `json:"jobID,omitempty"`
+	// ID of the parent job
+	//
+	// Example: 6ecfe560-104c-4e7b-8cd3-ee3cbc3b58fb
+	ParentID string `json:"parentAction,omitempty"`
+	// Number of the last action
+	//
+	// Example: 2
+	LastActionNumber int `json:"numSeq,omitempty"`
+	// Timestamp of the latest action
+	Timestamp time.Time `json:"timestamp,omitempty"`
 }
 
 // WebsocketScanCommand is a command that triggers a scan for vulnerabilities.

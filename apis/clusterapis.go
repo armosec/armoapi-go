@@ -9,19 +9,29 @@ const (
 )
 
 // Supported NotificationTypes
+//
+// swagger:enum NotificationPolicyType
 type NotificationPolicyType string
 
 const (
-	TypeValidateRules              NotificationPolicyType = "validateRules"
-	TypeExecPostureScan            NotificationPolicyType = "execPostureScan"
-	TypeUpdateRules                NotificationPolicyType = "updateRules"
-	TypeRunKubescapeJob            NotificationPolicyType = "runKubescapeJob"
-	TypeRunKubescape               NotificationPolicyType = "kubescapeScan"
-	TypeSetKubescapeCronJob        NotificationPolicyType = "setKubescapeCronJob"
-	TypeUpdateKubescapeCronJob     NotificationPolicyType = "updateKubescapeCronJob"
-	TypeDeleteKubescapeCronJob     NotificationPolicyType = "deleteKubescapeCronJob"
-	TypeSetVulnScanCronJob         NotificationPolicyType = "setVulnScanCronJob"
-	TypeUpdateVulnScanCronJob      NotificationPolicyType = "updateVulnScanCronJob"
+	TypeValidateRules NotificationPolicyType = "validateRules"
+	// Execute a posture scan
+	TypeExecPostureScan NotificationPolicyType = "execPostureScan"
+	TypeUpdateRules     NotificationPolicyType = "updateRules"
+	TypeRunKubescapeJob NotificationPolicyType = "runKubescapeJob"
+	// Trigger a Kubescape scan
+	TypeRunKubescape NotificationPolicyType = "kubescapeScan"
+	// Create a CronJob that runs a Kubescape scan
+	TypeSetKubescapeCronJob NotificationPolicyType = "setKubescapeCronJob"
+	// Update a CronJob that runs a Kubescape scan
+	TypeUpdateKubescapeCronJob NotificationPolicyType = "updateKubescapeCronJob"
+	// Delete a CronJob that runs a Kubescape scan
+	TypeDeleteKubescapeCronJob NotificationPolicyType = "deleteKubescapeCronJob"
+	// Create a CronJob that runs a Vulnerability Scan
+	TypeSetVulnScanCronJob NotificationPolicyType = "setVulnScanCronJob"
+	// Update a CronJob that runs a Vulnerability Scan
+	TypeUpdateVulnScanCronJob NotificationPolicyType = "updateVulnScanCronJob"
+	// Delete a CronJob that runs a Vulnerability Scan
 	TypeDeleteVulnScanCronJob      NotificationPolicyType = "deleteVulnScanCronJob"
 	TypeUpdateWorkload             NotificationPolicyType = "update"
 	TypeAttachWorkload             NotificationPolicyType = "Attach"
@@ -36,9 +46,14 @@ const (
 	TypeRestartWorkload            NotificationPolicyType = "restart"
 	TypeEncryptSecret              NotificationPolicyType = "encryptSecret"
 	TypeDecryptSecret              NotificationPolicyType = "decryptSecret"
-	TypeScanImages                 NotificationPolicyType = "scan"
-	TypeScanRegistry               NotificationPolicyType = "scanRegistry"
-	TypeSetRegistryScanCronJob     NotificationPolicyType = "setRegistryScanCronJob"
-	TypeUpdateRegistryScanCronJob  NotificationPolicyType = "updateRegistryScanCronJob"
-	TypeDeleteRegistryScanCronJob  NotificationPolicyType = "deleteRegistryScanCronJob"
+	// Trigger an image scan
+	TypeScanImages NotificationPolicyType = "scan"
+	// Trigger a registry scan
+	TypeScanRegistry NotificationPolicyType = "scanRegistry"
+	// Create a CronJob that runs registry scans
+	TypeSetRegistryScanCronJob NotificationPolicyType = "setRegistryScanCronJob"
+	// Update a CronJob that runs registry scans
+	TypeUpdateRegistryScanCronJob NotificationPolicyType = "updateRegistryScanCronJob"
+	// Delete a CronJob that runs registry scans
+	TypeDeleteRegistryScanCronJob NotificationPolicyType = "deleteRegistryScanCronJob"
 )
