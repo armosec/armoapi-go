@@ -8,37 +8,46 @@ import (
 )
 
 /*
-SessionChain
-hold up all related jobIDs, earliest timestamp(command was issued/websocket started to handle it)
-and action title
+SessionChain provides the context of a given job.
 
-goal is to provide
-for e.g in vulnerability scan context:
+The goal is to provide context for a given job: its parent jobs, a chain of how the jobs were spawned and some metadata.
 
-BE/cluster sends websocket request(With jobID ofc - jobid#1)
-websocket takes all the cluster workloads and for each workload it creates jobID_i
-for each container in workload_i it creates jobid_j
+Consider a vulnerability scan, for example:
+ - The Backend or cluster sends a websocket request with a Job ID, e.g. jobID_1.
+ - The Websocket takes all the cluster workloads and for each workload it creates a job with ID `jobID_i`.
+ - Then, for each container in `workload_i` it creates a job with ID `jobID_j`.
 
-so when it sends the scan it sends the normal command object(pre sessionchain) to vulnscan
-+
-session: {
-     jobIDs: [jobID#1,jobID_i,jobID_j]
-	 timestamp: <jobID#1 timestamp>
-	 rootJobID: jobID#1
-}
+So when the Websocket sends the scan command, it sends the normal command object (pre Session Chain) to the Vulnerability Scanner
 
-WHy?
-----
-each scan will hold it's own unique sessionChain
-rootJobID will allow customers to find their latest scans issues by cluster/other
-jobIDs will allow them to take all specific workload related for that specific scan
+ session: {
+   "jobIDs": ["jobID_1", "jobID_i", "jobID_j"],
+   "timestamp": "<jobID#1 timestamp>",
+   "rootJobID": "jobID_1"
+ }
 
+This Session Chain is needed so that:
+  - each scan will hold it's own unique sessionChain.
+  - `rootJobID` will allow customers to find their latest scans issues by cluster/other.
+  - `jobID`s will allow customers to take all specific workload related for that specific scan.
 */
 type SessionChain struct {
-	JobIDs      []string  `json:"jobIDs"`              // all related JobIds in order: eg. grandparent,parent,this
-	Timestamp   time.Time `json:"timestamp"`           //earliest/ timestamp
-	RootJobID   string    `json:"rootJobID,omitempty"` //e,g grandparent
-	ActionTitle string    `json:"action,omitempty"`    //e,g vulnerability-scan
+	// All related job IDs in order from the most distant to the closes relative.
+	//
+	// For instance: grandparent → parent → current.
+	//
+	// Example: ["825f0a9e-34a9-4727-b81a-6e1bf3a63725", "c188de09-c6ec-4814-b36a-722dcccea64b"]
+	JobIDs []string `json:"jobIDs"`
+	// The timestamp of the earliest job
+	Timestamp time.Time `json:"timestamp"`
+	// ID of the job that started this chain.
+	//
+	// Example: 825f0a9e-34a9-4727-b81a-6e1bf3a63725
+	// swagger:strfmt uuid4
+	RootJobID string `json:"rootJobID,omitempty"`
+	// Title of the current action being performed
+	//
+	// Example: vulnerability-scan
+	ActionTitle string `json:"action,omitempty"`
 }
 
 type SessionChainWrapper struct {

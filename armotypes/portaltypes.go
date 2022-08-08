@@ -19,25 +19,30 @@ type PortalBase struct {
 	Attributes map[string]interface{} `json:"attributes,omitempty"` // could be string
 }
 
+// Type of the designator
+//
+// swagger:enum DesignatorType
 type DesignatorType string
 
 // Supported designators
 const (
 	DesignatorAttributes DesignatorType = "Attributes"
 	DesignatorAttribute  DesignatorType = "Attribute" // Deprecated
-	/*
-		WorkloadID format.
-		k8s format: wlid://cluster-<cluster>/namespace-<namespace>/<kind>-<name>
-		native format: wlid://datacenter-<datacenter>/project-<project>/native-<name>
-	*/
+	// WorkloadID format.
+	//
+	// Has two formats:
+	//  1. Kubernetes format: wlid://cluster-<cluster>/namespace-<namespace>/<kind>-<name>
+	//  2. Native format: wlid://datacenter-<datacenter>/project-<project>/native-<name>
 	DesignatorWlid DesignatorType = "Wlid"
-	/*
-		Wild card - subset of wlid. e.g.
-		1. Include cluster:
-			wlid://cluster-<cluster>/
-		2. Include cluster and namespace (filter out all other namespaces):
-			wlid://cluster-<cluster>/namespace-<namespace>/
-	*/
+	// A WorkloadID wildcard expression.
+	//
+	// A wildcard expression that includes a cluster:
+	//
+	//  wlid://cluster-<cluster>/
+	//
+	// An expression that includes a cluster and namespace (filters out all other namespaces):
+	//
+	//  wlid://cluster-<cluster>/namespace-<namespace>/
 	DesignatorWildWlid      DesignatorType = "WildWlid"
 	DesignatorWlidContainer DesignatorType = "WlidContainer"
 	DesignatorWlidProcess   DesignatorType = "WlidProcess"
@@ -104,13 +109,17 @@ const (
 	AttributeHostSensor           = "hostSensor"
 )
 
-// PortalDesignator represented single designation options
+// PortalDesignator represents a single designation option
 type PortalDesignator struct {
-	DesignatorType DesignatorType    `json:"designatorType"`
-	WLID           string            `json:"wlid,omitempty"`
-	WildWLID       string            `json:"wildwlid,omitempty"`
-	SID            string            `json:"sid,omitempty"`
-	Attributes     map[string]string `json:"attributes"`
+	DesignatorType DesignatorType `json:"designatorType"`
+	// A specific Workload ID
+	WLID string `json:"wlid,omitempty"`
+	// An expression that describes applicable workload IDs
+	WildWLID string `json:"wildwlid,omitempty"`
+	// A specific Secret ID
+	SID string `json:"sid,omitempty"`
+	// Attributes that describe the targets
+	Attributes map[string]string `json:"attributes"`
 }
 
 // Worker nodes attribute related consts
