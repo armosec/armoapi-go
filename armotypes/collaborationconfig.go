@@ -4,12 +4,17 @@ package armotypes
 // swagger:model CollaborationConfigOptionType
 type CollaborationConfigOptionType struct {
 	// Name of the type
-	// Example: cloud
+	// Example: project
 	Name string `json:"name"`
 
-	// This is a mandatory option or not
+	// Indicates if this option is a mandatory for collaboration configuration
+	// Example: false
+	ConfigRequired bool `json:"required"`
+
+	// Indicates if this option is a mandatory for sharing
 	// Example: true
-	Required bool `json:"required"`
+	ShareRequired bool `json:"-"`
+	//TODO set back to `json:"shareRequired"` after updating the schema in the portal
 
 	// Custom input available or not
 	// Example: false
