@@ -125,11 +125,3 @@ func (c *Command) Json() string {
 	b, _ := json.Marshal(*c)
 	return string(b)
 }
-
-func (safeMode *SafeMode) Json() string {
-	b, err := json.Marshal(*safeMode)
-	if err != nil {
-		return ""
-	}
-	return string(b)
-}

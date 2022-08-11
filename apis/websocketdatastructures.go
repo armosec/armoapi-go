@@ -54,25 +54,6 @@ type WebsocketScanCommand struct {
 	Args            map[string]interface{} `json:"args,omitempty"`
 }
 
-type SafeMode struct {
-	Reporter        string `json:"reporter"`                // "Agent"
-	Action          string `json:"action,omitempty"`        // "action"
-	Wlid            string `json:"wlid"`                    // CAA_WLID
-	PodName         string `json:"podName"`                 // CAA_POD_NAME
-	InstanceID      string `json:"instanceID"`              // CAA_POD_NAME
-	ContainerName   string `json:"containerName,omitempty"` // CAA_CONTAINER_NAME
-	ProcessName     string `json:"processName,omitempty"`
-	ProcessID       int    `json:"processID,omitempty"`
-	ProcessCMD      string `json:"processCMD,omitempty"`
-	ComponentGUID   string `json:"componentGUID,omitempty"` // CAA_GUID
-	StatusCode      int    `json:"statusCode"`              // 0/1/2
-	ProcessExitCode int    `json:"processExitCode"`         // 0 +
-	Timestamp       int64  `json:"timestamp"`
-	Message         string `json:"message,omitempty"` // any string
-	JobID           string `json:"jobID,omitempty"`   // any string
-	Compatible      *bool  `json:"compatible,omitempty"`
-}
-
 // CronJobParams parmas for cronJob
 type CronJobParams struct {
 	CronTabSchedule string `json:"cronTabSchedule"`

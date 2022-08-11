@@ -7,9 +7,7 @@ import (
 )
 
 func TestCronJobParams(t *testing.T) {
-	c := Command{
-		CommandName: TypeRunKubescapeJob,
-	}
+	c := Command{}
 	cjp := CronJobParams{
 		CronTabSchedule: "* * * * *",
 	}
@@ -19,9 +17,7 @@ func TestCronJobParams(t *testing.T) {
 }
 
 func TestLabels(t *testing.T) {
-	c := Command{
-		CommandName: TypeAttachWorkload,
-	}
+	c := Command{}
 	cjp := map[string]string{
 		"app": "game",
 	}
@@ -31,9 +27,7 @@ func TestLabels(t *testing.T) {
 }
 
 func TestFieldSelector(t *testing.T) {
-	c := Command{
-		CommandName: TypeAttachWorkload,
-	}
+	c := Command{}
 	cjp := map[string]string{
 		"app": "game",
 	}
