@@ -1,10 +1,5 @@
 package armotypes
 
-const (
-	LowestHelmVersionSupportedRegistryScan = "v1.7.14"
-	RegistriInfoArgKey                     = "registryInfo-v1"
-)
-
 type RegistryJobParams struct {
 	Name            string `json:"name,omitempty"`
 	ID              string `json:"id,omitempty"`
