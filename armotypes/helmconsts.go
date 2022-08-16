@@ -16,8 +16,16 @@ const (
 	LowestHelmVersionSupportedVulnerabilityScan = "v1.7.17"
 
 	// cronjob template annotation and labels
-	CronJobTemplateAnnotationJobIDKey        = "armo.jobid"
-	CronJobTemplateAnnotationNamespaceKey    = "armo.namespace"
+	CronJobTemplateAnnotationArmoJobIDKeyDeprecated      = "armo.jobid"       // deprecated
+	CronJobTemplateAnnotationArmoCloudJobIDKeyDeprecated = "armo.cloud/jobid" // deprecated
+	CronJobTemplateAnnotationJobIDKey                    = "app.kubescape/job-id"
+
+	CronJobTemplateAnnotationUpdateJobIDDeprecated = "armo.updatejobid" // deprecated
+	CronJobTemplateAnnotationUpdateJobID           = "app.kubescape/update-job-id"
+
+	CronJobTemplateAnnotationNamespaceKeyDeprecated = "armo.namespace" // deprecated
+	CronJobTemplateAnnotationNamespaceKey           = "app.kubescape/namespace"
+
 	CronJobTemplateAnnotationRegistryNameKey = "armo.cloud/registryname"
 	CronJobTemplateAnnotationHostScannerKey  = "armo.host-scanner"
 	CronJobTemplateAnnotationFrameworkKey    = "armo.framework"
