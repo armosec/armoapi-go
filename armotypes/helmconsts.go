@@ -5,7 +5,8 @@ const (
 	ArmoSystemNamespace = "armo-system" // deprecated, kept for backward compatibility
 	KubescapeNamespace  = "kubescape"
 
-	ArmoKollectorContainerName = "armo-collector"
+	ArmoKollectorContainerName = "armo-collector" // deprecated, kept for backward compatibility
+	KollectorContainerName     = "kollector"
 
 	// registry scan
 	LowestHelmVersionSupportedRegistryScan = "v1.7.14"
