@@ -1,0 +1,36 @@
+package armotypes
+
+const (
+	K8sKindCluster   = "Cluster"
+	K8sKindNode      = "Node"
+	K8sKindNamespace = "Namespace"
+	//K8sKindPod         = "Pod"
+	//K8sKindDeployment  = "Deployment"
+	//K8sKindReplicaSet  = "ReplicaSet"
+	//K8sKindStatefulSet = "StatefulSet"
+	//K8sKindDaemonSet   = "DaemonSet"
+	//K8sKindJob         = "Job"
+	//K8sKindCronJob     = "CronJob"
+	//K8sKindService     = "Service"
+	//K8sKindConfigMap   = "ConfigMap"
+	//K8sKindSecret      = "Secret"
+	//K8sKindIngress = "Ingress"
+	//K8sKindNetworkPolicy = "NetworkPolicy"
+	//K8sKindPersistentVolume = "PersistentVolume"
+	//K8sKindPersistentVolumeClaim = "PersistentVolumeClaim"
+	//K8sKindStorageClass = "StorageClass"
+	//K8sKindVolumeAttachment = "VolumeAttachment"
+	//K8sKindRole = "Role"
+	//K8sKindRoleBinding = "RoleBinding"
+	//K8sKindClusterRole = "ClusterRole"
+	//K8sKindClusterRoleBinding = "ClusterRoleBinding"
+	//K8sKindServiceAccount = "ServiceAccount"
+	//K8sKindResourceQuota = "ResourceQuota"
+	//K8sKindLimitRange = "LimitRange"
+
+	K8sApiVersionV1      = "v1"
+	K8sApiVersionRBAC    = "rbac.authorization.k8s.io"
+	K8sApiVersionRBACV1  = K8sApiVersionRBAC + "/" + K8sApiVersionV1
+	K8SApiVersionAppsV1  = "apps/v1"
+	K8SApiVersionBatchV1 = "batch/v1"
+)
