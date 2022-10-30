@@ -69,6 +69,7 @@ const (
 	AttributeWorkloadHash  = "workloadHash"
 	AttributeIsIncomplete  = "isIncomplete"
 	AttributeSensor        = "sensor"
+	AttributePath          = "path"
 )
 
 // Repository scan related attributes

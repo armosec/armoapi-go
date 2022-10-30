@@ -31,53 +31,58 @@ func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
 }
 
 func (designator *PortalDesignator) GetCluster() string {
-	cluster, _, _, _, _ := designator.DigestPortalDesignator()
+	cluster, _, _, _, _, _ := designator.DigestPortalDesignator()
 	return cluster
 }
 
 func (designator *PortalDesignator) GetNamespace() string {
-	_, namespace, _, _, _ := designator.DigestPortalDesignator()
+	_, namespace, _, _, _, _ := designator.DigestPortalDesignator()
 	return namespace
 }
 
 func (designator *PortalDesignator) GetKind() string {
-	_, _, kind, _, _ := designator.DigestPortalDesignator()
+	_, _, kind, _, _, _ := designator.DigestPortalDesignator()
 	return kind
 }
 
 func (designator *PortalDesignator) GetName() string {
-	_, _, _, name, _ := designator.DigestPortalDesignator()
+	_, _, _, name, _, _ := designator.DigestPortalDesignator()
 	return name
 }
+func (designator *PortalDesignator) GetPath() string {
+	_, _, _, _, path, _ := designator.DigestPortalDesignator()
+	return path
+}
 func (designator *PortalDesignator) GetLabels() map[string]string {
-	_, _, _, _, labels := designator.DigestPortalDesignator()
+	_, _, _, _, _, labels := designator.DigestPortalDesignator()
 	return labels
 }
 
 // DigestPortalDesignator - get cluster namespace and labels from designator
-func (designator *PortalDesignator) DigestPortalDesignator() (string, string, string, string, map[string]string) {
+func (designator *PortalDesignator) DigestPortalDesignator() (string, string, string, string, string, map[string]string) {
 	switch designator.DesignatorType {
 	case DesignatorAttributes, DesignatorAttribute:
 		return designator.DigestAttributesDesignator()
 	case DesignatorWlid.ToLower(), DesignatorWildWlid.ToLower():
-		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), map[string]string{}
+		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), "", map[string]string{}
 	// case DesignatorSid: // TODO
 	default:
 		// TODO - Do not print from here!
 		// glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
 	}
-	return "", "", "", "", nil
+	return "", "", "", "", "", nil
 }
 
-func (designator *PortalDesignator) DigestAttributesDesignator() (string, string, string, string, map[string]string) {
+func (designator *PortalDesignator) DigestAttributesDesignator() (string, string, string, string, string, map[string]string) {
 	cluster := ""
 	namespace := ""
 	kind := ""
 	name := ""
+	path := ""
 	labels := map[string]string{}
 	attributes := designator.Attributes
 	if attributes == nil {
-		return cluster, namespace, kind, name, labels
+		return cluster, namespace, kind, name, path, labels
 	}
 	for k, v := range attributes {
 		labels[k] = v
@@ -98,7 +103,11 @@ func (designator *PortalDesignator) DigestAttributesDesignator() (string, string
 		name = v
 		delete(labels, AttributeName)
 	}
-	return cluster, namespace, kind, name, labels
+	if v, ok := attributes[AttributePath]; ok {
+		path = v
+		delete(labels, AttributePath)
+	}
+	return cluster, namespace, kind, name, path, labels
 }
 
 // DigestPortalDesignator DEPRECATED. use designator.DigestPortalDesignator() - get cluster namespace and labels from designator
