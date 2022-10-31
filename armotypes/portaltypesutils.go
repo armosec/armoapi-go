@@ -10,12 +10,12 @@ import (
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
 
 type attributesDesignators struct {
-	cluster   string
-	namespace string
-	kind      string
-	name      string
-	path      string
-	labels    map[string]string
+	Cluster   string
+	Namespace string
+	Kind      string
+	Name      string
+	Path      string
+	Labels    map[string]string
 }
 
 func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
@@ -41,30 +41,30 @@ func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
 
 func (designator *PortalDesignator) GetCluster() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.cluster
+	return attributes.Cluster
 }
 
 func (designator *PortalDesignator) GetNamespace() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.namespace
+	return attributes.Namespace
 }
 
 func (designator *PortalDesignator) GetKind() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.kind
+	return attributes.Kind
 }
 
 func (designator *PortalDesignator) GetName() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.name
+	return attributes.Name
 }
 func (designator *PortalDesignator) GetPath() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.path
+	return attributes.Path
 }
 func (designator *PortalDesignator) GetLabels() map[string]string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.labels
+	return attributes.Labels
 }
 
 // DigestPortalDesignator - get cluster namespace and labels from designator
@@ -84,33 +84,33 @@ func (designator *PortalDesignator) DigestPortalDesignator() attributesDesignato
 
 func (designator *PortalDesignator) DigestAttributesDesignator() attributesDesignators {
 	var attributes attributesDesignators
-	attributes.labels = map[string]string{}
+	attributes.Labels = map[string]string{}
 	attr := designator.Attributes
 	if attr == nil {
 		return attributes
 	}
 	for k, v := range attr {
-		attributes.labels[k] = v
+		attributes.Labels[k] = v
 	}
 	if v, ok := attr[AttributeNamespace]; ok {
-		attributes.namespace = v
-		delete(attributes.labels, AttributeNamespace)
+		attributes.Namespace = v
+		delete(attributes.Labels, AttributeNamespace)
 	}
 	if v, ok := attr[AttributeCluster]; ok {
-		attributes.cluster = v
-		delete(attributes.labels, AttributeCluster)
+		attributes.Cluster = v
+		delete(attributes.Labels, AttributeCluster)
 	}
 	if v, ok := attr[AttributeKind]; ok {
-		attributes.kind = v
-		delete(attributes.labels, AttributeKind)
+		attributes.Kind = v
+		delete(attributes.Labels, AttributeKind)
 	}
 	if v, ok := attr[AttributeName]; ok {
-		attributes.name = v
-		delete(attributes.labels, AttributeName)
+		attributes.Name = v
+		delete(attributes.Labels, AttributeName)
 	}
 	if v, ok := attr[AttributePath]; ok {
-		attributes.path = v
-		delete(attributes.labels, AttributePath)
+		attributes.Path = v
+		delete(attributes.Labels, AttributePath)
 	}
 	return attributes
 }
