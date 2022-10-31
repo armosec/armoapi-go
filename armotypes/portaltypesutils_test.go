@@ -9,6 +9,39 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var attribute = map[string]string{AttributeCluster: "cluster1", AttributeNamespace: "namespace1", AttributeKind: "kind1", AttributeName: "name1", AttributePath: "path1"}
+var portalDesignator = PortalDesignator{DesignatorType: DesignatorAttribute, Attributes: attribute}
+
+func TestGetCluster(t *testing.T) {
+	er := attribute[AttributeCluster]
+	cluster := portalDesignator.GetCluster()
+	assert.Equal(t, er, cluster)
+}
+
+func TestGetNamespace(t *testing.T) {
+	er := attribute[AttributeNamespace]
+	namespace := portalDesignator.GetNamespace()
+	assert.Equal(t, er, namespace)
+}
+
+func TestGetKind(t *testing.T) {
+	er := attribute[AttributeKind]
+	kind := portalDesignator.GetKind()
+	assert.Equal(t, er, kind)
+}
+
+func TestGetName(t *testing.T) {
+	er := attribute[AttributeName]
+	name := portalDesignator.GetName()
+	assert.Equal(t, er, name)
+}
+
+func TestGetPath(t *testing.T) {
+	er := attribute[AttributePath]
+	path := portalDesignator.GetPath()
+	assert.Equal(t, er, path)
+}
+
 func TestAttributesDesignatorsFromWLID(t *testing.T) {
 	attDesig := AttributesDesignatorsFromWLID("wlid://cluster-liortest1/namespace-default/deployment-payment")
 	if attDesig.Attributes[AttributeCluster] != "liortest1" ||
