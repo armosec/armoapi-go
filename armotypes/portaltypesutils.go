@@ -9,6 +9,15 @@ import (
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
 
+type attributesDesignators struct {
+	cluster   string
+	namespace string
+	kind      string
+	name      string
+	path      string
+	labels    map[string]string
+}
+
 func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
 	wlidSlices := wlidpkg.RestoreMicroserviceIDs(wlid)
 	pd := &PortalDesignator{
@@ -31,74 +40,79 @@ func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
 }
 
 func (designator *PortalDesignator) GetCluster() string {
-	cluster, _, _, _, _ := designator.DigestPortalDesignator()
-	return cluster
+	attributes := designator.DigestPortalDesignator()
+	return attributes.cluster
 }
 
 func (designator *PortalDesignator) GetNamespace() string {
-	_, namespace, _, _, _ := designator.DigestPortalDesignator()
-	return namespace
+	attributes := designator.DigestPortalDesignator()
+	return attributes.namespace
 }
 
 func (designator *PortalDesignator) GetKind() string {
-	_, _, kind, _, _ := designator.DigestPortalDesignator()
-	return kind
+	attributes := designator.DigestPortalDesignator()
+	return attributes.kind
 }
 
 func (designator *PortalDesignator) GetName() string {
-	_, _, _, name, _ := designator.DigestPortalDesignator()
-	return name
+	attributes := designator.DigestPortalDesignator()
+	return attributes.name
+}
+func (designator *PortalDesignator) GetPath() string {
+	attributes := designator.DigestPortalDesignator()
+	return attributes.path
 }
 func (designator *PortalDesignator) GetLabels() map[string]string {
-	_, _, _, _, labels := designator.DigestPortalDesignator()
-	return labels
+	attributes := designator.DigestPortalDesignator()
+	return attributes.labels
 }
 
 // DigestPortalDesignator - get cluster namespace and labels from designator
-func (designator *PortalDesignator) DigestPortalDesignator() (string, string, string, string, map[string]string) {
+func (designator *PortalDesignator) DigestPortalDesignator() attributesDesignators {
 	switch designator.DesignatorType {
 	case DesignatorAttributes, DesignatorAttribute:
 		return designator.DigestAttributesDesignator()
 	case DesignatorWlid.ToLower(), DesignatorWildWlid.ToLower():
-		return wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), map[string]string{}
+		return attributesDesignators{wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), "", map[string]string{}}
 	// case DesignatorSid: // TODO
 	default:
 		// TODO - Do not print from here!
 		// glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
 	}
-	return "", "", "", "", nil
+	return attributesDesignators{}
 }
 
-func (designator *PortalDesignator) DigestAttributesDesignator() (string, string, string, string, map[string]string) {
-	cluster := ""
-	namespace := ""
-	kind := ""
-	name := ""
-	labels := map[string]string{}
-	attributes := designator.Attributes
-	if attributes == nil {
-		return cluster, namespace, kind, name, labels
+func (designator *PortalDesignator) DigestAttributesDesignator() attributesDesignators {
+	var attributes attributesDesignators
+	attributes.labels = map[string]string{}
+	attr := designator.Attributes
+	if attr == nil {
+		return attributes
 	}
-	for k, v := range attributes {
-		labels[k] = v
+	for k, v := range attr {
+		attributes.labels[k] = v
 	}
-	if v, ok := attributes[AttributeNamespace]; ok {
-		namespace = v
-		delete(labels, AttributeNamespace)
+	if v, ok := attr[AttributeNamespace]; ok {
+		attributes.namespace = v
+		delete(attributes.labels, AttributeNamespace)
 	}
-	if v, ok := attributes[AttributeCluster]; ok {
-		cluster = v
-		delete(labels, AttributeCluster)
+	if v, ok := attr[AttributeCluster]; ok {
+		attributes.cluster = v
+		delete(attributes.labels, AttributeCluster)
 	}
-	if v, ok := attributes[AttributeKind]; ok {
-		kind = v
-		delete(labels, AttributeKind)
+	if v, ok := attr[AttributeKind]; ok {
+		attributes.kind = v
+		delete(attributes.labels, AttributeKind)
 	}
-	if v, ok := attributes[AttributeName]; ok {
-		name = v
-		delete(labels, AttributeName)
+	if v, ok := attr[AttributeName]; ok {
+		attributes.name = v
+		delete(attributes.labels, AttributeName)
 	}
-	return cluster, namespace, kind, name, labels
+	if v, ok := attr[AttributePath]; ok {
+		attributes.path = v
+		delete(attributes.labels, AttributePath)
+	}
+	return attributes
 }
 
 // DigestPortalDesignator DEPRECATED. use designator.DigestPortalDesignator() - get cluster namespace and labels from designator
