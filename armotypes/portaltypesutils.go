@@ -10,12 +10,36 @@ import (
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
 
 type attributesDesignators struct {
-	Cluster   string
-	Namespace string
-	Kind      string
-	Name      string
-	Path      string
-	Labels    map[string]string
+	cluster   string
+	namespace string
+	kind      string
+	name      string
+	path      string
+	labels    map[string]string
+}
+
+func (ad *attributesDesignators) GetCluster() string {
+	return ad.cluster
+}
+
+func (ad *attributesDesignators) GetNamespace() string {
+	return ad.namespace
+}
+
+func (ad *attributesDesignators) GetKind() string {
+	return ad.kind
+}
+
+func (ad *attributesDesignators) GetName() string {
+	return ad.name
+}
+
+func (ad *attributesDesignators) GetPath() string {
+	return ad.path
+}
+
+func (ad *attributesDesignators) GetLabels() map[string]string {
+	return ad.labels
 }
 
 func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
@@ -41,30 +65,30 @@ func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
 
 func (designator *PortalDesignator) GetCluster() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.Cluster
+	return attributes.cluster
 }
 
 func (designator *PortalDesignator) GetNamespace() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.Namespace
+	return attributes.namespace
 }
 
 func (designator *PortalDesignator) GetKind() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.Kind
+	return attributes.kind
 }
 
 func (designator *PortalDesignator) GetName() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.Name
+	return attributes.name
 }
 func (designator *PortalDesignator) GetPath() string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.Path
+	return attributes.path
 }
 func (designator *PortalDesignator) GetLabels() map[string]string {
 	attributes := designator.DigestPortalDesignator()
-	return attributes.Labels
+	return attributes.labels
 }
 
 // DigestPortalDesignator - get cluster namespace and labels from designator
@@ -84,33 +108,33 @@ func (designator *PortalDesignator) DigestPortalDesignator() attributesDesignato
 
 func (designator *PortalDesignator) DigestAttributesDesignator() attributesDesignators {
 	var attributes attributesDesignators
-	attributes.Labels = map[string]string{}
+	attributes.labels = map[string]string{}
 	attr := designator.Attributes
 	if attr == nil {
 		return attributes
 	}
 	for k, v := range attr {
-		attributes.Labels[k] = v
+		attributes.labels[k] = v
 	}
 	if v, ok := attr[AttributeNamespace]; ok {
-		attributes.Namespace = v
-		delete(attributes.Labels, AttributeNamespace)
+		attributes.namespace = v
+		delete(attributes.labels, AttributeNamespace)
 	}
 	if v, ok := attr[AttributeCluster]; ok {
-		attributes.Cluster = v
-		delete(attributes.Labels, AttributeCluster)
+		attributes.cluster = v
+		delete(attributes.labels, AttributeCluster)
 	}
 	if v, ok := attr[AttributeKind]; ok {
-		attributes.Kind = v
-		delete(attributes.Labels, AttributeKind)
+		attributes.kind = v
+		delete(attributes.labels, AttributeKind)
 	}
 	if v, ok := attr[AttributeName]; ok {
-		attributes.Name = v
-		delete(attributes.Labels, AttributeName)
+		attributes.name = v
+		delete(attributes.labels, AttributeName)
 	}
 	if v, ok := attr[AttributePath]; ok {
-		attributes.Path = v
-		delete(attributes.Labels, AttributePath)
+		attributes.path = v
+		delete(attributes.labels, AttributePath)
 	}
 	return attributes
 }
