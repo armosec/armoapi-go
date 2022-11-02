@@ -18,6 +18,30 @@ type attributesDesignators struct {
 	labels    map[string]string
 }
 
+func (ad *attributesDesignators) GetCluster() string {
+	return ad.cluster
+}
+
+func (ad *attributesDesignators) GetNamespace() string {
+	return ad.namespace
+}
+
+func (ad *attributesDesignators) GetKind() string {
+	return ad.kind
+}
+
+func (ad *attributesDesignators) GetName() string {
+	return ad.name
+}
+
+func (ad *attributesDesignators) GetPath() string {
+	return ad.path
+}
+
+func (ad *attributesDesignators) GetLabels() map[string]string {
+	return ad.labels
+}
+
 func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
 	wlidSlices := wlidpkg.RestoreMicroserviceIDs(wlid)
 	pd := &PortalDesignator{
