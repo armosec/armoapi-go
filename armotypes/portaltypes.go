@@ -14,9 +14,9 @@ const (
 
 // PortalBase holds basic items data from portal BE
 type PortalBase struct {
-	GUID       string                 `json:"guid"`
-	Name       string                 `json:"name"`
-	Attributes map[string]interface{} `json:"attributes,omitempty"` // could be string
+	GUID       string                 `json:"guid" bson:"guid"`
+	Name       string                 `json:"name" bson:"name"`
+	Attributes map[string]interface{} `json:"attributes,omitempty" bson:"attributes,omitempty"` // could be string
 }
 
 // Type of the designator
@@ -112,15 +112,15 @@ const (
 
 // PortalDesignator represents a single designation option
 type PortalDesignator struct {
-	DesignatorType DesignatorType `json:"designatorType"`
+	DesignatorType DesignatorType `json:"designatorType" bson:"designatorType"`
 	// A specific Workload ID
-	WLID string `json:"wlid,omitempty"`
+	WLID string `json:"wlid,omitempty" bson:"wlid,omitempty"`
 	// An expression that describes applicable workload IDs
-	WildWLID string `json:"wildwlid,omitempty"`
+	WildWLID string `json:"wildwlid,omitempty" bson:"wildwlid,omitempty"`
 	// A specific Secret ID
-	SID string `json:"sid,omitempty"`
+	SID string `json:"sid,omitempty" bson:"sid,omitempty"`
 	// Attributes that describe the targets
-	Attributes map[string]string `json:"attributes"`
+	Attributes map[string]string `json:"attributes" bson:"attributes"`
 }
 
 // Worker nodes attribute related consts
@@ -134,3 +134,10 @@ const (
 	WorkerNodesmaxPerMonthReportGUID = "maxPerMonthReportGUID"
 	WorkerNodeslastReportGUID        = "lastReportGUID"
 )
+
+// PortalCluster holds cluster data from portal BE
+type PortalCluster struct {
+	PortalBase       `json:",inline" bson:"inline"`
+	SubscriptionDate string `json:"subscription_date" bson:"subscription_date"`
+	LastLoginDate    string `json:"last_login_date" bson:"last_login_date"`
+}
