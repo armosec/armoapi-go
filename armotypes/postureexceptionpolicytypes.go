@@ -6,19 +6,19 @@ const AlertOnly PostureExceptionPolicyActions = "alertOnly"
 const Disable PostureExceptionPolicyActions = "disable"
 
 type PostureExceptionPolicy struct {
-	PortalBase      `json:",inline"`
-	PolicyType      string                          `json:"policyType"`
-	CreationTime    string                          `json:"creationTime"`
-	Actions         []PostureExceptionPolicyActions `json:"actions"`
-	Resources       []PortalDesignator              `json:"resources"`
-	PosturePolicies []PosturePolicy                 `json:"posturePolicies"`
+	PortalBase      `json:",inline" bson:"inline"`
+	PolicyType      string                          `json:"policyType" bson:"policyType"`
+	CreationTime    string                          `json:"creationTime" bson:"creationTime"`
+	Actions         []PostureExceptionPolicyActions `json:"actions" bson:"actions"`
+	Resources       []PortalDesignator              `json:"resources" bson:"resources"`
+	PosturePolicies []PosturePolicy                 `json:"posturePolicies" bson:"posturePolicies"`
 }
 
 type PosturePolicy struct {
-	FrameworkName string `json:"frameworkName"`
-	ControlName   string `json:"controlName,omitempty"`
-	ControlID     string `json:"controlID,omitempty"`
-	RuleName      string `json:"ruleName,omitempty"`
+	FrameworkName string `json:"frameworkName" bson:"frameworkName"`
+	ControlName   string `json:"controlName,omitempty" bson:"controlName,omitempty"`
+	ControlID     string `json:"controlID,omitempty" bson:"controlID,omitempty"`
+	RuleName      string `json:"ruleName,omitempty" bson:"ruleName,omitempty"`
 }
 
 func (exceptionPolicy *PostureExceptionPolicy) IsAlertOnly() bool {
