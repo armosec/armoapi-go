@@ -113,6 +113,13 @@ type PostureClusterSummary struct {
 	PassedResources   int `json:"passedResources"`
 	FailedResources   int `json:"failedResources"`
 	ExcludedResources int `json:"excludedResources"`
+
+	// Metadata
+	KubescapeVersion  string `json:"kubescapeVersion"`
+	KubernetesVersion string `json:"kubernetesVersion"`
+	WorkerNodeCount   int    `json:"workerNodeCount"`
+	Location          string `json:"location"`
+	CloudProvider     string `json:"cloudProvider"`
 }
 
 type PostureFrameworkSubsectionSummary struct {
