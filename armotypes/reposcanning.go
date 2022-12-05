@@ -70,15 +70,3 @@ type RepoEntitySummary struct {
 	// Recommendations        []RecommendationAssociation `json:"recommendations"`
 	// ArmoBestScore int64        `json:"armoBestScore"`
 }
-
-// ControlInfo Basic information about a control
-type ControlInfo struct {
-
-	// ID of the control
-	// Exmaple: C-0034
-	ID string `json:"id"`
-
-	// How much this control is critical
-	// Example: 6
-	BaseScore float32 `json:"baseScore"`
-}

@@ -120,6 +120,10 @@ type PostureClusterSummary struct {
 	WorkerNodeCount   int    `json:"workerNodeCount"`
 	Location          string `json:"location"`
 	CloudProvider     string `json:"cloudProvider"`
+
+	// Information about the controls that were run on this entity
+	// The key is the status of the control (`failed`, `passed`, etc)
+	ControlsInfo map[string][]ControlInfo `json:"controlsInfo"`
 }
 
 type PostureFrameworkSubsectionSummary struct {
@@ -308,4 +312,20 @@ type PostureJobParams struct {
 	FrameworkName   string `json:"frameworkName"`
 	CronTabSchedule string `json:"cronTabSchedule,omitempty"`
 	JobID           string `json:"jobID,omitempty"`
+}
+
+// ControlInfo Basic information about a control
+type ControlInfo struct {
+
+	// ID of the control
+	// Example: C-0034
+	ID string `json:"id"`
+
+	// How much this control is critical
+	// Example: 6
+	BaseScore float32 `json:"baseScore"`
+
+	// How many failed resources for this control
+	// Example: 3
+	FailedResources int `json:"failedResources"`
 }
