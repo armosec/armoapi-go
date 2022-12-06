@@ -35,7 +35,7 @@ type CommonSummaryFields struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 
-//-------- /api/v1/posture/clustersOvertime response datastructures
+// -------- /api/v1/posture/clustersOvertime response datastructures
 type PostureClusterOverTime struct {
 	Designators  PortalDesignator           `json:"designators,omitempty"`
 	ClusterName  string                     `json:"clusterName"`
@@ -43,7 +43,7 @@ type PostureClusterOverTime struct {
 	DeleteStatus RecordStatus               `json:"deletionStatus,omitempty"`
 }
 
-//Used for elastic
+// Used for elastic
 type PostureFrameworksOverTime struct {
 	ClusterName string `json:"clusterName"`
 
@@ -84,6 +84,48 @@ type PostureFrameworkSummary struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 
+type PostureClusterSummary struct {
+	Score           float32          `json:"score"`
+	TotalControls   int              `json:"totalControls"`
+	FailedControls  int              `json:"failedControls"`
+	WarningControls int              `json:"warningControls"`
+	ReportID        string           `json:"reportGUID"`
+	Designators     PortalDesignator `json:"designators"`
+
+	Timestamp    time.Time    `json:"timestamp"`
+	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
+
+	Frameworks []string `json:"frameworks"`
+
+	// Counters - Failed resources by severity
+	CriticalSeverityResources int `json:"criticalSeverityResources"`
+	HighSeverityResources     int `json:"highSeverityResources"`
+	MediumSeverityResources   int `json:"mediumSeverityResources"`
+	LowSeverityResources      int `json:"lowSeverityResources"`
+
+	// Counters - Failed controls by severity
+	CriticalSeverityControls int `json:"criticalSeverityControls"`
+	HighSeverityControls     int `json:"highSeverityControls"`
+	MediumSeverityControls   int `json:"mediumSeverityControls"`
+	LowSeverityControls      int `json:"lowSeverityControls"`
+
+	// Counters -  Resources by status
+	PassedResources   int `json:"passedResources"`
+	FailedResources   int `json:"failedResources"`
+	ExcludedResources int `json:"excludedResources"`
+
+	// Metadata
+	KubescapeVersion  string `json:"kubescapeVersion"`
+	KubernetesVersion string `json:"kubernetesVersion"`
+	WorkerNodeCount   int    `json:"workerNodeCount"`
+	Location          string `json:"location"`
+	CloudProvider     string `json:"cloudProvider"`
+
+	// Information about the controls that were run on this entity
+	// The key is the status of the control (`failed`, `passed`, etc)
+	ControlsInfo map[string][]ControlInfo `json:"controlsInfo"`
+}
+
 type PostureFrameworkSubsectionSummary struct {
 	// The name (title) of the subsection
 	// Example: General Policies
@@ -114,7 +156,7 @@ type ControlInputs struct {
 	Inputs   []PostureAttributesList // Attribute = input list name, Values = list values
 }
 
-//----/api/v1/posture/controls
+// ----/api/v1/posture/controls
 type PostureControlSummary struct {
 	Designators                    PortalDesignator `json:"designators"`
 	ControlID                      string           `json:"id"` // "C0001"
@@ -148,7 +190,7 @@ type PostureControlSummary struct {
 
 //---------/api/v1/posture/resources
 
-//1 resource per 1 control
+// 1 resource per 1 control
 type PostureResource struct {
 	UniqueResourceResult string           `json:"uniqueResourceResult"` // FNV(customerGUID + cluster+resourceID+frameworkName + resource.ReportID) to allow fast search for aggregation
 	Designators          PortalDesignator `json:"designators"`
@@ -220,7 +262,7 @@ type PostureAttributesList struct {
 	Values    []string `json:"values"`
 }
 
-//--------/api/v1/posture/summary
+// --------/api/v1/posture/summary
 type PostureSummary struct {
 	RuntimeImprovementPercentage float32               `json:"runtimeImprovementPercentage"`
 	LastRun                      time.Time             `json:"lastRun"`
@@ -270,4 +312,20 @@ type PostureJobParams struct {
 	FrameworkName   string `json:"frameworkName"`
 	CronTabSchedule string `json:"cronTabSchedule,omitempty"`
 	JobID           string `json:"jobID,omitempty"`
+}
+
+// ControlInfo Basic information about a control
+type ControlInfo struct {
+
+	// ID of the control
+	// Example: C-0034
+	ID string `json:"id"`
+
+	// How much this control is critical
+	// Example: 6
+	BaseScore float32 `json:"baseScore"`
+
+	// How many failed resources for this control
+	// Example: 3
+	FailedResources int `json:"failedResources"`
 }
