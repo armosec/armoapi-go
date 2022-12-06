@@ -43,4 +43,6 @@ const (
 	TypeUpdateRegistryScanCronJob NotificationPolicyType = "updateRegistryScanCronJob"
 	// Delete a CronJob that runs registry scans
 	TypeDeleteRegistryScanCronJob NotificationPolicyType = "deleteRegistryScanCronJob"
+	TypeTestRegistryConnectivity NotificationPolicyType = "testRegistryConnectivity"
+
 )
