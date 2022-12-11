@@ -9,6 +9,21 @@ type RegistryJobParams struct {
 	JobID           string `json:"jobID,omitempty"`
 }
 
-type RegistriInfoArg struct {
-	RegistryName string `json:"registryName"`
+type RegistryInfo struct {
+	RegistryName     string     `json:"registryName,omitempty"`
+	RegistryProvider string     `json:"registryProvider,omitempty"`
+	RegistryToken    string     `json:"registryToken,omitempty"`
+	Depth            int        `json:"depth,omitempty"`
+	Include          []string   `json:"include,omitempty"`
+	Exclude          []string   `json:"exclude,omitempty"`
+	Kind             string     `json:"kind,omitempty"`
+	IsHTTPs          bool       `json:"isHTTPs,omitempty"`
+	SkipTLS          bool       `json:"skipTLS,omitempty"`
+	AuthMethod       AuthMethod `json:"authMethod,omitempty"`
+}
+
+type AuthMethod struct {
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	Type     string `json:"type,omitempty"`
 }
