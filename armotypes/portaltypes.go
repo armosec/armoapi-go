@@ -1,6 +1,8 @@
 package armotypes
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	CustomerGuidQuery   = "customerGUID"
@@ -140,4 +142,16 @@ type PortalCluster struct {
 	PortalBase       `json:",inline" bson:"inline"`
 	SubscriptionDate string `json:"subscription_date" bson:"subscription_date"`
 	LastLoginDate    string `json:"last_login_date" bson:"last_login_date"`
+}
+
+type PortalCustomer struct {
+	PortalBase       `json:",inline" bson:"inline"`
+	Description      string `json:"description" bson:"description"`
+	SubscriptionDate string `json:"subscription_date" bson:"subscription_date"`
+	LastLoginDate    string `json:"last_login_date" bson:"last_login_date"`
+	Email            string `json:"email" bson:"email"`
+	//License
+	LicenseType            string `json:"license_type" bson:"license_type"`
+	SubscriptionExpiration string `json:"subscription_expiration" bson:"subscription_expiration"`
+	InitialLicenseType     string `json:"initial_license_type" bson:"initial_license_type"`
 }
