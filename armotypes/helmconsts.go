@@ -9,6 +9,7 @@ const (
 	KollectorContainerName     = "kollector"
 
 	// registry scan
+	LowestHelmVersionSupportedRegistryScanAndTest = "v1.9"
 	LowestHelmVersionSupportedRegistryScan = "v1.7.14"
 	RegistryInfoArgKey                     = "registryInfo-v1"
 	RegistryScanSecretName                 = "kubescape-registry-scan"
