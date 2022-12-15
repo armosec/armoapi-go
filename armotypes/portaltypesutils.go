@@ -230,3 +230,23 @@ func AttributesDesignatorsFromImageTag(imageTag string) *PortalDesignator {
 	}
 	return pd
 }
+
+// Getters & Setter used by derived types for interfaces implementation
+func (p *PortalBase) GetGUID() string {
+	return p.GUID
+}
+func (p *PortalBase) SetGUID(guid string) {
+	p.GUID = guid
+}
+func (p *PortalBase) GetName() string {
+	return p.Name
+}
+func (p *PortalBase) SetName(name string) {
+	p.Name = name
+}
+func (p *PortalBase) GetAttributes() map[string]interface{} {
+	return p.Attributes
+}
+func (p *PortalBase) SetAttributes(attributes map[string]interface{}) {
+	p.Attributes = attributes
+}

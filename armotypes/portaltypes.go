@@ -155,3 +155,12 @@ type PortalCustomer struct {
 	SubscriptionExpiration string `json:"subscription_expiration" bson:"subscription_expiration"`
 	InitialLicenseType     string `json:"initial_license_type" bson:"initial_license_type"`
 }
+
+type PortalRepository struct {
+	PortalBase   `json:",inline" bson:"inline"`
+	CreationDate string `json:"creationDate" bson:"creationDate"`
+	Provider     string `json:"provider" bson:"provider"`
+	Owner        string `json:"owner" bson:"owner"`
+	RepoName     string `json:"repoName" bson:"repoName"`
+	BranchName   string `json:"branchName" bson:"branchName"`
+}
