@@ -124,6 +124,11 @@ type PostureClusterSummary struct {
 	// Information about the controls that were run on this entity
 	// The key is the status of the control (`failed`, `passed`, etc)
 	ControlsInfo map[string][]ControlInfo `json:"controlsInfo"`
+
+	// Names of the cluster
+	FullName   string `json:"clusterFullName"`
+	ShortName  string `json:"clusterShortName"`
+	PrefixName string `json:"clusterPrefixName"`
 }
 
 type PostureFrameworkSubsectionSummary struct {
