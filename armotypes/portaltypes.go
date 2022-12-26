@@ -19,6 +19,7 @@ type PortalBase struct {
 	GUID       string                 `json:"guid" bson:"guid"`
 	Name       string                 `json:"name" bson:"name"`
 	Attributes map[string]interface{} `json:"attributes,omitempty" bson:"attributes,omitempty"` // could be string
+	UpdateDate string                 `json:"updateDate,omitempty" bson:"updateDate,omitempty"`
 }
 
 // Type of the designator
@@ -168,7 +169,9 @@ type PortalRepository struct {
 type PortalRegistryCronJob struct {
 	PortalBase      `json:",inline" bson:"inline"`
 	RegistryInfo    `json:",inline" bson:"inline"`
-	ID              string `json:"id" bson:"id"`
-	ClusterName     string `json:"clusterName" bson:"clusterName"`
-	CronTabSchedule string `json:"cronTabSchedule" bson:"cronTabSchedule"`
+	CreationDate    string       `json:"creationDate" bson:"creationDate"`
+	ID              string       `json:"id" bson:"id"`
+	ClusterName     string       `json:"clusterName" bson:"clusterName"`
+	CronTabSchedule string       `json:"cronTabSchedule" bson:"cronTabSchedule"`
+	Repositories    []Repository `json:"repositories" bson:"repositories"`
 }
