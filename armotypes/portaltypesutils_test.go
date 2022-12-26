@@ -44,28 +44,27 @@ func TestGetPath(t *testing.T) {
 }
 
 func TestSetUpdatedTime(t *testing.T) {
-	now := time.Now().UTC().Format(time.RFC3339)
+	now := time.Now()
+	nowString := now.UTC().Format(time.RFC3339)
+	
+	validDateString:= "2022-12-26T15:05:23Z"
+	validDate, _ := time.Parse(time.RFC3339, validDateString)
 
 	type testCase struct {
 		name     string
-		time     string
+		time     *time.Time
 		expected PortalBase
 	}
 	testTable := []testCase{
 		{
 			name:     "valid time",
-			time:     "2022-12-26T15:05:23Z",
-			expected: PortalBase{UpdatedTime: "2022-12-26T15:05:23Z"},
+			time:     &validDate,
+			expected: PortalBase{UpdatedTime: validDateString},
 		},
 		{
 			name:     "default time",
-			time:     "",
-			expected: PortalBase{UpdatedTime: now},
-		},
-		{
-			name:     "invalid time",
-			time:     "invalid time string",
-			expected: PortalBase{UpdatedTime: now},
+			time:     nil,
+			expected: PortalBase{UpdatedTime: nowString},
 		},
 	}
 
