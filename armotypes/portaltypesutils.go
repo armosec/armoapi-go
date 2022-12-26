@@ -2,6 +2,7 @@ package armotypes
 
 import (
 	"strings"
+	"time"
 
 	wlidpkg "github.com/armosec/utils-k8s-go/wlid"
 	"github.com/francoispqt/gojay"
@@ -249,4 +250,12 @@ func (p *PortalBase) GetAttributes() map[string]interface{} {
 }
 func (p *PortalBase) SetAttributes(attributes map[string]interface{}) {
 	p.Attributes = attributes
+}
+
+func (p *PortalBase) SetUpdatedTime(updatedTime *time.Time) {
+	if updatedTime == nil {
+		p.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
+		return
+	}
+	p.UpdatedTime = updatedTime.UTC().Format(time.RFC3339)
 }
