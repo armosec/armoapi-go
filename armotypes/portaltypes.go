@@ -164,3 +164,11 @@ type PortalRepository struct {
 	RepoName     string `json:"repoName" bson:"repoName"`
 	BranchName   string `json:"branchName" bson:"branchName"`
 }
+
+type PortalRegistryCronJob struct {
+	PortalBase      `json:",inline" bson:"inline"`
+	RegistryInfo    `json:",inline" bson:"inline"`
+	ID              string `json:"id" bson:"id"`
+	ClusterName     string `json:"clusterName" bson:"clusterName"`
+	CronTabSchedule string `json:"cronTabSchedule" bson:"cronTabSchedule"`
+}
