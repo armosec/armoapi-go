@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/francoispqt/gojay"
 	"github.com/stretchr/testify/assert"
@@ -40,6 +41,41 @@ func TestGetPath(t *testing.T) {
 	er := attribute[AttributePath]
 	path := portalDesignator.GetPath()
 	assert.Equal(t, er, path)
+}
+
+func TestSetUpdatedTime(t *testing.T) {
+	now := time.Now().UTC().Format(time.RFC3339)
+	type testCase struct {
+		name     string
+		time     string
+		expected PortalBase
+	}
+
+	testTable := []testCase{
+		{
+			name:     "valid time",
+			time:     now,
+			expected: PortalBase{UpdatedTime: now},
+		},
+		{
+			name:     "default time",
+			time:     "",
+			expected: PortalBase{UpdatedTime: now},
+		},
+		{
+			name:     "invalid time",
+			time:     "invalid time string",
+			expected: PortalBase{UpdatedTime: now},
+		},
+	}
+
+	for _, test := range testTable {
+		t.Run(test.name, func(t *testing.T) {
+			p := PortalBase{}
+			p.SetUpdatedTime(test.time)
+			assert.Equal(t, test.expected, p)
+		})
+	}
 }
 
 func TestAttributesDesignatorsFromWLID(t *testing.T) {
