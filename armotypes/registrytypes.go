@@ -28,12 +28,6 @@ type AuthMethod struct {
 	Type     string `json:"type,omitempty" bson:"type"`
 }
 
-
 type Repository struct {
 	RepositoryName string `json:"repositoryName"`
-	Tags           []Tag  `json:"tags"`
-}
-
-type Tag struct {
-	Tag string `json:"tag"`
 }
