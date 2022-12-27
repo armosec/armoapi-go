@@ -260,6 +260,16 @@ type PostureResourceSummary struct {
 	ReportID      string       `json:"reportGUID"`
 	DeleteStatus  RecordStatus `json:"deletionStatus,omitempty"`
 	ArmoBestScore int64        `json:"armoBestScore"`
+
+	// Information about the controls that were run on this entity
+	// The key is the status of the control (`failed`, `passed`, etc)
+	ControlsInfo map[string][]ControlInfo `json:"controlsInfo"`
+
+	// Counters - Failed controls by severity
+	CriticalSeverityControls int `json:"criticalSeverityControls"`
+	HighSeverityControls     int `json:"highSeverityControls"`
+	MediumSeverityControls   int `json:"mediumSeverityControls"`
+	LowSeverityControls      int `json:"lowSeverityControls"`
 }
 
 type PostureAttributesList struct {
