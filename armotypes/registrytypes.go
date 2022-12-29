@@ -20,6 +20,7 @@ type RegistryInfo struct {
 	IsHTTPs          bool       `json:"isHTTPs" bson:"isHTTPs"`
 	SkipTLSVerify    bool       `json:"skipTLSVerify" bson:"skipTLSVerify"`
 	AuthMethod       AuthMethod `json:"authMethod,omitempty" bson:"authMethod"`
+	SecretName       string     `json:"secret,omitempty" bson:"secret"`
 }
 
 type AuthMethod struct {
