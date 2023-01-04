@@ -17,7 +17,7 @@ type RegistryInfo struct {
 	Include          []string   `json:"include,omitempty" bson:"include"`
 	Exclude          []string   `json:"exclude,omitempty" bson:"exclude"`
 	Kind             string     `json:"kind,omitempty" bson:"kind"`
-	IsHTTPs          *bool      `json:"isHTTPs,omitempty" bson:"isHTTPs"`
+	IsHTTPS          *bool      `json:"isHTTPS,omitempty" bson:"isHTTPS"`
 	SkipTLSVerify    *bool      `json:"skipTLSVerify,omitempty" bson:"skipTLSVerify"`
 	AuthMethod       AuthMethod `json:"authMethod,omitempty" bson:"authMethod"`
 	SecretName       string     `json:"secretName,omitempty" bson:"secretName"`
