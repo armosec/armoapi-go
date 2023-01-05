@@ -152,9 +152,10 @@ type PortalCustomer struct {
 	LastLoginDate    string `json:"last_login_date" bson:"last_login_date"`
 	Email            string `json:"email" bson:"email"`
 	//License
-	LicenseType            string `json:"license_type" bson:"license_type"`
-	SubscriptionExpiration string `json:"subscription_expiration" bson:"subscription_expiration"`
-	InitialLicenseType     string `json:"initial_license_type" bson:"initial_license_type"`
+	LicenseType            string               `json:"license_type" bson:"license_type"`
+	SubscriptionExpiration string               `json:"subscription_expiration" bson:"subscription_expiration"`
+	InitialLicenseType     string               `json:"initial_license_type" bson:"initial_license_type"`
+	NotificationsConfig    *NotificationsConfig `json:"notifications_config,omitempty" bson:"notifications_config,omitempty"`
 }
 
 type PortalRepository struct {
@@ -174,4 +175,21 @@ type PortalRegistryCronJob struct {
 	ClusterName     string       `json:"clusterName" bson:"clusterName"`
 	CronTabSchedule string       `json:"cronTabSchedule" bson:"cronTabSchedule"`
 	Repositories    []Repository `json:"repositories" bson:"repositories"`
+}
+
+type NotificationType string
+
+const (
+	NotificationTypeAll    NotificationType = "all"
+	NotificationTypePush   NotificationType = "push"
+	NotificationTypeWeekly NotificationType = "weekly"
+)
+
+type NotificationsConfig struct {
+	//Map of unsubscribed user id to notification config identifier
+	UnsubscribedUsers map[string]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
+}
+
+type NotificationConfigIdentifier struct {
+	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
 }

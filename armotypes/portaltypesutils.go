@@ -259,3 +259,14 @@ func (p *PortalBase) SetUpdatedTime(updatedTime *time.Time) {
 	}
 	p.UpdatedTime = updatedTime.UTC().Format(time.RFC3339)
 }
+
+func (p *PortalBase) GetUpdatedTime() *time.Time {
+	if p.UpdatedTime == "" {
+		return nil
+	}
+	updatedTime, err := time.Parse(time.RFC3339, p.UpdatedTime)
+	if err != nil {
+		return nil
+	}
+	return &updatedTime
+}
