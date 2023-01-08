@@ -17,6 +17,33 @@ type WeeklyReport struct {
 	RegistriesScanned                   []RegistryScanned   `json:"registriesScanned"`
 }
 
+type ClusterScanned struct {
+	Cluster ClusterResourceScanned `json:"cluster"`
+}
+
+type RegistryScanned struct {
+	Registry ResourceScanned `json:"registry"`
+}
+
+type RepositoryScanned struct {
+	Repository ResourceScanned `json:"repository"`
+}
+
+type ClusterResourceScanned struct {
+	FullName  string                     `json:"fullName"`
+	ShortName string                     `json:"shortName"`
+	Resource  map[string]ResourceDetails `json:"resourcesToDetails"`
+}
+
+type ResourceScanned struct {
+	Name     string                     `json:"name"`
+	Resource map[string]ResourceDetails `json:"resourcesToDetails"`
+}
+
+type ResourceDetails struct {
+	FailedResourcesNumber int `json:"failedResourcesNumber"`
+}
+
 type Vulnerability struct {
 	Name               string                         `json:"name"`
 	ImgHash            string                         `json:"imageHash"`
@@ -29,12 +56,12 @@ type Vulnerability struct {
 	SeverityScore      int                            `json:"severityScore"`
 	Metadata           interface{}                    `json:"metadata"`
 	Fixes              VulFixes                       `json:"fixedIn"`
-	Relevancy          string                         `json:"relevant"` // use the related enum
+	Relevancy          string                         `json:"relevant"`
 	UrgentCount        int                            `json:"urgent"`
 	NeglectedCount     int                            `json:"neglected"`
 	HealthStatus       string                         `json:"healthStatus"`
 	Categories         VulnerabilityCategory          `json:"categories"`
-	ExceptionApplied   []VulnerabilityExceptionPolicy `json:"exceptionApplied,omitempty"` // Active relevant exceptions
+	ExceptionApplied   []VulnerabilityExceptionPolicy `json:"exceptionApplied,omitempty"`
 }
 
 type VulFixes []FixedIn
@@ -121,31 +148,4 @@ type SeverityStats struct {
 
 type ShortVulnerabilityResult struct {
 	Name string `json:"name"`
-}
-
-type ClusterScanned struct {
-	Cluster ClusterResourceScanned `json:"cluster"`
-}
-
-type RegistryScanned struct {
-	Registry ResourceScanned `json:"registry"`
-}
-
-type RepositoryScanned struct {
-	Repository ResourceScanned `json:"repository"`
-}
-
-type ClusterResourceScanned struct {
-	FullName  string                     `json:"fullName"`
-	ShortName string                     `json:"shortName"`
-	Resource  map[string]ResourceDetails `json:"resourcesToDetails"`
-}
-
-type ResourceScanned struct {
-	Name     string                     `json:"name"`
-	Resource map[string]ResourceDetails `json:"resourcesToDetails"`
-}
-
-type ResourceDetails struct {
-	FailedResourcesNumber int `json:"failedResourcesNumber"`
 }
