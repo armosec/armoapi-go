@@ -1,151 +1,151 @@
 package armotypes
 
 type WeeklyReport struct {
-	ClustersScannedThisWeek             int                 `json:"clustersScannedThisWeek"`
-	ClustersScannedPrevWeek             int                 `json:"clustersScannedPrevWeek"`
-	LinkToConfigurationScanningFiltered string              `json:"linkToConfigurationScanningFiltered"`
-	RepositoriesScannedThisWeek         int                 `json:"repositoriesScannedThisWeek"`
-	RepositoriesScannedPrevWeek         int                 `json:"repositoriesScannedPrevWeek"`
-	LinkToRepositoriesScanningFiltered  string              `json:"linkToRepositoriesScanningFiltered"`
-	RegistriesScannedThisWeek           int                 `json:"registriesScannedThisWeek"`
-	RegistriesScannedPrevWeek           int                 `json:"registriesScannedPrevWeek"`
-	LinkToRegistriesScanningFiltered    string              `json:"linkToRegistriesScanningFiltered"`
-	Top5FailedControls                  []TopCtrlItem       `json:"top5FailedControls"`
-	Top5FailedCVEs                      []TopVulItem        `json:"top5FailedCVEs"`
-	ClustersScanned                     []ClusterScanned    `json:"clustersScanned"`
-	RepositoriesScanned                 []RepositoryScanned `json:"repositoriesScanned"`
-	RegistriesScanned                   []RegistryScanned   `json:"registriesScanned"`
+	ClustersScannedThisWeek             int                 `json:"clustersScannedThisWeek" bson:"clustersScannedThisWeek"`
+	ClustersScannedPrevWeek             int                 `json:"clustersScannedPrevWeek" bson:"clustersScannedPrevWeek"`
+	LinkToConfigurationScanningFiltered string              `json:"linkToConfigurationScanningFiltered" bson:"linkToConfigurationScanningFiltered"`
+	RepositoriesScannedThisWeek         int                 `json:"repositoriesScannedThisWeek" bson:"repositoriesScannedThisWeek"`
+	RepositoriesScannedPrevWeek         int                 `json:"repositoriesScannedPrevWeek" bson:"repositoriesScannedPrevWeek"`
+	LinkToRepositoriesScanningFiltered  string              `json:"linkToRepositoriesScanningFiltered" bson:"linkToRepositoriesScanningFiltered"`
+	RegistriesScannedThisWeek           int                 `json:"registriesScannedThisWeek" bson:"registriesScannedThisWeek"`
+	RegistriesScannedPrevWeek           int                 `json:"registriesScannedPrevWeek" bson:"registriesScannedPrevWeek"`
+	LinkToRegistriesScanningFiltered    string              `json:"linkToRegistriesScanningFiltered" bson:"linkToRegistriesScanningFiltered"`
+	Top5FailedControls                  []TopCtrlItem       `json:"top5FailedControls" bson:"top5FailedControls"`
+	Top5FailedCVEs                      []TopVulItem        `json:"top5FailedCVEs" bson:"top5FailedCVEs"`
+	ClustersScanned                     []ClusterScanned    `json:"clustersScanned" bson:"clustersScanned"`
+	RepositoriesScanned                 []RepositoryScanned `json:"repositoriesScanned" bson:"repositoriesScanned"`
+	RegistriesScanned                   []RegistryScanned   `json:"registriesScanned" bson:"registriesScanned"`
 }
 
 type ClusterScanned struct {
-	Cluster ClusterResourceScanned `json:"cluster"`
+	Cluster ClusterResourceScanned `json:"cluster" bson:"cluster"`
 }
 
 type RegistryScanned struct {
-	Registry ResourceScanned `json:"registry"`
+	Registry ResourceScanned `json:"registry" bson:"registry"`
 }
 
 type RepositoryScanned struct {
-	Repository ResourceScanned `json:"repository"`
+	Repository ResourceScanned `json:"repository" bson:"repository"`
 }
 
 type ClusterResourceScanned struct {
-	FullName  string                     `json:"fullName"`
-	ShortName string                     `json:"shortName"`
-	Resource  map[string]ResourceDetails `json:"resourcesToDetails"`
+	FullName  string                     `json:"fullName" bson:"fullName"`
+	ShortName string                     `json:"shortName" bson:"shortName"`
+	Resource  map[string]ResourceDetails `json:"resourcesToDetails" bson:"resourcesToDetails"`
 }
 
 type ResourceScanned struct {
-	Name     string                     `json:"name"`
-	Resource map[string]ResourceDetails `json:"resourcesToDetails"`
+	Name     string                     `json:"name" bson:"name"`
+	Resource map[string]ResourceDetails `json:"resourcesToDetails" bson:"resourcesToDetails"`
 }
 
 type ResourceDetails struct {
-	FailedResourcesNumber int `json:"failedResourcesNumber"`
+	FailedResourcesNumber int `json:"failedResourcesNumber" bson:"failedResourcesNumber"`
 }
 
 type Vulnerability struct {
-	Name               string                         `json:"name"`
-	ImgHash            string                         `json:"imageHash"`
-	ImgTag             string                         `json:"imageTag"`
-	RelatedPackageName string                         `json:"packageName"`
-	PackageVersion     string                         `json:"packageVersion"`
-	Link               string                         `json:"link"`
-	Description        string                         `json:"description"`
-	Severity           string                         `json:"severity"`
-	SeverityScore      int                            `json:"severityScore"`
-	Metadata           interface{}                    `json:"metadata"`
-	Fixes              VulFixes                       `json:"fixedIn"`
-	Relevancy          string                         `json:"relevant"`
-	UrgentCount        int                            `json:"urgent"`
-	NeglectedCount     int                            `json:"neglected"`
-	HealthStatus       string                         `json:"healthStatus"`
-	Categories         VulnerabilityCategory          `json:"categories"`
-	ExceptionApplied   []VulnerabilityExceptionPolicy `json:"exceptionApplied,omitempty"`
+	Name               string                         `json:"name" bson:"name"`
+	ImgHash            string                         `json:"imageHash" bson:"imageHash"`
+	ImgTag             string                         `json:"imageTag" bson:"imageTag"`
+	RelatedPackageName string                         `json:"packageName" bson:"packageName"`
+	PackageVersion     string                         `json:"packageVersion" bson:"packageVersion"`
+	Link               string                         `json:"link" bson:"link"`
+	Description        string                         `json:"description" bson:"description"`
+	Severity           string                         `json:"severity" bson:"severity"`
+	SeverityScore      int                            `json:"severityScore" bson:"severityScore"`
+	Metadata           interface{}                    `json:"metadata" bson:"metadata"`
+	Fixes              VulFixes                       `json:"fixedIn" bson:"fixedIn"`
+	Relevancy          string                         `json:"relevant" bson:"relevant"`
+	UrgentCount        int                            `json:"urgent" bson:"urgent"`
+	NeglectedCount     int                            `json:"neglected" bson:"neglected"`
+	HealthStatus       string                         `json:"healthStatus" bson:"healthStatus"`
+	Categories         VulnerabilityCategory          `json:"categories" bson:"categories"`
+	ExceptionApplied   []VulnerabilityExceptionPolicy `json:"exceptionApplied,omitempty" bson:"exceptionApplied,omitempty"`
 }
 
 type VulFixes []FixedIn
 
 type VulnerabilityCategory struct {
-	IsRCE bool `json:"isRce"`
+	IsRCE bool `json:"isRce" bson:"isRce"`
 }
 
 type FixedIn struct {
-	Name    string `json:"name"`
-	ImgTag  string `json:"imageTag"`
-	Version string `json:"version"`
+	Name    string `json:"name" bson:"name"`
+	ImgTag  string `json:"imageTag" bson:"imageTag"`
+	Version string `json:"version" bson:"version"`
 }
 type TopVulItem struct {
 	Vulnerability   `json:",inline"`
-	WorkloadsCount  int64 `json:"workloadsCount"`
-	SeverityOverall int64 `json:"severityOverall"`
+	WorkloadsCount  int64 `json:"workloadsCount" bson:"workloadsCount"`
+	SeverityOverall int64 `json:"severityOverall" bson:"severityOverall"`
 }
 
 type TopCtrlItem struct {
-	ControlID            string           `json:"id"`
-	ControlGUID          string           `json:"guid"`
-	Name                 string           `json:"name"`
-	Remediation          string           `json:"remediation"`
-	Description          string           `json:"description"`
-	ClustersCount        int64            `json:"clustersCount"`
-	SeverityOverall      int64            `json:"severityOverall"`
-	BaseScore            int64            `json:"baseScore"`
-	Clusters             []TopCtrlCluster `json:"clusters"`
+	ControlID            string           `json:"id" bson:"id"`
+	ControlGUID          string           `json:"guid" bson:"guid"`
+	Name                 string           `json:"name" bson:"name"`
+	Remediation          string           `json:"remediation" bson:"remediation"`
+	Description          string           `json:"description" bson:"description"`
+	ClustersCount        int64            `json:"clustersCount" bson:"clustersCount"`
+	SeverityOverall      int64            `json:"severityOverall" bson:"severityOverall"`
+	BaseScore            int64            `json:"baseScore" bson:"baseScore"`
+	Clusters             []TopCtrlCluster `json:"clusters" bson:"clusters"`
 	TotalFailedResources int64            `json:"-"`
 }
 
 type TopCtrlCluster struct {
-	Name               string `json:"name"`
-	ResourcesCount     int64  `json:"resourcesCount"`
-	ReportGUID         string `json:"reportGUID"`
-	TopFailedFramework string `json:"topFailedFramework"`
+	Name               string `json:"name" bson:"name"`
+	ResourcesCount     int64  `json:"resourcesCount" bson:"resourcesCount"`
+	ReportGUID         string `json:"reportGUID" bson:"reportGUID"`
+	TopFailedFramework string `json:"topFailedFramework" bson:"topFailedFramework"`
 }
 
 type CommonContainerScanSummaryResult struct {
 	SeverityStats
-	Designators     PortalDesignator `json:"designators"`
-	Context         []ArmoContext    `json:"context"`
-	JobIDs          []string         `json:"jobIDs"`
-	CustomerGUID    string           `json:"customerGUID"`
-	ContainerScanID string           `json:"containersScanID"`
+	Designators     PortalDesignator `json:"designators" bson:"designators"`
+	Context         []ArmoContext    `json:"context" bson:"context"`
+	JobIDs          []string         `json:"jobIDs" bson:"jobIDs"`
+	CustomerGUID    string           `json:"customerGUID" bson:"customerGUID"`
+	ContainerScanID string           `json:"containersScanID" bson:"containersScanID"`
 
-	Timestamp     int64    `json:"timestamp"`
-	WLID          string   `json:"wlid"`
-	ImgTag        string   `json:"imageTag"`
-	ImgHash       string   `json:"imageHash"`
-	Cluster       string   `json:"cluster"`
-	Namespace     string   `json:"namespace"`
-	ContainerName string   `json:"containerName"`
-	PackagesName  []string `json:"packages"`
+	Timestamp     int64    `json:"timestamp" bson:"timestamp"`
+	WLID          string   `json:"wlid" bson:"wlid"`
+	ImgTag        string   `json:"imageTag" bson:"imageTag"`
+	ImgHash       string   `json:"imageHash" bson:"imageHash"`
+	Cluster       string   `json:"cluster" bson:"cluster"`
+	Namespace     string   `json:"namespace" bson:"namespace"`
+	ContainerName string   `json:"containerName" bson:"containerName"`
+	PackagesName  []string `json:"packages" bson:"packages"`
 
-	ListOfDangerousArtifcats []string `json:"listOfDangerousArtifcats"`
+	ListOfDangerousArtifcats []string `json:"listOfDangerousArtifcats" bson:"listOfDangerousArtifcats"`
 
-	Status string `json:"status"`
+	Status string `json:"status" bson:"status"`
 
-	Registry     string `json:"registry"`
-	VersionImage string `json:"versionImage"`
+	Registry     string `json:"registry" bson:"registry"`
+	VersionImage string `json:"versionImage" bson:"versionImage"`
 
-	SeveritiesStats         []SeverityStats `json:"severitiesStats"`
-	ExcludedSeveritiesStats []SeverityStats `json:"excludedSeveritiesStats,omitempty"`
+	SeveritiesStats         []SeverityStats `json:"severitiesStats" bson:"severitiesStats"`
+	ExcludedSeveritiesStats []SeverityStats `json:"excludedSeveritiesStats,omitempty" bson:"excludedSeveritiesStats,omitempty"`
 
-	Version string `json:"version"`
+	Version string `json:"version" bson:"version"`
 
-	Vulnerabilities []ShortVulnerabilityResult `json:"vulnerabilities"`
+	Vulnerabilities []ShortVulnerabilityResult `json:"vulnerabilities" bson:"vulnerabilities"`
 }
 
 type SeverityStats struct {
-	Severity                     string `json:"severity,omitempty"`
-	TotalCount                   int64  `json:"total"`
-	RCEFixCount                  int64  `json:"rceFixCount"`
-	FixAvailableOfTotalCount     int64  `json:"fixedTotal"`
-	RelevantCount                int64  `json:"totalRelevant"`
-	FixAvailableForRelevantCount int64  `json:"fixedRelevant"`
-	RCECount                     int64  `json:"rceTotal"`
-	UrgentCount                  int64  `json:"urgent"`
-	NeglectedCount               int64  `json:"neglected"`
-	HealthStatus                 string `json:"healthStatus"`
+	Severity                     string `json:"severity,omitempty" bson:"severity,omitempty"`
+	TotalCount                   int64  `json:"total" bson:"total"`
+	RCEFixCount                  int64  `json:"rceFixCount" bson:"rceFixCount"`
+	FixAvailableOfTotalCount     int64  `json:"fixedTotal" bson:"fixedTotal"`
+	RelevantCount                int64  `json:"totalRelevant" bson:"totalRelevant"`
+	FixAvailableForRelevantCount int64  `json:"fixedRelevant" bson:"fixedRelevant"`
+	RCECount                     int64  `json:"rceTotal" bson:"rceTotal"`
+	UrgentCount                  int64  `json:"urgent" bson:"urgent"`
+	NeglectedCount               int64  `json:"neglected" bson:"neglected"`
+	HealthStatus                 string `json:"healthStatus" bson:"healthStatus"`
 }
 
 type ShortVulnerabilityResult struct {
-	Name string `json:"name"`
+	Name string `json:"name" bson:"name"`
 }
