@@ -176,20 +176,3 @@ type PortalRegistryCronJob struct {
 	CronTabSchedule string       `json:"cronTabSchedule" bson:"cronTabSchedule"`
 	Repositories    []Repository `json:"repositories" bson:"repositories"`
 }
-
-type NotificationType string
-
-const (
-	NotificationTypeAll    NotificationType = "all"
-	NotificationTypePush   NotificationType = "push"
-	NotificationTypeWeekly NotificationType = "weekly"
-)
-
-type NotificationsConfig struct {
-	//Map of unsubscribed user id to notification config identifier
-	UnsubscribedUsers map[string]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
-}
-
-type NotificationConfigIdentifier struct {
-	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
-}
