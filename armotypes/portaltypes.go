@@ -156,6 +156,7 @@ type PortalCustomer struct {
 	SubscriptionExpiration string               `json:"subscription_expiration" bson:"subscription_expiration"`
 	InitialLicenseType     string               `json:"initial_license_type" bson:"initial_license_type"`
 	NotificationsConfig    *NotificationsConfig `json:"notifications_config,omitempty" bson:"notifications_config,omitempty"`
+	State                  *CustomerState       `json:"state,omitempty" bson:"state,omitempty"`
 }
 
 type PortalRepository struct {
@@ -175,4 +176,30 @@ type PortalRegistryCronJob struct {
 	ClusterName     string       `json:"clusterName" bson:"clusterName"`
 	CronTabSchedule string       `json:"cronTabSchedule" bson:"cronTabSchedule"`
 	Repositories    []Repository `json:"repositories" bson:"repositories"`
+}
+
+type CustomerOnboarding struct {
+	Completed   bool     `json:"completed,omitempty" bson:"completed,omitempty"`     // user completed the onboarding
+	CompanySize string   `json:"companySize,omitempty" bson:"companySize,omitempty"` // user company size
+	Role        string   `json:"role,omitempty" bson:"role,omitempty"`               // user role
+	OrgName     string   `json:"orgName,omitempty" bson:"orgName,omitempty"`         // user organization name
+	Interests   []string `json:"interests,omitempty" bson:"interests,omitempty"`     // user interests
+}
+
+type GettingStartedChecklist struct {
+	// indicates if the user has dismissed the checklist
+	GettingStartedDismissed bool `json:"gettingStartedDismissed,omitempty" bson:"gettingStartedDismissed,omitempty"`
+	// checklist items
+	EverConnectedCluster   bool `json:"everConnectedCluster,omitempty" bson:"everConnectedCluster,omitempty"`
+	EverScannedRepository  bool `json:"everScannedRepository,omitempty" bson:"everScannedRepository,omitempty"`
+	EverScannedRegistry    bool `json:"everScannedRegistry,omitempty" bson:"everScannedRegistry,omitempty"`
+	EverCollaborated       bool `json:"everCollaborated,omitempty" bson:"everCollaborated,omitempty"`
+	EverInvitedTeammate    bool `json:"everInvitedTeammate,omitempty" bson:"everInvitedTeammate,omitempty"`
+	EverUsedRbacVisualizer bool `json:"everUsedRbacVisualizer,omitempty" bson:"everUsedRbacVisualizer,omitempty"`
+}
+
+// CustomerState holds the state of the customer, used for UI purposes
+type CustomerState struct {
+	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
+	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
 }
