@@ -357,3 +357,23 @@ type ControlInfo struct {
 	// Example: 3
 	FailedResources int `json:"failedResources"`
 }
+
+type TopCtrlItem struct {
+	ControlID            string           `json:"id" bson:"id"`
+	ControlGUID          string           `json:"guid" bson:"guid"`
+	Name                 string           `json:"name" bson:"name"`
+	Remediation          string           `json:"remediation" bson:"remediation"`
+	Description          string           `json:"description" bson:"description"`
+	ClustersCount        int64            `json:"clustersCount" bson:"clustersCount"`
+	SeverityOverall      int64            `json:"severityOverall" bson:"severityOverall"`
+	BaseScore            int64            `json:"baseScore" bson:"baseScore"`
+	Clusters             []TopCtrlCluster `json:"clusters" bson:"clusters"`
+	TotalFailedResources int64            `json:"-"`
+}
+
+type TopCtrlCluster struct {
+	Name               string `json:"name" bson:"name"`
+	ResourcesCount     int64  `json:"resourcesCount" bson:"resourcesCount"`
+	ReportGUID         string `json:"reportGUID" bson:"reportGUID"`
+	TopFailedFramework string `json:"topFailedFramework" bson:"topFailedFramework"`
+}
