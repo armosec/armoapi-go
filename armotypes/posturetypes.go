@@ -77,11 +77,9 @@ type PostureFrameworkSummary struct {
 	TotalControls    int              `json:"totalControls"`
 	FailedControls   int              `json:"failedControls"`
 	SkippedControls  int              `json:"skippedControls,omitempty"`
+	WarningControls  int              `json:"warningControls,omitempty"` // Deprecated
 	ReportID         string           `json:"reportGUID"`
 	Designators      PortalDesignator `json:"designators"`
-
-	// Deprecated
-	WarningControls int `json:"warningControls,omitempty"`
 
 	Timestamp    time.Time    `json:"timestamp"`
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
@@ -92,11 +90,9 @@ type PostureClusterSummary struct {
 	TotalControls   int              `json:"totalControls"`
 	FailedControls  int              `json:"failedControls"`
 	SkippedControls int              `json:"skippedControls,omitempty"`
+	WarningControls int              `json:"warningControls,omitempty"` // Deprecated
 	ReportID        string           `json:"reportGUID"`
 	Designators     PortalDesignator `json:"designators"`
-
-	// Deprecated
-	WarningControls int `json:"warningControls,omitempty"`
 
 	Timestamp    time.Time    `json:"timestamp"`
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
@@ -116,11 +112,10 @@ type PostureClusterSummary struct {
 	LowSeverityControls      int `json:"lowSeverityControls"`
 
 	// Counters -  Resources by status
-	PassedResources  int `json:"passedResources"`
-	FailedResources  int `json:"failedResources"`
-	SkippedResources int `jsons:"skippedResources,omitempty"`
-	// Deprecated
-	ExcludedResources int `json:"excludedResources,omitempty"`
+	PassedResources   int `json:"passedResources"`
+	FailedResources   int `json:"failedResources"`
+	SkippedResources  int `jsons:"skippedResources,omitempty"`
+	ExcludedResources int `json:"excludedResources,omitempty"` // Deprecated
 
 	// Metadata
 	KubescapeVersion  string `json:"kubescapeVersion"`
@@ -177,7 +172,7 @@ type PostureControlSummary struct {
 	Name                           string           `json:"name"`
 	AffectedResourcesCount         int              `json:"affectedResourcesCount"`
 	FailedResourcesCount           int              `json:"failedResourcesCount"`
-	SkippedResourcesCount          int              `json:"SkippedResourcesCount"`
+	SkippedResourcesCount          int              `json:"skippedResourcesCount"`
 	WarningResourcesCount          int              `json:"warningResourcesCount"` // Deprecated
 	PreviousAffectedResourcesCount int              `json:"previousAffectedResourcesCount"`
 	PreviousFailedResourcesCount   int              `json:"previousFailedResourcesCount"`
