@@ -41,9 +41,9 @@ const (
 
 type NotificationsConfig struct {
 	//Map of unsubscribed user id to notification config identifier
-	UnsubscribedUsers  map[string]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
-	LatestWeeklyReport *WeeklyReport                           `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
-	LatestPushReports  map[string]*PushReport                  `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
+	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
+	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
+	LatestPushReports  map[string]*PushReport                    `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
 }
 
 func (nc *NotificationsConfig) AddLatestPushReport(report *PushReport) {
