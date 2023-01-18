@@ -1,5 +1,10 @@
 package armotypes
 
+import (
+	"fmt"
+	"time"
+)
+
 type WeeklyReport struct {
 	ClustersScannedThisWeek             int                      `json:"clustersScannedThisWeek" bson:"clustersScannedThisWeek"`
 	ClustersScannedPrevWeek             int                      `json:"clustersScannedPrevWeek" bson:"clustersScannedPrevWeek"`
@@ -16,11 +21,54 @@ type WeeklyReport struct {
 	RepositoriesScanned                 []RepositoryScanned      `json:"repositoriesScanned" bson:"repositoriesScanned"`
 	RegistriesScanned                   []RegistryScanned        `json:"registriesScanned" bson:"registriesScanned"`
 }
+type PushNotification struct {
+	Misconfigurations []Misconfiguration `json:"misconfigurations" bson:"misconfigurations"`
+}
+
+type Misconfiguration struct {
+	Name               string   `json:"name" bson:"name"`
+	Type               ScanType `json:"scanType" bson:"scanType"`
+	Link               string   `json:"link" bson:"link"`
+	PercentageIncrease int      `json:"percentageIncrease" bson:"percentageIncrease"`
+}
+
+type ScanType string
+
+const (
+	ScanTypePosture      ScanType = "posture"
+	ScanTypeRepositories ScanType = "repository"
+)
 
 type NotificationsConfig struct {
 	//Map of unsubscribed user id to notification config identifier
-	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
-	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
+	UnsubscribedUsers  map[string]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
+	LatestWeeklyReport *WeeklyReport                           `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
+	LatestPushReports  map[string]*PushReport                  `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
+}
+
+func (nc *NotificationsConfig) AddLatestPushReport(report *PushReport) {
+	if report == nil {
+		return
+	}
+	if nc.LatestPushReports == nil {
+		nc.LatestPushReports = make(map[string]*PushReport, 0)
+	}
+	nc.LatestPushReports[fmt.Sprintf("%s_%s", report.Cluster, report.ScanType)] = report
+}
+
+func (nc *NotificationsConfig) GetLatestPushReport(cluster string, scanType ScanType) *PushReport {
+	if val, ok := nc.LatestPushReports[fmt.Sprintf("%s_%s", cluster, scanType)]; ok {
+		return val
+	}
+	return nil
+}
+
+type PushReport struct {
+	Cluster         string    `json:"custer,omitempty" bson:"custer,omitempty"`
+	ReportGUID      string    `json:"reportGUID,omitempty" bson:"reportGUID,omitempty"`
+	ScanType        ScanType  `json:"scanType" bson:"scanType"`
+	Timestamp       time.Time `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
+	FailedResources uint64    `json:"failedResources,omitempty" bson:"failedResources,omitempty"`
 }
 
 type NotificationConfigIdentifier struct {
@@ -44,8 +92,10 @@ type RepositoryScanned struct {
 }
 
 type ClusterResourceScanned struct {
-	ShortName string          `json:"shortName" bson:"shortName"`
-	Cluster   ResourceScanned `json:"cluster" bson:"cluster"`
+	ShortName       string          `json:"shortName" bson:"shortName"`
+	Cluster         ResourceScanned `json:"cluster" bson:"cluster"`
+	ReportGUID      string          `json:"reportGUID" bson:"reportGUID"`
+	FailedResources uint64          `json:"failedResources" bson:"failedResources"`
 }
 
 type ResourceScanned struct {
