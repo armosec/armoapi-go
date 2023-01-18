@@ -141,41 +141,41 @@ const (
 // PortalCluster holds cluster data from portal BE
 type PortalCluster struct {
 	PortalBase       `json:",inline" bson:"inline"`
-	SubscriptionDate string `json:"subscription_date" bson:"subscription_date"`
-	LastLoginDate    string `json:"last_login_date" bson:"last_login_date"`
+	SubscriptionDate string `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
+	LastLoginDate    string `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
 }
 
 type PortalCustomer struct {
 	PortalBase       `json:",inline" bson:"inline"`
-	Description      string `json:"description" bson:"description"`
-	SubscriptionDate string `json:"subscription_date" bson:"subscription_date"`
-	LastLoginDate    string `json:"last_login_date" bson:"last_login_date"`
-	Email            string `json:"email" bson:"email"`
+	Description      string `json:"description,omitempty" bson:"description,omitempty,omitempty"`
+	SubscriptionDate string `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
+	LastLoginDate    string `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
+	Email            string `json:"email,omitempty" bson:"email,omitempty"`
 	//License
-	LicenseType            string               `json:"license_type" bson:"license_type"`
-	SubscriptionExpiration string               `json:"subscription_expiration" bson:"subscription_expiration"`
-	InitialLicenseType     string               `json:"initial_license_type" bson:"initial_license_type"`
+	LicenseType            string               `json:"license_type,omitempty" bson:"license_type,omitempty"`
+	SubscriptionExpiration string               `json:"subscription_expiration,omitempty" bson:"subscription_expiration,omitempty"`
+	InitialLicenseType     string               `json:"initial_license_type,omitempty" bson:"initial_license_type,omitempty"`
 	NotificationsConfig    *NotificationsConfig `json:"notifications_config,omitempty" bson:"notifications_config,omitempty"`
 	State                  *CustomerState       `json:"state,omitempty" bson:"state,omitempty"`
 }
 
 type PortalRepository struct {
 	PortalBase   `json:",inline" bson:"inline"`
-	CreationDate string `json:"creationDate" bson:"creationDate"`
-	Provider     string `json:"provider" bson:"provider"`
-	Owner        string `json:"owner" bson:"owner"`
-	RepoName     string `json:"repoName" bson:"repoName"`
-	BranchName   string `json:"branchName" bson:"branchName"`
+	CreationDate string `json:"creationDate,omitempty" bson:"creationDate,omitempty"`
+	Provider     string `json:"provider,omitempty" bson:"provider,omitempty"`
+	Owner        string `json:"owner,omitempty" bson:"owner,omitempty"`
+	RepoName     string `json:"repoName,omitempty" bson:"repoName,omitempty"`
+	BranchName   string `json:"branchName,omitempty" bson:"branchName,omitempty"`
 }
 
 type PortalRegistryCronJob struct {
 	PortalBase      `json:",inline" bson:"inline"`
 	RegistryInfo    `json:",inline" bson:"inline"`
-	CreationDate    string       `json:"creationDate" bson:"creationDate"`
-	ID              string       `json:"id" bson:"id"`
-	ClusterName     string       `json:"clusterName" bson:"clusterName"`
-	CronTabSchedule string       `json:"cronTabSchedule" bson:"cronTabSchedule"`
-	Repositories    []Repository `json:"repositories" bson:"repositories"`
+	CreationDate    string       `json:"creationDate,omitempty" bson:"creationDate,omitempty"`
+	ID              string       `json:"id,omitempty" bson:"id,omitempty"`
+	ClusterName     string       `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
+	CronTabSchedule string       `json:"cronTabSchedule,omitempty" bson:"cronTabSchedule,omitempty"`
+	Repositories    []Repository `json:"repositories,omitempty" bson:"repositories,omitempty"`
 }
 
 type CustomerOnboarding struct {
