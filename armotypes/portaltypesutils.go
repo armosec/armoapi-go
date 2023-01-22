@@ -93,12 +93,21 @@ func (designator *PortalDesignator) GetLabels() map[string]string {
 }
 
 // DigestPortalDesignator - get cluster namespace and labels from designator
+//
+// TODO(fredbi): a public method returning a private type is not convenient to use. We should export attributesDesignators.
 func (designator *PortalDesignator) DigestPortalDesignator() attributesDesignators {
 	switch designator.DesignatorType {
 	case DesignatorAttributes, DesignatorAttribute:
 		return designator.DigestAttributesDesignator()
 	case DesignatorWlid.ToLower(), DesignatorWildWlid.ToLower():
-		return attributesDesignators{wlidpkg.GetClusterFromWlid(designator.WLID), wlidpkg.GetNamespaceFromWlid(designator.WLID), wlidpkg.GetKindFromWlid(designator.WLID), wlidpkg.GetNameFromWlid(designator.WLID), "", map[string]string{}}
+		return attributesDesignators{
+			cluster:   wlidpkg.GetClusterFromWlid(designator.WLID),
+			namespace: wlidpkg.GetNamespaceFromWlid(designator.WLID),
+			kind:      wlidpkg.GetKindFromWlid(designator.WLID),
+			name:      wlidpkg.GetNameFromWlid(designator.WLID),
+			path:      "",
+			labels:    map[string]string{},
+		}
 	// case DesignatorSid: // TODO
 	default:
 		// TODO - Do not print from here!
@@ -109,34 +118,30 @@ func (designator *PortalDesignator) DigestPortalDesignator() attributesDesignato
 
 func (designator *PortalDesignator) DigestAttributesDesignator() attributesDesignators {
 	var attributes attributesDesignators
-	attributes.labels = map[string]string{}
 	attr := designator.Attributes
+	attributes.labels = make(map[string]string, len(attr))
+
 	if attr == nil {
 		return attributes
 	}
+
 	for k, v := range attr {
-		attributes.labels[k] = v
+		switch k {
+		case AttributeNamespace:
+			attributes.namespace = v
+		case AttributeCluster:
+			attributes.cluster = v
+		case AttributeKind:
+			attributes.kind = v
+		case AttributeName:
+			attributes.name = v
+		case AttributePath:
+			attributes.path = v
+		default:
+			attributes.labels[k] = v
+		}
 	}
-	if v, ok := attr[AttributeNamespace]; ok {
-		attributes.namespace = v
-		delete(attributes.labels, AttributeNamespace)
-	}
-	if v, ok := attr[AttributeCluster]; ok {
-		attributes.cluster = v
-		delete(attributes.labels, AttributeCluster)
-	}
-	if v, ok := attr[AttributeKind]; ok {
-		attributes.kind = v
-		delete(attributes.labels, AttributeKind)
-	}
-	if v, ok := attr[AttributeName]; ok {
-		attributes.name = v
-		delete(attributes.labels, AttributeName)
-	}
-	if v, ok := attr[AttributePath]; ok {
-		attributes.path = v
-		delete(attributes.labels, AttributePath)
-	}
+
 	return attributes
 }
 
