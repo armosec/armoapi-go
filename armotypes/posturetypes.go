@@ -8,10 +8,10 @@ import (
 const (
 	PostureControlStatusUnknown    = 0
 	PostureControlStatusPassed     = 1
-	PostureControlStatusWarning    = 2
+	PostureControlStatusWarning    = 2 // deprecated
 	PostureControlStatusFailed     = 3
 	PostureControlStatusSkipped    = 4
-	PostureControlStatusIrrelevant = 5
+	PostureControlStatusIrrelevant = 5 // deprecated
 	PostureControlStatusError      = 6
 
 	PostureResourceMaxCtrls = 6
@@ -76,7 +76,8 @@ type PostureFrameworkSummary struct {
 	ImprovementScore float32          `json:"improvementScore"`
 	TotalControls    int              `json:"totalControls"`
 	FailedControls   int              `json:"failedControls"`
-	WarningControls  int              `json:"warningControls"`
+	SkippedControls  int              `json:"skippedControls,omitempty"`
+	WarningControls  int              `json:"warningControls,omitempty"` // Deprecated
 	ReportID         string           `json:"reportGUID"`
 	Designators      PortalDesignator `json:"designators"`
 
@@ -88,7 +89,8 @@ type PostureClusterSummary struct {
 	Score           float32          `json:"score"`
 	TotalControls   int              `json:"totalControls"`
 	FailedControls  int              `json:"failedControls"`
-	WarningControls int              `json:"warningControls"`
+	SkippedControls int              `json:"skippedControls,omitempty"`
+	WarningControls int              `json:"warningControls,omitempty"` // Deprecated
 	ReportID        string           `json:"reportGUID"`
 	Designators     PortalDesignator `json:"designators"`
 
@@ -112,7 +114,8 @@ type PostureClusterSummary struct {
 	// Counters -  Resources by status
 	PassedResources   int `json:"passedResources"`
 	FailedResources   int `json:"failedResources"`
-	ExcludedResources int `json:"excludedResources"`
+	SkippedResources  int `jsons:"skippedResources,omitempty"`
+	ExcludedResources int `json:"excludedResources,omitempty"` // Deprecated
 
 	// Metadata
 	KubescapeVersion  string `json:"kubescapeVersion"`
@@ -169,15 +172,18 @@ type PostureControlSummary struct {
 	Name                           string           `json:"name"`
 	AffectedResourcesCount         int              `json:"affectedResourcesCount"`
 	FailedResourcesCount           int              `json:"failedResourcesCount"`
-	WarningResourcesCount          int              `json:"warningResourcesCount"`
+	SkippedResourcesCount          int              `json:"skippedResourcesCount"`
+	WarningResourcesCount          int              `json:"warningResourcesCount"` // Deprecated
 	PreviousAffectedResourcesCount int              `json:"previousAffectedResourcesCount"`
 	PreviousFailedResourcesCount   int              `json:"previousFailedResourcesCount"`
-	PreviousWarningResourcesCount  int              `json:"previousWarningResourcesCount"`
+	PreviousSkippedResourcesCount  int              `json:"previousSkippedResourcesCount"`
+	PreviousWarningResourcesCount  int              `json:"previousWarningResourcesCount"` // Deprecated
 	Framework                      string           `json:"frameworkName"`
 	FrameworkSubSectionID          []string         `json:"frameworkSubsectionID,omitempty"`
 	Remediation                    string           `json:"remediation"`
 	Status                         int              `json:"status"`
 	StatusText                     string           `json:"statusText"`
+	SubStatusText                  string           `json:"subStatusText,omitempty"`
 	Description                    string           `json:"description"`
 	Section                        string           `json:"section"`
 	Timestamp                      time.Time        `json:"timestamp"`
@@ -207,7 +213,7 @@ type PostureResource struct {
 	FixPaths          []FixPath                   `json:"fixPaths"`       // specifies "fixPaths" - what in the raw resources needs to be added by user
 	ControlID         string                      `json:"controlID"`
 	FrameworkName     string                      `json:"frameworkName"`
-	ControlStatus     int                         `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be warning
+	ControlStatus     int                         `json:"controlStatus"` // it's rather resource status within the control, control might fail but on this specific resource it might be passed (exception)
 	ControlStatusText string                      `json:"controlStatusText"`
 	RelatedExceptions []PostureExceptionPolicy    `json:"relatedExceptions"` // configured in portal
 	ExceptionApplied  []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
@@ -235,8 +241,9 @@ type PostureResourceSummary struct {
 	ResourceID  string           `json:"resourceID"` //as given by kscape
 
 	//gives upto PostureResourceMaxCtrls controls as an example
-	FailedControl   []string `json:"failedControls"` // failed+warning controls
-	WarningControls []string `json:"warningControls"`
+	FailedControl   []string `json:"failedControls"`
+	WarningControls []string `json:"warningControls"` // Deprecated
+	SkippedControls []string `json:"skippedControls"`
 	//maps statusText 2 list of controlIDs
 	StatusToControls map[string][]string `json:"statusToControls"`
 
@@ -244,7 +251,8 @@ type PostureResourceSummary struct {
 
 	//totalcount (including the failed/warning controls slices)
 	FailedControlCount     int                         `json:"failedControlsCount"`
-	WarningControlCount    int                         `json:"warningControlsCount"`
+	SkippedControlCount    int                         `json:"skippedControlsCount"`
+	WarningControlCount    int                         `json:"warningControlsCount"` // Deprecated
 	Status                 int                         `json:"status"`
 	StatusText             string                      `json:"statusText"`
 	Remediation            []string                    `json:"remediation"`
