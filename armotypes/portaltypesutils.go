@@ -10,7 +10,8 @@ import (
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
 
-type attributesDesignators struct {
+// AttributeDesignators describe a kubernetes object, with its labels.
+type AttributesDesignators struct {
 	cluster   string
 	namespace string
 	kind      string
@@ -19,27 +20,27 @@ type attributesDesignators struct {
 	labels    map[string]string
 }
 
-func (ad *attributesDesignators) GetCluster() string {
+func (ad *AttributesDesignators) GetCluster() string {
 	return ad.cluster
 }
 
-func (ad *attributesDesignators) GetNamespace() string {
+func (ad *AttributesDesignators) GetNamespace() string {
 	return ad.namespace
 }
 
-func (ad *attributesDesignators) GetKind() string {
+func (ad *AttributesDesignators) GetKind() string {
 	return ad.kind
 }
 
-func (ad *attributesDesignators) GetName() string {
+func (ad *AttributesDesignators) GetName() string {
 	return ad.name
 }
 
-func (ad *attributesDesignators) GetPath() string {
+func (ad *AttributesDesignators) GetPath() string {
 	return ad.path
 }
 
-func (ad *attributesDesignators) GetLabels() map[string]string {
+func (ad *AttributesDesignators) GetLabels() map[string]string {
 	return ad.labels
 }
 
@@ -93,14 +94,12 @@ func (designator *PortalDesignator) GetLabels() map[string]string {
 }
 
 // DigestPortalDesignator - get cluster namespace and labels from designator
-//
-// TODO(fredbi): a public method returning a private type is not convenient to use. We should export attributesDesignators.
-func (designator *PortalDesignator) DigestPortalDesignator() attributesDesignators {
+func (designator *PortalDesignator) DigestPortalDesignator() AttributesDesignators {
 	switch designator.DesignatorType {
 	case DesignatorAttributes, DesignatorAttribute:
 		return designator.DigestAttributesDesignator()
 	case DesignatorWlid.ToLower(), DesignatorWildWlid.ToLower():
-		return attributesDesignators{
+		return AttributesDesignators{
 			cluster:   wlidpkg.GetClusterFromWlid(designator.WLID),
 			namespace: wlidpkg.GetNamespaceFromWlid(designator.WLID),
 			kind:      wlidpkg.GetKindFromWlid(designator.WLID),
@@ -113,11 +112,11 @@ func (designator *PortalDesignator) DigestPortalDesignator() attributesDesignato
 		// TODO - Do not print from here!
 		// glog.Warningf("in 'digestPortalDesignator' designator type: '%v' not yet supported. please contact Armo team", designator.DesignatorType)
 	}
-	return attributesDesignators{}
+	return AttributesDesignators{}
 }
 
-func (designator *PortalDesignator) DigestAttributesDesignator() attributesDesignators {
-	var attributes attributesDesignators
+func (designator *PortalDesignator) DigestAttributesDesignator() AttributesDesignators {
+	var attributes AttributesDesignators
 	attr := designator.Attributes
 	attributes.labels = make(map[string]string, len(attr))
 
