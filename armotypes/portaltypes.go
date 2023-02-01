@@ -145,9 +145,15 @@ type PortalCluster struct {
 	LastLoginDate    string `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
 }
 
+// StripeCustomer holds customer data from stripe
 type StripeCustomer struct {
-	CustomerID         string `json:"customer_id,omitempty" bson:"customer_id,omitempty"`
-	SubscriptionID     string `json:"subscription_id,omitempty" bson:"subscription_id,omitempty"`
+	// holds the customer id from stripe and is used to connect PortalCustomer activities on stripe.
+	CustomerID string `json:"customer_id,omitempty" bson:"customer_id,omitempty"`
+
+	// holds the subscription id from stripe
+	SubscriptionID string `json:"subscription_id,omitempty" bson:"subscription_id,omitempty"`
+
+	//  holds the subscription status from stripe. Possible values:  incomplete, incomplete_expired, trialing, active, past_due, canceled, or unpaid.
 	SubscriptionStatus string `json:"subscription_status,omitempty" bson:"subscription_status,omitempty"`
 }
 
@@ -163,7 +169,9 @@ type PortalCustomer struct {
 	InitialLicenseType     string               `json:"initial_license_type,omitempty" bson:"initial_license_type,omitempty"`
 	NotificationsConfig    *NotificationsConfig `json:"notifications_config,omitempty" bson:"notifications_config,omitempty"`
 	State                  *CustomerState       `json:"state,omitempty" bson:"state,omitempty"`
-	StripeCustomer         *StripeCustomer      `json:"stripe_customer,omitempty" bson:"stripe_customer,omitempty"`
+
+	// stripe customer information
+	StripeCustomer *StripeCustomer `json:"stripe_customer,omitempty" bson:"stripe_customer,omitempty"`
 }
 
 type PortalRepository struct {
