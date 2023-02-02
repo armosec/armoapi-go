@@ -155,6 +155,7 @@ type PortalCustomer struct {
 	LicenseType            string               `json:"license_type,omitempty" bson:"license_type,omitempty"`
 	SubscriptionExpiration string               `json:"subscription_expiration,omitempty" bson:"subscription_expiration,omitempty"`
 	InitialLicenseType     string               `json:"initial_license_type,omitempty" bson:"initial_license_type,omitempty"`
+	OpenAiRequestCount     int                  `json:"open_ai_request_count,omitempty" bson:"open_ai_request_count,omitempty"`
 	NotificationsConfig    *NotificationsConfig `json:"notifications_config,omitempty" bson:"notifications_config,omitempty"`
 	State                  *CustomerState       `json:"state,omitempty" bson:"state,omitempty"`
 }
