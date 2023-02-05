@@ -1,11 +1,38 @@
 package armotypes
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
+	_ "embed"
 	"github.com/stretchr/testify/assert"
 )
+
+//go:embed testdata/weeklyReport.json
+var weeklyReport string
+
+func TestWeeklyReport(t *testing.T) {
+	from, _ := time.Parse(time.RFC3339,  "2023-01-07T00:00:00+00:00")
+	to, _ := time.Parse(time.RFC3339, "2023-01-14T00:00:00+00:00")
+	report :=WeeklyReport{
+		From:                                from,
+		To:                                  to,
+		AccountName:                         "userAccount",
+		ClustersScannedThisWeek:             1,
+		ClustersScannedPrevWeek:             2,
+		LinkToConfigurationScanningFiltered: "http://somelink1.com",
+		RepositoriesScannedThisWeek:         3,
+		RepositoriesScannedPrevWeek:         4,
+		LinkToRepositoriesScanningFiltered:  "http://somelink2.com",
+		RegistriesScannedThisWeek:           5,
+		RegistriesScannedPrevWeek:           6,
+		LinkToRegistriesScanningFiltered:    "http://somelink3.com",
+		Top5FailedControls:                  []TopCtrlItem{{Name: "control1", TotalFailedResources: 1}},
+	}
+	b, _ := json.Marshal(report)
+	assert.Equal(t, weeklyReport, string(b))
+}
 
 func TestAddLatestPushReport(t *testing.T) {
 	ts := time.Now()
