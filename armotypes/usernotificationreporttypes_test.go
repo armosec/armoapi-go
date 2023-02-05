@@ -13,8 +13,10 @@ import (
 var weeklyReport string
 
 func TestWeeklyReport(t *testing.T) {
-	from, _ := time.Parse(time.RFC3339,  "2023-01-07T00:00:00+00:00")
-	to, _ := time.Parse(time.RFC3339, "2023-01-14T00:00:00+00:00")
+	from, err := time.Parse(time.RFC3339,  "2023-01-07T00:00:00+00:00")
+	assert.NoError(t, err)
+	to, err:= time.Parse(time.RFC3339, "2023-01-14T00:00:00+00:00")
+	assert.NoError(t, err)
 	report :=WeeklyReport{
 		From:                                from,
 		To:                                  to,
@@ -30,8 +32,8 @@ func TestWeeklyReport(t *testing.T) {
 		LinkToRegistriesScanningFiltered:    "http://somelink3.com",
 		Top5FailedControls:                  []TopCtrlItem{{Name: "control1", TotalFailedResources: 1}},
 	}
-	got, error := json.Marshal(report)
-	assert.NoError(t, error)
+	got, err := json.Marshal(report)
+	assert.NoError(t, err)
 	assert.Equal(t, weeklyReport, string(got))
 }
 
