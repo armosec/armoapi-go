@@ -30,8 +30,9 @@ func TestWeeklyReport(t *testing.T) {
 		LinkToRegistriesScanningFiltered:    "http://somelink3.com",
 		Top5FailedControls:                  []TopCtrlItem{{Name: "control1", TotalFailedResources: 1}},
 	}
-	b, _ := json.Marshal(report)
-	assert.Equal(t, weeklyReport, string(b))
+	got, error := json.Marshal(report)
+	assert.NoError(t, error)
+	assert.Equal(t, weeklyReport, string(got))
 }
 
 func TestAddLatestPushReport(t *testing.T) {
