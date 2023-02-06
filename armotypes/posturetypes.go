@@ -372,3 +372,12 @@ type TopCtrlCluster struct {
 	ReportGUID         string `json:"reportGUID" bson:"reportGUID"`
 	TopFailedFramework string `json:"topFailedFramework" bson:"topFailedFramework"`
 }
+
+func (t *TopCtrlItem) GetTotalFailedResources() int64 {
+	if t.TotalFailedResources == 0 {
+		for _, c := range t.Clusters {
+			t.TotalFailedResources += c.ResourcesCount
+		}
+	}
+	return t.TotalFailedResources
+}
