@@ -374,10 +374,9 @@ type TopCtrlCluster struct {
 }
 
 func (t *TopCtrlItem) GetTotalFailedResources() int64 {
-	if t.TotalFailedResources == 0 {
-		for _, c := range t.Clusters {
-			t.TotalFailedResources += c.ResourcesCount
-		}
+	var totalFailedResources int64
+	for _, c := range t.Clusters {
+		totalFailedResources += c.ResourcesCount
 	}
-	return t.TotalFailedResources
+	return totalFailedResources
 }
