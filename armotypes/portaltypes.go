@@ -212,6 +212,8 @@ type PortalCustomer struct {
 	NotificationsConfig *NotificationsConfig `json:"notifications_config,omitempty" bson:"notifications_config,omitempty"`
 	State               *CustomerState       `json:"state,omitempty" bson:"state,omitempty"`
 
+	OpenAiRequestCount     int                  `json:"open_ai_request_count,omitempty" bson:"open_ai_request_count,omitempty"`
+
 	// Paid/free subscriptions information
 	ActiveSubscription      *Subscription  `json:"activeSubscription,omitempty" bson:"activeSubscription,omitempty"`
 	HistoricalSubscriptions []Subscription `json:"historicalSubscriptions,omitempty" bson:"historicalSubscriptions,omitempty"`
