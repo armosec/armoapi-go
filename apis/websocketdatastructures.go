@@ -101,6 +101,10 @@ type WebsocketScanCommand struct {
 	//
 	// Example: bcae378eacedab83da66079d9366c8f5df542d7ed9ab23bf487e3e1a8481375d
 	ImageHash string `json:"imageHash"`
+	// InstanceID for relevancy scan
+	// namespace-<namespace>/<kind>-<name>/<resourceVersion>
+	// Example: namespace-default/pod-nginx/75641
+	InstanceID *string `json:"instanceID,omitempty"`
 	// Deprecated: Credentials to the Container Registry that holds the image to be scanned
 	//
 	// Kept for backward compatibility

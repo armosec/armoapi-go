@@ -35,6 +35,8 @@ const (
 	TypeDeleteVulnScanCronJob NotificationPolicyType = "deleteVulnScanCronJob"
 	// Trigger an image scan
 	TypeScanImages NotificationPolicyType = "scan"
+	// Trigger a relevancy image scan
+	TypeScanRelevancyImages NotificationPolicyType = "scanRelevancy"
 	// Trigger a registry scan
 	TypeScanRegistry NotificationPolicyType = "scanRegistry"
 	// Create a CronJob that runs registry scans
