@@ -159,38 +159,38 @@ type Subscription struct {
 	// -------- Stripe specific properties ------- //
 
 	// Stripe internal customer ID, usually generated on subscription creation.
-	StripeCustomerID string `json:"stripe_customer_id,omitempty" bson:"stripe_customer_id,omitempty"`
+	StripeCustomerID string `json:"stripeCustomerID,omitempty" bson:"stripeCustomerID,omitempty"`
 
 	// Stripe subscription id.
-	StripeSubscriptionID string `json:"stripe_subscription_id,omitempty" bson:"stripe_subscription_id,omitempty"`
+	StripeSubscriptionID string `json:"stripeSubscriptionID,omitempty" bson:"stripeSubscriptionID,omitempty"`
 
 	// -------- Stripe 'borrowed' properties, to be used also for none-stripe plans ------- //
 
 	// Stripe subscription status, optional values: incomplete, incomplete_expired, trialing, active, past_due, canceled, or unpaid.
-	SubscriptionStatus string `json:"subscription_status,omitempty" bson:"subscription_status,omitempty"`
+	SubscriptionStatus string `json:"subscriptionStatus,omitempty" bson:"subscriptionStatus,omitempty"`
 
 	// Stripe The most recent invoice this subscription has generated.
-	LatestInvoice string `json:"latest_invoice,omitempty" bson:"latest_invoice,omitempty"`
+	LatestInvoice string `json:"latestInvoice,omitempty" bson:"latestInvoice,omitempty"`
 
 	// determine whether a subscription that has a status of active is scheduled to be canceled at the end of the current period.
-	CancelAtPeriodEnd bool `json:"cancel_at_period_end,omitempty" bson:"cancel_at_period_end,omitempty"`
+	CancelAtPeriodEnd bool `json:"cancelAtPeriodEnd,omitempty" bson:"cancelAtPeriodEnd,omitempty"`
 
 	// End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
-	CurrentPeriodStart int64 `json:"current_period_start,omitempty" bson:"current_period_start,omitempty"`
+	CurrentPeriodStart int64 `json:"currentPeriodStart,omitempty" bson:"currentPeriodStart,omitempty"`
 
 	// End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
-	CurrentPeriodEnd int64 `json:"current_period_end,omitempty" bson:"current_period_end,omitempty"`
+	CurrentPeriodEnd int64 `json:"currentPeriodEnd,omitempty" bson:"currentPeriodEnd,omitempty"`
 
 	// If the subscription has a trial, the end of that trial.
-	TrialEnd int64 `json:"trial_end,omitempty" bson:"trial_end,omitempty"`
+	TrialEnd int64 `json:"trialEnd,omitempty" bson:"trialEnd,omitempty"`
 
 	// ------- Internal properties associated with plan --------- //
 
 	// monthly average of daily sum of max scanned Worker Nodes per cluster per day
-	NumNodes int `json:"num_nodes,omitempty" bson:"num_nodes,omitempty"`
+	NumNodes int `json:"numNodes,omitempty" bson:"numNodes,omitempty"`
 
 	// can be "free", "team" or "enterprise"
-	LicenseType LicenseType `json:"LicenseType,omitempty" bson:"LicenseType,omitempty"`
+	LicenseType LicenseType `json:"licenseType,omitempty" bson:"licenseType,omitempty"`
 }
 
 type PortalCustomer struct {
@@ -213,8 +213,8 @@ type PortalCustomer struct {
 	State               *CustomerState       `json:"state,omitempty" bson:"state,omitempty"`
 
 	// Paid/free subscriptions information
-	ActiveSubscription      *Subscription  `json:"active_subscription,omitempty" bson:"active_subscription,omitempty"`
-	HistoricalSubscriptions []Subscription `json:"historical_subscriptions,omitempty" bson:"historical_subscriptions,omitempty"`
+	ActiveSubscription      *Subscription  `json:"activeSubscription,omitempty" bson:"activeSubscription,omitempty"`
+	HistoricalSubscriptions []Subscription `json:"historicalSubscriptions,omitempty" bson:"historicalSubscriptions,omitempty"`
 }
 
 type PortalRepository struct {
