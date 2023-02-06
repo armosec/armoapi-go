@@ -6,6 +6,9 @@ import (
 )
 
 type WeeklyReport struct {
+	From                                time.Time                `json:"from" bson:"from"`
+	To                                  time.Time                `json:"to" bson:"to"`
+	AccountName                         string                   `json:"accountName" bson:"accountID"`
 	ClustersScannedThisWeek             int                      `json:"clustersScannedThisWeek" bson:"clustersScannedThisWeek"`
 	ClustersScannedPrevWeek             int                      `json:"clustersScannedPrevWeek" bson:"clustersScannedPrevWeek"`
 	LinkToConfigurationScanningFiltered string                   `json:"linkToConfigurationScanningFiltered" bson:"linkToConfigurationScanningFiltered"`
