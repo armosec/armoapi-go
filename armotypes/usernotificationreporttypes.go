@@ -106,6 +106,13 @@ type ResourceScanned struct {
 	MapSeverityToSeverityDetails map[string]SeverityDetails `json:"mapSeverityToSeverityDetails" bson:"mapSeverityToSeverityDetails"`
 }
 
+func (r *ResourceScanned) GetFailedResourcesNumber(severity string) int {
+	if _, ok := r.MapSeverityToSeverityDetails[severity]; ok {
+		return r.MapSeverityToSeverityDetails[severity].FailedResourcesNumber
+	}
+	return 0
+}
+
 type SeverityDetails struct {
 	Severity              string `json:"severity" bson:"severity"`
 	FailedResourcesNumber int    `json:"failedResourcesNumber" bson:"failedResourcesNumber"`

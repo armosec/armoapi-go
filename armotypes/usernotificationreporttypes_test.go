@@ -169,3 +169,40 @@ func TestGetLatestPushReport(t *testing.T) {
 		})
 	}
 }
+
+
+func TestGetFailedResourcesNumber(t *testing.T) {
+	type testCase struct {
+		name                string
+		resourceScanned ResourceScanned
+		severity          string
+		want              int
+	}
+	testTable := []testCase{
+		{
+			name: "existing severity",
+			resourceScanned: ResourceScanned{MapSeverityToSeverityDetails: map[string]SeverityDetails{
+				"Critical": {FailedResourcesNumber: 1},
+				},
+			},
+			severity: "Critical",
+			want: 1,
+
+		},{
+			name: "not existing severity",
+			resourceScanned: ResourceScanned{MapSeverityToSeverityDetails: map[string]SeverityDetails{
+				"Critical": {FailedResourcesNumber: 1},
+				},
+			},
+			severity: "High",
+			want: 0,
+
+		},
+	}
+
+	for _, test := range testTable {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want,test.resourceScanned.GetFailedResourcesNumber(test.severity), test.name)
+		})
+	}
+}
