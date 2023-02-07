@@ -25,23 +25,29 @@ type WeeklyReport struct {
 	RegistriesScanned                   []RegistryScanned        `json:"registriesScanned" bson:"registriesScanned"`
 }
 type PushNotification struct {
-	Misconfigurations []Misconfiguration `json:"misconfigurations" bson:"misconfigurations"`
+	Misconfigurations Misconfigurations
+	NewClusterAdmins  NewClusterAdmins
 }
 
+type NewClusterAdmins []NewClusterAdmin
+type NewClusterAdmin struct {
+	Resource string
+	Link     string
+}
+
+type Misconfigurations []Misconfiguration
 type Misconfiguration struct {
-	Name               string   `json:"name" bson:"name"`
-	Type               ScanType `json:"scanType" bson:"scanType"`
-	Link               string   `json:"link" bson:"link"`
-	PercentageIncrease int      `json:"percentageIncrease" bson:"percentageIncrease"`
+	Name               string
+	Type               ScanType
+	Link               string
+	PercentageIncrease uint64
 }
-
 type ScanType string
 
 const (
 	ScanTypePosture      ScanType = "posture"
 	ScanTypeRepositories ScanType = "repository"
 )
-
 type NotificationsConfig struct {
 	//Map of unsubscribed user id to notification config identifier
 	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
