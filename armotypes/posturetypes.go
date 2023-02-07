@@ -255,6 +255,7 @@ type PostureResourceSummary struct {
 	WarningControlCount    int                         `json:"warningControlsCount"` // Deprecated
 	Status                 int                         `json:"status"`
 	StatusText             string                      `json:"statusText"`
+	SubStatusText          string                      `json:"subStatusText,omitempty"`
 	Remediation            []string                    `json:"remediation"`
 	ResourceKind           string                      `json:"resourceKind"`
 	FrameworkName          string                      `json:"frameworkName"`
