@@ -108,6 +108,7 @@ type ClusterResourceScanned struct {
 }
 
 type ResourceScanned struct {
+	Kind                         string                     `json:"kind" bson:"kind"`
 	Name                         string                     `json:"name" bson:"name"`
 	MapSeverityToSeverityDetails map[string]SeverityDetails `json:"mapSeverityToSeverityDetails" bson:"mapSeverityToSeverityDetails"`
 }
