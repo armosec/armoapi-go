@@ -4,6 +4,7 @@ package apis
 const (
 	WebsocketScanCommandVersion string = "v1"
 	WebsocketScanCommandPath    string = "scanImage"
+	SBOMCalculationCommandPath  string = "generateSBOM"
 	DBCommandPath               string = "DBCommand"
 	ServerReady                 string = "ready"
 )
@@ -36,7 +37,7 @@ const (
 	// Trigger an image scan
 	TypeScanImages NotificationPolicyType = "scan"
 	// Trigger a relevancy image scan
-	TypeScanRelevancyImages NotificationPolicyType = "scanRelevancy"
+	TypeCalculateSBOM NotificationPolicyType = "calculateSBOM"
 	// Trigger a registry scan
 	TypeScanRegistry NotificationPolicyType = "scanRegistry"
 	// Create a CronJob that runs registry scans
