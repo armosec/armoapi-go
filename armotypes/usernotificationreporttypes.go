@@ -114,3 +114,28 @@ type SeverityDetails struct {
 	Severity              string `json:"severity" bson:"severity"`
 	FailedResourcesNumber int    `json:"failedResourcesNumber" bson:"failedResourcesNumber"`
 }
+
+var SeverityOrder = map[string]int{SeverityCritical:5, SeverityHigh:4, SeverityMedium:3, SeverityLow:2, SeverityNegligible:1, SeverityUnknown:0}
+
+const (
+	SeverityCritical   string = "Critical"
+	SeverityHigh       string = "High"
+	SeverityMedium     string = "Medium"
+	SeverityLow        string = "Low"
+	SeverityNegligible string = "Negligible"
+	SeverityUnknown    string = "Unknown"
+)
+
+func GetSeverityByBaseScore(baseScore int64) string {
+	switch true {
+	case baseScore >= 9:
+		return SeverityCritical
+	case baseScore >= 7:
+		return SeverityHigh
+	case baseScore >= 4:
+		return SeverityMedium
+	case baseScore >= 1:
+		return  SeverityLow
+	}
+	return SeverityUnknown
+}

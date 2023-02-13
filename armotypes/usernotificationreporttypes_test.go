@@ -162,3 +162,43 @@ func TestGetLatestPushReport(t *testing.T) {
 		})
 	}
 }
+
+func TestGetSeverityByBaseScore(t *testing.T) {
+	type testCase struct {
+		name                string
+		baseScore int64
+		want               string
+	}
+	testTable := []testCase{
+		{
+			name: "empty",
+			want: SeverityUnknown,
+		},
+		{
+			name: "low",
+			baseScore: 1,
+			want: SeverityLow,
+		},
+		{
+			name: "medium",
+			baseScore: 4,
+			want: SeverityMedium,
+		},
+		{
+			name: "high",
+			baseScore: 7,
+			want: SeverityHigh,
+		},
+		{
+			name: "critical",
+			baseScore: 9,
+			want: SeverityCritical,
+		},
+	}
+
+	for _, test := range testTable {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, GetSeverityByBaseScore(test.baseScore), test.name)
+		})
+	}
+}
