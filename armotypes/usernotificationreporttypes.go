@@ -45,6 +45,7 @@ const (
 	ScanTypePosture      ScanType = "posture"
 	ScanTypeRepositories ScanType = "repository"
 )
+
 type NotificationsConfig struct {
 	//Map of unsubscribed user id to notification config identifier
 	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
@@ -90,7 +91,8 @@ const (
 )
 
 type RegistryScanned struct {
-	Registry ResourceScanned `json:"registry" bson:"registry"`
+	ReportGUID string          `json:"reportGUID" bson:"reportGUID"`
+	Registry   ResourceScanned `json:"registry" bson:"registry"`
 }
 
 type RepositoryScanned struct {
