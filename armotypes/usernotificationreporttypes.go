@@ -91,11 +91,11 @@ const (
 )
 
 type RegistryScanned struct {
-	ReportGUID string          `json:"reportGUID" bson:"reportGUID"`
 	Registry   ResourceScanned `json:"registry" bson:"registry"`
 }
 
 type RepositoryScanned struct {
+	ReportGUID string          `json:"reportGUID" bson:"reportGUID"`
 	Repository ResourceScanned `json:"repository" bson:"repository"`
 }
 
