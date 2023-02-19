@@ -6,6 +6,7 @@ import (
 
 	wlidpkg "github.com/armosec/utils-k8s-go/wlid"
 	"github.com/francoispqt/gojay"
+	"k8s.io/utils/strings/slices"
 )
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
@@ -273,4 +274,45 @@ func (p *PortalBase) GetUpdatedTime() *time.Time {
 		return nil
 	}
 	return &updatedTime
+}
+
+// ====== PortalCustomer methods ======
+
+// Customer is paying if he has active subscription "Team" or "Enterprise"
+// and subscription status is one of the ActiveSubscriptionStatuses
+func (p *PortalCustomer) IsPayingCustomer() bool {
+	if p.ActiveSubscription != nil {
+		if p.ActiveSubscription.LicenseType == LicenseTypeTeam || p.ActiveSubscription.LicenseType == LicenseTypeEnterprise {
+			return slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus)
+		}
+	}
+	return false
+}
+
+// Customer is free if They have no active subscription or active subscription is free
+func (p *PortalCustomer) IsFreeCustomer() bool {
+	if p.ActiveSubscription != nil {
+		return p.ActiveSubscription.LicenseType == LicenseTypeFree
+	}
+	return true
+}
+
+// Returns if user has a "Team" active subscription, has not paid yet, and trial end has not passed
+func (p *PortalCustomer) IsTrialCustomer(now int64) bool {
+	if p.ActiveSubscription != nil {
+		if p.ActiveSubscription.LicenseType == LicenseTypeTeam && p.ActiveSubscription.TrialEnd > now {
+			return !slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus)
+		}
+	}
+	return false
+}
+
+// Returns if user has a "Team" active subscription, has not paid yet, and trial end has passed
+func (p *PortalCustomer) IsBlockedCustomer(now int64) bool {
+	if p.ActiveSubscription != nil {
+		if p.ActiveSubscription.LicenseType == LicenseTypeTeam && p.ActiveSubscription.TrialEnd < now {
+			return !slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus)
+		}
+	}
+	return false
 }

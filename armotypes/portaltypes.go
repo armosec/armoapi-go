@@ -22,6 +22,8 @@ const (
 	LicenseTypeEnterprise             = "Enterprise"
 )
 
+var ActiveSubscriptionStatuses = []string{"incomplete", "trialing", "active"}
+
 // PortalBase holds basic items data from portal BE
 type PortalBase struct {
 	GUID        string                 `json:"guid" bson:"guid"`
