@@ -2,6 +2,8 @@ package armotypes
 
 import (
 	"strings"
+
+	stripe "github.com/stripe/stripe-go/v74"
 )
 
 const (
@@ -14,12 +16,22 @@ const (
 	SidQuery            = "sid"
 )
 
+const (
+	SubscriptionStatusIncomplete        = string(stripe.SubscriptionStatusIncomplete)
+	SubscriptionStatusIncompleteExpired = string(stripe.SubscriptionStatusIncompleteExpired)
+	SubscriptionStatusTrialing          = string(stripe.SubscriptionStatusTrialing)
+	SubscriptionStatusActive            = string(stripe.SubscriptionStatusActive)
+	SubscriptionStatusPastDue           = string(stripe.SubscriptionStatusPastDue)
+	SubscriptionStatusCanceled          = string(stripe.SubscriptionStatusCanceled)
+	SubscriptionStatusUnpaid            = string(stripe.SubscriptionStatusUnpaid)
+)
+
 type LicenseType string
 
 const (
 	LicenseTypeFree       LicenseType = "Free"
-	LicenseTypeTeam                   = "Team"
-	LicenseTypeEnterprise             = "Enterprise"
+	LicenseTypeTeam       LicenseType = "Team"
+	LicenseTypeEnterprise LicenseType = "Enterprise"
 )
 
 type CustomerStatus string
@@ -31,7 +43,7 @@ const (
 	BlockedCustomer CustomerStatus = "blocked"
 )
 
-var ActiveSubscriptionStatuses = []string{"incomplete", "trialing", "active"}
+var ActiveSubscriptionStatuses = []string{SubscriptionStatusIncomplete, SubscriptionStatusTrialing, SubscriptionStatusActive}
 
 // PortalBase holds basic items data from portal BE
 type PortalBase struct {
