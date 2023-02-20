@@ -276,6 +276,12 @@ func (p *PortalBase) GetUpdatedTime() *time.Time {
 	return &updatedTime
 }
 
+// GetCustomerStatus returns one of the 4 customer statuses:
+// "paying" - has active subscription "Team" or "Enterprise"
+// and subscription status is one of the ActiveSubscriptionStatuses
+// "free" - has no active subscription or active subscription is free
+// "trial" - has a "Team" active subscription, has not paid yet, and trial end has not passed
+// "blocked" - has a "Team" active subscription, has not paid yet, and trial end has passed
 func (p *PortalCustomer) GetCustomerStatus(now int64) CustomerStatus {
 	if p.ActiveSubscription == nil || p.ActiveSubscription.LicenseType == LicenseTypeFree {
 		return FreeCustomer
