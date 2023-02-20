@@ -168,6 +168,7 @@ func TestAttributesDesignatorsFromImageTag(t *testing.T) {
 type testCase struct {
 	name     string
 	customer *PortalCustomer
+	expected CustomerStatus
 }
 
 // TrialEnd is before "now"
@@ -181,101 +182,43 @@ var teamPayingCustomer = &PortalCustomer{ActiveSubscription: &Subscription{Licen
 var enterpriseCustomer = &PortalCustomer{ActiveSubscription: &Subscription{LicenseType: LicenseTypeEnterprise, SubscriptionStatus: "trialing"}}
 var now = int64(1257894000)
 
-var testTableCustomers = []testCase{
-	{
-		name:     "blockedCustomer",
-		customer: blockedCustomer,
-	},
-	{
-		name:     "trialCustomer",
-		customer: trialCustomer,
-	},
-	{
-		name:     "freeCustomer",
-		customer: freeCustomer,
-	},
-	{
-		name:     "freeCustomerNoSubscription",
-		customer: freeCustomerNoSubscription,
-	},
-	{
-		name:     "teamPayingCustomer",
-		customer: teamPayingCustomer,
-	},
-	{
-		name:     "enterpriseCustomer",
-		customer: enterpriseCustomer,
-	},
-}
-
-func TestIsPayingCustomer(t *testing.T) {
-	expected := map[string]bool{
-		"blockedCustomer":            false,
-		"trialCustomer":              false,
-		"freeCustomer":               false,
-		"freeCustomerNoSubscription": false,
-		"teamPayingCustomer":         true,
-		"enterpriseCustomer":         true,
+func TestGetCustomerStatus(t *testing.T) {
+	var testTableCustomers = []testCase{
+		{
+			name:     "blockedCustomer",
+			customer: blockedCustomer,
+			expected: BlockedCustomer,
+		},
+		{
+			name:     "trialCustomer",
+			customer: trialCustomer,
+			expected: TrialCustomer,
+		},
+		{
+			name:     "freeCustomer",
+			customer: freeCustomer,
+			expected: FreeCustomer,
+		},
+		{
+			name:     "freeCustomerNoSubscription",
+			customer: freeCustomerNoSubscription,
+			expected: FreeCustomer,
+		},
+		{
+			name:     "teamPayingCustomer",
+			customer: teamPayingCustomer,
+			expected: PayingCustomer,
+		},
+		{
+			name:     "enterpriseCustomer",
+			customer: enterpriseCustomer,
+			expected: PayingCustomer,
+		},
 	}
-
 	for _, test := range testTableCustomers {
 		t.Run(test.name, func(t *testing.T) {
-			is := test.customer.IsPayingCustomer()
-			assert.Equal(t, expected[test.name], is)
-		})
-	}
-}
-
-func TestIsFreeCustomer(t *testing.T) {
-	expected := map[string]bool{
-		"blockedCustomer":            false,
-		"trialCustomer":              false,
-		"freeCustomer":               true,
-		"freeCustomerNoSubscription": true,
-		"teamPayingCustomer":         false,
-		"enterpriseCustomer":         false,
-	}
-
-	for _, test := range testTableCustomers {
-		t.Run(test.name, func(t *testing.T) {
-			is := test.customer.IsFreeCustomer()
-			assert.Equal(t, expected[test.name], is)
-		})
-	}
-}
-
-func TestIsTrialCustomer(t *testing.T) {
-	expected := map[string]bool{
-		"blockedCustomer":            false,
-		"trialCustomer":              true,
-		"freeCustomer":               false,
-		"freeCustomerNoSubscription": false,
-		"teamPayingCustomer":         false,
-		"enterpriseCustomer":         false,
-	}
-
-	for _, test := range testTableCustomers {
-		t.Run(test.name, func(t *testing.T) {
-			is := test.customer.IsTrialCustomer(now)
-			assert.Equal(t, expected[test.name], is)
-		})
-	}
-}
-
-func TestIsBlockedCustomer(t *testing.T) {
-	expected := map[string]bool{
-		"blockedCustomer":            true,
-		"trialCustomer":              false,
-		"freeCustomer":               false,
-		"freeCustomerNoSubscription": false,
-		"teamPayingCustomer":         false,
-		"enterpriseCustomer":         false,
-	}
-
-	for _, test := range testTableCustomers {
-		t.Run(test.name, func(t *testing.T) {
-			is := test.customer.IsBlockedCustomer(now)
-			assert.Equal(t, expected[test.name], is)
+			status := test.customer.GetCustomerStatus(now)
+			assert.Equal(t, test.expected, status)
 		})
 	}
 }

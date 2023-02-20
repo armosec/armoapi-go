@@ -276,43 +276,28 @@ func (p *PortalBase) GetUpdatedTime() *time.Time {
 	return &updatedTime
 }
 
-// ====== PortalCustomer methods ======
+func (p *PortalCustomer) GetCustomerStatus(now int64) CustomerStatus {
+	if p.ActiveSubscription == nil || p.ActiveSubscription.LicenseType == LicenseTypeFree {
+		return FreeCustomer
+	}
 
-// Customer is paying if he has active subscription "Team" or "Enterprise"
-// and subscription status is one of the ActiveSubscriptionStatuses
-func (p *PortalCustomer) IsPayingCustomer() bool {
-	if p.ActiveSubscription != nil {
-		if p.ActiveSubscription.LicenseType == LicenseTypeTeam || p.ActiveSubscription.LicenseType == LicenseTypeEnterprise {
-			return slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus)
+	if p.ActiveSubscription.LicenseType == LicenseTypeTeam {
+		if !slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus) {
+			if p.ActiveSubscription.TrialEnd > now {
+				return TrialCustomer
+			} else {
+				return BlockedCustomer
+			}
+		} else {
+			return PayingCustomer
 		}
 	}
-	return false
-}
 
-// Customer is free if They have no active subscription or active subscription is free
-func (p *PortalCustomer) IsFreeCustomer() bool {
-	if p.ActiveSubscription != nil {
-		return p.ActiveSubscription.LicenseType == LicenseTypeFree
-	}
-	return true
-}
-
-// Returns if user has a "Team" active subscription, has not paid yet, and trial end has not passed
-func (p *PortalCustomer) IsTrialCustomer(now int64) bool {
-	if p.ActiveSubscription != nil {
-		if p.ActiveSubscription.LicenseType == LicenseTypeTeam && p.ActiveSubscription.TrialEnd > now {
-			return !slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus)
+	if p.ActiveSubscription.LicenseType == LicenseTypeEnterprise {
+		if slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus) {
+			return PayingCustomer
 		}
 	}
-	return false
-}
 
-// Returns if user has a "Team" active subscription, has not paid yet, and trial end has passed
-func (p *PortalCustomer) IsBlockedCustomer(now int64) bool {
-	if p.ActiveSubscription != nil {
-		if p.ActiveSubscription.LicenseType == LicenseTypeTeam && p.ActiveSubscription.TrialEnd < now {
-			return !slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus)
-		}
-	}
-	return false
+	return FreeCustomer
 }
