@@ -10,6 +10,7 @@ require (
 	github.com/francoispqt/gojay v1.2.13
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.7.0
+	github.com/stripe/stripe-go/v74 v74.8.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 )
