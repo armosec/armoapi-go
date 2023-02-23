@@ -1,5 +1,7 @@
 package armotypes
 
+import "time"
+
 type PostureExceptionPolicyActions string
 
 const AlertOnly PostureExceptionPolicyActions = "alertOnly"
@@ -7,11 +9,14 @@ const Disable PostureExceptionPolicyActions = "disable"
 
 type PostureExceptionPolicy struct {
 	PortalBase      `json:",inline" bson:"inline"`
-	PolicyType      string                          `json:"policyType" bson:"policyType"`
+	PolicyType      string                          `json:"policyType" bson:"policyType,omitempty"`
 	CreationTime    string                          `json:"creationTime" bson:"creationTime"`
 	Actions         []PostureExceptionPolicyActions `json:"actions" bson:"actions"`
 	Resources       []PortalDesignator              `json:"resources" bson:"resources"`
 	PosturePolicies []PosturePolicy                 `json:"posturePolicies" bson:"posturePolicies"`
+	Reason          string                          `json:"reason,omitempty" bson:"reason,omitempty"`
+	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
+	CreatedBy       string                          `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
 
 type PosturePolicy struct {
