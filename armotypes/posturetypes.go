@@ -252,7 +252,7 @@ type PostureResourceSummary struct {
 	//totalcount (including the failed/warning controls slices)
 	FailedControlCount     int                         `json:"failedControlsCount"`
 	SkippedControlCount    int                         `json:"skippedControlsCount"`
-	WarningControlCount    int                         `json:"warningControlsCount"` // Deprecated
+	WarningControlCount    int                         `json:"warningControlsCount"` 
 	Status                 int                         `json:"status"`
 	StatusText             string                      `json:"statusText"`
 	SubStatusText          string                      `json:"subStatusText,omitempty"`
@@ -264,6 +264,7 @@ type PostureResourceSummary struct {
 	ExceptionApplied       []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
 	Images                 []PostureContainerSummary   `json:"containers,omitempty"`
 	Recommendations        []RecommendationAssociation `json:"recommendations"`
+	IgnoreRulesSummary     map[string]IgnoreRuleSummary    `json:"ignoreRulesSummary"` // configured in portal
 
 	Timestamp     time.Time    `json:"timestamp"`
 	ReportID      string       `json:"reportGUID"`
@@ -279,6 +280,11 @@ type PostureResourceSummary struct {
 	HighSeverityControls     int `json:"highSeverityControls"`
 	MediumSeverityControls   int `json:"mediumSeverityControls"`
 	LowSeverityControls      int `json:"lowSeverityControls"`
+}
+
+type IgnoreRuleSummary struct {
+	NumberOfSystemRules int      `json:"numberOfSystemRules"`
+	IgnoreRulesIDs      []string `json:"ignoreRulesIDs"`
 }
 
 type PostureAttributesList struct {
