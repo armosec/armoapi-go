@@ -34,15 +34,6 @@ const (
 	LicenseTypeEnterprise LicenseType = "Enterprise"
 )
 
-type CustomerStatus string
-
-const (
-	PayingCustomer  CustomerStatus = "paying"
-	FreeCustomer    CustomerStatus = "free"
-	TrialCustomer   CustomerStatus = "trial"
-	BlockedCustomer CustomerStatus = "blocked"
-)
-
 var ActiveSubscriptionStatuses = []string{SubscriptionStatusIncomplete, SubscriptionStatusTrialing, SubscriptionStatusActive}
 
 // PortalBase holds basic items data from portal BE
@@ -283,8 +274,16 @@ type GettingStartedChecklist struct {
 	EverUsedRbacVisualizer *bool `json:"everUsedRbacVisualizer,omitempty" bson:"everUsedRbacVisualizer,omitempty"`
 }
 
+type MaxNodeUsage struct {
+	// max sum of nodes across all clusters ever scanned on one day
+	MaxNodesSumEver int `json:"maxNodesSumEver,omitempty" bson:"maxNodesSumEver,omitempty"`
+	// date of MaxNodesSumEver
+	MaxNodesSumDate string `json:"maxNodesSumDate,omitempty" bson:"maxNodesSumDate,omitempty"`
+}
+
 // CustomerState holds the state of the customer, used for UI purposes
 type CustomerState struct {
 	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
 	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
+	MaxNodeUsage   *MaxNodeUsage            `json:"maxNodeUsage,omitempty" bson:"maxNodeUsage,omitempty"`
 }
