@@ -264,7 +264,7 @@ type PostureResourceSummary struct {
 	ExceptionApplied       []PostureExceptionPolicy     `json:"exceptionApplied"`  //actual ruleResponse
 	Images                 []PostureContainerSummary    `json:"containers,omitempty"`
 	Recommendations        []RecommendationAssociation  `json:"recommendations"`
-	IgnoreRulesSummary     map[string]IgnoreRuleSummary `json:"ignoreRulesSummary"
+	IgnoreRulesSummary     map[string]IgnoreRuleSummary `json:"ignoreRulesSummary"`
 
 	Timestamp     time.Time    `json:"timestamp"`
 	ReportID      string       `json:"reportGUID"`
