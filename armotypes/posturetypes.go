@@ -250,21 +250,21 @@ type PostureResourceSummary struct {
 	HighlightsPerCtrl []HighlightsByControl `json:"highlightsPerControl"`
 
 	//totalcount (including the failed/warning controls slices)
-	FailedControlCount     int                         `json:"failedControlsCount"`
-	SkippedControlCount    int                         `json:"skippedControlsCount"`
-	WarningControlCount    int                         `json:"warningControlsCount"` 
-	Status                 int                         `json:"status"`
-	StatusText             string                      `json:"statusText"`
-	SubStatusText          string                      `json:"subStatusText,omitempty"`
-	Remediation            []string                    `json:"remediation"`
-	ResourceKind           string                      `json:"resourceKind"`
-	FrameworkName          string                      `json:"frameworkName"`
-	ExceptionRecommendaion string                      `json:"exceptionRecommendaion"`
-	RelatedExceptions      []PostureExceptionPolicy    `json:"relatedExceptions"` // configured in portal
-	ExceptionApplied       []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
-	Images                 []PostureContainerSummary   `json:"containers,omitempty"`
-	Recommendations        []RecommendationAssociation `json:"recommendations"`
-	IgnoreRulesSummary     map[string]IgnoreRuleSummary    `json:"ignoreRulesSummary"` // configured in portal
+	FailedControlCount     int                          `json:"failedControlsCount"`
+	SkippedControlCount    int                          `json:"skippedControlsCount"`
+	WarningControlCount    int                          `json:"warningControlsCount"`
+	Status                 int                          `json:"status"`
+	StatusText             string                       `json:"statusText"`
+	SubStatusText          string                       `json:"subStatusText,omitempty"`
+	Remediation            []string                     `json:"remediation"`
+	ResourceKind           string                       `json:"resourceKind"`
+	FrameworkName          string                       `json:"frameworkName"`
+	ExceptionRecommendaion string                       `json:"exceptionRecommendaion"`
+	RelatedExceptions      []PostureExceptionPolicy     `json:"relatedExceptions"` // configured in portal
+	ExceptionApplied       []PostureExceptionPolicy     `json:"exceptionApplied"`  //actual ruleResponse
+	Images                 []PostureContainerSummary    `json:"containers,omitempty"`
+	Recommendations        []RecommendationAssociation  `json:"recommendations"`
+	IgnoreRulesSummary     map[string]IgnoreRuleSummary `json:"ignoreRulesSummary"
 
 	Timestamp     time.Time    `json:"timestamp"`
 	ReportID      string       `json:"reportGUID"`
