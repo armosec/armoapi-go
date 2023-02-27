@@ -187,7 +187,7 @@ type Subscription struct {
 	LatestInvoice string `json:"latestInvoice,omitempty" bson:"latestInvoice,omitempty"`
 
 	// determine whether a subscription that has a status of active is scheduled to be canceled at the end of the current period.
-	CancelAtPeriodEnd bool `json:"cancelAtPeriodEnd,omitempty" bson:"cancelAtPeriodEnd,omitempty"`
+	CancelAtPeriodEnd *bool `json:"cancelAtPeriodEnd,omitempty" bson:"cancelAtPeriodEnd,omitempty"`
 
 	// End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
 	CurrentPeriodStart int64 `json:"currentPeriodStart,omitempty" bson:"currentPeriodStart,omitempty"`
