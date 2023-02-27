@@ -6,7 +6,6 @@ import (
 
 	wlidpkg "github.com/armosec/utils-k8s-go/wlid"
 	"github.com/francoispqt/gojay"
-	"k8s.io/utils/strings/slices"
 )
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
@@ -274,36 +273,4 @@ func (p *PortalBase) GetUpdatedTime() *time.Time {
 		return nil
 	}
 	return &updatedTime
-}
-
-// GetCustomerStatus returns one of the 4 customer statuses:
-// "paying" - has active subscription "Team" or "Enterprise"
-// and subscription status is one of the ActiveSubscriptionStatuses
-// "free" - has no active subscription or active subscription is free
-// "trial" - has a "Team" active subscription, has not paid yet, and trial end has not passed
-// "blocked" - has a "Team" active subscription, has not paid yet, and trial end has passed
-func (p *PortalCustomer) GetCustomerStatus(now int64) CustomerStatus {
-	if p.ActiveSubscription == nil || p.ActiveSubscription.LicenseType == LicenseTypeFree {
-		return FreeCustomer
-	}
-
-	if p.ActiveSubscription.LicenseType == LicenseTypeTeam {
-		if !slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus) {
-			if p.ActiveSubscription.TrialEnd > now {
-				return TrialCustomer
-			} else {
-				return BlockedCustomer
-			}
-		} else {
-			return PayingCustomer
-		}
-	}
-
-	if p.ActiveSubscription.LicenseType == LicenseTypeEnterprise {
-		if slices.Contains(ActiveSubscriptionStatuses, p.ActiveSubscription.SubscriptionStatus) {
-			return PayingCustomer
-		}
-	}
-
-	return FreeCustomer
 }

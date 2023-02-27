@@ -34,15 +34,6 @@ const (
 	LicenseTypeEnterprise LicenseType = "Enterprise"
 )
 
-type CustomerStatus string
-
-const (
-	PayingCustomer  CustomerStatus = "paying"
-	FreeCustomer    CustomerStatus = "free"
-	TrialCustomer   CustomerStatus = "trial"
-	BlockedCustomer CustomerStatus = "blocked"
-)
-
 var ActiveSubscriptionStatuses = []string{SubscriptionStatusIncomplete, SubscriptionStatusTrialing, SubscriptionStatusActive}
 
 // PortalBase holds basic items data from portal BE
@@ -196,7 +187,7 @@ type Subscription struct {
 	LatestInvoice string `json:"latestInvoice,omitempty" bson:"latestInvoice,omitempty"`
 
 	// determine whether a subscription that has a status of active is scheduled to be canceled at the end of the current period.
-	CancelAtPeriodEnd bool `json:"cancelAtPeriodEnd,omitempty" bson:"cancelAtPeriodEnd,omitempty"`
+	CancelAtPeriodEnd *bool `json:"cancelAtPeriodEnd,omitempty" bson:"cancelAtPeriodEnd,omitempty"`
 
 	// End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
 	CurrentPeriodStart int64 `json:"currentPeriodStart,omitempty" bson:"currentPeriodStart,omitempty"`
@@ -283,8 +274,16 @@ type GettingStartedChecklist struct {
 	EverUsedRbacVisualizer *bool `json:"everUsedRbacVisualizer,omitempty" bson:"everUsedRbacVisualizer,omitempty"`
 }
 
+type NodeUsage struct {
+	// max sum of nodes across all clusters ever scanned on one day
+	MaxNodesSumEver int `json:"maxNodesSumEver,omitempty" bson:"maxNodesSumEver,omitempty"`
+	// date of MaxNodesSumEver
+	MaxNodesSumDate string `json:"maxNodesSumDate,omitempty" bson:"maxNodesSumDate,omitempty"`
+}
+
 // CustomerState holds the state of the customer, used for UI purposes
 type CustomerState struct {
 	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
 	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
+	NodeUsage      *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
 }
