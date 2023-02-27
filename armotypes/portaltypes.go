@@ -274,7 +274,7 @@ type GettingStartedChecklist struct {
 	EverUsedRbacVisualizer *bool `json:"everUsedRbacVisualizer,omitempty" bson:"everUsedRbacVisualizer,omitempty"`
 }
 
-type MaxNodeUsage struct {
+type NodeUsage struct {
 	// max sum of nodes across all clusters ever scanned on one day
 	MaxNodesSumEver int `json:"maxNodesSumEver,omitempty" bson:"maxNodesSumEver,omitempty"`
 	// date of MaxNodesSumEver
@@ -285,5 +285,5 @@ type MaxNodeUsage struct {
 type CustomerState struct {
 	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
 	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
-	MaxNodeUsage   *MaxNodeUsage            `json:"maxNodeUsage,omitempty" bson:"maxNodeUsage,omitempty"`
+	NodeUsage      *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
 }
