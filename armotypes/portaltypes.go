@@ -34,6 +34,15 @@ const (
 	LicenseTypeEnterprise LicenseType = "Enterprise"
 )
 
+type CustomerAccessStatus string
+
+const (
+	PayingCustomer  CustomerAccessStatus = "paying"
+	FreeCustomer    CustomerAccessStatus = "free"
+	TrialCustomer   CustomerAccessStatus = "trial"
+	BlockedCustomer CustomerAccessStatus = "blocked"
+)
+
 var ActiveSubscriptionStatuses = []string{SubscriptionStatusIncomplete, SubscriptionStatusTrialing, SubscriptionStatusActive}
 
 // PortalBase holds basic items data from portal BE
