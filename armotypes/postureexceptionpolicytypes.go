@@ -10,17 +10,17 @@ const Disable PostureExceptionPolicyActions = "disable"
 type PostureExceptionPolicy struct {
 	PortalBase      `json:",inline" bson:"inline"`
 	PolicyType      string                          `json:"policyType,omitempty" bson:"policyType,omitempty"`
-	CreationTime    string                          `json:"creationTime" bson:"creationTime"`
-	Actions         []PostureExceptionPolicyActions `json:"actions" bson:"actions"`
-	Resources       []PortalDesignator              `json:"resources" bson:"resources"`
-	PosturePolicies []PosturePolicy                 `json:"posturePolicies" bson:"posturePolicies"`
+	CreationTime    string                          `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
+	Actions         []PostureExceptionPolicyActions `json:"actions,omitempty" bson:"actions,omitempty"`
+	Resources       []PortalDesignator              `json:"resources,omitempty" bson:"resources,omitempty"`
+	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
 	Reason          string                          `json:"reason,omitempty" bson:"reason,omitempty"`
 	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
 	CreatedBy       string                          `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
 
 type PosturePolicy struct {
-	FrameworkName string `json:"frameworkName" bson:"frameworkName"`
+	FrameworkName string `json:"frameworkName,omitempty" bson:"frameworkName,omitempty"`
 	ControlName   string `json:"controlName,omitempty" bson:"controlName,omitempty"`
 	ControlID     string `json:"controlID,omitempty" bson:"controlID,omitempty"`
 	RuleName      string `json:"ruleName,omitempty" bson:"ruleName,omitempty"`
