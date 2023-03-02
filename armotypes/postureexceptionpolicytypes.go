@@ -10,11 +10,11 @@ const Disable PostureExceptionPolicyActions = "disable"
 type PostureExceptionPolicy struct {
 	PortalBase      `json:",inline" bson:"inline"`
 	PolicyType      string                          `json:"policyType,omitempty" bson:"policyType,omitempty"`
-	CreationTime    string                          `json:"creationTime" bson:"creationTime"`
-	Actions         []PostureExceptionPolicyActions `json:"actions" bson:"actions"`
+	CreationTime    string                          `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
+	Actions         []PostureExceptionPolicyActions `json:"actions,omitempty" bson:"actions,omitempty"`
 	Resources       []PortalDesignator              `json:"resources" bson:"resources"`
-	PosturePolicies []PosturePolicy                 `json:"posturePolicies" bson:"posturePolicies"`
-	Reason          string                          `json:"reason,omitempty" bson:"reason,omitempty"`
+	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
+	Reason          *string                         `json:"reason,omitempty" bson:"reason,omitempty"`
 	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
 	CreatedBy       string                          `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
