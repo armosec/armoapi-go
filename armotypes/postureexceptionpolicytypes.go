@@ -7,6 +7,11 @@ type PostureExceptionPolicyActions string
 const AlertOnly PostureExceptionPolicyActions = "alertOnly"
 const Disable PostureExceptionPolicyActions = "disable"
 
+type PolicyType string
+
+const PostureExceptionPolicyType PolicyType = "postureExceptionPolicy"
+const VulnerabilityExceptionPolicyType PolicyType = "vulnerabilityExceptionPolicy"
+
 type PostureExceptionPolicy struct {
 	PortalBase      `json:",inline" bson:"inline"`
 	PolicyType      string                          `json:"policyType,omitempty" bson:"policyType,omitempty"`
