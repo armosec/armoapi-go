@@ -1,6 +1,10 @@
 package armotypes
 
-import "time"
+import (
+	"fmt"
+	"strings"
+	"time"
+)
 
 type PostureExceptionPolicyActions string
 
@@ -20,8 +24,24 @@ type PostureExceptionPolicy struct {
 	Resources       []PortalDesignator              `json:"resources" bson:"resources"`
 	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
 	Reason          *string                         `json:"reason,omitempty" bson:"reason,omitempty"`
-	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
+	ExpirationDate  *Date                           `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
 	CreatedBy       string                          `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
+}
+
+
+type Date time.Time
+
+const dtLayout = "02-01-2006"
+
+func (dt *Date) UnmarshalJSON(b []byte) (err error) {
+	s := strings.Trim(string(b), `"`)
+	nt, _ := time.Parse(dtLayout, s)
+	*dt = Date(nt)
+	return nil
+}
+func (dt Date) MarshalJSON() ([]byte, error) {
+	stamp := fmt.Sprintf("\"%s\"", time.Time(dt).Format(dtLayout))
+	return []byte(stamp), nil
 }
 
 type PosturePolicy struct {
