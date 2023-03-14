@@ -1,7 +1,8 @@
-name: Release-Tag
+name: pr-checks
+
 on:
-  push:
-    branches: [ master, main ] 
+  pull_request:
+    types: [ edited, opened, synchronize, reopened ]
     paths-ignore:
       - '**.md' ### Ignore running when .md files change
       - '**.yaml' ### Ignore running when .yaml files change
@@ -12,9 +13,7 @@ jobs:
   test:
     permissions:
       pull-requests: write
-    uses: kubescape/workflows/.github/workflows/package-release.yaml@main
+    uses: kubescape/workflows/.github/workflows/go-basic-tests.yaml@main
     with:
       GO_VERSION: 1.19
-      RELEASE: "v0.0.${{ github.run_number }}"
     secrets: inherit
- 
