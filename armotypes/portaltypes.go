@@ -104,6 +104,7 @@ const (
 	AttributeIsIncomplete  = "isIncomplete"
 	AttributeSensor        = "sensor"
 	AttributePath          = "path"
+	AttributeResourceID    = "resourceID"
 )
 
 // Repository scan related attributes

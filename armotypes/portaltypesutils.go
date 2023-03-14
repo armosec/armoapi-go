@@ -12,12 +12,13 @@ var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
 
 // AttributeDesignators describe a kubernetes object, with its labels.
 type AttributesDesignators struct {
-	cluster   string
-	namespace string
-	kind      string
-	name      string
-	path      string
-	labels    map[string]string
+	cluster    string
+	namespace  string
+	kind       string
+	name       string
+	path       string
+	labels     map[string]string
+	resourceID string
 }
 
 func (ad *AttributesDesignators) GetCluster() string {
@@ -42,6 +43,10 @@ func (ad *AttributesDesignators) GetPath() string {
 
 func (ad *AttributesDesignators) GetLabels() map[string]string {
 	return ad.labels
+}
+
+func (ad *AttributesDesignators) GetResourceID() string {
+	return ad.resourceID
 }
 
 func AttributesDesignatorsFromWLID(wlid string) *PortalDesignator {
@@ -93,6 +98,11 @@ func (designator *PortalDesignator) GetLabels() map[string]string {
 	return attributes.labels
 }
 
+func (designator *PortalDesignator) GetResourceID() string {
+	attributes := designator.DigestPortalDesignator()
+	return attributes.resourceID
+}
+
 // DigestPortalDesignator - get cluster namespace and labels from designator
 func (designator *PortalDesignator) DigestPortalDesignator() AttributesDesignators {
 	switch designator.DesignatorType {
@@ -136,6 +146,8 @@ func (designator *PortalDesignator) DigestAttributesDesignator() AttributesDesig
 			attributes.name = v
 		case AttributePath:
 			attributes.path = v
+		case AttributeResourceID:
+			attributes.resourceID = v
 		default:
 			attributes.labels[k] = v
 		}

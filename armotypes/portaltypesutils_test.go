@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var attribute = map[string]string{AttributeCluster: "cluster1", AttributeNamespace: "namespace1", AttributeKind: "kind1", AttributeName: "name1", AttributePath: "path1"}
+var attribute = map[string]string{AttributeCluster: "cluster1", AttributeNamespace: "namespace1", AttributeKind: "kind1", AttributeName: "name1", AttributePath: "path1", AttributeResourceID: "resourceID1"}
 var portalDesignator = PortalDesignator{DesignatorType: DesignatorAttribute, Attributes: attribute}
 
 func TestGetCluster(t *testing.T) {
@@ -40,6 +40,12 @@ func TestGetName(t *testing.T) {
 func TestGetPath(t *testing.T) {
 	er := attribute[AttributePath]
 	path := portalDesignator.GetPath()
+	assert.Equal(t, er, path)
+}
+
+func TestGetResourceID(t *testing.T) {
+	er := attribute[AttributeResourceID]
+	path := portalDesignator.GetResourceID()
 	assert.Equal(t, er, path)
 }
 
