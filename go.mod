@@ -9,10 +9,11 @@ require (
 	github.com/docker/docker v20.10.17+incompatible
 	github.com/francoispqt/gojay v1.2.13
 	github.com/google/uuid v1.3.0
+	github.com/lib/pq v1.10.7
 	github.com/stretchr/testify v1.7.0
 	github.com/stripe/stripe-go/v74 v74.8.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
+	gorm.io/gorm v1.24.6
 )
 
 require (
@@ -21,6 +22,8 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
