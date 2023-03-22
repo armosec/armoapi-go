@@ -275,10 +275,11 @@ type PostureResourceSummary struct {
 	ControlsInfo map[string][]ControlInfo `json:"controlsInfo"`
 
 	// Counters - Failed controls by severity
-	CriticalSeverityControls int `json:"criticalSeverityControls"`
-	HighSeverityControls     int `json:"highSeverityControls"`
-	MediumSeverityControls   int `json:"mediumSeverityControls"`
-	LowSeverityControls      int `json:"lowSeverityControls"`
+	CriticalSeverityControls int    `json:"criticalSeverityControls"`
+	HighSeverityControls     int    `json:"highSeverityControls"`
+	MediumSeverityControls   int    `json:"mediumSeverityControls"`
+	LowSeverityControls      int    `json:"lowSeverityControls"`
+	ClusterShortName         string `json:"clusterShortName"`
 }
 
 type PostureAttributesList struct {
