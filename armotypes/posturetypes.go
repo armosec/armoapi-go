@@ -197,6 +197,7 @@ type PostureControlSummary struct {
 	ControlInputs                  []ControlInputs  `json:"controlInputs"`
 	IsLastScan                     int              `json:"isLastScan"`
 	HighlightPathsCount            int64            `json:"highlightPathsCount"`
+	ClusterShortName               string           `json:"clusterShortName"`
 }
 
 //---------/api/v1/posture/resources
