@@ -197,6 +197,7 @@ type PostureControlSummary struct {
 	ControlInputs                  []ControlInputs  `json:"controlInputs"`
 	IsLastScan                     int              `json:"isLastScan"`
 	HighlightPathsCount            int64            `json:"highlightPathsCount"`
+	ClusterShortName               string           `json:"clusterShortName"`
 }
 
 //---------/api/v1/posture/resources
@@ -275,10 +276,11 @@ type PostureResourceSummary struct {
 	ControlsInfo map[string][]ControlInfo `json:"controlsInfo"`
 
 	// Counters - Failed controls by severity
-	CriticalSeverityControls int `json:"criticalSeverityControls"`
-	HighSeverityControls     int `json:"highSeverityControls"`
-	MediumSeverityControls   int `json:"mediumSeverityControls"`
-	LowSeverityControls      int `json:"lowSeverityControls"`
+	CriticalSeverityControls int    `json:"criticalSeverityControls"`
+	HighSeverityControls     int    `json:"highSeverityControls"`
+	MediumSeverityControls   int    `json:"mediumSeverityControls"`
+	LowSeverityControls      int    `json:"lowSeverityControls"`
+	ClusterShortName         string `json:"clusterShortName"`
 }
 
 type PostureAttributesList struct {
