@@ -2,11 +2,12 @@ package apis
 
 // WebsocketScanCommand api
 const (
-	WebsocketScanCommandVersion string = "v1"
-	WebsocketScanCommandPath    string = "scanImage"
-	SBOMCalculationCommandPath  string = "generateSBOM"
-	DBCommandPath               string = "DBCommand"
-	ServerReady                 string = "ready"
+	VulnerabilityScanCommandVersion string = "v1"
+	ContainerScanCommandPath        string = "scanImage"
+	RegistryScanCommandPath         string = "scanRegistryImage"
+	SBOMCalculationCommandPath      string = "generateSBOM"
+	DBCommandPath                   string = "DBCommand"
+	ServerReady                     string = "ready"
 )
 
 // Supported NotificationTypes

@@ -62,14 +62,7 @@ type JobTracking struct {
 
 // WebsocketScanCommand is a command that triggers a scan for vulnerabilities.
 type WebsocketScanCommand struct {
-	// Current session context
-	//
-	// Used for correlating requests in the logs.
-	Session SessionChain `json:"session,omitempty"`
-	// Tag of the image to scan
-	//
-	// Example: nginx:latest
-	ImageTag string `json:"imageTag"`
+	ImageScanParams
 	// ID of a workload that is running the image you want to scan
 	//
 	// Example: wlid://cluster-marina/namespace-default/deployment-nginx
@@ -85,14 +78,6 @@ type WebsocketScanCommand struct {
 	//
 	// Example: nginx
 	ContainerName string `json:"containerName"`
-	// ID of the scanning Job
-	//
-	// Example: 7b04592b-665a-4e47-a9c9-65b2b3cabb49
-	JobID string `json:"jobID,omitempty"`
-	// ID of the Parent Job — a job that initiated the current job
-	//
-	// Example: 825f0a9e-34a9-4727-b81a-6e1bf3a63725
-	ParentJobID string `json:"parentJobID,omitempty"`
 	// The last action received from the Websocket
 	//
 	// Example: 2
@@ -109,13 +94,35 @@ type WebsocketScanCommand struct {
 	//
 	// Kept for backward compatibility
 	Credentials *types.AuthConfig `json:"credentials,omitempty"`
+}
+
+type ImageScanParams struct {
 	// A list of credentials for private Container Registries that store images to be scanned
 	Credentialslist []types.AuthConfig `json:"credentialsList,omitempty"`
 	// Arguments to pass to the scan command
 	//
 	// Example: {"useHTTP": true, "skipTLSVerify": true, "registryName": "", "repository": "", "tag": ""}
 	Args map[string]interface{} `json:"args,omitempty"`
-	// CustomerGUID string `json:"customerGUID"`
+	// Current session context
+	//
+	// Used for correlating requests in the logs.
+	Session SessionChain `json:"session,omitempty"`
+	// Tag of the image to scan
+	//
+	// Example: nginx:latest
+	ImageTag string `json:"imageTag"`
+	// ID of the scanning Job
+	//
+	// Example: 7b04592b-665a-4e47-a9c9-65b2b3cabb49
+	JobID string `json:"jobID,omitempty"`
+	// ID of the Parent Job — a job that initiated the current job
+	//
+	// Example: 825f0a9e-34a9-4727-b81a-6e1bf3a63725
+	ParentJobID string `json:"parentJobID,omitempty"`
+}
+
+type RegistryScanCommand struct {
+	ImageScanParams
 }
 
 // CronJobParams parmas for cronJob
