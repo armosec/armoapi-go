@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/armosec/armoapi-go/armotypes"
+	"github.com/docker/docker/api/types"
 )
 
 const (
@@ -124,4 +125,132 @@ func (c *Command) GetID() string {
 func (c *Command) Json() string {
 	b, _ := json.Marshal(*c)
 	return string(b)
+}
+
+// RegistryScanCommand implementation for ImageScanCommand interface
+
+var _ ImageScanCommand = &RegistryScanCommand{}
+
+func (r *RegistryScanCommand) GetWlid() string {
+	return ""
+}
+
+func (r *RegistryScanCommand) GetCredentialsList() []types.AuthConfig {
+	return r.ImageScanParams.Credentialslist
+}
+
+func (r *RegistryScanCommand) SetCredentialsList(credentialslist []types.AuthConfig) {
+	r.ImageScanParams.Credentialslist = credentialslist
+}
+
+func (r *RegistryScanCommand) GetArgs() map[string]interface{} {
+	return r.ImageScanParams.Args
+}
+
+func (r *RegistryScanCommand) SetArgs(args map[string]interface{}) {
+	r.ImageScanParams.Args = args
+}
+
+func (r *RegistryScanCommand) GetSession() SessionChain {
+	return r.ImageScanParams.Session
+}
+
+func (r *RegistryScanCommand) SetSession(session SessionChain) {
+	r.ImageScanParams.Session = session
+}
+
+func (r *RegistryScanCommand) GetImageTag() string {
+	return r.ImageScanParams.ImageTag
+}
+
+func (r *RegistryScanCommand) SetImageTag(imageTag string) {
+	r.ImageScanParams.ImageTag = imageTag
+}
+
+func (r *RegistryScanCommand) GetJobID() string {
+	return r.ImageScanParams.JobID
+}
+
+func (r *RegistryScanCommand) SetJobID(jobID string) {
+	r.ImageScanParams.JobID = jobID
+}
+
+func (r *RegistryScanCommand) GetParentJobID() string {
+	return r.ImageScanParams.ParentJobID
+}
+
+func (r *RegistryScanCommand) SetParentJobID(parentJobID string) {
+	r.ImageScanParams.ParentJobID = parentJobID
+}
+
+func (r *RegistryScanCommand) GetCreds() *types.AuthConfig {
+	return nil
+}
+
+func (r *RegistryScanCommand) GetImageHash() string {
+	return ""
+}
+
+// WebsocketScanCommand implementation for ImageScanCommand interface
+
+var _ ImageScanCommand = &WebsocketScanCommand{}
+
+func (c *WebsocketScanCommand) GetCredentialsList() []types.AuthConfig {
+	return c.Credentialslist
+}
+
+func (c *WebsocketScanCommand) SetCredentialsList(credentialslist []types.AuthConfig) {
+	c.Credentialslist = credentialslist
+}
+
+func (c *WebsocketScanCommand) GetArgs() map[string]interface{} {
+	return c.Args
+}
+
+func (c *WebsocketScanCommand) SetArgs(args map[string]interface{}) {
+	c.Args = args
+}
+
+func (c *WebsocketScanCommand) GetSession() SessionChain {
+	return c.Session
+}
+
+func (c *WebsocketScanCommand) SetSession(session SessionChain) {
+	c.Session = session
+}
+
+func (c *WebsocketScanCommand) GetImageTag() string {
+	return c.ImageTag
+}
+
+func (c *WebsocketScanCommand) SetImageTag(imageTag string) {
+	c.ImageTag = imageTag
+}
+
+func (c *WebsocketScanCommand) GetJobID() string {
+	return c.JobID
+}
+
+func (c *WebsocketScanCommand) SetJobID(jobID string) {
+	c.JobID = jobID
+}
+
+func (c *WebsocketScanCommand) GetParentJobID() string {
+	return c.ParentJobID
+}
+
+func (c *WebsocketScanCommand) SetParentJobID(parentJobID string) {
+	c.ParentJobID = parentJobID
+}
+
+func (c *WebsocketScanCommand) GetImageHash() string {
+	return c.ImageHash
+}
+
+func (c *WebsocketScanCommand) GetCreds() *types.AuthConfig {
+	return c.Credentials
+}
+
+func (c *WebsocketScanCommand) GetWlid() string {
+	return c.Wlid
 }

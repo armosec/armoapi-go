@@ -1,6 +1,10 @@
 package apis
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/docker/docker/api/types"
+)
 
 // Connector - interface for any connector (BE/Portal and so on)
 type Connector interface {
@@ -18,4 +22,22 @@ type Connector interface {
 		payload []byte,
 		f HTTPReqFunc,
 		qryData interface{}) ([]byte, error)
+}
+
+type ImageScanCommand interface {
+	GetWlid() string
+	GetImageHash() string
+	GetCreds() *types.AuthConfig
+	GetCredentialsList() []types.AuthConfig
+	SetCredentialsList([]types.AuthConfig)
+	GetArgs() map[string]interface{}
+	SetArgs(map[string]interface{})
+	GetSession() SessionChain
+	SetSession(SessionChain)
+	GetImageTag() string
+	SetImageTag(string)
+	GetJobID() string
+	SetJobID(string)
+	GetParentJobID() string
+	SetParentJobID(string)
 }
