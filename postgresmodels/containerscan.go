@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"gorm.io/datatypes"
 )
 
 // TODO: add explicit column names, add validation
@@ -40,7 +41,7 @@ type VulnerabilityScanSummary struct {
 	Timestamp       time.Time
 	CustomerGuid    string
 	Wlid            string
-	Designators     JSONB
+	Designators     datatypes.JSON
 	ImageRegistry   string
 	ImageRepository string
 	ImageTag        string
@@ -50,4 +51,19 @@ type VulnerabilityScanSummary struct {
 	Errors          pq.StringArray         `gorm:"type:text[]"`
 	Findings        []VulnerabilityFinding `gorm:"foreignKey:ImageScanId"`
 	IsStub          *bool                  // if true, this is a stub scan summary, and the actual scan summary is not yet available. Should be deleted once we have the real one.
+}
+
+type VulnerabilitySeverityStats struct {
+	BaseModel
+	ImageScanId                  string `gorm:"primaryKey"`
+	Severity                     string `gorm:"primaryKey"`
+	TotalCount                   int64
+	RCEFixCount                  int64
+	FixAvailableOfTotalCount     int64
+	RelevantCount                int64
+	FixAvailableForRelevantCount int64
+	RCECount                     int64
+	UrgentCount                  int64
+	NeglectedCount               int64
+	HealthStatus                 string
 }
