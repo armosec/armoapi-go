@@ -57,15 +57,17 @@ type PostureFrameworksOverTime struct {
 type PostureFrameworkOverTime struct {
 	// "frameworkName": "MITRE",
 	//                 "riskScore": 54,
-	RiskScore float32                         `json:"riskScore"`
-	Framework string                          `json:"frameworkName"`
-	Coords    []PostureFrameworkOverTimeCoord `json:"cords"`
+	RiskScore       float32                         `json:"riskScore,omitempty"`
+	ComplianceScore float32                         `json:"complianceScore,omitempty"`
+	Framework       string                          `json:"frameworkName"`
+	Coords          []PostureFrameworkOverTimeCoord `json:"cords"`
 }
 
 type PostureFrameworkOverTimeCoord struct {
-	ScoreValue float32   `json:"value"`
-	ReportID   string    `json:"reportGUID"`
-	Timestamp  time.Time `json:"timestamp"`
+	ScoreValue      float32   `json:"value,omitempty"`
+	ComplianceScore float32   `json:"complianceScore,omitempty"`
+	ReportID        string    `json:"reportGUID"`
+	Timestamp       time.Time `json:"timestamp"`
 }
 
 //---- /api/v1/posture/frameworks
