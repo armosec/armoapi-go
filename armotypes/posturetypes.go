@@ -57,29 +57,32 @@ type PostureFrameworksOverTime struct {
 type PostureFrameworkOverTime struct {
 	// "frameworkName": "MITRE",
 	//                 "riskScore": 54,
-	RiskScore float32                         `json:"riskScore"`
-	Framework string                          `json:"frameworkName"`
-	Coords    []PostureFrameworkOverTimeCoord `json:"cords"`
+	RiskScore       float32                         `json:"riskScore,omitempty"`
+	ComplianceScore float32                         `json:"complianceScore,omitempty"`
+	Framework       string                          `json:"frameworkName"`
+	Coords          []PostureFrameworkOverTimeCoord `json:"cords"`
 }
 
 type PostureFrameworkOverTimeCoord struct {
-	ScoreValue float32   `json:"value"`
-	ReportID   string    `json:"reportGUID"`
-	Timestamp  time.Time `json:"timestamp"`
+	ScoreValue      float32   `json:"value,omitempty"`
+	ComplianceScore float32   `json:"complianceScore,omitempty"`
+	ReportID        string    `json:"reportGUID"`
+	Timestamp       time.Time `json:"timestamp"`
 }
 
 //---- /api/v1/posture/frameworks
 
 type PostureFrameworkSummary struct {
-	Name             string           `json:"name"`
-	Score            float32          `json:"value"`
-	ImprovementScore float32          `json:"improvementScore"`
-	TotalControls    int              `json:"totalControls"`
-	FailedControls   int              `json:"failedControls"`
-	SkippedControls  int              `json:"skippedControls,omitempty"`
-	WarningControls  int              `json:"warningControls,omitempty"` // Deprecated
-	ReportID         string           `json:"reportGUID"`
-	Designators      PortalDesignator `json:"designators"`
+	Name                 string           `json:"name"`
+	Score                float32          `json:"value"`
+	ImprovementScore     float32          `json:"improvementScore"`
+	TotalControls        int              `json:"totalControls"`
+	FailedControls       int              `json:"failedControls"`
+	SkippedControls      int              `json:"skippedControls,omitempty"`
+	WarningControls      int              `json:"warningControls,omitempty"` // Deprecated
+	ReportID             string           `json:"reportGUID"`
+	Designators          PortalDesignator `json:"designators"`
+	AverageControlsScore float32          `json:"averageControlsScore"`
 
 	Timestamp    time.Time    `json:"timestamp"`
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
