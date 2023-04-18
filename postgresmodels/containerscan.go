@@ -36,21 +36,22 @@ type VulnerabilityFinding struct {
 
 type VulnerabilityScanSummary struct {
 	BaseModel
-	ScanKind        string
-	ImageScanId     string `gorm:"primaryKey"`
-	Timestamp       time.Time
-	CustomerGuid    string
-	Wlid            string
-	Designators     datatypes.JSON
-	ImageRegistry   string
-	ImageRepository string
-	ImageTag        string
-	ImageHash       string
-	JobIds          pq.StringArray `gorm:"type:text[]"`
-	Status          string
-	Errors          pq.StringArray         `gorm:"type:text[]"`
-	Findings        []VulnerabilityFinding `gorm:"foreignKey:ImageScanId"`
-	IsStub          *bool                  // if true, this is a stub scan summary, and the actual scan summary is not yet available. Should be deleted once we have the real one.
+	ScanKind                   string
+	ImageScanId                string `gorm:"primaryKey"`
+	Timestamp                  time.Time
+	CustomerGuid               string
+	Wlid                       string
+	Designators                datatypes.JSON
+	ImageRegistry              string
+	ImageRepository            string
+	ImageTag                   string
+	ImageHash                  string
+	JobIds                     pq.StringArray `gorm:"type:text[]"`
+	Status                     string
+	Errors                     pq.StringArray               `gorm:"type:text[]"`
+	Findings                   []VulnerabilityFinding       `gorm:"foreignKey:ImageScanId"`
+	VulnerabilitySeverityStats []VulnerabilitySeverityStats `gorm:"foreignKey:ImageScanId"`
+	IsStub                     *bool                        // if true, this is a stub scan summary, and the actual scan summary is not yet available. Should be deleted once we have the real one.
 }
 
 type VulnerabilitySeverityStats struct {
