@@ -31,6 +31,8 @@ type VulnerabilityFinding struct {
 	FixedInVersion    string
 	LayerIndex        *int
 	LayerCommand      string
+	IsRelevant        *bool
+	RelevantLabel     string
 	// TODO: add applied exceptions
 }
 
@@ -54,6 +56,12 @@ type VulnerabilityScanSummary struct {
 	IsStub                     *bool                        // if true, this is a stub scan summary, and the actual scan summary is not yet available. Should be deleted once we have the real one.
 }
 
+// ContextualVulnerabilityFinding is a VulnerabilityFinding with a VulnerabilityScanSummary, do not auto-migrate it
+// uses only for retreiving data from db
+type ContextualVulnerabilityFinding struct {
+	VulnerabilityFinding     `gorm:"embedded"`
+	VulnerabilityScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
+}
 type VulnerabilitySeverityStats struct {
 	BaseModel
 	ImageScanId                  string `gorm:"primaryKey"`
