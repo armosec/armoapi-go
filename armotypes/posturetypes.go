@@ -73,16 +73,16 @@ type PostureFrameworkOverTimeCoord struct {
 //---- /api/v1/posture/frameworks
 
 type PostureFrameworkSummary struct {
-	Name                 string           `json:"name"`
-	Score                float32          `json:"value"`
-	ImprovementScore     float32          `json:"improvementScore"`
-	TotalControls        int              `json:"totalControls"`
-	FailedControls       int              `json:"failedControls"`
-	SkippedControls      int              `json:"skippedControls,omitempty"`
-	WarningControls      int              `json:"warningControls,omitempty"` // Deprecated
-	ReportID             string           `json:"reportGUID"`
-	Designators          PortalDesignator `json:"designators"`
-	AverageControlsScore float32          `json:"averageControlsScore"`
+	Name             string           `json:"name"`
+	Score            float32          `json:"value"`
+	ComplianceScore  float32          `json:"complianceScore"`
+	ImprovementScore float32          `json:"improvementScore"`
+	TotalControls    int              `json:"totalControls"`
+	FailedControls   int              `json:"failedControls"`
+	SkippedControls  int              `json:"skippedControls,omitempty"`
+	WarningControls  int              `json:"warningControls,omitempty"` // Deprecated
+	ReportID         string           `json:"reportGUID"`
+	Designators      PortalDesignator `json:"designators"`
 
 	Timestamp    time.Time    `json:"timestamp"`
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
