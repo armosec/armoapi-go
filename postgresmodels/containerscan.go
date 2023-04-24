@@ -62,6 +62,11 @@ type ContextualVulnerabilityFinding struct {
 	VulnerabilityFinding     `gorm:"embedded"`
 	VulnerabilityScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
 }
+
+func (ContextualVulnerabilityFinding) TableName() string {
+	return "vulnerability_findings"
+}
+
 type VulnerabilitySeverityStats struct {
 	BaseModel
 	ImageScanId                  string `gorm:"primaryKey"`
