@@ -75,7 +75,7 @@ type PostureFrameworkOverTimeCoord struct {
 type PostureFrameworkSummary struct {
 	Name             string           `json:"name"`
 	Score            float32          `json:"value"`
-	ComplianceScore  float32          `json:"complianceScore"`
+	ComplianceScore  float32          `json:"complianceScorev1"`
 	ImprovementScore float32          `json:"improvementScore"`
 	TotalControls    int              `json:"totalControls"`
 	FailedControls   int              `json:"failedControls"`
