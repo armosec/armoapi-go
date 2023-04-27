@@ -193,6 +193,7 @@ type PostureControlSummary struct {
 	ReportID                       string           `json:"reportGUID"`
 	DeleteStatus                   RecordStatus     `json:"deletionStatus,omitempty"`
 	Score                          float32          `json:"score"`
+	ComplianceScore                float32          `json:"complianceScore"`
 	ScoreFactor                    float32          `json:"baseScore"`
 	ScoreWeight                    float32          `json:"scoreWeight"`
 	ARMOImprovement                float32          `json:"ARMOimprovement"`
