@@ -71,6 +71,7 @@ type VulnerabilitySeverityStats struct {
 	BaseModel
 	ImageScanId                  string `gorm:"primaryKey"`
 	Severity                     string `gorm:"primaryKey"`
+	SeverityScore                int
 	TotalCount                   int64
 	RCEFixCount                  int64
 	FixAvailableOfTotalCount     int64
