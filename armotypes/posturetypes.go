@@ -177,6 +177,7 @@ type PostureControlSummary struct {
 	FailedResourcesCount           int              `json:"failedResourcesCount"`
 	SkippedResourcesCount          int              `json:"skippedResourcesCount"`
 	WarningResourcesCount          int              `json:"warningResourcesCount"` // Deprecated
+	TotalScannedResourcesCount     *int             `json:"totalScannedResourcesCount"`
 	PreviousAffectedResourcesCount int              `json:"previousAffectedResourcesCount"`
 	PreviousFailedResourcesCount   int              `json:"previousFailedResourcesCount"`
 	PreviousSkippedResourcesCount  int              `json:"previousSkippedResourcesCount"`
