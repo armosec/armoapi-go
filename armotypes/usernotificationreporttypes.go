@@ -34,10 +34,11 @@ type NewClusterAdmin struct {
 
 type Misconfigurations []Misconfiguration
 type Misconfiguration struct {
-	Name               string
-	Type               ScanType
-	Link               string
-	PercentageIncrease uint64
+	Name                      string
+	Type                      ScanType
+	Link                      string
+	PercentageIncrease        uint64
+	FrameworksComplianceDrift map[string]int
 }
 type ScanType string
 
@@ -71,11 +72,12 @@ func (nc *NotificationsConfig) GetLatestPushReport(cluster string, scanType Scan
 }
 
 type PushReport struct {
-	Cluster         string    `json:"custer,omitempty" bson:"custer,omitempty"`
-	ReportGUID      string    `json:"reportGUID,omitempty" bson:"reportGUID,omitempty"`
-	ScanType        ScanType  `json:"scanType" bson:"scanType"`
-	Timestamp       time.Time `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
-	FailedResources uint64    `json:"failedResources,omitempty" bson:"failedResources,omitempty"`
+	Cluster                   string             `json:"custer,omitempty" bson:"custer,omitempty"`
+	ReportGUID                string             `json:"reportGUID,omitempty" bson:"reportGUID,omitempty"`
+	ScanType                  ScanType           `json:"scanType" bson:"scanType"`
+	Timestamp                 time.Time          `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
+	FailedResources           uint64             `json:"failedResources,omitempty" bson:"failedResources,omitempty"`
+	FrameworksComplianceScore map[string]float32 `json:"frameworksComplianceScore,omitempty" bson:"frameworksComplianceScore,omitempty"`
 }
 
 type NotificationConfigIdentifier struct {
@@ -91,7 +93,7 @@ const (
 )
 
 type RegistryScanned struct {
-	Registry   ResourceScanned `json:"registry" bson:"registry"`
+	Registry ResourceScanned `json:"registry" bson:"registry"`
 }
 
 type RepositoryScanned struct {
