@@ -193,6 +193,9 @@ type Subscription struct {
 	// Stripe subscription status, optional values: incomplete, incomplete_expired, trialing, active, past_due, canceled, or unpaid.
 	SubscriptionStatus string `json:"subscriptionStatus,omitempty" bson:"subscriptionStatus,omitempty"`
 
+	// Date when the subscription was first created. The date might differ from the created date due to backdating
+	StartDate int64 `json:"startDate,omitempty" bson:"startDate,omitempty"`
+
 	// Stripe The most recent invoice this subscription has generated.
 	LatestInvoice string `json:"latestInvoice,omitempty" bson:"latestInvoice,omitempty"`
 
