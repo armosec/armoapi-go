@@ -173,8 +173,19 @@ const (
 // PortalCluster holds cluster data from portal BE
 type PortalCluster struct {
 	PortalBase       `json:",inline" bson:"inline"`
-	SubscriptionDate string `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
-	LastLoginDate    string `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
+	SubscriptionDate string            `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
+	LastLoginDate    string            `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
+	InstallationData *InstallationData `json:"installationData" bson:"installationData,omitempty"`
+}
+
+type InstallationData struct {
+	ClusterName                         string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                 // cluster name defined manually or from the cluster context
+	StorageEnabled                      *bool  `json:"storage,omitempty" bson:"storage,omitempty"`                                                         // storage configuration (enabled/disabled)
+	RelevantImageVulnerabilitiesEnabled *bool  `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"` // relevancy configuration (enabled/disabled)
+	Namespace                           string `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                     // namespace to deploy the components
+	ImageVulnerabilitiesScanningEnabled *bool  `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"` // image scanning configuration (enabled/disabled)
+	PostureScanEnabled                  *bool  `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                   // posture configuration (enabled/disabled)
+	OtelCollectorEnabled                *bool  `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                             // otel collector configuration (enabled/disabled)
 }
 
 // hold information of a single subscription.
