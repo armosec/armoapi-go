@@ -17,7 +17,7 @@ type PostureExceptionPolicy struct {
 	PolicyType      string                          `json:"policyType,omitempty" bson:"policyType,omitempty"`
 	CreationTime    string                          `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 	Actions         []PostureExceptionPolicyActions `json:"actions,omitempty" bson:"actions,omitempty"`
-	Resources       []PortalDesignator              `json:"resources" bson:"resources"`
+	Resources       []PortalDesignator              `json:"resources" bson:"resources,omitempty"`
 	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
 	Reason          *string                         `json:"reason,omitempty" bson:"reason,omitempty"`
 	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
