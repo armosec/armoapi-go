@@ -180,12 +180,12 @@ type PortalCluster struct {
 
 type InstallationData struct {
 	ClusterName                         string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                 // cluster name defined manually or from the cluster context
-	StorageEnabled                      bool   `json:"storage,omitempty" bson:"storage,omitempty"`                                                         // storage configuration (enabled/disabled)
-	RelevantImageVulnerabilitiesEnabled bool   `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"` // relevancy configuration (enabled/disabled)
+	StorageEnabled                      *bool  `json:"storage,omitempty" bson:"storage,omitempty"`                                                         // storage configuration (enabled/disabled)
+	RelevantImageVulnerabilitiesEnabled *bool  `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"` // relevancy configuration (enabled/disabled)
 	Namespace                           string `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                     // namespace to deploy the components
-	ImageVulnerabilitiesScanningEnabled bool   `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"` // image scanning configuration (enabled/disabled)
-	PostureScanEnabled                  bool   `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                   // posture configuration (enabled/disabled)
-	OtelCollectorEnabled                bool   `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                             // otel collector configuration (enabled/disabled)
+	ImageVulnerabilitiesScanningEnabled *bool  `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"` // image scanning configuration (enabled/disabled)
+	PostureScanEnabled                  *bool  `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                   // posture configuration (enabled/disabled)
+	OtelCollectorEnabled                *bool  `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                             // otel collector configuration (enabled/disabled)
 }
 
 // hold information of a single subscription.
