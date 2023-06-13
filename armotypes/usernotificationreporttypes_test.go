@@ -162,3 +162,29 @@ func TestGetLatestPushReport(t *testing.T) {
 		})
 	}
 }
+
+func TestNotificationConfigIdentifierValidate(t *testing.T) {
+	// Test case 1: Valid NotificationType (NotificationTypeAll)
+	nci1 := NotificationConfigIdentifier{NotificationType: NotificationTypeAll}
+	if !nci1.Validate() {
+		t.Errorf("Test case 1 failed: Expected Validate to return true, but got false")
+	}
+
+	// Test case 2: Valid NotificationType (NotificationTypePush)
+	nci2 := NotificationConfigIdentifier{NotificationType: NotificationTypePush}
+	if !nci2.Validate() {
+		t.Errorf("Test case 2 failed: Expected Validate to return true, but got false")
+	}
+
+	// Test case 3: Valid NotificationType (NotificationTypeWeekly)
+	nci3 := NotificationConfigIdentifier{NotificationType: NotificationTypeWeekly}
+	if !nci3.Validate() {
+		t.Errorf("Test case 3 failed: Expected Validate to return true, but got false")
+	}
+
+	// Test case 4: Invalid NotificationType
+	nci4 := NotificationConfigIdentifier{NotificationType: "invalidType"}
+	if nci4.Validate() {
+		t.Errorf("Test case 4 failed: Expected Validate to return false, but got true")
+	}
+}

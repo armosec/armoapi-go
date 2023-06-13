@@ -85,6 +85,10 @@ type NotificationConfigIdentifier struct {
 	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
 }
 
+func (nci *NotificationConfigIdentifier) Validate() bool {
+	return nci.NotificationType == NotificationTypeAll || nci.NotificationType == NotificationTypePush || nci.NotificationType == NotificationTypeWeekly
+}
+
 type NotificationType string
 
 const (
