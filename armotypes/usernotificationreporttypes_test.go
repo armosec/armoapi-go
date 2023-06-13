@@ -195,4 +195,14 @@ func TestNotificationConfigIdentifier_Validate(t *testing.T) {
 	} else if err4.Error() != expectedError.Error() {
 		t.Errorf("Test case 4 failed: Expected error %s, but got %s", expectedError.Error(), err4.Error())
 	}
+
+	// Test case 5: empty NotificationType
+	nci5 := NotificationConfigIdentifier{NotificationType: ""}
+	err5 := nci5.Validate()
+	expectedError = fmt.Errorf("notification type is required")
+	if err5 == nil {
+		t.Errorf("Test case 5 failed: Expected Validate to return non-nil error, but got nil")
+	} else if err5.Error() != expectedError.Error() {
+		t.Errorf("Test case 5 failed: Expected error %s, but got %s", expectedError.Error(), err4.Error())
+	}
 }

@@ -88,9 +88,11 @@ type NotificationConfigIdentifier struct {
 func (nci *NotificationConfigIdentifier) Validate() error {
 	if nci.NotificationType == NotificationTypeAll || nci.NotificationType == NotificationTypePush || nci.NotificationType == NotificationTypeWeekly {
 		return nil
-	} else {
-		return fmt.Errorf("invalid notification type: %s", nci.NotificationType)
 	}
+	if nci.NotificationType == "" {
+		return fmt.Errorf("notification type is required")
+	}
+	return fmt.Errorf("invalid notification type: %s", nci.NotificationType)
 }
 
 type NotificationType string
