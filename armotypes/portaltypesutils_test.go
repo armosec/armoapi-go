@@ -170,3 +170,33 @@ func TestAttributesDesignatorsFromImageTag(t *testing.T) {
 	assert.Equal(t, "", deisgs.Attributes[AttributeTag])
 	assert.Equal(t, 1, len(deisgs.Attributes))
 }
+
+func TestValidateContainerScanID(t *testing.T) {
+	type args struct {
+		containerScanID string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "valid containerScanID",
+			args: args{
+				containerScanID: "9711c327-1a08-487e-b24a-72128712ef2d",
+			},
+			want: true,
+		},
+		{
+			name: "containerScanID with a slash is invalid",
+			args: args{
+				containerScanID: "foo/bar",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, ValidateContainerScanID(tt.args.containerScanID), "ValidateContainerScanID(%v)", tt.args.containerScanID)
+		})
+	}
+}
