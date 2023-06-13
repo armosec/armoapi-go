@@ -2,6 +2,7 @@ package armotypes
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -160,5 +161,48 @@ func TestGetLatestPushReport(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.want, test.notificationsConfig.GetLatestPushReport(test.clusterName, test.scanType), test.name)
 		})
+	}
+}
+
+func TestNotificationConfigIdentifier_Validate(t *testing.T) {
+	// Test case 1: Valid NotificationType (NotificationTypeAll)
+	nci1 := NotificationConfigIdentifier{NotificationType: NotificationTypeAll}
+	err1 := nci1.Validate()
+	if err1 != nil {
+		t.Errorf("Test case 1 failed: Expected Validate to return nil error, but got %s", err1.Error())
+	}
+
+	// Test case 2: Valid NotificationType (NotificationTypePush)
+	nci2 := NotificationConfigIdentifier{NotificationType: NotificationTypePush}
+	err2 := nci2.Validate()
+	if err2 != nil {
+		t.Errorf("Test case 2 failed: Expected Validate to return nil error, but got %s", err2.Error())
+	}
+
+	// Test case 3: Valid NotificationType (NotificationTypeWeekly)
+	nci3 := NotificationConfigIdentifier{NotificationType: NotificationTypeWeekly}
+	err3 := nci3.Validate()
+	if err3 != nil {
+		t.Errorf("Test case 3 failed: Expected Validate to return nil error, but got %s", err3.Error())
+	}
+
+	// Test case 4: Invalid NotificationType
+	nci4 := NotificationConfigIdentifier{NotificationType: "invalidType"}
+	err4 := nci4.Validate()
+	expectedError := fmt.Errorf("invalid notification type: %s", nci4.NotificationType)
+	if err4 == nil {
+		t.Errorf("Test case 4 failed: Expected Validate to return non-nil error, but got nil")
+	} else if err4.Error() != expectedError.Error() {
+		t.Errorf("Test case 4 failed: Expected error %s, but got %s", expectedError.Error(), err4.Error())
+	}
+
+	// Test case 5: empty NotificationType
+	nci5 := NotificationConfigIdentifier{NotificationType: ""}
+	err5 := nci5.Validate()
+	expectedError = fmt.Errorf("notification type is required")
+	if err5 == nil {
+		t.Errorf("Test case 5 failed: Expected Validate to return non-nil error, but got nil")
+	} else if err5.Error() != expectedError.Error() {
+		t.Errorf("Test case 5 failed: Expected error %s, but got %s", expectedError.Error(), err4.Error())
 	}
 }
