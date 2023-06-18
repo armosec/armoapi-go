@@ -321,5 +321,5 @@ type Banner struct {
 	BannerKind   string `json:"bannerKind,omitempty" bson:"bannerKind,omitempty"`     // kind of the banner
 	BannerID     string `json:"bannerID,omitempty" bson:"bannerID,omitempty"`         // identifies the banner in the UI, where there is an scan ID
 	Count        int    `json:"count,omitempty" bson:"count,omitempty"`               // number of times the banner was clicked
-	LastTime     string `json:"lastTime,omitempty" bson:"lastTime,omitempty"`         // last time the banner was clicked
+	LastClicked  string `json:"lastClicked,omitempty" bson:"lastClicked,omitempty"`   // last time the banner was clicked
 }
