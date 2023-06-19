@@ -173,6 +173,7 @@ const (
 // PortalCluster holds cluster data from portal BE
 type PortalCluster struct {
 	PortalBase       `json:",inline" bson:"inline"`
+	ClusterShortName string            `json:"clusterShortName,omitempty" bson:"clusterShortName,omitempty"`
 	SubscriptionDate string            `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
 	LastLoginDate    string            `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
 	InstallationData *InstallationData `json:"installationData" bson:"installationData,omitempty"`
