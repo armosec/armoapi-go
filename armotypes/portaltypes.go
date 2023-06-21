@@ -180,6 +180,7 @@ type PortalCluster struct {
 
 type InstallationData struct {
 	ClusterName                         string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                 // cluster name defined manually or from the cluster context
+	ClusterShortName                    string `json:"clusterShortName,omitempty" bson:"clusterShortName,omitempty"`                                       // cluster short name enriched from the cluster name by BE
 	StorageEnabled                      *bool  `json:"storage,omitempty" bson:"storage,omitempty"`                                                         // storage configuration (enabled/disabled)
 	RelevantImageVulnerabilitiesEnabled *bool  `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"` // relevancy configuration (enabled/disabled)
 	Namespace                           string `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                     // namespace to deploy the components
