@@ -314,10 +314,10 @@ type CustomerState struct {
 }
 
 type User struct {
-	DismissedBanners map[string]Banner `json:"dismissedBanners,omitempty" bson:"dismissedBanners,omitempty"` // list of banners clicked by the user to be dismissed
+	DismissedBanners map[string]Banner `json:"dismissedBanners,omitempty" bson:"dismissedBanners,omitempty"` // map of bannerID to Banner
 }
 
 type Banner struct {
 	CustomerGUID string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"` // customerGUID of the account which clicked the banner
-	ScanID       string `json:"scanID,omitempty" bson:"scanID,omitempty"`             // identifies the banner in the UI, where there is an scan ID
+	ScanID       string `json:"scanID,omitempty" bson:"scanID,omitempty"`             // for detailed view, unique key for banner is combination of scanID and bannerID
 }
