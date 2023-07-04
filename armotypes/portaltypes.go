@@ -181,9 +181,9 @@ type PortalCluster struct {
 type RelevantImageVulnerabilitiesConfiguration string
 
 const (
-	RelevantImageVulnerabilitiesConfigurationEnabled  RelevantImageVulnerabilitiesConfiguration = "enable"
-	RelevantImageVulnerabilitiesConfigurationDisabled RelevantImageVulnerabilitiesConfiguration = "disable"
-	RelevantImageVulnerabilitiesConfigurationDetect   RelevantImageVulnerabilitiesConfiguration = "detect"
+	RelevantImageVulnerabilitiesConfigurationEnable  RelevantImageVulnerabilitiesConfiguration = "enable"
+	RelevantImageVulnerabilitiesConfigurationDisable RelevantImageVulnerabilitiesConfiguration = "disable"
+	RelevantImageVulnerabilitiesConfigurationDetect  RelevantImageVulnerabilitiesConfiguration = "detect"
 )
 
 type InstallationData struct {
