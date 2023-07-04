@@ -179,14 +179,17 @@ type PortalCluster struct {
 }
 
 type InstallationData struct {
-	ClusterName                         string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                 // cluster name defined manually or from the cluster context
-	ClusterShortName                    string `json:"clusterShortName,omitempty" bson:"clusterShortName,omitempty"`                                       // cluster short name enriched from the cluster name by BE
-	StorageEnabled                      *bool  `json:"storage,omitempty" bson:"storage,omitempty"`                                                         // storage configuration (enabled/disabled)
-	RelevantImageVulnerabilitiesEnabled *bool  `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"` // relevancy configuration (enabled/disabled)
-	Namespace                           string `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                     // namespace to deploy the components
-	ImageVulnerabilitiesScanningEnabled *bool  `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"` // image scanning configuration (enabled/disabled)
-	PostureScanEnabled                  *bool  `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                   // posture configuration (enabled/disabled)
-	OtelCollectorEnabled                *bool  `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                             // otel collector configuration (enabled/disabled)
+	ClusterName                               string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                             // cluster name defined manually or from the cluster context
+	ClusterShortName                          string `json:"clusterShortName,omitempty" bson:"clusterShortName,omitempty"`                                                   // cluster short name enriched from the cluster name by BE
+	StorageEnabled                            *bool  `json:"storage,omitempty" bson:"storage,omitempty"`                                                                     // storage configuration (enabled/disabled)
+	RelevantImageVulnerabilitiesEnabled       *bool  `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"`             // relevancy actual state (enabled/disabled)
+	RelevantImageVulnerabilitiesConfiguration string `json:"relevantImageVulnerabilitiesConfiguration,omitempty" bson:"relevantImageVulnerabilitiesConfiguration,omitempty"` // relevancy configuration defined user
+	Namespace                                 string `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                                 // namespace to deploy the components
+	ImageVulnerabilitiesScanningEnabled       *bool  `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"`             // image scanning configuration (enabled/disabled)
+	PostureScanEnabled                        *bool  `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                               // posture configuration (enabled/disabled)
+	OtelCollectorEnabled                      *bool  `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                                         // otel collector configuration (enabled/disabled)
+	ClusterProvider                           string `json:"clusterProvider,omitempty" bson:"clusterProvider,omitempty"`                                                     // cluster provider (aws/azure/gcp)
+
 }
 
 // hold information of a single subscription.
