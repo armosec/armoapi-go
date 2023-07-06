@@ -33,13 +33,15 @@ type VulnerabilityFinding struct {
 	LayerCommand      string
 	IsRelevant        *bool
 	RelevantLabel     string
-	// TODO: add applied exceptions
+	IsIgnored         *bool
+	IgnoreRuleIds     pq.StringArray `gorm:"type:text[]"`
 }
 
 type VulnerabilityScanSummary struct {
 	BaseModel
 	ScanKind                   string
 	ImageScanId                string `gorm:"primaryKey"`
+	ContainerSpecId            string
 	Timestamp                  time.Time
 	CustomerGuid               string
 	Wlid                       string
@@ -69,8 +71,10 @@ func (ContextualVulnerabilityFinding) TableName() string {
 
 type VulnerabilitySeverityStats struct {
 	BaseModel
-	ImageScanId                  string `gorm:"primaryKey"`
-	Severity                     string `gorm:"primaryKey"`
+	ImageScanId                  string         `gorm:"primaryKey"`
+	Severity                     string         `gorm:"primaryKey"`
+	DayDate                      datatypes.Date `gorm:"primaryKey"`
+	SeverityScore                int
 	TotalCount                   int64
 	RCEFixCount                  int64
 	FixAvailableOfTotalCount     int64
