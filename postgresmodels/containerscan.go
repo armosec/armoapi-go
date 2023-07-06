@@ -33,7 +33,8 @@ type VulnerabilityFinding struct {
 	LayerCommand      string
 	IsRelevant        *bool
 	RelevantLabel     string
-	// TODO: add applied exceptions
+	IsIgnored         *bool
+	IgnoreRuleIds     pq.StringArray `gorm:"type:text[]"`
 }
 
 type VulnerabilityScanSummary struct {
