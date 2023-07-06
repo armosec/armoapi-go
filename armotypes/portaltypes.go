@@ -173,8 +173,31 @@ const (
 // PortalCluster holds cluster data from portal BE
 type PortalCluster struct {
 	PortalBase       `json:",inline" bson:"inline"`
-	SubscriptionDate string `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
-	LastLoginDate    string `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
+	SubscriptionDate string            `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
+	LastLoginDate    string            `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
+	InstallationData *InstallationData `json:"installationData" bson:"installationData,omitempty"`
+}
+
+type RelevantImageVulnerabilitiesConfiguration string
+
+const (
+	RelevantImageVulnerabilitiesConfigurationEnable  RelevantImageVulnerabilitiesConfiguration = "enable"
+	RelevantImageVulnerabilitiesConfigurationDisable RelevantImageVulnerabilitiesConfiguration = "disable"
+	RelevantImageVulnerabilitiesConfigurationDetect  RelevantImageVulnerabilitiesConfiguration = "detect"
+)
+
+type InstallationData struct {
+	ClusterName                               string                                    `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                             // cluster name defined manually or from the cluster context
+	ClusterShortName                          string                                    `json:"clusterShortName,omitempty" bson:"clusterShortName,omitempty"`                                                   // cluster short name enriched from the cluster name by BE
+	StorageEnabled                            *bool                                     `json:"storage,omitempty" bson:"storage,omitempty"`                                                                     // storage configuration (enabled/disabled)
+	RelevantImageVulnerabilitiesEnabled       *bool                                     `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"`             // relevancy actual state (enabled/disabled)
+	RelevantImageVulnerabilitiesConfiguration RelevantImageVulnerabilitiesConfiguration `json:"relevantImageVulnerabilitiesConfiguration,omitempty" bson:"relevantImageVulnerabilitiesConfiguration,omitempty"` // relevancy configuration defined user
+	Namespace                                 string                                    `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                                 // namespace to deploy the components
+	ImageVulnerabilitiesScanningEnabled       *bool                                     `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"`             // image scanning configuration (enabled/disabled)
+	PostureScanEnabled                        *bool                                     `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                               // posture configuration (enabled/disabled)
+	OtelCollectorEnabled                      *bool                                     `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                                         // otel collector configuration (enabled/disabled)
+	ClusterProvider                           string                                    `json:"clusterProvider,omitempty" bson:"clusterProvider,omitempty"`                                                     // cluster provider (aws/azure/gcp)
+
 }
 
 // hold information of a single subscription.
@@ -192,6 +215,9 @@ type Subscription struct {
 
 	// Stripe subscription status, optional values: incomplete, incomplete_expired, trialing, active, past_due, canceled, or unpaid.
 	SubscriptionStatus string `json:"subscriptionStatus,omitempty" bson:"subscriptionStatus,omitempty"`
+
+	// Date when the subscription was first created. The date might differ from the created date due to backdating
+	StartDate int64 `json:"startDate,omitempty" bson:"startDate,omitempty"`
 
 	// Stripe The most recent invoice this subscription has generated.
 	LatestInvoice string `json:"latestInvoice,omitempty" bson:"latestInvoice,omitempty"`
@@ -296,4 +322,13 @@ type CustomerState struct {
 	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
 	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
 	NodeUsage      *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
+}
+
+type User struct {
+	DismissedBanners map[string]Banner `json:"dismissedBanners,omitempty" bson:"dismissedBanners,omitempty"` // map of bannerID to Banner
+}
+
+type Banner struct {
+	CustomerGUID string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"` // customerGUID of the account which clicked the banner
+	ScanID       string `json:"scanID,omitempty" bson:"scanID,omitempty"`             // for detailed view, unique key for banner is combination of scanID and bannerID
 }
