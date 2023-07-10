@@ -53,6 +53,24 @@ type NotificationsConfig struct {
 	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
 	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
 	LatestPushReports  map[string]*PushReport                    `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
+	AlertChannels      map[CollaborationType][]AlertChannel      `json:"alertChannels,omitempty" bson:"alertChannels,omitempty"`
+}
+
+type AlertChannel struct {
+	ChannelType             CollaborationType `json:"channelType,omitempty" bson:"channelType,omitempty"`
+	CollaborationConfigGUID string            `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
+	Alerts                  []AlertConfig     `json:"notifications,omitempty" bson:"notifications,omitempty"`
+}
+type AlertConfig struct {
+	NotificationConfigIdentifier `json:",inline" bson:",inline"`
+	Scope                        []AlertScope           `json:"scope,omitempty" bson:"scope,omitempty"`
+	Parameters                   map[string]interface{} `json:"attributes,omitempty" bson:"attributes,omitempty"`
+	Disabled                     *bool                  `json:"disabled,omitempty" bson:"disabled,omitempty"`
+}
+
+type AlertScope struct {
+	Cluster    string   `json:"cluster,omitempty" bson:"cluster,omitempty"`
+	Namespaces []string `json:"namespaces,omitempty" bson:"namespaces,omitempty"`
 }
 
 func (nc *NotificationsConfig) AddLatestPushReport(report *PushReport) {
@@ -128,4 +146,13 @@ type ResourceScanned struct {
 type SeverityDetails struct {
 	Severity              string `json:"severity" bson:"severity"`
 	FailedResourcesNumber int    `json:"failedResourcesNumber" bson:"failedResourcesNumber"`
+}
+
+type NotificationPushEvent struct {
+	CustomerGUID string           `json:"customerGUID"`
+	EventName    string           `json:"eventName"`
+	EventTime    time.Time        `json:"eventTime"`
+	ReportGUID   string           `json:"reportGUID,omitempty"`
+	ClusterName  string           `json:"clusterName,omitempty"`
+	Designators  PortalDesignator `json:"designators,omitempty"`
 }

@@ -44,13 +44,22 @@ type CollaborationConfigOption struct {
 	IconBase64 string `json:"iconBase64,omitempty" bson:"iconBase64,omitempty"`
 }
 
+type CollaborationType string
+
+const (
+	CollaborationTypeJira  CollaborationType = "jira"
+	CollaborationTypeSlack CollaborationType = "slack"
+	CollaborationTypeTeams CollaborationType = "teams"
+	CollaborationTypeEmail CollaborationType = "email"
+)
+
 // swagger:model CollaborationConfig
 type CollaborationConfig struct {
 	PortalBase `json:",inline" bson:",inline"`
 
 	// Provider name
 	// Example: jira
-	Provider string `json:"provider" bson:"provider,omitempty"`
+	Provider CollaborationType `json:"provider" bson:"provider,omitempty"`
 
 	// Host name for private hosting
 	// Example: http://example.com
