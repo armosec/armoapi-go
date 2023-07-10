@@ -8,6 +8,37 @@ import (
 
 type DataType string
 
+// PortalCache is an auxiliary structure to store cache data
+type PortalCache struct {
+	GUID         string      `json:"guid" bson:"guid"`
+	Name         string      `json:"name,omitempty" bson:"name,omitempty"`
+	DataType     DataType    `json:"dataType,omitempty" bson:"dataType,omitempty"`
+	Data         interface{} `json:"data,omitempty" bson:"data,omitempty"`
+	CreationTime string      `json:"creationTime" bson:"creationTime"`
+	UpdatedTime  string      `json:"lastUpdated,omitempty" bson:"lastUpdated,omitempty"`
+	ExpiryTime   time.Time   `json:"expiryTime,omitempty" bson:"expiryTime,omitempty"`
+}
+
+func (c *PortalCache) SetExpiryTime(expiryTime time.Time) {
+	c.ExpiryTime = expiryTime
+}
+
+func (c *PortalCache) SetTTL(ttl time.Duration) {
+	c.ExpiryTime = time.Now().Add(ttl)
+}
+
+func GetCacheData[T any](cache *PortalCache) (T, error) {
+	if cache.Data == nil {
+		var val T
+		return val, fmt.Errorf("cache data is nil")
+	}
+	val, ok := cache.Data.(T)
+	if !ok {
+		return val, fmt.Errorf("cache data is not of type %T", val)
+	}
+	return val, nil
+}
+
 // Generates cache data-type form properties
 func MakeCacheDataTypeV1(service, customerGUID, domain, propose, version string) DataType {
 	return DataType(fmt.Sprintf("datatypeV1:%s-%s-%s-%s-%s", service, customerGUID, domain, propose, version))
@@ -31,35 +62,4 @@ func ParseCacheDataTypeV1(dataType DataType) (service, customerGUID, domain, pro
 	propose = parts[3]
 	version = parts[4]
 	return
-}
-
-// PortalCache is an auxiliary structure to store cache data
-type PortalCache struct {
-	GUID         string      `json:"guid" bson:"guid"`
-	Name         string      `json:"name,omitempty" bson:"name,omitempty"`
-	DataType     DataType    `json:"dataType,omitempty" bson:"dataType,omitempty"`
-	Data         interface{} `json:"data,omitempty" bson:"data,omitempty"`
-	CreationTime string      `json:"creationTime" bson:"creationTime"`
-	UpdatedTime  string      `json:"lastUpdated,omitempty" bson:"lastUpdated,omitempty"`
-	ExpiryTime   time.Time   `json:"expiryTime,omitempty" bson:"expiryTime,omitempty"`
-}
-
-func GetCacheData[T any](cache *PortalCache) (T, error) {
-	if cache.Data == nil {
-		var val T
-		return val, fmt.Errorf("cache data is nil")
-	}
-	val, ok := cache.Data.(T)
-	if !ok {
-		return val, fmt.Errorf("cache data is not of type %T", val)
-	}
-	return val, nil
-}
-
-func (c *PortalCache) SetExpiryTime(expiryTime time.Time) {
-	c.ExpiryTime = expiryTime
-}
-
-func (c *PortalCache) SetTTL(ttl time.Duration) {
-	c.ExpiryTime = time.Now().Add(ttl)
 }
