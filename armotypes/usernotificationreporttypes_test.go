@@ -289,7 +289,7 @@ func TestGetAlertConfigurations(t *testing.T) {
 }
 
 func TestAlertParams(t *testing.T) {
-	ap := make(AlertParams)
+	ap := make(NotificationParams)
 
 	// Test SetDriftPercentage and GetDriftPercentage
 	ap.SetDriftPercentage(10)

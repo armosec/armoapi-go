@@ -64,12 +64,12 @@ type AlertChannel struct {
 	Alerts                  []AlertConfig   `json:"notifications,omitempty" bson:"notifications,omitempty"`
 }
 
-type AlertParams map[NotificationParameter]interface{}
+type NotificationParams map[NotificationParameter]interface{}
 type AlertConfig struct {
 	NotificationConfigIdentifier `json:",inline" bson:",inline"`
-	Scope                        []AlertScope `json:"scope,omitempty" bson:"scope,omitempty"`
-	Parameters                   AlertParams  `json:"attributes,omitempty" bson:"attributes,omitempty"`
-	Disabled                     *bool        `json:"disabled,omitempty" bson:"disabled,omitempty"`
+	Scope                        []AlertScope       `json:"scope,omitempty" bson:"scope,omitempty"`
+	Parameters                   NotificationParams `json:"attributes,omitempty" bson:"attributes,omitempty"`
+	Disabled                     *bool              `json:"disabled,omitempty" bson:"disabled,omitempty"`
 }
 
 type AlertScope struct {
