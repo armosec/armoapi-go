@@ -24,7 +24,7 @@ func (c *PortalCache) SetExpiryTime(expiryTime time.Time) {
 }
 
 func (c *PortalCache) SetTTL(ttl time.Duration) {
-	c.ExpiryTime = time.Now().Add(ttl)
+	c.ExpiryTime = time.Now().UTC().Add(ttl)
 }
 
 func GetCacheData[T any](cache *PortalCache) (T, error) {
