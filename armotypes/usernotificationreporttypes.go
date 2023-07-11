@@ -1,10 +1,7 @@
 package armotypes
 
 import (
-	"fmt"
 	"time"
-
-	"golang.org/x/exp/slices"
 )
 
 type WeeklyReport struct {
@@ -55,86 +52,29 @@ type NotificationsConfig struct {
 	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
 	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
 	LatestPushReports  map[string]*PushReport                    `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
-	AlertChannels      map[CollaborationType][]AlertChannel      `json:"alertChannels,omitempty" bson:"alertChannels,omitempty"`
-}
-
-type AlertChannel struct {
-	ChannelType             CollaborationType `json:"channelType,omitempty" bson:"channelType,omitempty"`
-	CollaborationConfigGUID string            `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
-	Alerts                  []AlertConfig     `json:"notifications,omitempty" bson:"notifications,omitempty"`
-}
-
-func (ac *AlertChannel) GetAlertConfig(notificationType NotificationType) *AlertConfig {
-	for _, alert := range ac.Alerts {
-		if alert.NotificationType == notificationType {
-			return &alert
-		}
-	}
-	return nil
-}
-
-type AlertConfig struct {
-	NotificationConfigIdentifier `json:",inline" bson:",inline"`
-	Scope                        []AlertScope           `json:"scope,omitempty" bson:"scope,omitempty"`
-	Parameters                   map[string]interface{} `json:"attributes,omitempty" bson:"attributes,omitempty"`
-	Disabled                     *bool                  `json:"disabled,omitempty" bson:"disabled,omitempty"`
-}
-
-type AlertScope struct {
-	Cluster    string   `json:"cluster,omitempty" bson:"cluster,omitempty"`
-	Namespaces []string `json:"namespaces,omitempty" bson:"namespaces,omitempty"`
-}
-
-func (nc *NotificationsConfig) GetAlertConfigurations(notificationType NotificationType) []AlertConfig {
-	alerts := make([]AlertConfig, 0)
-	for _, typesChannels := range nc.AlertChannels {
-		for _, alertChannel := range typesChannels {
-			if config := alertChannel.GetAlertConfig(notificationType); config != nil {
-				alerts = append(alerts, *config)
-			}
-		}
-	}
-	return alerts
-}
-
-func (nc *NotificationsConfig) AddLatestPushReport(report *PushReport) {
-	if report == nil {
-		return
-	}
-	if nc.LatestPushReports == nil {
-		nc.LatestPushReports = make(map[string]*PushReport, 0)
-	}
-	nc.LatestPushReports[fmt.Sprintf("%s_%s", report.Cluster, report.ScanType)] = report
-}
-
-func (nc *NotificationsConfig) GetLatestPushReport(cluster string, scanType ScanType) *PushReport {
-	if val, ok := nc.LatestPushReports[fmt.Sprintf("%s_%s", cluster, scanType)]; ok {
-		return val
-	}
-	return nil
-}
-
-type PushReport struct {
-	Cluster                   string             `json:"custer,omitempty" bson:"custer,omitempty"`
-	ReportGUID                string             `json:"reportGUID,omitempty" bson:"reportGUID,omitempty"`
-	ScanType                  ScanType           `json:"scanType" bson:"scanType"`
-	Timestamp                 time.Time          `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
-	FailedResources           uint64             `json:"failedResources,omitempty" bson:"failedResources,omitempty"`
-	FrameworksComplianceScore map[string]float32 `json:"frameworksComplianceScore,omitempty" bson:"frameworksComplianceScore,omitempty"`
+	AlertChannels      map[ChannelProvider][]AlertChannel        `json:"alertChannels,omitempty" bson:"alertChannels,omitempty"`
 }
 
 type NotificationConfigIdentifier struct {
 	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
 }
+type AlertChannel struct {
+	ChannelType             ChannelProvider `json:"channelType,omitempty" bson:"channelType,omitempty"`
+	CollaborationConfigGUID string          `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
+	Alerts                  []AlertConfig   `json:"notifications,omitempty" bson:"notifications,omitempty"`
+}
 
-func (nci *NotificationConfigIdentifier) Validate() error {
-	if slices.Contains(notificationTypes, nci.NotificationType) {
-		return nil
-	}
-	if nci.NotificationType == "" {
-		return fmt.Errorf("notification type is required")
-	}
-	return fmt.Errorf("invalid notification type: %s", nci.NotificationType)
+type AlertParams map[NotificationParameter]interface{}
+type AlertConfig struct {
+	NotificationConfigIdentifier `json:",inline" bson:",inline"`
+	Scope                        []AlertScope `json:"scope,omitempty" bson:"scope,omitempty"`
+	Parameters                   AlertParams  `json:"attributes,omitempty" bson:"attributes,omitempty"`
+	Disabled                     *bool        `json:"disabled,omitempty" bson:"disabled,omitempty"`
+}
+
+type AlertScope struct {
+	Cluster    string   `json:"cluster,omitempty" bson:"cluster,omitempty"`
+	Namespaces []string `json:"namespaces,omitempty" bson:"namespaces,omitempty"`
 }
 
 type NotificationType string
@@ -156,6 +96,22 @@ var notificationTypes = []NotificationType{NotificationTypeAll,
 	NotificationTypeNewClusterAdmin,
 	NotificationTypeNewVulnerability,
 	NotificationTypeVulnerabilityNewFix,
+}
+
+type NotificationParameter string
+
+const (
+	NotificationParameterDriftPercentage NotificationParameter = "driftPercentage"
+	NotificationParameterMinSeverity     NotificationParameter = "minSeverity"
+)
+
+type PushReport struct {
+	Cluster                   string             `json:"custer,omitempty" bson:"custer,omitempty"`
+	ReportGUID                string             `json:"reportGUID,omitempty" bson:"reportGUID,omitempty"`
+	ScanType                  ScanType           `json:"scanType" bson:"scanType"`
+	Timestamp                 time.Time          `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
+	FailedResources           uint64             `json:"failedResources,omitempty" bson:"failedResources,omitempty"`
+	FrameworksComplianceScore map[string]float32 `json:"frameworksComplianceScore,omitempty" bson:"frameworksComplianceScore,omitempty"`
 }
 
 type RegistryScanned struct {

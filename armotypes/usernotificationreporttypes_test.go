@@ -260,7 +260,7 @@ func TestGetAlertConfigurations(t *testing.T) {
 	}
 
 	notificationsConfig := NotificationsConfig{
-		AlertChannels: map[CollaborationType][]AlertChannel{
+		AlertChannels: map[ChannelProvider][]AlertChannel{
 			CollaborationTypeJira:  {alertChannel1},
 			CollaborationTypeSlack: {alertChannel2},
 		},
@@ -285,5 +285,143 @@ func TestGetAlertConfigurations(t *testing.T) {
 	alertConfigs = notificationsConfig.GetAlertConfigurations(NotificationTypeAll)
 	if len(alertConfigs) != 0 {
 		t.Errorf("Expected 0 alert configs, got %d", len(alertConfigs))
+	}
+}
+
+func TestAlertParams(t *testing.T) {
+	ap := make(AlertParams)
+
+	// Test SetDriftPercentage and GetDriftPercentage
+	ap.SetDriftPercentage(10)
+	percentage, err := ap.GetDriftPercentage()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if percentage != 10 {
+		t.Errorf("Expected 10, got %d", percentage)
+	}
+
+	// Test SetMinSeverity and GetMinSeverity
+	ap.SetMinSeverity(5)
+	severity, err := ap.GetMinSeverity()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if severity != 5 {
+		t.Errorf("Expected 5, got %d", severity)
+	}
+}
+
+func TestNotificationsConfigChannels(t *testing.T) {
+	nc := NotificationsConfig{
+		AlertChannels: make(map[ChannelProvider][]AlertChannel),
+	}
+	ac := AlertChannel{
+		Alerts: []AlertConfig{
+			{
+				Scope: []AlertScope{
+					{
+						Cluster:    "testCluster",
+						Namespaces: []string{"testNamespace"},
+					},
+				},
+			},
+		},
+	}
+	nc.AlertChannels["testProvider"] = []AlertChannel{ac}
+
+	// Test GetProviderChannels
+	channels := nc.GetProviderChannels("testProvider")
+	if len(channels) != 1 {
+		t.Errorf("Expected 1, got %d", len(channels))
+	}
+
+	// Test IsInScope for NotificationsConfig, AlertChannel, AlertConfig, and AlertScope
+	if !nc.IsInScope("testCluster", "testNamespace") {
+		t.Errorf("Expected true, got false")
+	}
+	if !channels[0].IsInScope("testCluster", "testNamespace") {
+		t.Errorf("Expected true, got false")
+	}
+	if !channels[0].Alerts[0].IsInScope("testCluster", "testNamespace") {
+		t.Errorf("Expected true, got false")
+	}
+	if !channels[0].Alerts[0].Scope[0].IsInScope("testCluster", "testNamespace") {
+		t.Errorf("Expected true, got false")
+	}
+
+	// Test AddAlertConfig and GetAlertConfig
+	err := channels[0].AddAlertConfig(AlertConfig{
+		NotificationConfigIdentifier: NotificationConfigIdentifier{
+			NotificationType: "testType",
+		},
+	})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	config := channels[0].GetAlertConfig("testType")
+	if config == nil {
+		t.Errorf("Expected non-nil, got nil")
+	}
+	if config.NotificationType != "testType" {
+		t.Errorf("Expected 'testType', got '%s'", config.NotificationType)
+	}
+}
+
+func TestNotificationsConfigChannelsNegative(t *testing.T) {
+	nc := NotificationsConfig{
+		AlertChannels: make(map[ChannelProvider][]AlertChannel),
+	}
+	ac := AlertChannel{
+		Alerts: []AlertConfig{
+			{
+				NotificationConfigIdentifier: NotificationConfigIdentifier{
+					NotificationType: "testType",
+				},
+				Scope: []AlertScope{
+					{
+						Cluster:    "testCluster",
+						Namespaces: []string{"testNamespace"},
+					},
+				},
+			},
+		},
+	}
+	nc.AlertChannels["testProvider"] = []AlertChannel{ac}
+
+	// Test GetProviderChannels with non-existing provider
+	channels := nc.GetProviderChannels("nonExistingProvider")
+	if len(channels) != 0 {
+		t.Errorf("Expected 0, got %d", len(channels))
+	}
+
+	// Test IsInScope for NotificationsConfig, AlertChannel, AlertConfig, and AlertScope with non-existing cluster and namespace
+	if nc.IsInScope("nonExistingCluster", "nonExistingNamespace") {
+		t.Errorf("Expected false, got true")
+	}
+	if nc.AlertChannels["testProvider"][0].IsInScope("nonExistingCluster", "nonExistingNamespace") {
+		t.Errorf("Expected false, got true")
+	}
+	if nc.AlertChannels["testProvider"][0].Alerts[0].IsInScope("nonExistingCluster", "nonExistingNamespace") {
+		t.Errorf("Expected false, got true")
+	}
+	if nc.AlertChannels["testProvider"][0].Alerts[0].Scope[0].IsInScope("nonExistingCluster", "nonExistingNamespace") {
+		t.Errorf("Expected false, got true")
+	}
+
+	// Test AddAlertConfig with existing notification type
+	err := nc.AlertChannels["testProvider"][0].AddAlertConfig(AlertConfig{
+		NotificationConfigIdentifier: NotificationConfigIdentifier{
+			NotificationType: "testType",
+		},
+	})
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+
+	// Test GetAlertConfig with non-existing notification type
+	config := nc.AlertChannels["testProvider"][0].GetAlertConfig("nonExistingType")
+	if config != nil {
+		t.Errorf("Expected nil, got non-nil")
 	}
 }

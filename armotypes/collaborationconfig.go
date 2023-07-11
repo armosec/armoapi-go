@@ -44,13 +44,13 @@ type CollaborationConfigOption struct {
 	IconBase64 string `json:"iconBase64,omitempty" bson:"iconBase64,omitempty"`
 }
 
-type CollaborationType string
+type ChannelProvider string
 
 const (
-	CollaborationTypeJira  CollaborationType = "jira"
-	CollaborationTypeSlack CollaborationType = "slack"
-	CollaborationTypeTeams CollaborationType = "teams"
-	CollaborationTypeEmail CollaborationType = "email"
+	CollaborationTypeJira  ChannelProvider = "jira"
+	CollaborationTypeSlack ChannelProvider = "slack"
+	CollaborationTypeTeams ChannelProvider = "teams"
+	CollaborationTypeEmail ChannelProvider = "email"
 )
 
 // swagger:model CollaborationConfig
@@ -59,7 +59,7 @@ type CollaborationConfig struct {
 
 	// Provider name
 	// Example: jira
-	Provider CollaborationType `json:"provider" bson:"provider,omitempty"`
+	Provider ChannelProvider `json:"provider" bson:"provider,omitempty"`
 
 	// Host name for private hosting
 	// Example: http://example.com
