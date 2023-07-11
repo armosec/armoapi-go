@@ -173,7 +173,7 @@ func TestNotificationConfigIdentifier_Validate(t *testing.T) {
 	}
 
 	// Test case 2: Valid NotificationType (NotificationTypePush)
-	nci2 := NotificationConfigIdentifier{NotificationType: NotificationTypePush}
+	nci2 := NotificationConfigIdentifier{NotificationType: NotificationTypePushPosture}
 	err2 := nci2.Validate()
 	if err2 != nil {
 		t.Errorf("Test case 2 failed: Expected Validate to return nil error, but got %s", err2.Error())
@@ -204,5 +204,86 @@ func TestNotificationConfigIdentifier_Validate(t *testing.T) {
 		t.Errorf("Test case 5 failed: Expected Validate to return non-nil error, but got nil")
 	} else if err5.Error() != expectedError.Error() {
 		t.Errorf("Test case 5 failed: Expected error %s, but got %s", expectedError.Error(), err4.Error())
+	}
+}
+
+func TestGetAlertConfig(t *testing.T) {
+	alertChannel := AlertChannel{
+		Alerts: []AlertConfig{
+			{
+				NotificationConfigIdentifier: NotificationConfigIdentifier{
+					NotificationType: NotificationTypePushPosture,
+				},
+			},
+			{
+				NotificationConfigIdentifier: NotificationConfigIdentifier{
+					NotificationType: NotificationTypeWeekly,
+				},
+			},
+		},
+	}
+
+	// Test case where the alert config should be found
+	config := alertChannel.GetAlertConfig(NotificationTypePushPosture)
+	if config == nil {
+		t.Errorf("Expected alert config, got nil")
+	} else if config.NotificationType != NotificationTypePushPosture {
+		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypePushPosture, config.NotificationType)
+	}
+
+	// Test case where the alert config should not be found
+	config = alertChannel.GetAlertConfig(NotificationTypeAll)
+	if config != nil {
+		t.Errorf("Expected nil, got alert config")
+	}
+}
+
+func TestGetAlertConfigurations(t *testing.T) {
+	alertChannel1 := AlertChannel{
+		Alerts: []AlertConfig{
+			{
+				NotificationConfigIdentifier: NotificationConfigIdentifier{
+					NotificationType: NotificationTypePushPosture,
+				},
+			},
+		},
+	}
+
+	alertChannel2 := AlertChannel{
+		Alerts: []AlertConfig{
+			{
+				NotificationConfigIdentifier: NotificationConfigIdentifier{
+					NotificationType: NotificationTypeWeekly,
+				},
+			},
+		},
+	}
+
+	notificationsConfig := NotificationsConfig{
+		AlertChannels: map[CollaborationType][]AlertChannel{
+			CollaborationTypeJira:  {alertChannel1},
+			CollaborationTypeSlack: {alertChannel2},
+		},
+	}
+
+	// Test case where the alert configs should be found
+	alertConfigs := notificationsConfig.GetAlertConfigurations(NotificationTypePushPosture)
+	if len(alertConfigs) != 1 {
+		t.Errorf("Expected 1 alert config, got %d", len(alertConfigs))
+	} else if alertConfigs[0].NotificationType != NotificationTypePushPosture {
+		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypePushPosture, alertConfigs[0].NotificationType)
+	}
+
+	alertConfigs = notificationsConfig.GetAlertConfigurations(NotificationTypeWeekly)
+	if len(alertConfigs) != 1 {
+		t.Errorf("Expected 1 alert config, got %d", len(alertConfigs))
+	} else if alertConfigs[0].NotificationType != NotificationTypeWeekly {
+		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypeWeekly, alertConfigs[0].NotificationType)
+	}
+
+	// Test case where the alert configs should not be found
+	alertConfigs = notificationsConfig.GetAlertConfigurations(NotificationTypeAll)
+	if len(alertConfigs) != 0 {
+		t.Errorf("Expected 0 alert configs, got %d", len(alertConfigs))
 	}
 }

@@ -3,6 +3,8 @@ package armotypes
 import (
 	"fmt"
 	"time"
+
+	"golang.org/x/exp/slices"
 )
 
 type WeeklyReport struct {
@@ -61,6 +63,16 @@ type AlertChannel struct {
 	CollaborationConfigGUID string            `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
 	Alerts                  []AlertConfig     `json:"notifications,omitempty" bson:"notifications,omitempty"`
 }
+
+func (ac *AlertChannel) GetAlertConfig(notificationType NotificationType) *AlertConfig {
+	for _, alert := range ac.Alerts {
+		if alert.NotificationType == notificationType {
+			return &alert
+		}
+	}
+	return nil
+}
+
 type AlertConfig struct {
 	NotificationConfigIdentifier `json:",inline" bson:",inline"`
 	Scope                        []AlertScope           `json:"scope,omitempty" bson:"scope,omitempty"`
@@ -71,6 +83,18 @@ type AlertConfig struct {
 type AlertScope struct {
 	Cluster    string   `json:"cluster,omitempty" bson:"cluster,omitempty"`
 	Namespaces []string `json:"namespaces,omitempty" bson:"namespaces,omitempty"`
+}
+
+func (nc *NotificationsConfig) GetAlertConfigurations(notificationType NotificationType) []AlertConfig {
+	alerts := make([]AlertConfig, 0)
+	for _, typesChannels := range nc.AlertChannels {
+		for _, alertChannel := range typesChannels {
+			if config := alertChannel.GetAlertConfig(notificationType); config != nil {
+				alerts = append(alerts, *config)
+			}
+		}
+	}
+	return alerts
 }
 
 func (nc *NotificationsConfig) AddLatestPushReport(report *PushReport) {
@@ -104,7 +128,7 @@ type NotificationConfigIdentifier struct {
 }
 
 func (nci *NotificationConfigIdentifier) Validate() error {
-	if nci.NotificationType == NotificationTypeAll || nci.NotificationType == NotificationTypePush || nci.NotificationType == NotificationTypeWeekly {
+	if slices.Contains(notificationTypes, nci.NotificationType) {
 		return nil
 	}
 	if nci.NotificationType == "" {
@@ -116,10 +140,23 @@ func (nci *NotificationConfigIdentifier) Validate() error {
 type NotificationType string
 
 const (
-	NotificationTypeAll    NotificationType = "all"
-	NotificationTypePush   NotificationType = "push"
-	NotificationTypeWeekly NotificationType = "weekly"
+	NotificationTypeAll                 NotificationType = "all"
+	NotificationTypePushPosture         NotificationType = "push"
+	NotificationTypeWeekly              NotificationType = "weekly"
+	NotificationTypeComplianceDrift     NotificationType = "complianceDrift"
+	NotificationTypeNewClusterAdmin     NotificationType = "newClusterAdmin"
+	NotificationTypeNewVulnerability    NotificationType = "newVulnerability"
+	NotificationTypeVulnerabilityNewFix NotificationType = "vulnerabilityNewFix"
 )
+
+var notificationTypes = []NotificationType{NotificationTypeAll,
+	NotificationTypePushPosture,
+	NotificationTypeWeekly,
+	NotificationTypeComplianceDrift,
+	NotificationTypeNewClusterAdmin,
+	NotificationTypeNewVulnerability,
+	NotificationTypeVulnerabilityNewFix,
+}
 
 type RegistryScanned struct {
 	Registry ResourceScanned `json:"registry" bson:"registry"`
