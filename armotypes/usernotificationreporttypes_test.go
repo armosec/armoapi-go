@@ -167,7 +167,7 @@ func TestGetLatestPushReport(t *testing.T) {
 func TestNotificationConfigIdentifier_Validate(t *testing.T) {
 
 	// Test case 2: Valid NotificationType (NotificationTypePush)
-	nci2 := NotificationConfigIdentifier{NotificationType: NotificationTypePushPosture}
+	nci2 := NotificationConfigIdentifier{NotificationType: NotificationTypePush}
 	err2 := nci2.Validate()
 	if err2 != nil {
 		t.Errorf("Test case 2 failed: Expected Validate to return nil error, but got %s", err2.Error())
@@ -206,7 +206,7 @@ func TestGetAlertConfig(t *testing.T) {
 		Alerts: []AlertConfig{
 			{
 				NotificationConfigIdentifier: NotificationConfigIdentifier{
-					NotificationType: NotificationTypePushPosture,
+					NotificationType: NotificationTypePush,
 				},
 			},
 			{
@@ -218,11 +218,11 @@ func TestGetAlertConfig(t *testing.T) {
 	}
 
 	// Test case where the alert config should be found
-	config := alertChannel.GetAlertConfig(NotificationTypePushPosture)
+	config := alertChannel.GetAlertConfig(NotificationTypePush)
 	if config == nil {
 		t.Errorf("Expected alert config, got nil")
-	} else if config.NotificationType != NotificationTypePushPosture {
-		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypePushPosture, config.NotificationType)
+	} else if config.NotificationType != NotificationTypePush {
+		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypePush, config.NotificationType)
 	}
 
 }
@@ -232,7 +232,7 @@ func TestGetAlertConfigurations(t *testing.T) {
 		Alerts: []AlertConfig{
 			{
 				NotificationConfigIdentifier: NotificationConfigIdentifier{
-					NotificationType: NotificationTypePushPosture,
+					NotificationType: NotificationTypePush,
 				},
 			},
 		},
@@ -256,11 +256,11 @@ func TestGetAlertConfigurations(t *testing.T) {
 	}
 
 	// Test case where the alert configs should be found
-	alertConfigs := notificationsConfig.GetAlertConfigurations(NotificationTypePushPosture)
+	alertConfigs := notificationsConfig.GetAlertConfigurations(NotificationTypePush)
 	if len(alertConfigs) != 1 {
 		t.Errorf("Expected 1 alert config, got %d", len(alertConfigs))
-	} else if alertConfigs[0].NotificationType != NotificationTypePushPosture {
-		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypePushPosture, alertConfigs[0].NotificationType)
+	} else if alertConfigs[0].NotificationType != NotificationTypePush {
+		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypePush, alertConfigs[0].NotificationType)
 	}
 
 	alertConfigs = notificationsConfig.GetAlertConfigurations(NotificationTypeWeekly)
