@@ -12,6 +12,7 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/stretchr/testify v1.7.0
 	github.com/stripe/stripe-go/v74 v74.8.0
+	golang.org/x/exp v0.0.0-20230711023510-fffb14384f22
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	gorm.io/datatypes v1.1.1
 	gorm.io/gorm v1.24.6
