@@ -7,31 +7,11 @@ import (
 )
 
 func (ap NotificationParams) SetDriftPercentage(percentage int) {
-	ap[NotificationParameterDriftPercentage] = percentage
-}
-
-func (ap NotificationParams) GetDriftPercentage() (int, error) {
-	if val, ok := ap[NotificationParameterDriftPercentage]; ok {
-		if percentage, ok := val.(int); ok {
-			return percentage, nil
-		}
-		return 0, fmt.Errorf("drift percentage is not an integer")
-	}
-	return 0, fmt.Errorf("drift percentage not found")
+	ap.DriftPercentage = &percentage
 }
 
 func (ap NotificationParams) SetMinSeverity(severity int) {
-	ap[NotificationParameterMinSeverity] = severity
-}
-
-func (ap NotificationParams) GetMinSeverity() (int, error) {
-	if val, ok := ap[NotificationParameterMinSeverity]; ok {
-		if severity, ok := val.(int); ok {
-			return severity, nil
-		}
-		return 0, fmt.Errorf("min severity is not an integer")
-	}
-	return 0, fmt.Errorf("min severity not found")
+	ap.DriftPercentage = &severity
 }
 
 func (ac *AlertChannel) GetAlertConfig(notificationType NotificationType) *AlertConfig {

@@ -40,14 +40,14 @@ func GetCacheData[T any](cache *PortalCache) (T, error) {
 }
 
 // Generates cache data-type form properties
-func MakeCacheDataTypeV1(service, customerGUID, domain, propose, version string) DataType {
-	return DataType(fmt.Sprintf("datatypeV1:%s-%s-%s-%s-%s", service, customerGUID, domain, propose, version))
+func MakeCacheDataTypeV1(service, domain, purpose, version string) DataType {
+	return DataType(fmt.Sprintf("datatypeV1:%s-%s-%s-%s", service, domain, purpose, version))
 }
 
 // Parse cache data-type
-func ParseCacheDataTypeV1(dataType DataType) (service, customerGUID, domain, propose, version string, err error) {
+func ParseCacheDataTypeV1(dataType DataType) (service, domain, propose, version string, err error) {
 	parts := strings.Split(string(dataType), "-")
-	if len(parts) != 5 {
+	if len(parts) != 4 {
 		err = fmt.Errorf("failed to parse dataType: %s", dataType)
 		return
 	}
@@ -57,9 +57,8 @@ func ParseCacheDataTypeV1(dataType DataType) (service, customerGUID, domain, pro
 		return
 	}
 	service = parts[0][len(prefix):]
-	customerGUID = parts[1]
-	domain = parts[2]
-	propose = parts[3]
-	version = parts[4]
+	domain = parts[1]
+	propose = parts[2]
+	version = parts[3]
 	return
 }

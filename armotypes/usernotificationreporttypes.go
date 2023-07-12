@@ -64,7 +64,11 @@ type AlertChannel struct {
 	Alerts                  []AlertConfig   `json:"notifications,omitempty" bson:"notifications,omitempty"`
 }
 
-type NotificationParams map[NotificationParameter]interface{}
+type NotificationParams struct {
+	DriftPercentage *int `json:"driftPercentage,omitempty" bson:"driftPercentage,omitempty"`
+	MinSeverity     *int `json:"minSeverity,omitempty" bson:"minSeverity,omitempty"`
+}
+
 type AlertConfig struct {
 	NotificationConfigIdentifier `json:",inline" bson:",inline"`
 	Scope                        []AlertScope       `json:"scope,omitempty" bson:"scope,omitempty"`
@@ -80,7 +84,6 @@ type AlertScope struct {
 type NotificationType string
 
 const (
-	NotificationTypeAll                 NotificationType = "all"
 	NotificationTypePushPosture         NotificationType = "push"
 	NotificationTypeWeekly              NotificationType = "weekly"
 	NotificationTypeComplianceDrift     NotificationType = "complianceDrift"
@@ -89,7 +92,7 @@ const (
 	NotificationTypeVulnerabilityNewFix NotificationType = "vulnerabilityNewFix"
 )
 
-var notificationTypes = []NotificationType{NotificationTypeAll,
+var notificationTypes = []NotificationType{
 	NotificationTypePushPosture,
 	NotificationTypeWeekly,
 	NotificationTypeComplianceDrift,
@@ -97,13 +100,6 @@ var notificationTypes = []NotificationType{NotificationTypeAll,
 	NotificationTypeNewVulnerability,
 	NotificationTypeVulnerabilityNewFix,
 }
-
-type NotificationParameter string
-
-const (
-	NotificationParameterDriftPercentage NotificationParameter = "driftPercentage"
-	NotificationParameterMinSeverity     NotificationParameter = "minSeverity"
-)
 
 type PushReport struct {
 	Cluster                   string             `json:"custer,omitempty" bson:"custer,omitempty"`
@@ -141,11 +137,12 @@ type SeverityDetails struct {
 	FailedResourcesNumber int    `json:"failedResourcesNumber" bson:"failedResourcesNumber"`
 }
 
+const (
+	NotificationBeforeUpdateContainerScanEvent = "beforeUpdateContainerScan"
+)
+
 type NotificationPushEvent struct {
-	CustomerGUID string           `json:"customerGUID"`
-	EventName    string           `json:"eventName"`
-	EventTime    time.Time        `json:"eventTime"`
-	ReportGUID   string           `json:"reportGUID,omitempty"`
-	ClusterName  string           `json:"clusterName,omitempty"`
-	Designators  PortalDesignator `json:"designators,omitempty"`
+	EventName   string           `json:"eventName"`
+	EventTime   time.Time        `json:"eventTime"`
+	Designators PortalDesignator `json:"designators,omitempty"`
 }

@@ -165,12 +165,6 @@ func TestGetLatestPushReport(t *testing.T) {
 }
 
 func TestNotificationConfigIdentifier_Validate(t *testing.T) {
-	// Test case 1: Valid NotificationType (NotificationTypeAll)
-	nci1 := NotificationConfigIdentifier{NotificationType: NotificationTypeAll}
-	err1 := nci1.Validate()
-	if err1 != nil {
-		t.Errorf("Test case 1 failed: Expected Validate to return nil error, but got %s", err1.Error())
-	}
 
 	// Test case 2: Valid NotificationType (NotificationTypePush)
 	nci2 := NotificationConfigIdentifier{NotificationType: NotificationTypePushPosture}
@@ -231,11 +225,6 @@ func TestGetAlertConfig(t *testing.T) {
 		t.Errorf("Expected NotificationType to be %s, got %s", NotificationTypePushPosture, config.NotificationType)
 	}
 
-	// Test case where the alert config should not be found
-	config = alertChannel.GetAlertConfig(NotificationTypeAll)
-	if config != nil {
-		t.Errorf("Expected nil, got alert config")
-	}
 }
 
 func TestGetAlertConfigurations(t *testing.T) {
@@ -282,33 +271,9 @@ func TestGetAlertConfigurations(t *testing.T) {
 	}
 
 	// Test case where the alert configs should not be found
-	alertConfigs = notificationsConfig.GetAlertConfigurations(NotificationTypeAll)
+	alertConfigs = notificationsConfig.GetAlertConfigurations(NotificationTypeVulnerabilityNewFix)
 	if len(alertConfigs) != 0 {
 		t.Errorf("Expected 0 alert configs, got %d", len(alertConfigs))
-	}
-}
-
-func TestAlertParams(t *testing.T) {
-	ap := make(NotificationParams)
-
-	// Test SetDriftPercentage and GetDriftPercentage
-	ap.SetDriftPercentage(10)
-	percentage, err := ap.GetDriftPercentage()
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	if percentage != 10 {
-		t.Errorf("Expected 10, got %d", percentage)
-	}
-
-	// Test SetMinSeverity and GetMinSeverity
-	ap.SetMinSeverity(5)
-	severity, err := ap.GetMinSeverity()
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	if severity != 5 {
-		t.Errorf("Expected 5, got %d", severity)
 	}
 }
 

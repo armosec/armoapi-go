@@ -43,8 +43,8 @@ func TestGetCacheData(t *testing.T) {
 }
 
 func TestDataTypeConversion(t *testing.T) {
-	dataType := MakeCacheDataTypeV1("service", "customer", "domain", "propose", "version")
-	service, customerGUID, domain, propose, version, err := ParseCacheDataTypeV1(dataType)
+	dataType := MakeCacheDataTypeV1("service", "domain", "purpose", "version")
+	service, domain, purpose, version, err := ParseCacheDataTypeV1(dataType)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -52,17 +52,14 @@ func TestDataTypeConversion(t *testing.T) {
 	if service != "service" {
 		t.Errorf("expected service to be 'service', got '%s'", service)
 	}
-
-	if customerGUID != "customer" {
-		t.Errorf("expected customerGUID to be 'customer', got '%s'", customerGUID)
-	}
+	
 
 	if domain != "domain" {
 		t.Errorf("expected domain to be 'domain', got '%s'", domain)
 	}
 
-	if propose != "propose" {
-		t.Errorf("expected propose to be 'propose', got '%s'", propose)
+	if purpose != "purpose" {
+		t.Errorf("expected purpose to be 'purpose', got '%s'", purpose)
 	}
 
 	if version != "version" {
@@ -70,13 +67,13 @@ func TestDataTypeConversion(t *testing.T) {
 	}
 
 	// Test bad data type format
-	_, _, _, _, _, err = ParseCacheDataTypeV1("datatypeV1:invalid")
+	_, _, _,_,  err = ParseCacheDataTypeV1("datatypeV1:invalid")
 	if err == nil {
 		t.Error("expected error, got nil")
 	}
 
 	// Test incomplete data type
-	_, _, _, _, _, err = ParseCacheDataTypeV1("datatypeV1:service-customer-domain")
+	_, _, _,_,  err = ParseCacheDataTypeV1("datatypeV1:service-customer-domain")
 	if err == nil {
 		t.Error("expected error, got nil")
 	}
