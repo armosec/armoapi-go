@@ -25,7 +25,7 @@ type AttackChain struct {
 	CustomerGUID     string               `json:"customerGUID"`
 	AttackChainNodes AttackChainNode      `json:"attackChainNodes"`
 	UIStatus         *AttackChainUIStatus `json:"uiStatus"`
-	LatestReportGUID string               `json:"latestReportGUID"` // list of reportGUIDs in which this attack chain was identified
+	LatestReportGUID string               `json:"latestReportGUID"` // latest reportGUID in which this attack chain was identified
 }
 
 type AttackChainNode struct {
