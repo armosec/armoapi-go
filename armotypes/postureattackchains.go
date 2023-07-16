@@ -48,5 +48,5 @@ type AttackChainUIStatus struct {
 	FirstSeen string `json:"firstSeen"` // timestamp of first scan in which the attack chain was identified
 	// fields updated by the UI
 	ViewedMainScreen string `json:"wasViewedMainScreen"` // if the attack chain was viewed by the user// New badge
-	ProcessingStatus string `json:"processingStatus"`    // "processing"/"" //
+	ProcessingStatus string `json:"processingStatus"`    // "processing"/ "done"
 }
