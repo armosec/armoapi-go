@@ -23,10 +23,9 @@ type AttackChain struct {
 	Resource         PortalDesignator     `json:"resource"`
 	AttackChainID    string               `json:"attackChainID"` // name/cluster/resourceID
 	CustomerGUID     string               `json:"customerGUID"`
-	Status           AttackChainStatus    `json:"status"`
 	AttackChainNodes AttackChainNode      `json:"attackChainNodes"`
 	UIStatus         *AttackChainUIStatus `json:"uiStatus"`
-	AttackChainScans *AttackChainScans    `json:"attackChainScans"`
+	LatestReportGUID string               `json:"latestReportGUID"` // list of reportGUIDs in which this attack chain was identified
 }
 
 type AttackChainNode struct {
@@ -41,10 +40,6 @@ type AttackChainNode struct {
 type VulnerabilityNames struct {
 	ContainersScanID string `json:"containersScanID"`
 	Name             string `json:"name"` // CVE name
-}
-
-type AttackChainScans struct {
-	LatestReportGUID string `json:"latestReportGUID"` // list of reportGUIDs in which this attack chain was identified
 }
 
 // struct for UI support. All strings are timestamps
