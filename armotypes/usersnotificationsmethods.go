@@ -6,12 +6,12 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func (ap NotificationParams) SetDriftPercentage(percentage int) {
+func (ap *NotificationParams) SetDriftPercentage(percentage int) {
 	ap.DriftPercentage = &percentage
 }
 
-func (ap NotificationParams) SetMinSeverity(severity int) {
-	ap.DriftPercentage = &severity
+func (ap *NotificationParams) SetMinSeverity(severity int) {
+	ap.MinSeverity = &severity
 }
 
 func (ac *AlertChannel) GetAlertConfig(notificationType NotificationType) *AlertConfig {
@@ -56,6 +56,10 @@ func (ac *AlertConfig) IsInScope(cluster, namespace string) bool {
 	if !ac.IsEnabled() {
 		return false
 	}
+	//no scope defined, so all clusters are in scope
+	if ac.Scope == nil {
+		return true
+	}
 	for _, scope := range ac.Scope {
 		if scope.IsInScope(cluster, namespace) {
 			return true
@@ -71,6 +75,9 @@ func (ac *AlertScope) IsInScope(cluster, namespace string) bool {
 	}
 	if ac.Cluster != cluster {
 		return false
+	}
+	if namespace == "" {
+		return true
 	}
 	if len(ac.Namespaces) == 0 {
 		return true

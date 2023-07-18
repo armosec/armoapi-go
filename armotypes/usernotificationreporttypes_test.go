@@ -390,3 +390,74 @@ func TestNotificationsConfigChannelsNegative(t *testing.T) {
 		t.Errorf("Expected nil, got non-nil")
 	}
 }
+
+func TestSetDriftPercentage(t *testing.T) {
+	params := NotificationParams{}
+	percentage := 10
+
+	params.SetDriftPercentage(percentage)
+
+	if *params.DriftPercentage != percentage {
+		t.Errorf("Expected drift percentage to be %v, but got %v", percentage, *params.DriftPercentage)
+	}
+}
+
+func TestSetMinSeverity(t *testing.T) {
+	params := NotificationParams{}
+	severity := 5
+
+	params.SetMinSeverity(severity)
+
+	if *params.MinSeverity != severity {
+		t.Errorf("Expected min severity to be %v, but got %v", severity, *params.MinSeverity)
+	}
+}
+
+func TestAddAlertConfig(t *testing.T) {
+	channel := AlertChannel{}
+	config := AlertConfig{
+		NotificationConfigIdentifier: NotificationConfigIdentifier{
+			NotificationType: NotificationTypePush,
+		},
+	}
+
+	err := channel.AddAlertConfig(config)
+
+	if err != nil {
+		t.Errorf("Expected no error, but got %v", err)
+	}
+
+	if len(channel.Alerts) != 1 {
+		t.Errorf("Expected 1 alert config, but got %v", len(channel.Alerts))
+	}
+
+	if channel.Alerts[0].NotificationType != NotificationTypePush {
+		t.Errorf("Expected notification type to be %v, but got %v", NotificationTypePush, channel.Alerts[0].NotificationType)
+	}
+}
+
+func TestIsInScope(t *testing.T) {
+	scope := AlertScope{
+		Cluster:    "test-cluster",
+		Namespaces: []string{"test-namespace"},
+	}
+
+	if !scope.IsInScope("test-cluster", "test-namespace") {
+		t.Errorf("Expected scope to be in scope, but it was not")
+	}
+
+	if scope.IsInScope("wrong-cluster", "test-namespace") {
+		t.Errorf("Expected scope to not be in scope, but it was")
+	}
+}
+
+func TestIsEnabled(t *testing.T) {
+	disabled := false
+	config := AlertConfig{
+		Disabled: &disabled,
+	}
+
+	if !config.IsEnabled() {
+		t.Errorf("Expected alert config to be enabled, but it was not")
+	}
+}
