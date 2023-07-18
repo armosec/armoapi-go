@@ -84,12 +84,13 @@ type AlertScope struct {
 type NotificationType string
 
 const (
-	NotificationTypePush                NotificationType = "push"
-	NotificationTypeWeekly              NotificationType = "weekly"
-	NotificationTypeComplianceDrift     NotificationType = NotificationTypePush + "ComplianceDrift"
-	NotificationTypeNewClusterAdmin     NotificationType = NotificationTypePush + "NewClusterAdmin"
-	NotificationTypeNewVulnerability    NotificationType = NotificationTypePush + "NewVulnerability"
-	NotificationTypeVulnerabilityNewFix NotificationType = NotificationTypePush + "VulnerabilityNewFix"
+	NotificationTypeWeekly              NotificationType = "weekly"            //weekly report
+	NotificationTypePush                NotificationType = "push"              //posture scan
+	NotificationTypeContainerPush       NotificationType = "containerScanPush" //container scan
+	NotificationTypeComplianceDrift     NotificationType = NotificationTypePush + ":complianceDrift"
+	NotificationTypeNewClusterAdmin     NotificationType = NotificationTypePush + ":newClusterAdmin"
+	NotificationTypeNewVulnerability    NotificationType = NotificationTypeContainerPush + ":newVulnerability"
+	NotificationTypeVulnerabilityNewFix NotificationType = NotificationTypeContainerPush + ":vulnerabilityNewFix"
 )
 
 var notificationTypes = []NotificationType{
