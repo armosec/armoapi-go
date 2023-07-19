@@ -23,7 +23,7 @@ type AttackChainNodeImageScanRelation struct {
 	NodeID uint `gorm:"primaryKey; not null"`
 
 	// ImageScanId = ContainerScanId (required for attack chain.)
-	ImageScanId string `gorm:"primaryKey; type:varchar(255);not null"`
+	ImageScanId string `gorm:"primaryKey; foreignKey:ImageScanId; type:varchar(255);not null"`
 }
 
 type AttackChainNodeRelatedResourcesRelation struct {
