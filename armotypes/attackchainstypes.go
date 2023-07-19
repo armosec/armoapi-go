@@ -39,6 +39,7 @@ type AttackChainNode struct {
 
 type Vulnerabilities struct {
 	ContainersScanID string   `json:"containersScanID"`
+	ContainerName    string   `json:"containerName"`
 	Names            []string `json:"names"` // CVE names
 }
 

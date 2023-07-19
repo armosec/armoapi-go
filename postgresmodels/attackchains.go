@@ -6,36 +6,38 @@ import (
 
 type AttackChainNode struct {
 	gorm.Model            // ID, CreatedAt, UpdatedAt, DeletedAt - ID is required for linking nodes
-	Name          string  `gorm:"type:varchar(255);not null" json:"name"`
-	Description   *string `gorm:"type:varchar(255)" json:"description"`
-	AttackChainID string  `gorm:"type:varchar(255);not null" json:"attackChainID"`
-	CustomerGUID  string  `gorm:"type:varchar(255);not null" json:"customerGUID"`
+	Name          string  `gorm:"type:varchar(255);not null"`
+	Description   *string `gorm:"type:varchar(255)" `
+	AttackChainID string  `gorm:"primaryKey;type:varchar(255);not null"`
+	CustomerGUID  string  `gorm:"primaryKey;type:varchar(255);not null"`
 }
 
 type AttackChainNodeRelation struct {
 	BaseModel
-	ParentNodeID uint `gorm:"not null"`
-	ChildNodeID  uint `gorm:"not null"`
+	ParentNodeID uint `gorm:"primaryKey; not null"`
+	ChildNodeID  uint `gorm:"primaryKey; not null"`
 }
 
-type AttackChainNodeImageScanRelations struct {
+type AttackChainNodeImageScanRelation struct {
 	BaseModel
-	NodeID uint `gorm:"not null"`
+	NodeID uint `gorm:"primaryKey; not null"`
 
-	// via VulnerabilityScanSummary.ImageScanId, can get the ContainerSpecId (ContainerScanId) and list of image names required for attack chain.
-	ImageScanId string `gorm:"type:varchar(255);not null" json:"imageScanId"`
+	// ImageScanId = ContainerScanId (required for attack chain.)
+	ImageScanId string `gorm:"primaryKey; type:varchar(255);not null"`
 }
 
-type AttackChainNodeRelatedResourcesRelations struct {
+type AttackChainNodeRelatedResourcesRelation struct {
 	BaseModel
-	NodeID     uint   `gorm:"not null"`
-	ResourceID string `gorm:"type:varchar(255);not null" json:"resourceID"`
+	NodeID     uint   `gorm:"primaryKey; not null"`
+	ResourceID string `gorm:"primaryKey; type:varchar(255);not null"`
 }
 
-type AttackChainNodeControlsRelations struct {
+type AttackChainNodeControlsRelation struct {
 	BaseModel
-	NodeID    uint   `gorm:"not null"`
-	ControlID string `gorm:"type:varchar(255);not null" json:"controlID"`
+	NodeID uint `gorm:"primaryKey; not null"`
+
+	// ControlID = failed or ignored control ID that is associated with the node.
+	ControlID string `gorm:"primaryKey; type:varchar(255);not null"`
 }
 
 func (AttackChainNode) TableName() string {
@@ -46,15 +48,15 @@ func (AttackChainNodeRelation) TableName() string {
 	return "attack_chain_nodes_relations"
 }
 
-func (AttackChainNodeImageScanRelations) TableName() string {
+func (AttackChainNodeImageScanRelation) TableName() string {
 	return "attack_chain_node_image_scan_relations"
 }
 
-func (AttackChainNodeRelatedResourcesRelations) TableName() string {
+func (AttackChainNodeRelatedResourcesRelation) TableName() string {
 	return "attack_chain_node_related_resources_relations"
 }
 
-func (AttackChainNodeControlsRelations) TableName() string {
+func (AttackChainNodeControlsRelation) TableName() string {
 	return "attack_chain_node_controls_relations"
 }
 
