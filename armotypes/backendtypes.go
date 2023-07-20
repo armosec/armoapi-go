@@ -27,3 +27,38 @@ type V2ListRequest struct {
 	FieldsList              []string          `json:"includeFields"`
 	FieldsReverseKeywordMap map[string]string `json:"-"`
 }
+
+// UniqueValuesRequestV2 holds data to return unique values to
+type UniqueValuesRequestV2 struct {
+	Fields map[string]string `json:"fields"`
+	// Which elements of the list to return, each field can hold multiple values separated by comma
+	// Example: ": {"severity": "High,Medium",		"type": "61539,30303"}
+	// An empty map means "return the complete list"
+	InnerFilters            []map[string]string `json:"innerFilters"`
+	PageSize                int                 `json:"-"`
+	FieldsReverseKeywordMap map[string]string   `json:"-"`
+	Cursor                  string              `json:"-"`
+	// The time window to search (Default: since - beginning of the time, until - now)
+	Since          *time.Time `json:"since,omitempty"`
+	Until          *time.Time `json:"until,omitempty"`
+	TimestampField string     `json:"-"`
+}
+
+// UniqueCardinalityResponseV2 holds response data of cardinality request
+type UniqueCardinalityResponseV2 struct {
+	Fields map[string]uint64 `json:"fields"`
+	// UniqueTotalCount map[string]ElasticRespTotal `json:"totalCount"`
+}
+
+// UniqueValuesResponseV2 holds response data of unique values
+type UniqueValuesResponseV2 struct {
+	Fields      map[string][]string                          `json:"fields"`
+	FieldsCount map[string][]UniqueValuesResponseFieldsCount `json:"fieldsCount"`
+	// UniqueTotalCount map[string]ElasticRespTotal `json:"totalCount"`
+}
+
+// UniqueValuesResponseFieldsCount  holds response data of UniqueValuesResponseV2 request
+type UniqueValuesResponseFieldsCount struct {
+	Field string `json:"key"`
+	Count int64  `json:"count"`
+}
