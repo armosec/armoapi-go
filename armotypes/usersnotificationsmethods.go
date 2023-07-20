@@ -37,12 +37,10 @@ func (ac *AlertChannel) AddAlertConfig(config AlertConfig) error {
 }
 
 func (ac *AlertChannel) IsInScope(cluster, namespace string) bool {
-	for _, alert := range ac.Alerts {
-		if alert.IsInScope(cluster, namespace) {
-			return true
-		}
+	if ac.Scope == nil {
+		return true
 	}
-	return false
+	return ac.Scope.IsInScope(cluster, namespace)
 }
 
 func (ac *AlertConfig) IsEnabled() bool {
@@ -52,25 +50,9 @@ func (ac *AlertConfig) IsEnabled() bool {
 	return !*ac.Disabled
 }
 
-func (ac *AlertConfig) IsInScope(cluster, namespace string) bool {
-	if !ac.IsEnabled() {
-		return false
-	}
-	//no scope defined, so all clusters are in scope
-	if ac.Scope == nil {
-		return true
-	}
-	for _, scope := range ac.Scope {
-		if scope.IsInScope(cluster, namespace) {
-			return true
-		}
-	}
-	return false
-}
-
 func (ac *AlertScope) IsInScope(cluster, namespace string) bool {
 	if ac.Cluster == "" {
-		//no cluster scope defined, so all clusters are in scope
+		//no scope defined
 		return true
 	}
 	if ac.Cluster != cluster {

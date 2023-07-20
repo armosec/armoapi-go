@@ -282,15 +282,9 @@ func TestNotificationsConfigChannels(t *testing.T) {
 		AlertChannels: make(map[ChannelProvider][]AlertChannel),
 	}
 	ac := AlertChannel{
-		Alerts: []AlertConfig{
-			{
-				Scope: []AlertScope{
-					{
-						Cluster:    "testCluster",
-						Namespaces: []string{"testNamespace"},
-					},
-				},
-			},
+		Scope: &AlertScope{
+			Cluster:    "testCluster",
+			Namespaces: []string{"testNamespace"},
 		},
 	}
 	nc.AlertChannels["testProvider"] = []AlertChannel{ac}
@@ -306,12 +300,6 @@ func TestNotificationsConfigChannels(t *testing.T) {
 		t.Errorf("Expected true, got false")
 	}
 	if !channels[0].IsInScope("testCluster", "testNamespace") {
-		t.Errorf("Expected true, got false")
-	}
-	if !channels[0].Alerts[0].IsInScope("testCluster", "testNamespace") {
-		t.Errorf("Expected true, got false")
-	}
-	if !channels[0].Alerts[0].Scope[0].IsInScope("testCluster", "testNamespace") {
 		t.Errorf("Expected true, got false")
 	}
 
@@ -338,16 +326,14 @@ func TestNotificationsConfigChannelsNegative(t *testing.T) {
 		AlertChannels: make(map[ChannelProvider][]AlertChannel),
 	}
 	ac := AlertChannel{
+		Scope: &AlertScope{
+			Cluster:    "testCluster",
+			Namespaces: []string{"testNamespace"},
+		},
 		Alerts: []AlertConfig{
 			{
 				NotificationConfigIdentifier: NotificationConfigIdentifier{
 					NotificationType: "testType",
-				},
-				Scope: []AlertScope{
-					{
-						Cluster:    "testCluster",
-						Namespaces: []string{"testNamespace"},
-					},
 				},
 			},
 		},
@@ -365,12 +351,6 @@ func TestNotificationsConfigChannelsNegative(t *testing.T) {
 		t.Errorf("Expected false, got true")
 	}
 	if nc.AlertChannels["testProvider"][0].IsInScope("nonExistingCluster", "nonExistingNamespace") {
-		t.Errorf("Expected false, got true")
-	}
-	if nc.AlertChannels["testProvider"][0].Alerts[0].IsInScope("nonExistingCluster", "nonExistingNamespace") {
-		t.Errorf("Expected false, got true")
-	}
-	if nc.AlertChannels["testProvider"][0].Alerts[0].Scope[0].IsInScope("nonExistingCluster", "nonExistingNamespace") {
 		t.Errorf("Expected false, got true")
 	}
 

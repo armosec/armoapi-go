@@ -60,6 +60,7 @@ type NotificationConfigIdentifier struct {
 }
 type AlertChannel struct {
 	ChannelType             ChannelProvider `json:"channelType,omitempty" bson:"channelType,omitempty"`
+	Scope                   *AlertScope     `json:"scope,omitempty" bson:"scope,omitempty"`
 	CollaborationConfigGUID string          `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
 	Alerts                  []AlertConfig   `json:"notifications,omitempty" bson:"notifications,omitempty"`
 }
@@ -71,8 +72,7 @@ type NotificationParams struct {
 
 type AlertConfig struct {
 	NotificationConfigIdentifier `json:",inline" bson:",inline"`
-	Scope                        []AlertScope       `json:"scope,omitempty" bson:"scope,omitempty"`
-	Parameters                   NotificationParams `json:"attributes,omitempty" bson:"attributes,omitempty"`
+	Parameters                   NotificationParams `json:"parameters,omitempty" bson:"parameters,omitempty"`
 	Disabled                     *bool              `json:"disabled,omitempty" bson:"disabled,omitempty"`
 }
 
