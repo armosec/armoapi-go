@@ -1,6 +1,10 @@
 package armotypes
 
-import "time"
+import (
+	"time"
+
+	"github.com/armosec/armoapi-go/identifiers"
+)
 
 type ApprovementStatus int
 
@@ -40,7 +44,7 @@ type RecommendationSkeletonV1 struct {
 	// link to some well explained description of this recommendation
 	DescriptionLink string `json:"descriptionLink"`
 	// the context to show this recommendation in
-	Context []ArmoContext `json:"context"`
+	Context []identifiers.ArmoContext `json:"context"`
 	// the approvement status. Do we should show this recommendation to users?
 	Approvement ApprovementState `json:"approvement"`
 }
@@ -51,10 +55,10 @@ type RecommendationAssociation struct {
 	// audit for user actions taken for this recommendation
 	UpdatesAudit []UpdateAuditEntry `json:"updatesAudit"`
 	// the context to show this recommendation to this customer
-	Context []ArmoContext `json:"context"`
+	Context []identifiers.ArmoContext `json:"context"`
 	// designator object as we have in current resources represntaion
 	// this is about to be useless
-	Designators PortalDesignator `json:"designators"`
+	Designators identifiers.PortalDesignator `json:"designators"`
 	// guid of the recommendation in recommendation DB
 	RecommendationPrototypeGUID string                   `json:"recommendationPrototypeGUID"`
 	RecommendationDetails       RecommendationSkeletonV1 `json:"recommendationDetails"`

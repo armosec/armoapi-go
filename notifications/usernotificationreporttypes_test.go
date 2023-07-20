@@ -1,4 +1,4 @@
-package armotypes
+package notifications
 
 import (
 	"encoding/json"

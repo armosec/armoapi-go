@@ -1,6 +1,10 @@
 package armotypes
 
-import "time"
+import (
+	"time"
+
+	"github.com/armosec/armoapi-go/identifiers"
+)
 
 // Kind of an entity. Can only be one of the following: `file` or `repo`
 // Example: repo
@@ -13,7 +17,7 @@ const (
 
 // RepoEntitySummary summary of repo scanning entity.
 type RepoEntitySummary struct {
-	Designators PortalDesignator `json:"designators"`
+	Designators identifiers.PortalDesignator `json:"designators"`
 
 	// Name of this entity
 	// Example: "my-repo"

@@ -1,24 +1,27 @@
-package armotypes
+package notifications
 
 import (
 	"time"
+
+	"github.com/armosec/armoapi-go/containerscan"
+	"github.com/armosec/armoapi-go/identifiers"
 )
 
 type WeeklyReport struct {
-	ClustersScannedThisWeek             int                      `json:"clustersScannedThisWeek" bson:"clustersScannedThisWeek"`
-	ClustersScannedPrevWeek             int                      `json:"clustersScannedPrevWeek" bson:"clustersScannedPrevWeek"`
-	LinkToConfigurationScanningFiltered string                   `json:"linkToConfigurationScanningFiltered" bson:"linkToConfigurationScanningFiltered"`
-	RepositoriesScannedThisWeek         int                      `json:"repositoriesScannedThisWeek" bson:"repositoriesScannedThisWeek"`
-	RepositoriesScannedPrevWeek         int                      `json:"repositoriesScannedPrevWeek" bson:"repositoriesScannedPrevWeek"`
-	LinkToRepositoriesScanningFiltered  string                   `json:"linkToRepositoriesScanningFiltered" bson:"linkToRepositoriesScanningFiltered"`
-	RegistriesScannedThisWeek           int                      `json:"registriesScannedThisWeek" bson:"registriesScannedThisWeek"`
-	RegistriesScannedPrevWeek           int                      `json:"registriesScannedPrevWeek" bson:"registriesScannedPrevWeek"`
-	LinkToRegistriesScanningFiltered    string                   `json:"linkToRegistriesScanningFiltered" bson:"linkToRegistriesScanningFiltered"`
-	Top5FailedControls                  []TopCtrlItem            `json:"top5FailedControls" bson:"top5FailedControls"`
-	Top5FailedCVEs                      []TopVulItem             `json:"top5FailedCVEs" bson:"top5FailedCVEs"`
-	ClustersScanned                     []ClusterResourceScanned `json:"clustersScanned" bson:"clustersScanned"`
-	RepositoriesScanned                 []RepositoryScanned      `json:"repositoriesScanned" bson:"repositoriesScanned"`
-	RegistriesScanned                   []RegistryScanned        `json:"registriesScanned" bson:"registriesScanned"`
+	ClustersScannedThisWeek             int                        `json:"clustersScannedThisWeek" bson:"clustersScannedThisWeek"`
+	ClustersScannedPrevWeek             int                        `json:"clustersScannedPrevWeek" bson:"clustersScannedPrevWeek"`
+	LinkToConfigurationScanningFiltered string                     `json:"linkToConfigurationScanningFiltered" bson:"linkToConfigurationScanningFiltered"`
+	RepositoriesScannedThisWeek         int                        `json:"repositoriesScannedThisWeek" bson:"repositoriesScannedThisWeek"`
+	RepositoriesScannedPrevWeek         int                        `json:"repositoriesScannedPrevWeek" bson:"repositoriesScannedPrevWeek"`
+	LinkToRepositoriesScanningFiltered  string                     `json:"linkToRepositoriesScanningFiltered" bson:"linkToRepositoriesScanningFiltered"`
+	RegistriesScannedThisWeek           int                        `json:"registriesScannedThisWeek" bson:"registriesScannedThisWeek"`
+	RegistriesScannedPrevWeek           int                        `json:"registriesScannedPrevWeek" bson:"registriesScannedPrevWeek"`
+	LinkToRegistriesScanningFiltered    string                     `json:"linkToRegistriesScanningFiltered" bson:"linkToRegistriesScanningFiltered"`
+	Top5FailedControls                  []TopCtrlItem              `json:"top5FailedControls" bson:"top5FailedControls"`
+	Top5FailedCVEs                      []containerscan.TopVulItem `json:"top5FailedCVEs" bson:"top5FailedCVEs"`
+	ClustersScanned                     []ClusterResourceScanned   `json:"clustersScanned" bson:"clustersScanned"`
+	RepositoriesScanned                 []RepositoryScanned        `json:"repositoriesScanned" bson:"repositoriesScanned"`
+	RegistriesScanned                   []RegistryScanned          `json:"registriesScanned" bson:"registriesScanned"`
 }
 type PushNotification struct {
 	Misconfigurations Misconfigurations
@@ -143,7 +146,7 @@ const (
 )
 
 type NotificationPushEvent struct {
-	EventName   string           `json:"eventName"`
-	EventTime   time.Time        `json:"eventTime"`
-	Designators PortalDesignator `json:"designators,omitempty"`
+	EventName   string                       `json:"eventName"`
+	EventTime   time.Time                    `json:"eventTime"`
+	Designators identifiers.PortalDesignator `json:"designators,omitempty"`
 }

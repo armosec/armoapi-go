@@ -1,4 +1,6 @@
-package armotypes
+package notifications
+
+import "github.com/armosec/armoapi-go/armotypes"
 
 // Config option type
 // swagger:model CollaborationConfigOptionType
@@ -55,7 +57,7 @@ const (
 
 // swagger:model CollaborationConfig
 type CollaborationConfig struct {
-	PortalBase `json:",inline" bson:",inline"`
+	armotypes.PortalBase `json:",inline" bson:",inline"`
 
 	// Provider name
 	// Example: jira

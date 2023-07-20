@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/armosec/armoapi-go/armotypes"
+	"github.com/armosec/armoapi-go/identifiers"
 )
 
 /*
@@ -52,7 +52,7 @@ type SessionChain struct {
 
 type SessionChainWrapper struct {
 	SessionChain `json:",inline"`
-	Designators  armotypes.PortalDesignator `json:"designators"`
+	Designators  identifiers.PortalDesignator `json:"designators"`
 }
 
 type DBCommand struct {

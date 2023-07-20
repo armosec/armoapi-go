@@ -3,6 +3,8 @@ package armotypes
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/armosec/armoapi-go/identifiers"
 )
 
 const (
@@ -25,7 +27,7 @@ type CommonSummaryFields struct {
 	ReportID GUID `json:"reportGUID"`
 
 	// The designators of this summary
-	Designators *PortalDesignator `json:"designators"`
+	Designators *identifiers.PortalDesignator `json:"designators"`
 
 	// Time of the scan that produced this summary
 	Timestamp time.Time `json:"timestamp"`
@@ -37,10 +39,10 @@ type CommonSummaryFields struct {
 
 // -------- /api/v1/posture/clustersOvertime response datastructures
 type PostureClusterOverTime struct {
-	Designators  PortalDesignator           `json:"designators,omitempty"`
-	ClusterName  string                     `json:"clusterName"`
-	Frameworks   []PostureFrameworkOverTime `json:"frameworks"`
-	DeleteStatus RecordStatus               `json:"deletionStatus,omitempty"`
+	Designators  identifiers.PortalDesignator `json:"designators,omitempty"`
+	ClusterName  string                       `json:"clusterName"`
+	Frameworks   []PostureFrameworkOverTime   `json:"frameworks"`
+	DeleteStatus RecordStatus                 `json:"deletionStatus,omitempty"`
 }
 
 // Used for elastic
@@ -73,30 +75,30 @@ type PostureFrameworkOverTimeCoord struct {
 //---- /api/v1/posture/frameworks
 
 type PostureFrameworkSummary struct {
-	Name             string           `json:"name"`
-	TypeTags         []string         `json:"typeTags"`
-	Score            float32          `json:"value"`
-	ComplianceScore  float32          `json:"complianceScorev1"`
-	ImprovementScore float32          `json:"improvementScore"`
-	TotalControls    int              `json:"totalControls"`
-	FailedControls   int              `json:"failedControls"`
-	SkippedControls  int              `json:"skippedControls,omitempty"`
-	WarningControls  int              `json:"warningControls,omitempty"` // Deprecated
-	ReportID         string           `json:"reportGUID"`
-	Designators      PortalDesignator `json:"designators"`
+	Name             string                       `json:"name"`
+	TypeTags         []string                     `json:"typeTags"`
+	Score            float32                      `json:"value"`
+	ComplianceScore  float32                      `json:"complianceScorev1"`
+	ImprovementScore float32                      `json:"improvementScore"`
+	TotalControls    int                          `json:"totalControls"`
+	FailedControls   int                          `json:"failedControls"`
+	SkippedControls  int                          `json:"skippedControls,omitempty"`
+	WarningControls  int                          `json:"warningControls,omitempty"` // Deprecated
+	ReportID         string                       `json:"reportGUID"`
+	Designators      identifiers.PortalDesignator `json:"designators"`
 
 	Timestamp    time.Time    `json:"timestamp"`
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 
 type PostureClusterSummary struct {
-	Score           float32          `json:"score"`
-	TotalControls   int              `json:"totalControls"`
-	FailedControls  int              `json:"failedControls"`
-	SkippedControls int              `json:"skippedControls,omitempty"`
-	WarningControls int              `json:"warningControls,omitempty"` // Deprecated
-	ReportID        string           `json:"reportGUID"`
-	Designators     PortalDesignator `json:"designators"`
+	Score           float32                      `json:"score"`
+	TotalControls   int                          `json:"totalControls"`
+	FailedControls  int                          `json:"failedControls"`
+	SkippedControls int                          `json:"skippedControls,omitempty"`
+	WarningControls int                          `json:"warningControls,omitempty"` // Deprecated
+	ReportID        string                       `json:"reportGUID"`
+	Designators     identifiers.PortalDesignator `json:"designators"`
 
 	Timestamp    time.Time    `json:"timestamp"`
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
@@ -170,50 +172,50 @@ type ControlInputs struct {
 
 // ----/api/v1/posture/controls
 type PostureControlSummary struct {
-	Designators                    PortalDesignator `json:"designators"`
-	ControlID                      string           `json:"id"` // "C0001"
-	ControlGUID                    string           `json:"guid"`
-	Name                           string           `json:"name"`
-	AffectedResourcesCount         int              `json:"affectedResourcesCount"`
-	FailedResourcesCount           int              `json:"failedResourcesCount"`
-	SkippedResourcesCount          int              `json:"skippedResourcesCount"`
-	WarningResourcesCount          int              `json:"warningResourcesCount"` // Deprecated
-	TotalScannedResourcesCount     *int             `json:"totalScannedResourcesCount"`
-	PreviousAffectedResourcesCount int              `json:"previousAffectedResourcesCount"`
-	PreviousFailedResourcesCount   int              `json:"previousFailedResourcesCount"`
-	PreviousSkippedResourcesCount  int              `json:"previousSkippedResourcesCount"`
-	PreviousWarningResourcesCount  int              `json:"previousWarningResourcesCount"` // Deprecated
-	Framework                      string           `json:"frameworkName"`
-	FrameworkSubSectionID          []string         `json:"frameworkSubsectionID,omitempty"`
-	Remediation                    string           `json:"remediation"`
-	Status                         int              `json:"status"`
-	StatusText                     string           `json:"statusText"`
-	SubStatusText                  string           `json:"subStatusText,omitempty"`
-	Description                    string           `json:"description"`
-	Section                        string           `json:"section"`
-	Timestamp                      time.Time        `json:"timestamp"`
-	ReportID                       string           `json:"reportGUID"`
-	DeleteStatus                   RecordStatus     `json:"deletionStatus,omitempty"`
-	Score                          float32          `json:"score"`
-	ComplianceScore                *float32         `json:"complianceScore"`
-	ScoreFactor                    float32          `json:"baseScore"`
-	ScoreWeight                    float32          `json:"scoreWeight"`
-	ARMOImprovement                float32          `json:"ARMOimprovement"`
-	RelevantCloudProvides          []string         `json:"relevantCloudProvides"`
-	ControlInputs                  []ControlInputs  `json:"controlInputs"`
-	IsLastScan                     int              `json:"isLastScan"`
-	HighlightPathsCount            int64            `json:"highlightPathsCount"`
-	ClusterShortName               string           `json:"clusterShortName"`
+	Designators                    identifiers.PortalDesignator `json:"designators"`
+	ControlID                      string                       `json:"id"` // "C0001"
+	ControlGUID                    string                       `json:"guid"`
+	Name                           string                       `json:"name"`
+	AffectedResourcesCount         int                          `json:"affectedResourcesCount"`
+	FailedResourcesCount           int                          `json:"failedResourcesCount"`
+	SkippedResourcesCount          int                          `json:"skippedResourcesCount"`
+	WarningResourcesCount          int                          `json:"warningResourcesCount"` // Deprecated
+	TotalScannedResourcesCount     *int                         `json:"totalScannedResourcesCount"`
+	PreviousAffectedResourcesCount int                          `json:"previousAffectedResourcesCount"`
+	PreviousFailedResourcesCount   int                          `json:"previousFailedResourcesCount"`
+	PreviousSkippedResourcesCount  int                          `json:"previousSkippedResourcesCount"`
+	PreviousWarningResourcesCount  int                          `json:"previousWarningResourcesCount"` // Deprecated
+	Framework                      string                       `json:"frameworkName"`
+	FrameworkSubSectionID          []string                     `json:"frameworkSubsectionID,omitempty"`
+	Remediation                    string                       `json:"remediation"`
+	Status                         int                          `json:"status"`
+	StatusText                     string                       `json:"statusText"`
+	SubStatusText                  string                       `json:"subStatusText,omitempty"`
+	Description                    string                       `json:"description"`
+	Section                        string                       `json:"section"`
+	Timestamp                      time.Time                    `json:"timestamp"`
+	ReportID                       string                       `json:"reportGUID"`
+	DeleteStatus                   RecordStatus                 `json:"deletionStatus,omitempty"`
+	Score                          float32                      `json:"score"`
+	ComplianceScore                *float32                     `json:"complianceScore"`
+	ScoreFactor                    float32                      `json:"baseScore"`
+	ScoreWeight                    float32                      `json:"scoreWeight"`
+	ARMOImprovement                float32                      `json:"ARMOimprovement"`
+	RelevantCloudProvides          []string                     `json:"relevantCloudProvides"`
+	ControlInputs                  []ControlInputs              `json:"controlInputs"`
+	IsLastScan                     int                          `json:"isLastScan"`
+	HighlightPathsCount            int64                        `json:"highlightPathsCount"`
+	ClusterShortName               string                       `json:"clusterShortName"`
 }
 
 //---------/api/v1/posture/resources
 
 // 1 resource per 1 control
 type PostureResource struct {
-	UniqueResourceResult string           `json:"uniqueResourceResult"` // FNV(customerGUID + cluster+resourceID+frameworkName + resource.ReportID) to allow fast search for aggregation
-	Designators          PortalDesignator `json:"designators"`
-	Name                 string           `json:"name"`       // wlid/sid and etc.
-	ResourceID           string           `json:"resourceID"` //as given by kscape
+	UniqueResourceResult string                       `json:"uniqueResourceResult"` // FNV(customerGUID + cluster+resourceID+frameworkName + resource.ReportID) to allow fast search for aggregation
+	Designators          identifiers.PortalDesignator `json:"designators"`
+	Name                 string                       `json:"name"`       // wlid/sid and etc.
+	ResourceID           string                       `json:"resourceID"` //as given by kscape
 
 	ControlName       string                      `json:"controlName"`
 	HighlightPaths    []string                    `json:"highlightPaths"` // specifies "failedPath" - where exactly in the raw resources the control failed
@@ -243,9 +245,9 @@ type HighlightsByControl struct {
 }
 
 type PostureResourceSummary struct {
-	Designators PortalDesignator `json:"designators"`
-	Name        string           `json:"name"`       // wlid/sid and etc.
-	ResourceID  string           `json:"resourceID"` //as given by kscape
+	Designators identifiers.PortalDesignator `json:"designators"`
+	Name        string                       `json:"name"`       // wlid/sid and etc.
+	ResourceID  string                       `json:"resourceID"` //as given by kscape
 
 	//gives upto PostureResourceMaxCtrls controls as an example
 	FailedControl   []string `json:"failedControls"`
@@ -296,12 +298,12 @@ type PostureAttributesList struct {
 
 // --------/api/v1/posture/summary
 type PostureSummary struct {
-	RuntimeImprovementPercentage float32               `json:"runtimeImprovementPercentage"`
-	LastRun                      time.Time             `json:"lastRun"`
-	ReportID                     string                `json:"reportGUID"`
-	Designators                  PortalDesignator      `json:"designators"`
-	PostureAttributes            PostureAttributesList `json:"postureAttributes"`
-	ClusterCloudProvider         string                `json:"clusterCloudProvider"`
+	RuntimeImprovementPercentage float32                      `json:"runtimeImprovementPercentage"`
+	LastRun                      time.Time                    `json:"lastRun"`
+	ReportID                     string                       `json:"reportGUID"`
+	Designators                  identifiers.PortalDesignator `json:"designators"`
+	PostureAttributes            PostureAttributesList        `json:"postureAttributes"`
+	ClusterCloudProvider         string                       `json:"clusterCloudProvider"`
 
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
@@ -317,19 +319,19 @@ type FixPath struct {
 	Value string `json:"value"`
 }
 type PostureReportResultRaw struct {
-	Designators           PortalDesignator `json:"designators"`
-	Timestamp             time.Time        `json:"timestamp"`
-	ReportID              string           `json:"reportGUID"`
-	ResourceID            string           `json:"resourceID"`
-	ControlID             string           `json:"controlID"`
-	ControlConfigurations []ControlInputs  `json:"controlConfigurations,omitempty"`
-	HighlightsPaths       []PosturePaths   `json:"highlightsPaths"`
-	RelatedResourcesIDs   []string         `json:"relatedResourcesID,omitempty"`
+	Designators           identifiers.PortalDesignator `json:"designators"`
+	Timestamp             time.Time                    `json:"timestamp"`
+	ReportID              string                       `json:"reportGUID"`
+	ResourceID            string                       `json:"resourceID"`
+	ControlID             string                       `json:"controlID"`
+	ControlConfigurations []ControlInputs              `json:"controlConfigurations,omitempty"`
+	HighlightsPaths       []PosturePaths               `json:"highlightsPaths"`
+	RelatedResourcesIDs   []string                     `json:"relatedResourcesID,omitempty"`
 }
 type RawResource struct {
-	Designators  PortalDesignator `json:"designators"`
-	Timestamp    time.Time        `json:"timestamp"`
-	DeleteStatus RecordStatus     `json:"deletionStatus,omitempty"`
+	Designators  identifiers.PortalDesignator `json:"designators"`
+	Timestamp    time.Time                    `json:"timestamp"`
+	DeleteStatus RecordStatus                 `json:"deletionStatus,omitempty"`
 
 	ResourceID          string                    `json:"resourceID"`
 	PostureReportID     string                    `json:"postureReportID,omitempty"`
@@ -362,32 +364,4 @@ type ControlInfo struct {
 	// How many failed resources for this control
 	// Example: 3
 	FailedResources int `json:"failedResources"`
-}
-
-type TopCtrlItem struct {
-	ControlID            string           `json:"id" bson:"id"`
-	ControlGUID          string           `json:"guid" bson:"guid"`
-	Name                 string           `json:"name" bson:"name"`
-	Remediation          string           `json:"remediation" bson:"remediation"`
-	Description          string           `json:"description" bson:"description"`
-	ClustersCount        int64            `json:"clustersCount" bson:"clustersCount"`
-	SeverityOverall      int64            `json:"severityOverall" bson:"severityOverall"`
-	BaseScore            int64            `json:"baseScore" bson:"baseScore"`
-	Clusters             []TopCtrlCluster `json:"clusters" bson:"clusters"`
-	TotalFailedResources int64            `json:"-"`
-}
-
-type TopCtrlCluster struct {
-	Name               string `json:"name" bson:"name"`
-	ResourcesCount     int64  `json:"resourcesCount" bson:"resourcesCount"`
-	ReportGUID         string `json:"reportGUID" bson:"reportGUID"`
-	TopFailedFramework string `json:"topFailedFramework" bson:"topFailedFramework"`
-}
-
-func (t *TopCtrlItem) GetTotalFailedResources() int64 {
-	var totalFailedResources int64
-	for _, c := range t.Clusters {
-		totalFailedResources += c.ResourcesCount
-	}
-	return totalFailedResources
 }

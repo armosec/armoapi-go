@@ -1,4 +1,4 @@
-package armotypes
+package identifiers
 
 import "fmt"
 

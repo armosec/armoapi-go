@@ -1,5 +1,7 @@
 package armotypes
 
+import "github.com/armosec/armoapi-go/identifiers"
+
 type AttackChainStatus string
 type ProcessingStatus string
 
@@ -18,23 +20,23 @@ type AttackChainType struct {
 }
 
 type AttackChain struct {
-	Type             *AttackChainType     `json:"type"`
-	ClusterName      string               `json:"clusterName"`
-	Resource         PortalDesignator     `json:"resource"`
-	AttackChainID    string               `json:"attackChainID"` // name/cluster/resourceID
-	CustomerGUID     string               `json:"customerGUID"`
-	AttackChainNodes AttackChainNode      `json:"attackChainNodes"`
-	UIStatus         *AttackChainUIStatus `json:"uiStatus"`
-	LatestReportGUID string               `json:"latestReportGUID"` // latest reportGUID in which this attack chain was identified
+	Type             *AttackChainType             `json:"type"`
+	ClusterName      string                       `json:"clusterName"`
+	Resource         identifiers.PortalDesignator `json:"resource"`
+	AttackChainID    string                       `json:"attackChainID"` // name/cluster/resourceID
+	CustomerGUID     string                       `json:"customerGUID"`
+	AttackChainNodes AttackChainNode              `json:"attackChainNodes"`
+	UIStatus         *AttackChainUIStatus         `json:"uiStatus"`
+	LatestReportGUID string                       `json:"latestReportGUID"` // latest reportGUID in which this attack chain was identified
 }
 
 type AttackChainNode struct {
-	Name             string             `json:"name"`
-	Description      string             `json:"description"`
-	ControlIDs       []string           `json:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
-	Vulnerabilities  []Vulnerabilities  `json:"vulnerabilities,omitempty"`
-	RelatedResources []PortalDesignator `json:"relatedResources"`
-	NextNodes        []AttackChainNode  `json:"nextNodes,omitempty"`
+	Name             string                         `json:"name"`
+	Description      string                         `json:"description"`
+	ControlIDs       []string                       `json:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
+	Vulnerabilities  []Vulnerabilities              `json:"vulnerabilities,omitempty"`
+	RelatedResources []identifiers.PortalDesignator `json:"relatedResources"`
+	NextNodes        []AttackChainNode              `json:"nextNodes,omitempty"`
 }
 
 type Vulnerabilities struct {
