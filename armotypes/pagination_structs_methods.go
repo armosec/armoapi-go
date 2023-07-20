@@ -108,3 +108,43 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 		return errors.New("invalid duration")
 	}
 }
+
+// ValidatePageProperties validate page size and page number to be valid
+func (lr *V2ListRequest) ValidatePageProperties(maxPageSize int) {
+	// we are counting from 0 while the user counts from 1... so:
+	if lr.PageNum == nil {
+		lr.PageNum = utils.ZeroIntPtr()
+	} else {
+		if *lr.PageNum > 0 {
+			*lr.PageNum--
+		} else {
+			*lr.PageNum = 0
+		}
+	}
+	if maxPageSize < 1 {
+		return
+	}
+	if lr.PageSize == nil || *lr.PageSize > maxPageSize || *lr.PageSize < 0 {
+		lr.PageSize = &maxPageSize
+	}
+}
+
+// GetFieldsNames retunrs slice of Fields names
+func (lr *V2ListRequest) GetFieldsNames() []string {
+	res := make([]string, 0, len(lr.InnerFilters))
+	for filterObjIdx := range lr.InnerFilters {
+		for fieldName := range lr.InnerFilters[filterObjIdx] {
+			res = append(res, fieldName)
+		}
+	}
+	if lr.OrderBy != "" {
+		sortFields := strings.Split(lr.OrderBy, ",")
+		for fieldIdx := range sortFields {
+			fieldSlice := strings.Split(sortFields[fieldIdx], ":")
+			if len(fieldSlice) > 0 {
+				res = append(res, fieldSlice[0])
+			}
+		}
+	}
+	return res
+}
