@@ -40,7 +40,12 @@ func (ac *AlertChannel) IsInScope(cluster, namespace string) bool {
 	if ac.Scope == nil {
 		return true
 	}
-	return ac.Scope.IsInScope(cluster, namespace)
+	for _, scope := range ac.Scope {
+		if scope.IsInScope(cluster, namespace) {
+			return true
+		}
+	}
+	return false
 }
 
 func (ac *AlertConfig) IsEnabled() bool {
