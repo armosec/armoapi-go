@@ -29,17 +29,18 @@ type AttackChain struct {
 }
 
 type AttackChainNode struct {
-	Name             string               `json:"name"`
-	Description      string               `json:"description"`
-	ControlIDs       []string             `json:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
-	Vulnerabilities  []VulnerabilityNames `json:"vulnerabilitiesNames,omitempty"`
-	RelatedResources []PortalDesignator   `json:"relatedResources"`
-	NextNodes        []AttackChainNode    `json:"nextNodes,omitempty"`
+	Name             string             `json:"name"`
+	Description      string             `json:"description"`
+	ControlIDs       []string           `json:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
+	Vulnerabilities  []Vulnerabilities  `json:"vulnerabilities,omitempty"`
+	RelatedResources []PortalDesignator `json:"relatedResources"`
+	NextNodes        []AttackChainNode  `json:"nextNodes,omitempty"`
 }
 
-type VulnerabilityNames struct {
-	ContainersScanID string `json:"containersScanID"`
-	Name             string `json:"name"` // CVE name
+type Vulnerabilities struct {
+	ContainersScanID string   `json:"containersScanID"`
+	ContainerName    string   `json:"containerName"`
+	Names            []string `json:"names"` // CVE names
 }
 
 // struct for UI support. All strings are timestamps
