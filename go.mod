@@ -3,6 +3,7 @@ module github.com/armosec/armoapi-go
 go 1.18
 
 require (
+	github.com/armosec/gojay v1.2.15
 	github.com/armosec/utils-go v0.0.12
 	github.com/armosec/utils-k8s-go v0.0.12
 	github.com/coreos/go-oidc v2.2.1+incompatible
