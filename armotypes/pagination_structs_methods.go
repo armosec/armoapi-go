@@ -109,11 +109,16 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 	}
 }
 
+func zeroIntPtr() *int {
+	zeroPtr := 0
+	return &zeroPtr
+}
+
 // ValidatePageProperties validate page size and page number to be valid
 func (lr *V2ListRequest) ValidatePageProperties(maxPageSize int) {
 	// we are counting from 0 while the user counts from 1... so:
 	if lr.PageNum == nil {
-		lr.PageNum = utils.ZeroIntPtr()
+		lr.PageNum = zeroIntPtr()
 	} else {
 		if *lr.PageNum > 0 {
 			*lr.PageNum--

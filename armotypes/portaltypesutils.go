@@ -288,8 +288,5 @@ func (p *PortalBase) GetUpdatedTime() *time.Time {
 }
 
 func ValidateContainerScanID(containerScanID string) bool {
-	if strings.Contains(containerScanID, "/") {
-		return false
-	}
-	return true
+	return !strings.Contains(containerScanID, "/")
 }
