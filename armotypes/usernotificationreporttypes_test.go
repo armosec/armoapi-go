@@ -369,6 +369,13 @@ func TestNotificationsConfigChannelsNegative(t *testing.T) {
 	if config != nil {
 		t.Errorf("Expected nil, got non-nil")
 	}
+
+	//test nil scope - should return accept all cluster
+	nc.AlertChannels["testProvider"][0].Scope = nil
+	if !nc.IsInScope("nonExistingCluster", "nonExistingNamespace") {
+		t.Errorf("Expected true, got false")
+	}
+
 }
 
 func TestSetDriftPercentage(t *testing.T) {
