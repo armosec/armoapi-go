@@ -306,6 +306,7 @@ type PostureSummary struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 }
 type PosturePaths struct {
+	ResourceID string `json:"resourceID,omitempty"` // resource on which the remediation needs to be applied
 	// must have FailedPath or FixPath, not both
 	FailedPath string  `json:"failedPath,omitempty"`
 	FixPath    FixPath `json:"fixPath,omitempty"`
@@ -323,6 +324,7 @@ type PostureReportResultRaw struct {
 	ControlID             string           `json:"controlID"`
 	ControlConfigurations []ControlInputs  `json:"controlConfigurations,omitempty"`
 	HighlightsPaths       []PosturePaths   `json:"highlightsPaths"`
+	RelatedResourcesIDs   []string         `json:"relatedResourcesID,omitempty"`
 }
 type RawResource struct {
 	Designators  PortalDesignator `json:"designators"`

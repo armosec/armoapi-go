@@ -1,7 +1,6 @@
 package armotypes
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -53,23 +52,54 @@ type NotificationsConfig struct {
 	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
 	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
 	LatestPushReports  map[string]*PushReport                    `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
+	AlertChannels      map[ChannelProvider][]AlertChannel        `json:"alertChannels,omitempty" bson:"alertChannels,omitempty"`
 }
 
-func (nc *NotificationsConfig) AddLatestPushReport(report *PushReport) {
-	if report == nil {
-		return
-	}
-	if nc.LatestPushReports == nil {
-		nc.LatestPushReports = make(map[string]*PushReport, 0)
-	}
-	nc.LatestPushReports[fmt.Sprintf("%s_%s", report.Cluster, report.ScanType)] = report
+type NotificationConfigIdentifier struct {
+	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
+}
+type AlertChannel struct {
+	ChannelType             ChannelProvider `json:"channelType,omitempty" bson:"channelType,omitempty"`
+	CollaborationConfigGUID string          `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
+	Alerts                  []AlertConfig   `json:"notifications,omitempty" bson:"notifications,omitempty"`
 }
 
-func (nc *NotificationsConfig) GetLatestPushReport(cluster string, scanType ScanType) *PushReport {
-	if val, ok := nc.LatestPushReports[fmt.Sprintf("%s_%s", cluster, scanType)]; ok {
-		return val
-	}
-	return nil
+type NotificationParams struct {
+	DriftPercentage *int `json:"driftPercentage,omitempty" bson:"driftPercentage,omitempty"`
+	MinSeverity     *int `json:"minSeverity,omitempty" bson:"minSeverity,omitempty"`
+}
+
+type AlertConfig struct {
+	NotificationConfigIdentifier `json:",inline" bson:",inline"`
+	Scope                        []AlertScope       `json:"scope,omitempty" bson:"scope,omitempty"`
+	Parameters                   NotificationParams `json:"attributes,omitempty" bson:"attributes,omitempty"`
+	Disabled                     *bool              `json:"disabled,omitempty" bson:"disabled,omitempty"`
+}
+
+type AlertScope struct {
+	Cluster    string   `json:"cluster,omitempty" bson:"cluster,omitempty"`
+	Namespaces []string `json:"namespaces,omitempty" bson:"namespaces,omitempty"`
+}
+
+type NotificationType string
+
+const (
+	NotificationTypeWeekly              NotificationType = "weekly"            //weekly report
+	NotificationTypePush                NotificationType = "push"              //posture scan
+	NotificationTypeContainerPush       NotificationType = "containerScanPush" //container scan
+	NotificationTypeComplianceDrift     NotificationType = NotificationTypePush + ":complianceDrift"
+	NotificationTypeNewClusterAdmin     NotificationType = NotificationTypePush + ":newClusterAdmin"
+	NotificationTypeNewVulnerability    NotificationType = NotificationTypeContainerPush + ":newVulnerability"
+	NotificationTypeVulnerabilityNewFix NotificationType = NotificationTypeContainerPush + ":vulnerabilityNewFix"
+)
+
+var notificationTypes = []NotificationType{
+	NotificationTypePush,
+	NotificationTypeWeekly,
+	NotificationTypeComplianceDrift,
+	NotificationTypeNewClusterAdmin,
+	NotificationTypeNewVulnerability,
+	NotificationTypeVulnerabilityNewFix,
 }
 
 type PushReport struct {
@@ -80,28 +110,6 @@ type PushReport struct {
 	FailedResources           uint64             `json:"failedResources,omitempty" bson:"failedResources,omitempty"`
 	FrameworksComplianceScore map[string]float32 `json:"frameworksComplianceScore,omitempty" bson:"frameworksComplianceScore,omitempty"`
 }
-
-type NotificationConfigIdentifier struct {
-	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
-}
-
-func (nci *NotificationConfigIdentifier) Validate() error {
-	if nci.NotificationType == NotificationTypeAll || nci.NotificationType == NotificationTypePush || nci.NotificationType == NotificationTypeWeekly {
-		return nil
-	}
-	if nci.NotificationType == "" {
-		return fmt.Errorf("notification type is required")
-	}
-	return fmt.Errorf("invalid notification type: %s", nci.NotificationType)
-}
-
-type NotificationType string
-
-const (
-	NotificationTypeAll    NotificationType = "all"
-	NotificationTypePush   NotificationType = "push"
-	NotificationTypeWeekly NotificationType = "weekly"
-)
 
 type RegistryScanned struct {
 	Registry ResourceScanned `json:"registry" bson:"registry"`
@@ -128,4 +136,14 @@ type ResourceScanned struct {
 type SeverityDetails struct {
 	Severity              string `json:"severity" bson:"severity"`
 	FailedResourcesNumber int    `json:"failedResourcesNumber" bson:"failedResourcesNumber"`
+}
+
+const (
+	NotificationBeforeUpdateContainerScanEvent = "beforeUpdateContainerScan"
+)
+
+type NotificationPushEvent struct {
+	EventName   string           `json:"eventName"`
+	EventTime   time.Time        `json:"eventTime"`
+	Designators PortalDesignator `json:"designators,omitempty"`
 }

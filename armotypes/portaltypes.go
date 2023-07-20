@@ -105,6 +105,7 @@ const (
 	AttributeSensor        = "sensor"
 	AttributePath          = "path"
 	AttributeResourceID    = "resourceID"
+	AttributeContainerScanId = "containerScanId"
 )
 
 // Repository scan related attributes

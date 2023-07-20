@@ -1,6 +1,8 @@
 package armotypes
 
-import "time"
+import (
+	"time"
+)
 
 type V2ListRequest struct {
 	// properties of the requested next page
@@ -19,13 +21,9 @@ type V2ListRequest struct {
 	// When empty, the default sort order is used. To disable the default sort order, set IgnoreDefaultSort to true
 	// Example: timestamp:asc,severity:desc
 	OrderBy string `json:"orderBy"`
-	// When true, the default sort order is ignored
-	// TODO: take it off, and use the default sort order when OrderBy is empty
-	IgnoreDefaultSort bool `json:"ignoreDefaultOrderBy,omitempty"`
 	// FieldsList allow us to return only subset of the source document fields
 	// Don't expose FieldsList outside without well designed decision
-	FieldsList              []string          `json:"includeFields"`
-	FieldsReverseKeywordMap map[string]string `json:"-"`
+	FieldsList []string `json:"includeFields"`
 }
 
 // UniqueValuesRequestV2 holds data to return unique values to
@@ -62,3 +60,29 @@ type UniqueValuesResponseFieldsCount struct {
 	Field string `json:"key"`
 	Count int64  `json:"count"`
 }
+type RespTotal struct {
+	Value    int    `json:"value"`
+	Relation string `json:"relation"`
+}
+
+const (
+	V2ListExistsOperator   string = "exists"
+	V2ListEqualOperator    string = "equal"
+	V2ListMissingOperator  string = "missing"
+	V2ListMatchOperator    string = "match"
+	V2ListGreaterOperator  string = "greater"
+	V2ListLowerOperator    string = "lower"
+	V2ListRegexOperator    string = "regex"
+	V2ListLikeOperator     string = "like"
+	V2ListRangeOperator    string = "range"
+	V2ListIgnoreCaseOption string = "ignorecase"
+
+	V2ListAscendingSort  string = "asc"
+	V2ListDescendingSort string = "desc"
+
+	V2ListValueSeparator    = ","
+	V2ListOperatorSeparator = "|"
+	V2ListSubQuerySeparator = "&"
+	V2ListSortTypeSeparator = ":"
+	V2ListEscapeChar        = "\\"
+)

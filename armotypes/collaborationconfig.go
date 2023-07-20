@@ -44,13 +44,22 @@ type CollaborationConfigOption struct {
 	IconBase64 string `json:"iconBase64,omitempty" bson:"iconBase64,omitempty"`
 }
 
+type ChannelProvider string
+
+const (
+	CollaborationTypeJira  ChannelProvider = "jira"
+	CollaborationTypeSlack ChannelProvider = "slack"
+	CollaborationTypeTeams ChannelProvider = "teams"
+	CollaborationTypeEmail ChannelProvider = "email"
+)
+
 // swagger:model CollaborationConfig
 type CollaborationConfig struct {
 	PortalBase `json:",inline" bson:",inline"`
 
 	// Provider name
 	// Example: jira
-	Provider string `json:"provider" bson:"provider,omitempty"`
+	Provider ChannelProvider `json:"provider,omitempty" bson:"provider,omitempty"`
 
 	// Host name for private hosting
 	// Example: http://example.com
@@ -66,5 +75,5 @@ type CollaborationConfig struct {
 	// Icon for the option encoded in base64. Optional
 	IconBase64 string `json:"iconBase64,omitempty" bson:"iconBase64,omitempty"`
 
-	CreationTime string `json:"creationTime" bson:"creationTime"`
+	CreationTime string `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 }
