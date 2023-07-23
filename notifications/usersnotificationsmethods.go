@@ -1,4 +1,4 @@
-package armotypes
+package notifications
 
 import (
 	"fmt"
@@ -127,4 +127,32 @@ func (nci *NotificationConfigIdentifier) Validate() error {
 		return fmt.Errorf("notification type is required")
 	}
 	return fmt.Errorf("invalid notification type: %s", nci.NotificationType)
+}
+
+type TopCtrlItem struct {
+	ControlID            string           `json:"id" bson:"id"`
+	ControlGUID          string           `json:"guid" bson:"guid"`
+	Name                 string           `json:"name" bson:"name"`
+	Remediation          string           `json:"remediation" bson:"remediation"`
+	Description          string           `json:"description" bson:"description"`
+	ClustersCount        int64            `json:"clustersCount" bson:"clustersCount"`
+	SeverityOverall      int64            `json:"severityOverall" bson:"severityOverall"`
+	BaseScore            int64            `json:"baseScore" bson:"baseScore"`
+	Clusters             []TopCtrlCluster `json:"clusters" bson:"clusters"`
+	TotalFailedResources int64            `json:"-"`
+}
+
+type TopCtrlCluster struct {
+	Name               string `json:"name" bson:"name"`
+	ResourcesCount     int64  `json:"resourcesCount" bson:"resourcesCount"`
+	ReportGUID         string `json:"reportGUID" bson:"reportGUID"`
+	TopFailedFramework string `json:"topFailedFramework" bson:"topFailedFramework"`
+}
+
+func (t *TopCtrlItem) GetTotalFailedResources() int64 {
+	var totalFailedResources int64
+	for _, c := range t.Clusters {
+		totalFailedResources += c.ResourcesCount
+	}
+	return totalFailedResources
 }

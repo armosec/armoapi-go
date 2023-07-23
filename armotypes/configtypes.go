@@ -1,12 +1,14 @@
 package armotypes
 
+import "github.com/armosec/armoapi-go/identifiers"
+
 type ScanFrequency string
 
 type CustomerConfig struct {
-	Name       string                 `json:"name" bson:"name"`
-	Attributes map[string]interface{} `json:"attributes,omitempty" bson:"attributes,omitempty"` // could be string
-	Scope      PortalDesignator       `json:"scope" bson:"scope"`
-	Settings   Settings               `json:"settings" bson:"settings"`
+	Name       string                       `json:"name" bson:"name"`
+	Attributes map[string]interface{}       `json:"attributes,omitempty" bson:"attributes,omitempty"` // could be string
+	Scope      identifiers.PortalDesignator `json:"scope" bson:"scope"`
+	Settings   Settings                     `json:"settings" bson:"settings"`
 }
 
 type Settings struct {

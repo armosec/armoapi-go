@@ -1,4 +1,6 @@
-package armotypes
+package notifications
+
+import "github.com/armosec/armoapi-go/identifiers"
 
 type CollabAssignee struct {
 
@@ -9,5 +11,5 @@ type CollabAssignee struct {
 	AssigneeName string `json:"assigneeName"`
 
 	//put here properties of the assignee, ad
-	AdditionalInfo []ArmoContext `json:"additionalInfo"`
+	AdditionalInfo []identifiers.ArmoContext `json:"additionalInfo"`
 }

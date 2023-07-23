@@ -1,4 +1,4 @@
-package armotypes
+package notifications
 
 import (
 	"encoding/json"
@@ -317,6 +317,7 @@ func TestNotificationsConfigChannels(t *testing.T) {
 	config := channels[0].GetAlertConfig("testType")
 	if config == nil {
 		t.Errorf("Expected non-nil, got nil")
+		t.FailNow()
 	}
 	if config.NotificationType != "testType" {
 		t.Errorf("Expected 'testType', got '%s'", config.NotificationType)

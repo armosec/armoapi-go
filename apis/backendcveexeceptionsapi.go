@@ -9,10 +9,11 @@ import (
 	"path"
 
 	"github.com/armosec/armoapi-go/armotypes"
+	"github.com/armosec/armoapi-go/identifiers"
 	httputils "github.com/armosec/utils-go/httputils"
 )
 
-func getCVEExceptionsURL(backendURL string, cusGUID string, designators *armotypes.PortalDesignator) (*url.URL, error) {
+func getCVEExceptionsURL(backendURL string, cusGUID string, designators *identifiers.PortalDesignator) (*url.URL, error) {
 	expURL, err := url.Parse(backendURL)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func getCVEExceptionsURL(backendURL string, cusGUID string, designators *armotyp
 	return expURL, nil
 }
 
-func getCVEExceptionByDEsignator(backendURL string, cusGUID string, designators *armotypes.PortalDesignator) ([]armotypes.VulnerabilityExceptionPolicy, error) {
+func getCVEExceptionByDEsignator(backendURL string, cusGUID string, designators *identifiers.PortalDesignator) ([]armotypes.VulnerabilityExceptionPolicy, error) {
 
 	var vulnerabilityExceptionPolicy []armotypes.VulnerabilityExceptionPolicy
 
@@ -58,7 +59,7 @@ func getCVEExceptionByDEsignator(backendURL string, cusGUID string, designators 
 	return vulnerabilityExceptionPolicy, nil
 }
 
-func BackendGetCVEExceptionByDEsignator(baseURL string, cusGUID string, designators *armotypes.PortalDesignator) ([]armotypes.VulnerabilityExceptionPolicy, error) {
+func BackendGetCVEExceptionByDEsignator(baseURL string, cusGUID string, designators *identifiers.PortalDesignator) ([]armotypes.VulnerabilityExceptionPolicy, error) {
 	vulnerabilityExceptionPolicyList, err := getCVEExceptionByDEsignator(baseURL, cusGUID, designators)
 	if err != nil {
 		return nil, err

@@ -3,7 +3,7 @@ package apis
 import (
 	"encoding/json"
 
-	"github.com/armosec/armoapi-go/armotypes"
+	"github.com/armosec/armoapi-go/identifiers"
 	"github.com/docker/docker/api/types"
 )
 
@@ -105,7 +105,7 @@ func (c *Command) GetArg(key string) interface{} {
 
 func (c *Command) GetID() string {
 	if len(c.Designators) > 0 {
-		return armotypes.DesignatorsToken
+		return identifiers.DesignatorsToken
 	}
 	if c.WildWlid != "" {
 		return c.WildWlid

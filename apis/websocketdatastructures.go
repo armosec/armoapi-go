@@ -3,7 +3,7 @@ package apis
 import (
 	"time"
 
-	"github.com/armosec/armoapi-go/armotypes"
+	"github.com/armosec/armoapi-go/identifiers"
 	"github.com/docker/docker/api/types"
 )
 
@@ -29,11 +29,11 @@ type Command struct {
 	// Designators for the command
 	//
 	// Designators select the targets to which the command applies.
-	Designators []armotypes.PortalDesignator `json:"designators,omitempty"`
-	Wlid        string                       `json:"wlid,omitempty"`
-	WildWlid    string                       `json:"wildWlid,omitempty"`
-	Sid         string                       `json:"sid,omitempty"`
-	WildSid     string                       `json:"wildSid,omitempty"`
+	Designators []identifiers.PortalDesignator `json:"designators,omitempty"`
+	Wlid        string                         `json:"wlid,omitempty"`
+	WildWlid    string                         `json:"wildWlid,omitempty"`
+	Sid         string                         `json:"sid,omitempty"`
+	WildSid     string                         `json:"wildSid,omitempty"`
 	// Job tracking context for
 	JobTracking JobTracking `json:"jobTracking,omitempty"`
 
