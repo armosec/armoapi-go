@@ -1,8 +1,6 @@
 package armotypes
 
 import (
-	"strings"
-
 	stripe "github.com/stripe/stripe-go/v74"
 )
 
@@ -53,123 +51,6 @@ type PortalBase struct {
 	UpdatedTime string                 `json:"updatedTime,omitempty" bson:"updatedTime,omitempty"`
 }
 
-// Type of the designator
-//
-// swagger:enum DesignatorType
-type DesignatorType string
-
-// Supported designators
-const (
-	DesignatorAttributes DesignatorType = "Attributes"
-	DesignatorAttribute  DesignatorType = "Attribute" // Deprecated
-	// WorkloadID format.
-	//
-	// Has two formats:
-	//  1. Kubernetes format: wlid://cluster-<cluster>/namespace-<namespace>/<kind>-<name>
-	//  2. Native format: wlid://datacenter-<datacenter>/project-<project>/native-<name>
-	DesignatorWlid DesignatorType = "Wlid"
-	// A WorkloadID wildcard expression.
-	//
-	// A wildcard expression that includes a cluster:
-	//
-	//  wlid://cluster-<cluster>/
-	//
-	// An expression that includes a cluster and namespace (filters out all other namespaces):
-	//
-	//  wlid://cluster-<cluster>/namespace-<namespace>/
-	DesignatorWildWlid      DesignatorType = "WildWlid"
-	DesignatorWlidContainer DesignatorType = "WlidContainer"
-	DesignatorWlidProcess   DesignatorType = "WlidProcess"
-	DesignatorSid           DesignatorType = "Sid" // secret id
-)
-
-func (dt DesignatorType) ToLower() DesignatorType {
-	return DesignatorType(strings.ToLower(string(dt)))
-}
-
-// attributes
-const (
-	DesignatorsToken       = "designators"
-	AttributeCustomerGUID  = "customerGUID"
-	AttributeRegistryName  = "registryName"
-	AttributeRepository    = "repository"
-	AttributeTag           = "tag"
-	AttributeCluster       = "cluster"
-	AttributeNamespace     = "namespace"
-	AttributeKind          = "kind"
-	AttributeName          = "name"
-	AttributeContainerName = "containerName"
-	AttributeApiVersion    = "apiVersion"
-	AttributeWorkloadHash  = "workloadHash"
-	AttributeIsIncomplete  = "isIncomplete"
-	AttributeSensor        = "sensor"
-	AttributePath          = "path"
-	AttributeResourceID    = "resourceID"
-)
-
-// Repository scan related attributes
-const (
-	AttributeRepoName      = "repoName"
-	AttributeRepoOwner     = "repoOwner"
-	AttributeRepoHash      = "repoHash"
-	AttributeBranchName    = "branch"
-	AttributeDefaultBranch = "defaultBranch"
-	AttributeProvider      = "provider"
-	AttributeRemoteURL     = "remoteURL"
-
-	AttributeLastCommitHash     = "lastCommitHash"
-	AttributeLastCommitterName  = "lastCommitterName"
-	AttributeLastCommitterEmail = "lastCommitterEmail"
-	AttributeLastCommitTime     = "lastCommitTime"
-
-	AttributeFilePath          = "filePath"
-	AttributeFileType          = "fileType"
-	AttributeFileDir           = "fileDirectory"
-	AttributeFileUrl           = "fileUrl"
-	AttributeFileHelmChartName = "fileHelmChartName"
-
-	AttributeLastFileCommitHash     = "lastFileCommitHash"
-	AttributeLastFileCommitterName  = "lastFileCommitterName"
-	AttributeLastFileCommitterEmail = "LastFileCommitterEmail"
-	AttributeLastFileCommitTime     = "lastFileCommitTime"
-
-	AttributeUseHTTP       = "useHTTP"
-	AttributeSkipTLSVerify = "skipTLSVerify"
-)
-
-// rego-library attributes
-const (
-	AttributeImageScanRelated     = "imageScanRelated"
-	AttributeImageRelatedControls = "imageRelatedControls"
-	AttributeHostSensorRule       = "hostSensorRule"
-	AttributeHostSensor           = "hostSensor"
-)
-
-// PortalDesignator represents a single designation option
-type PortalDesignator struct {
-	DesignatorType DesignatorType `json:"designatorType" bson:"designatorType"`
-	// A specific Workload ID
-	WLID string `json:"wlid,omitempty" bson:"wlid,omitempty"`
-	// An expression that describes applicable workload IDs
-	WildWLID string `json:"wildwlid,omitempty" bson:"wildwlid,omitempty"`
-	// A specific Secret ID
-	SID string `json:"sid,omitempty" bson:"sid,omitempty"`
-	// Attributes that describe the targets
-	Attributes map[string]string `json:"attributes" bson:"attributes"`
-}
-
-// Worker nodes attribute related consts
-const (
-	AttributeWorkerNodes             = "workerNodes"
-	WorkerNodesmax                   = "max"
-	WorkerNodeslastReported          = "lastReported"
-	WorkerNodeslastReportDate        = "lastReportDate"
-	WorkerNodesmaxPerMonth           = "maxPerMonth"
-	WorkerNodesmaxReportGUID         = "maxReportGUID"
-	WorkerNodesmaxPerMonthReportGUID = "maxPerMonthReportGUID"
-	WorkerNodeslastReportGUID        = "lastReportGUID"
-)
-
 // PortalCluster holds cluster data from portal BE
 type PortalCluster struct {
 	PortalBase       `json:",inline" bson:"inline"`
@@ -178,14 +59,26 @@ type PortalCluster struct {
 	InstallationData *InstallationData `json:"installationData" bson:"installationData,omitempty"`
 }
 
+type RelevantImageVulnerabilitiesConfiguration string
+
+const (
+	RelevantImageVulnerabilitiesConfigurationEnable  RelevantImageVulnerabilitiesConfiguration = "enable"
+	RelevantImageVulnerabilitiesConfigurationDisable RelevantImageVulnerabilitiesConfiguration = "disable"
+	RelevantImageVulnerabilitiesConfigurationDetect  RelevantImageVulnerabilitiesConfiguration = "detect"
+)
+
 type InstallationData struct {
-	ClusterName                         string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                 // cluster name defined manually or from the cluster context
-	StorageEnabled                      *bool  `json:"storage,omitempty" bson:"storage,omitempty"`                                                         // storage configuration (enabled/disabled)
-	RelevantImageVulnerabilitiesEnabled *bool  `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"` // relevancy configuration (enabled/disabled)
-	Namespace                           string `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                     // namespace to deploy the components
-	ImageVulnerabilitiesScanningEnabled *bool  `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"` // image scanning configuration (enabled/disabled)
-	PostureScanEnabled                  *bool  `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                   // posture configuration (enabled/disabled)
-	OtelCollectorEnabled                *bool  `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                             // otel collector configuration (enabled/disabled)
+	ClusterName                               string                                    `json:"clusterName,omitempty" bson:"clusterName,omitempty"`                                                             // cluster name defined manually or from the cluster context
+	ClusterShortName                          string                                    `json:"clusterShortName,omitempty" bson:"clusterShortName,omitempty"`                                                   // cluster short name enriched from the cluster name by BE
+	StorageEnabled                            *bool                                     `json:"storage,omitempty" bson:"storage,omitempty"`                                                                     // storage configuration (enabled/disabled)
+	RelevantImageVulnerabilitiesEnabled       *bool                                     `json:"relevantImageVulnerabilitiesEnabled,omitempty" bson:"relevantImageVulnerabilitiesEnabled,omitempty"`             // relevancy actual state (enabled/disabled)
+	RelevantImageVulnerabilitiesConfiguration RelevantImageVulnerabilitiesConfiguration `json:"relevantImageVulnerabilitiesConfiguration,omitempty" bson:"relevantImageVulnerabilitiesConfiguration,omitempty"` // relevancy configuration defined user
+	Namespace                                 string                                    `json:"namespace,omitempty" bson:"namespace,omitempty"`                                                                 // namespace to deploy the components
+	ImageVulnerabilitiesScanningEnabled       *bool                                     `json:"imageVulnerabilitiesScanningEnabled,omitempty" bson:"imageVulnerabilitiesScanningEnabled,omitempty"`             // image scanning configuration (enabled/disabled)
+	PostureScanEnabled                        *bool                                     `json:"postureScanEnabled,omitempty" bson:"postureScanEnabled,omitempty"`                                               // posture configuration (enabled/disabled)
+	OtelCollectorEnabled                      *bool                                     `json:"otelCollector,omitempty" bson:"otelCollector,omitempty"`                                                         // otel collector configuration (enabled/disabled)
+	ClusterProvider                           string                                    `json:"clusterProvider,omitempty" bson:"clusterProvider,omitempty"`                                                     // cluster provider (aws/azure/gcp)
+
 }
 
 // hold information of a single subscription.
@@ -229,34 +122,6 @@ type Subscription struct {
 
 	// can be "free", "team" or "enterprise"
 	LicenseType LicenseType `json:"licenseType,omitempty" bson:"licenseType,omitempty"`
-}
-
-type PortalCustomer struct {
-	PortalBase       `json:",inline" bson:"inline"`
-	Description      string `json:"description,omitempty" bson:"description,omitempty,omitempty"`
-	SubscriptionDate string `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
-	LastLoginDate    string `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
-	Email            string `json:"email,omitempty" bson:"email,omitempty"`
-	// customizable field that overrides the default max
-	MaxFreeNodes int `json:"maxFreeNodes,omitempty" bson:"maxFreeNodes,omitempty"`
-
-	// DEPRECATED - moved to subscription
-	LicenseType string `json:"license_type,omitempty" bson:"license_type,omitempty"`
-
-	// DEPRECATED - moved to subscription
-	SubscriptionExpiration string `json:"subscription_expiration,omitempty" bson:"subscription_expiration,omitempty"`
-
-	// DEPRECATED
-	InitialLicenseType string `json:"initial_license_type,omitempty" bson:"initial_license_type,omitempty"`
-
-	NotificationsConfig *NotificationsConfig `json:"notifications_config,omitempty" bson:"notifications_config,omitempty"`
-	State               *CustomerState       `json:"state,omitempty" bson:"state,omitempty"`
-
-	OpenAiRequestCount int `json:"open_ai_request_count,omitempty" bson:"open_ai_request_count,omitempty"`
-
-	// Paid/free subscriptions information
-	ActiveSubscription      *Subscription  `json:"activeSubscription,omitempty" bson:"activeSubscription,omitempty"`
-	HistoricalSubscriptions []Subscription `json:"historicalSubscriptions,omitempty" bson:"historicalSubscriptions,omitempty"`
 }
 
 type PortalRepository struct {
@@ -310,4 +175,13 @@ type CustomerState struct {
 	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
 	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
 	NodeUsage      *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
+}
+
+type User struct {
+	DismissedBanners map[string]Banner `json:"dismissedBanners,omitempty" bson:"dismissedBanners,omitempty"` // map of bannerID to Banner
+}
+
+type Banner struct {
+	CustomerGUID string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"` // customerGUID of the account which clicked the banner
+	ScanID       string `json:"scanID,omitempty" bson:"scanID,omitempty"`             // for detailed view, unique key for banner is combination of scanID and bannerID
 }

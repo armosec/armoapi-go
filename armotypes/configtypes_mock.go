@@ -1,5 +1,7 @@
 package armotypes
 
+import "github.com/armosec/armoapi-go/identifiers"
+
 func MockCustomerConfig() *CustomerConfig {
 	scope := *MockPortalDesignator()
 	settings := *MockSettings()
@@ -10,8 +12,8 @@ func MockCustomerConfig() *CustomerConfig {
 	}
 }
 
-func MockPortalDesignator() *PortalDesignator {
-	return &PortalDesignator{
+func MockPortalDesignator() *identifiers.PortalDesignator {
+	return &identifiers.PortalDesignator{
 		DesignatorType: "Attributes",
 		WLID:           "",
 		WildWLID:       "",
