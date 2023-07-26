@@ -4,37 +4,50 @@ import (
 	"gorm.io/gorm"
 )
 
+/*
+Related resources, controls info and posture data will be enriched in backend business logic level until ready in postgres.
+*/
+
 type AttackChainNode struct {
 	gorm.Model            // ID, CreatedAt, UpdatedAt, DeletedAt - ID is required for linking nodes
-	Name          string  `gorm:"type:varchar(255);not null"`
+	Name          string  `gorm:"not null"`
 	Description   *string `gorm:"type:varchar(255)" `
-	AttackChainID string  `gorm:"primaryKey;type:varchar(255);not null"`
-	CustomerGUID  string  `gorm:"primaryKey;type:varchar(255);not null"`
+	AttackChainID string  `gorm:"not null"` // hash of cluster/resourceID
+	CustomerGUID  string  `gorm:"not null"`
+	IsRoot        bool    `gorm:"not null"`
 }
 
 type AttackChainNodeRelation struct {
 	BaseModel
-	ParentNodeID uint `gorm:"primaryKey; not null"`
-	ChildNodeID  uint `gorm:"primaryKey; not null"`
+	ParentNode   AttackChainNode `gorm:"foreignKey:ParentNodeID"`
+	ParentNodeID uint            `gorm:"primaryKey; not null"`
+	ChildNode    AttackChainNode `gorm:"foreignKey:ChildNodeID"`
+	ChildNodeID  uint            `gorm:"primaryKey; not null"`
 }
 
 type AttackChainNodeImageScanRelation struct {
 	BaseModel
-	NodeID uint `gorm:"primaryKey; not null"`
+	NodeID uint            `gorm:"primaryKey; not null"`
+	Node   AttackChainNode `gorm:"foreignKey:NodeID"`
 
 	// ImageScanId = ContainerScanId (required for attack chain.)
-	ImageScanId string `gorm:"primaryKey; foreignKey:ImageScanId; type:varchar(255);not null"`
+	ImageScanId string `gorm:"primaryKey; not null"`
+
+	// TODO: define ImageScanSummary with foreign key
+	// ImageScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
 }
 
 type AttackChainNodeRelatedResourcesRelation struct {
 	BaseModel
-	NodeID     uint   `gorm:"primaryKey; not null"`
-	ResourceID string `gorm:"primaryKey; type:varchar(255);not null"`
+	NodeID     uint            `gorm:"primaryKey; not null"`
+	Node       AttackChainNode `gorm:"foreignKey:NodeID"`
+	ResourceID string          `gorm:"primaryKey; not null"`
 }
 
 type AttackChainNodeControlsRelation struct {
 	BaseModel
-	NodeID uint `gorm:"primaryKey; not null"`
+	NodeID uint            `gorm:"primaryKey; not null"`
+	Node   AttackChainNode `gorm:"foreignKey:NodeID"`
 
 	// ControlID = failed or ignored control ID that is associated with the node.
 	ControlID string `gorm:"primaryKey; type:varchar(255);not null"`
