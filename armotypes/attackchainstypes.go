@@ -15,6 +15,11 @@ const (
 )
 
 type AttackChain struct {
+	AttackChainNodes AttackChainNode `json:"attackChainNodes,omitempty" bson:"attackChainNodes,omitempty"`
+	AttackChainConfig
+}
+
+type AttackChainConfig struct {
 	PortalBase       `json:",inline" bson:",inline"`
 	Resource         identifiers.PortalDesignator `json:"resource,omitempty" bson:"resource,omitempty"`
 	Description      string                       `json:"description,omitempty" bson:"description,omitempty"`
@@ -24,22 +29,21 @@ type AttackChain struct {
 	CustomerGUID     string                       `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
 	LatestReportGUID string                       `json:"latestReportGUID,omitempty" bson:"latestReportGUID,omitempty"` // latest reportGUID in which this attack chain was identified
 	UIStatus         *AttackChainUIStatus         `json:"uiStatus,omitempty" bson:"uiStatus,omitempty"`
-	AttackChainNodes AttackChainNode              `json:"attackChainNodes,omitempty" bson:"attackChainNodes,omitempty"`
 }
 
 type AttackChainNode struct {
-	Name             string                         `json:"name"`
-	Description      string                         `json:"description"`
-	ControlIDs       []string                       `json:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
-	Vulnerabilities  []Vulnerabilities              `json:"vulnerabilities,omitempty"`
-	RelatedResources []identifiers.PortalDesignator `json:"relatedResources"`
-	NextNodes        []AttackChainNode              `json:"nextNodes,omitempty"`
+	Name             string                         `json:"name" bson:"name,omitempty"`
+	Description      string                         `json:"description" bson:"description,omitempty"`
+	ControlIDs       []string                       `json:"controlIDs,omitempty" bson:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
+	Vulnerabilities  []Vulnerabilities              `json:"vulnerabilities,omitempty" bson:"vulnerabilities,omitempty"`
+	RelatedResources []identifiers.PortalDesignator `json:"relatedResources" bson:"relatedResources,omitempty"`
+	NextNodes        []AttackChainNode              `json:"nextNodes,omitempty" bson:"nextNodes,omitempty"`
 }
 
 type Vulnerabilities struct {
-	ContainersScanID string   `json:"containersScanID"`
-	ContainerName    string   `json:"containerName"`
-	Names            []string `json:"names"` // CVE names
+	ContainersScanID string   `json:"containersScanID" bson:"containersScanID,omitempty"`
+	ContainerName    string   `json:"containerName" bson:"containerName,omitempty"`
+	Names            []string `json:"names" bson:"names,omitempty"` // CVE names
 }
 
 // struct for UI support. All strings are timestamps
