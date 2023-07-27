@@ -16,6 +16,13 @@ const (
 	CriticalSeverity   = "Critical"
 
 	ContainerScanRedisPrefix = "_containerscan"
+
+	UnknownScore    = 1
+	NegligibleScore = 100
+	LowScore        = 200
+	MediumScore     = 300
+	HighScore       = 400
+	CriticalScore   = 500
 )
 
 var KnownSeverities = map[string]bool{
