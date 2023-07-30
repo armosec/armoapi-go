@@ -77,4 +77,13 @@ type LoginObject struct {
 type PaginationMarks struct {
 	ReportNumber int  `json:"chunkNumber"` // serial number of report, used in pagination
 	IsLastReport bool `json:"isLastChunk"` //specify this is the last report, used in pagination
+
+	// TotalChunksExpected and TotalChunksRecieved are used to track the progress of the report.
+	// Once TotalChunksExpected == TotalChunksRecieved, fields values will be set to -1 and reported is considered as completed.
+
+	//specify the total number of chunks expected. Will be populated with the ReportNumber of the LastReport (IsLastReport == true)
+	TotalChunksExpected int `json:"totalChunksExpected"`
+
+	//specify the total number of chunks recieved so far - will be increment by one on each chunk recieved.
+	TotalChunksRecieved int `json:"totalChunksRecieved"`
 }
