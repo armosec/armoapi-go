@@ -39,6 +39,7 @@ type VulnerabilityFinding struct {
 
 type VulnerabilityScanSummary struct {
 	BaseModel
+	BaseReport
 	ScanKind                   string
 	ImageScanId                string `gorm:"primaryKey"`
 	ContainerSpecId            string
