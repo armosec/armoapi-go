@@ -3,7 +3,7 @@ package postgresmodels
 type BaseReport struct {
 	// TotalChunksExpected and TotalChunksRecieved are used to track the progress of the report.
 
-	// Total number of chunks expected. Will be populated with the ReportNumber of the LastReport (IsLastReport == true)
+	// Total number of chunks expected. Will be populated with the (ReportNumber of the LastReport + 1) (IsLastReport == true)
 	// If not known yet (i.e. IsLastReport not recieved yet), will be set to -1
 	TotalChunksExpected int
 
