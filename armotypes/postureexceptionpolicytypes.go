@@ -6,6 +6,16 @@ import (
 	"github.com/armosec/armoapi-go/identifiers"
 )
 
+type PostureExceptionPolicyActions string
+
+const AlertOnly PostureExceptionPolicyActions = "alertOnly"
+const Disable PostureExceptionPolicyActions = "disable"
+
+type PolicyType string
+
+const PostureExceptionPolicyType PolicyType = "postureExceptionPolicy"
+const VulnerabilityExceptionPolicyType PolicyType = "vulnerabilityExceptionPolicy"
+
 /*
 swagger:route POST /api/v1/postureExceptionPolicy
 Create new exception
@@ -73,16 +83,6 @@ Deleting existing exception
 `/api/v1/postureExceptionPolicy?customerGUID=31fb54a9-6e8f-4289-8506-f4e875ac19f7&policyName=reg-policy1&policyName=bas-policy2`
 `/api/v1/postureExceptionPolicy?customerGUID=31fb54a9-6e8f-4289-8506-f4e875ac19f7&policyGUID=31fb54a9-6e8f-4289-8506-f4e875ac19f7&policyGUID=c62a6397-4777-4410-949e-d99c2efb1f79`
 */
-type PostureExceptionPolicyActions string
-
-const AlertOnly PostureExceptionPolicyActions = "alertOnly"
-const Disable PostureExceptionPolicyActions = "disable"
-
-type PolicyType string
-
-const PostureExceptionPolicyType PolicyType = "postureExceptionPolicy"
-const VulnerabilityExceptionPolicyType PolicyType = "vulnerabilityExceptionPolicy"
-
 type PostureExceptionPolicy struct {
 	PortalBase      `json:",inline" bson:"inline"`
 	PolicyType      string                          `json:"policyType,omitempty" bson:"policyType,omitempty"`
