@@ -42,7 +42,7 @@ type VulnerabilityScanSummary struct {
 	BaseReport
 	ScanKind                   string
 	ImageScanId                string `gorm:"primaryKey"`
-	ContainerSpecId            string // ContainerSpecId = ContainersScanID
+	ContainerSpecId            string
 	Timestamp                  time.Time
 	CustomerGuid               string
 	Wlid                       string
