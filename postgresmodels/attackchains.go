@@ -30,11 +30,11 @@ type AttackChainNodeImageScanRelation struct {
 	NodeID uint            `gorm:"primaryKey; not null"`
 	Node   AttackChainNode `gorm:"foreignKey:NodeID"`
 
-	// ImageScanId = ContainerScanId (required for attack chain.)
+	// ImageScanId = hash of customerGUID, cluster, containerSpecID
+	// Should be used instead of ContainersScanID
 	ImageScanId string `gorm:"primaryKey; not null"`
 
-	// TODO: define ImageScanSummary with foreign key
-	// ImageScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
+	ImageScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
 }
 
 type AttackChainNodeRelatedResourcesRelation struct {
