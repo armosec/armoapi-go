@@ -1,7 +1,6 @@
 package postgresmodels
 
 import (
-	"database/sql/driver"
 	"time"
 
 	"github.com/lib/pq"
@@ -54,18 +53,25 @@ type ControlScanResult struct {
 	ControlID                  string `gorm:"primaryKey"`
 	ReportGUID                 string `gorm:"primaryKey"`
 	FrameworkName              string `gorm:"primaryKey"`
-	ControlGUID                string
 	Name                       string
 	Status                     string
 	SubStatus                  string
+	StatusCode                 int
 	ComplianceScore            float32
 	AffectedResourcesCount     int
 	FailedResourcesCount       int
 	SkippedResourcesCount      int
+	WarningResourcesCount      int
 	TotalScannedResourcesCount int
+
+	//HighlightPathsCount        int64
+	//ControlInputs                  []ControlInputs
+	//FrameworkSubSectionID          []string
 }
 
 type ControlsSummary struct {
+	BaseModel
+	BaseReport                      //we keep it here and not on the cluster summary for security framework scans
 	ReportGUID               string `gorm:"primaryKey"`
 	TotalControls            int
 	FailedControls           int
@@ -76,10 +82,23 @@ type ControlsSummary struct {
 	LowSeverityControls      int
 }
 
+type FrameworkSummary struct {
+	BaseModel
+	ReportGUID      string `gorm:"primaryKey"`
+	FrameworkName   string `gorm:"primaryKey"`
+	ComplianceScore float32
+	TotalControls   int
+	FailedControls  int
+	SkippedControls int
+	TypeTags        []string `gorm:"type:text[]"`
+	//Designators      PortalDesignator `json:"designators"`
+}
+
 type Resource struct {
 	BaseModel
-	ResourceID        string `gorm:"primaryKey"`
-	ReportGUID        string `gorm:"primaryKey"`
+	ResourceID string `gorm:"primaryKey"`
+	ReportGUID string `gorm:"primaryKey"`
+	//Designators                datatypes.JSON
 	EventId           []byte
 	Kind              string
 	Name              string
@@ -89,61 +108,29 @@ type Resource struct {
 	RelatedNamespaces pq.StringArray `gorm:"type:text[]"`
 }
 
-/*
-type Framework struct {
-	BaseModel
-	GUID         string `gorm:"primaryKey"`
-	Name         string
-	CustomerGuid string
-}*/
-
-type FrameworkSummary struct {
-	BaseModel
-	ReportGUID    string `gorm:"primaryKey"`
-	FrameworkName string `gorm:"primaryKey"`
-	//Framework       Framework `gorm:"foreignKey:FrameworkGUID"`
-	ComplianceScore float32
-	TotalControls   int `json:"totalControls"`
-	FailedControls  int `json:"failedControls"`
-	SkippedControls int `json:"skippedControls,omitempty"`
-
-	//Designators      PortalDesignator `json:"designators"`
-}
-
 type ResourceScanResult struct {
 	BaseModel
-	ResourceID    string `gorm:"primaryKey"`
-	ReportGUID    string `gorm:"primaryKey"`
-	FrameworkName string `gorm:"primaryKey"`
-	ControlID     string `gorm:"primaryKey"`
-	ControlName   string
-	//RegoLibraryVersion string
-	//Control            Control   `gorm:"foreignKey:ControlID,RegoLibraryVersion"`
-	Resource Resource `gorm:"foreignKey:ResourceID,ReportGUID"`
-	//Framework        Framework `gorm:"foreignKey:FrameworkGUID"`
-	Status           string
-	ExceptionApplied datatypes.JSON
-	FixPaths         datatypes.JSON
+	ResourceID      string         `gorm:"primaryKey"`
+	ReportGUID      string         `gorm:"primaryKey"`
+	FrameworkName   string         `gorm:"primaryKey"`
+	Resource        Resource       `gorm:"foreignKey:ResourceID,ReportGUID"`
+	FailedControl   pq.StringArray `gorm:"type:text[]"`
+	WarningControls pq.StringArray `gorm:"type:text[]"`
+	SkippedControls pq.StringArray `gorm:"type:text[]"`
+	//maps statusText 2 list of controlIDs
+	StatusToControls         datatypes.JSON `gorm:"type:json"`
+	HighlightsPerCtrl        datatypes.JSON `gorm:"type:json"`
+	FailedControlCount       int
+	SkippedControlCount      int
+	WarningControlCount      int
+	Status                   int
+	StatusText               string
+	SubStatusText            string
+	ExceptionApplied         datatypes.JSON `gorm:"type:json"`
+	Images                   datatypes.JSON `gorm:"type:json"`
+	ControlsInfo             datatypes.JSON `json:"controlsInfo"`
+	CriticalSeverityControls int
+	HighSeverityControls     int
+	MediumSeverityControls   int
+	LowSeverityControls      int
 }
-
-type Designators struct {
-}
-
-type Ecosystem string
-
-const (
-	Production Ecosystem = "production"
-	TestSystem Ecosystem = "testsystem"
-)
-
-func (e *Ecosystem) Scan(value interface{}) error {
-	*e = Ecosystem(value.([]byte))
-	return nil
-}
-
-func (e Ecosystem) Value() (driver.Value, error) {
-	return string(e), nil
-}
-
-// model define
-//Ecosystem        Ecosystem `json:"ecosystem" sql:"type:ENUM('production', 'testsystem')"`*/
