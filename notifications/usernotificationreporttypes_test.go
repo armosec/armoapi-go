@@ -282,6 +282,7 @@ func TestNotificationsConfigChannels(t *testing.T) {
 		AlertChannels: make(map[ChannelProvider][]AlertChannel),
 	}
 	ac := AlertChannel{
+		CollaborationConfigGUID: "testGUID",
 		Scope: []AlertScope{
 			{
 				Cluster:    "testCluster",
@@ -290,6 +291,20 @@ func TestNotificationsConfigChannels(t *testing.T) {
 		},
 	}
 	nc.AlertChannels["testProvider"] = []AlertChannel{ac}
+
+	// Test GetAlertChannelByCollaborationID
+	byGUID, err := nc.GetAlertChannelByCollaborationID("testGUID")
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if byGUID == nil {
+		t.Errorf("Expected non-nil, got nil")
+	}
+
+	_, err = nc.GetAlertChannelByCollaborationID("missingGUID")
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
 
 	// Test GetProviderChannels
 	channels := nc.GetProviderChannels("testProvider")
@@ -306,7 +321,7 @@ func TestNotificationsConfigChannels(t *testing.T) {
 	}
 
 	// Test AddAlertConfig and GetAlertConfig
-	err := channels[0].AddAlertConfig(AlertConfig{
+	err = channels[0].AddAlertConfig(AlertConfig{
 		NotificationConfigIdentifier: NotificationConfigIdentifier{
 			NotificationType: "testType",
 		},
@@ -321,6 +336,15 @@ func TestNotificationsConfigChannels(t *testing.T) {
 	}
 	if config.NotificationType != "testType" {
 		t.Errorf("Expected 'testType', got '%s'", config.NotificationType)
+	}
+
+	// Test RemoveAlertChannel
+	if err = nc.RemoveAlertChannel("testGUID"); err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	_, err = nc.GetAlertChannelByCollaborationID("testGUID")
+	if err == nil {
+		t.Errorf("Expected error, got nil")
 	}
 }
 
