@@ -34,7 +34,8 @@ type AttackChainNodeImageScanRelation struct {
 	// Should be used instead of ContainersScanID
 	ImageScanId string `gorm:"primaryKey; not null"`
 
-	ImageScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
+	// TODO: define ImageScanSummary with foreign key - need to fix TestVulScan dumb data tests in postgres connector to be aligned with key constaints
+	// ImageScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
 }
 
 type AttackChainNodeRelatedResourcesRelation struct {
