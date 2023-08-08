@@ -119,6 +119,30 @@ func (nc *NotificationsConfig) GetLatestPushReport(cluster string, scanType Scan
 	return nil
 }
 
+func (nc *NotificationsConfig) GetAlertChannelByCollaborationID(collaborationId string) (*AlertChannel, error) {
+	providerToChannels := nc.AlertChannels
+	for _, alertChannels := range providerToChannels {
+		for _, alertChannel := range alertChannels {
+			if alertChannel.CollaborationConfigGUID == collaborationId {
+				return &alertChannel, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("alert channel with collaboration id %s not found", collaborationId)
+}
+
+func (nc *NotificationsConfig) RemoveAlertChannel(collaborationId string) error {
+	for key, alertChannels := range nc.AlertChannels {
+		for i, alertChannel := range alertChannels {
+			if alertChannel.CollaborationConfigGUID == collaborationId {
+				nc.AlertChannels[key] = append(alertChannels[:i], alertChannels[i+1:]...)
+				return nil
+			}
+		}
+	}
+	return fmt.Errorf("alert channel with collaboration id %s not found", collaborationId)
+}
+
 func (nci *NotificationConfigIdentifier) Validate() error {
 	if slices.Contains(notificationTypes, nci.NotificationType) {
 		return nil
