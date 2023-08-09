@@ -1,15 +1,22 @@
 package postgresmodels
 
 type BaseReport struct {
-	// TotalChunksExpected and TotalChunksRecieved are used to track the progress of the report.
+	// TotalChunksExpected and ReceivedChunkNumbers are used to track the progress of the report.
 
 	// Total number of chunks expected. Will be populated with the (ReportNumber of the LastReport + 1) (IsLastReport == true)
-	// If not known yet (i.e. IsLastReport not recieved yet), will be set to -1
+	// If not known yet (i.e. IsLastReport not received yet), will be set to -1
 	TotalChunksExpected int
 
-	//specify the total number of chunks recieved so far - will be increment by one on each chunk recieved.
-	TotalChunksRecieved int
+	// A list of the numbers of the chunks received so far - will be updated after each chunk is received.
+	ReceivedChunkNumbers []int
 
-	// set to True when TotalChunksExpected == TotalChunksRecieved
+	// set to True when TotalChunksExpected == ReceivedChunkNumbers
 	Completed bool
+}
+
+type Reports struct {
+	BaseModel
+	ReportID     string `gorm:"primaryKey; not null"`
+	CustomerGUID string
+	BaseReport
 }
