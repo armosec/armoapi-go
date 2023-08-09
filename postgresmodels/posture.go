@@ -96,5 +96,6 @@ type ResourceContainer struct {
 	ResourceID    string `gorm:"primaryKey"`
 	ReportGUID    string `gorm:"primaryKey"`
 	ContainerName string `gorm:"primaryKey"`
-	ImageTag      string
+	Image        string
+	ImageHash     string
 }
