@@ -7,11 +7,6 @@ import (
 	"gorm.io/datatypes"
 )
 
-type PostureReportStatus struct {
-	BaseModel
-	ReportGUID string `gorm:"primaryKey"`
-	BaseReport
-}
 type ClusterPostureReport struct {
 	BaseModel
 	ReportGUID               string `gorm:"primaryKey"`
@@ -51,6 +46,7 @@ type ControlScanResult struct {
 	TotalScannedResourcesCount int
 }
 
+// We need this table for quicker queries although it could be calculated from ControlScanResult
 type FrameworkSummary struct {
 	BaseModel
 	ReportGUID      string `gorm:"primaryKey"`
@@ -68,7 +64,16 @@ type Resource struct {
 	ReportGUID        string         `gorm:"primaryKey"`
 	Designators       datatypes.JSON `gorm:"type:json"` //Portal designators
 	ResourceObjectRef string         //external storage ref(e.g. S3 bucket:key) to the resource file
-	HighlightsPaths   datatypes.JSON `gorm:"type:json"` //map controlID to []PosturePaths
+}
+
+type ResourceFixPath struct {
+	ResourceID string `gorm:"primaryKey"`
+	ReportGUID string `gorm:"primaryKey"`
+	ControlID  string `gorm:"primaryKey"`
+	FailedPath string `gorm:"primaryKey"`
+	FixCommand string `gorm:"primaryKey"`
+	FixPath    string `gorm:"primaryKey"`
+	FixValue   string
 }
 
 type ResourceControlResult struct {
