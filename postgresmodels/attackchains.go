@@ -23,12 +23,9 @@ type AttackChainState struct {
 	AttackTrackDescription string
 
 	// attributes["cluster"], attributes["namespace"], attributes["kind"], attributes["name"]
-	Resource           datatypes.JSON
-	ResourceName       string `gorm:"not null"`
-	ResourceNamespace  string `gorm:"not null"`
-	ResourceKind       string `gorm:"not null"`
-	ResourceAPIVersion string `gorm:"not null"`
-	ClusterName        string `gorm:"not null"`
+	Resource     datatypes.JSON // designator attributes
+	ResourceHash string         `gorm:"not null"` // hash of resource name/namespace/kind/apiversion/cluster (Extracted from designator attribues)
+	ClusterName  string         `gorm:"not null"`
 
 	LatestReportGUID string `gorm:"not null"` // latest reportGUID in which this attack chain was identified
 
