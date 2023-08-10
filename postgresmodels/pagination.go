@@ -8,7 +8,7 @@ type BaseReport struct {
 	TotalChunksExpected int
 
 	//specify the total number of chunks recieved so far - will be increment by one on each chunk recieved.
-	TotalChunksReceived int
+	TotalChunksRecieved int
 
 	// set to True when TotalChunksExpected == TotalChunksRecieved
 	Completed bool

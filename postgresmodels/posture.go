@@ -60,8 +60,9 @@ type FrameworkSummary struct {
 
 type Resource struct {
 	BaseModel
-	ResourceID        string         `gorm:"primaryKey"`
-	ReportGUID        string         `gorm:"primaryKey"`
+	ResourceID        string `gorm:"primaryKey"`
+	ReportGUID        string `gorm:"primaryKey"`
+	SPIFFE            string
 	Designators       datatypes.JSON `gorm:"type:json"` //Portal designators
 	ResourceObjectRef string         //external storage ref(e.g. S3 bucket:key) to the resource file
 }
@@ -96,6 +97,6 @@ type ResourceContainer struct {
 	ResourceID    string `gorm:"primaryKey"`
 	ReportGUID    string `gorm:"primaryKey"`
 	ContainerName string `gorm:"primaryKey"`
-	Image        string
+	Image         string
 	ImageHash     string
 }
