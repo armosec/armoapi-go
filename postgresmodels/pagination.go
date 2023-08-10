@@ -13,3 +13,11 @@ type BaseReport struct {
 	// set to True when TotalChunksExpected == TotalChunksRecieved
 	Completed bool
 }
+
+type ReportStatus struct {
+	BaseModel
+	ReportGUID          string `gorm:"primaryKey"`
+	TotalChunksExpected int
+	TotalChunksReceived int
+	Completed           bool
+}
