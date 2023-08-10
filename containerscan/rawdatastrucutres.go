@@ -2,7 +2,6 @@ package containerscan
 
 import (
 	"fmt"
-	"hash/fnv"
 
 	"github.com/armosec/armoapi-go/apis"
 	"github.com/armosec/armoapi-go/armotypes"
@@ -31,9 +30,7 @@ type ScanResultReport struct {
 }
 
 func (v *ScanResultReport) AsFNVHash() string {
-	hasher := fnv.New64a()
-	hasher.Write([]byte(fmt.Sprintf("%v", *v)))
-	return fmt.Sprintf("%v", hasher.Sum64())
+	return identifiers.CalcHashFNV(fmt.Sprintf("%v", *v))
 }
 
 // ScanResultLayer - represents a single layer from container scan result
