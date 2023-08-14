@@ -8,6 +8,7 @@ require (
 	github.com/armosec/utils-k8s-go v0.0.16
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/docker/docker v24.0.5+incompatible
+	github.com/francoispqt/gojay v1.2.13
 	github.com/google/uuid v1.3.0
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.8.4
