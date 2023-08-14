@@ -146,10 +146,12 @@ type UniqueValuesRequestV2 struct {
 	// Which elements of the list to return, each field can hold multiple values separated by comma
 	// Example: ": {"severity": "High,Medium",		"type": "61539,30303"}
 	// An empty map means "return the complete list"
-	InnerFilters            []map[string]string `json:"innerFilters"`
-	PageSize                int                 `json:"-"`
-	FieldsReverseKeywordMap map[string]string   `json:"-"`
-	Cursor                  string              `json:"-"`
+	InnerFilters []map[string]string `json:"innerFilters"`
+	PageSize     int                 `json:"pageSize,omitempty"`
+	//for apis that support pagination
+	PageNum                 *int              `json:"pageNum,omitempty"`
+	FieldsReverseKeywordMap map[string]string `json:"-"`
+	Cursor                  string            `json:"-"`
 	// The time window to search (Default: since - beginning of the time, until - now)
 	Since          *time.Time `json:"since,omitempty"`
 	Until          *time.Time `json:"until,omitempty"`
