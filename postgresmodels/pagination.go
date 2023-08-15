@@ -19,6 +19,6 @@ type ReportStatus struct {
 	ReportIdentifier      string `gorm:"primaryKey"` // reportGUID or imageScanID+timestamp
 	TotalChunksExpected   int
 	TotalChunksReceived   int
-	ReceivedChunksNumbers []int // list of chunk numbers received so far
+	ReceivedChunksNumbers []int `gorm:"type:int[]"` // list of chunk numbers received so far
 	Completed             bool
 }
