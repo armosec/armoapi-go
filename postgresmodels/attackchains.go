@@ -33,8 +33,8 @@ type AttackChainState struct {
 
 	// processing status is updated by the UI once a scan is initiated for all relevant clusters (connected) of the customerGUID.
 	// "done" is updated by the attack chain engine once finished processing.
-	ProcessingStatus string    `gorm:"not null"` // "processing"/ "done"
-	ViewedMainScreen time.Time // updated by UI - if the attack chain was viewed by the user// New badge
+	ProcessingStatus string     `gorm:"not null"`     // "processing"/ "done"
+	ViewedMainScreen *time.Time `gorm:"default:NULL"` // updated by UI - if the attack chain was viewed by the user// New badge
 
 	RootNode   AttackChainNode `gorm:"foreignKey:RootNodeID"`
 	RootNodeID uint            `gorm:"not null"`
