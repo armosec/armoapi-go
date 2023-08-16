@@ -75,7 +75,11 @@ func (ContextualVulnerabilityFinding) TableName() string {
 func (v VulnerabilityScanSummary) GetDesignators() (*identifiers.PortalDesignator, error) {
 	var designators *identifiers.PortalDesignator
 
-	desigs, _ := v.Designators.Value()
+	desigs, err := v.Designators.Value()
+	if err != nil {
+		return nil, err
+	}
+
 	if err := json.Unmarshal([]byte(desigs.(string)), &designators); err != nil {
 		return nil, err
 	}
