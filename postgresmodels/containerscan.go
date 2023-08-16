@@ -1,8 +1,10 @@
 package postgresmodels
 
 import (
+	"encoding/json"
 	"time"
 
+	"github.com/armosec/armoapi-go/identifiers"
 	"github.com/lib/pq"
 	"gorm.io/datatypes"
 )
@@ -68,6 +70,21 @@ type ContextualVulnerabilityFinding struct {
 
 func (ContextualVulnerabilityFinding) TableName() string {
 	return "vulnerability_findings"
+}
+
+func (v VulnerabilityScanSummary) GetDesignators() (*identifiers.PortalDesignator, error) {
+	var designators *identifiers.PortalDesignator
+
+	desigs, err := v.Designators.Value()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal([]byte(desigs.(string)), &designators); err != nil {
+		return nil, err
+	}
+
+	return designators, nil
 }
 
 type VulnerabilitySeverityStats struct {
