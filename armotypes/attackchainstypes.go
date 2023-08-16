@@ -56,6 +56,22 @@ type AttackChainUIStatus struct {
 	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"`       // "processing"/ "done"
 }
 
+// --------- Ingesters structs and consts -------------
+
+// supported topics and properties:
+// [topic]/[propName]/[propValue]
+
+// attack-chain-scan-state-v1/action/update
+// attack-chain-viewed-v1/action/update
+
+const (
+	AttackChainStateScanStateTopic = "attack-chain-scan-state-v1"
+	AttackChainStateViewedTopic    = "attack-chain-viewed-v1"
+
+	MsgPropAction            = "action"
+	MsgPropActionValueUpdate = "update"
+)
+
 // struct for ConsumerAttackChainsStatesUpdate ingester as payloads
 type AttackChainFirstSeen struct {
 	AttackChainID    string `json:"attackChainID,omitempty" bson:"attackChainID,omitempty"` // name/cluster/resourceID
