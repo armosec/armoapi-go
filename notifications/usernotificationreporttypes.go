@@ -30,9 +30,13 @@ type PushNotification struct {
 
 type NewClusterAdmins []NewClusterAdmin
 type NewClusterAdmin struct {
-	Resource    string
-	Link        string
-	ClusterName string
+	Resource          string
+	Link              string
+	ClusterName       string
+	ClusterFullName   string
+	ResourceName      string
+	ResourceKind      string
+	ResourceNamespace string
 }
 
 type Misconfigurations []Misconfiguration
