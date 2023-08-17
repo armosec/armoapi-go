@@ -1,5 +1,7 @@
 package postgresmodels
 
+import "github.com/lib/pq"
+
 type BaseReport struct {
 	// TotalChunksExpected and TotalChunksRecieved are used to track the progress of the report.
 
@@ -19,6 +21,6 @@ type ReportStatus struct {
 	ReportIdentifier      string `gorm:"primaryKey"` // reportGUID or imageScanID+timestamp
 	TotalChunksExpected   int
 	TotalChunksReceived   int
-	ReceivedChunksNumbers []int `gorm:"type:int[]"` // list of chunk numbers received so far
+	ReceivedChunksNumbers pq.Int64Array `gorm:"type:int[]"` // list of chunk numbers received so far
 	Completed             bool
 }
