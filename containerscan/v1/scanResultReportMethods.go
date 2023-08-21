@@ -33,6 +33,9 @@ func (r *ScanResultReport) GetWorkloadHash() string {
 }
 
 func (r *ScanResultReport) GetCustomerGUID() string {
+	if r.GetSummary() != nil {
+		return r.GetSummary().GetCustomerGUID()
+	}
 	desg := r.GetDesignators()
 	customerGUID := desg.Attributes[identifiers.AttributeCustomerGUID]
 	return customerGUID
