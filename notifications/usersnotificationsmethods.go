@@ -91,7 +91,7 @@ func (nc *NotificationsConfig) GetProviderChannels(provider ChannelProvider) []A
 }
 
 func (nc *NotificationsConfig) GetAllChannels() []AlertChannel {
-	if nc.AlertChannels == nil {
+	if len(nc.AlertChannels) == 0 {
 		return nil
 	}
 	var channels []AlertChannel
