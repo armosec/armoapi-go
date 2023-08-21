@@ -65,11 +65,15 @@ type AttackChainUIStatus struct {
 // attack-chain-viewed-v1/action/update
 
 const (
-	AttackChainStateScanStateTopic = "attack-chain-scan-state-v1"
-	AttackChainStateViewedTopic    = "attack-chain-viewed-v1"
+	AttackChainStateScanStateTopic   = "attack-chain-scan-state-v1"
+	AttackChainStateViewedTopic      = "attack-chain-viewed-v1"
+	KubescapeScanReportFinishedTopic = "kubescape-scan-report-finished-v1"
 
 	MsgPropAction            = "action"
 	MsgPropActionValueUpdate = "update"
+
+	WasViewedMainScreenField = "wasViewedMainScreen"
+	ProcessingStatusField    = "processingStatus"
 )
 
 // struct for ConsumerAttackChainsStatesUpdate ingester as payloads

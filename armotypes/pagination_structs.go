@@ -129,6 +129,9 @@ type V2ListRequest struct {
 	FieldsReverseKeywordMap map[string]string `json:"-"`
 	// TODO: reuse cursor struct (few line above)
 	SearchAfter *SearchAfterResp `json:"searchAfter"`
+	// For PUT request, can be used to update only specific fields with specific values
+	// map of field name to new value
+	FieldsToUpdate map[string]string `json:"fieldsToUpdate"`
 }
 
 type Cursor struct {
