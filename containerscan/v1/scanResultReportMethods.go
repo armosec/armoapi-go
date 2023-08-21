@@ -33,7 +33,9 @@ func (r *ScanResultReport) GetWorkloadHash() string {
 }
 
 func (r *ScanResultReport) GetCustomerGUID() string {
-	return r.GetSummary().GetCustomerGUID()
+	desg := r.GetDesignators()
+	customerGUID := desg.Attributes[identifiers.AttributeCustomerGUID]
+	return customerGUID
 }
 
 func (r *ScanResultReport) GetSummary() containerscan.ContainerScanSummaryResult {
