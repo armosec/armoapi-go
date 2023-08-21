@@ -3,6 +3,7 @@ package notifications
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -473,5 +474,134 @@ func TestIsEnabled(t *testing.T) {
 
 	if !config.IsEnabled() {
 		t.Errorf("Expected alert config to be enabled, but it was not")
+	}
+}
+
+func TestGetAllChannels(t *testing.T) {
+	tests := []struct {
+		name     string
+		config   NotificationsConfig
+		expected []AlertChannel
+	}{
+		{
+			name: "no alert channels",
+			config: NotificationsConfig{
+				AlertChannels: map[ChannelProvider][]AlertChannel{},
+			},
+			expected: nil,
+		},
+		{
+			name: "single provider with multiple channels",
+			config: NotificationsConfig{
+				AlertChannels: map[ChannelProvider][]AlertChannel{
+					"provider1": {
+						{
+							ChannelType: "provider1",
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypeWeekly,
+									},
+								},
+							},
+						},
+						{
+							ChannelType: "provider1",
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypePush,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []AlertChannel{
+				{
+					ChannelType: "provider1",
+					Alerts: []AlertConfig{
+						{
+							NotificationConfigIdentifier: NotificationConfigIdentifier{
+								NotificationType: NotificationTypeWeekly,
+							},
+						},
+					},
+				},
+				{
+					ChannelType: "provider1",
+					Alerts: []AlertConfig{
+						{
+							NotificationConfigIdentifier: NotificationConfigIdentifier{
+								NotificationType: NotificationTypePush,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "multiple providers with single channel each",
+			config: NotificationsConfig{
+				AlertChannels: map[ChannelProvider][]AlertChannel{
+					"provider1": {
+						{
+							ChannelType: "provider1",
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypeWeekly,
+									},
+								},
+							},
+						},
+					},
+					"provider2": {
+						{
+							ChannelType: "provider2",
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypePush,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []AlertChannel{
+				{
+					ChannelType: "provider1",
+					Alerts: []AlertConfig{
+						{
+							NotificationConfigIdentifier: NotificationConfigIdentifier{
+								NotificationType: NotificationTypeWeekly,
+							},
+						},
+					},
+				},
+				{
+					ChannelType: "provider2",
+					Alerts: []AlertConfig{
+						{
+							NotificationConfigIdentifier: NotificationConfigIdentifier{
+								NotificationType: NotificationTypePush,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.config.GetAllChannels()
+			if !reflect.DeepEqual(got, tt.expected) {
+				t.Errorf("GetAllChannels() = %v, want %v", got, tt.expected)
+			}
+		})
 	}
 }

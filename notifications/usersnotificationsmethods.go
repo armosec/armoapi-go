@@ -90,6 +90,17 @@ func (nc *NotificationsConfig) GetProviderChannels(provider ChannelProvider) []A
 	return nc.AlertChannels[provider]
 }
 
+func (nc *NotificationsConfig) GetAllChannels() []AlertChannel {
+	if len(nc.AlertChannels) == 0 {
+		return nil
+	}
+	var channels []AlertChannel
+	for i := range nc.AlertChannels {
+		channels = append(channels, nc.AlertChannels[i]...)
+	}
+	return channels
+}
+
 func (nc *NotificationsConfig) GetAlertConfigurations(notificationType NotificationType) []AlertConfig {
 	alerts := make([]AlertConfig, 0)
 	for _, typesChannels := range nc.AlertChannels {
