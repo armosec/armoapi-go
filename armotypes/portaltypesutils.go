@@ -6,7 +6,7 @@ import (
 )
 
 // Getters & Setter used by derived types for interfaces implementation
-func (p *PortalBase) GetGuid() string {
+func (p *PortalBase) GetGUID() string {
 	return p.GUID
 }
 func (p *PortalBase) SetGUID(guid string) {

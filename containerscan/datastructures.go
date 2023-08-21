@@ -34,6 +34,19 @@ var KnownSeverities = map[string]bool{
 	CriticalSeverity:   true,
 }
 
+var knowScores = map[int]string{
+	UnknownScore:    UnknownSeverity,
+	NegligibleScore: NegligibleSeverity,
+	LowScore:        LowSeverity,
+	MediumScore:     MediumSeverity,
+	HighScore:       HighSeverity,
+	CriticalScore:   CriticalSeverity,
+}
+
+func SeverityScoreToString(score int) string {
+	return knowScores[score]
+}
+
 func CalculateFixed(Fixes []FixedIn) int {
 	for _, fix := range Fixes {
 		if fix.Version != "None" && fix.Version != "" {
