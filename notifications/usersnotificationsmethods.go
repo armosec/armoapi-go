@@ -48,6 +48,15 @@ func (ac *AlertChannel) IsInScope(cluster, namespace string) bool {
 	return false
 }
 
+func (ac *AlertChannel) IsNotificationTypeEnabled(notificationType NotificationType) bool {
+	if ac.Alerts == nil {
+		return false
+	}
+
+	config := ac.GetAlertConfig(notificationType)
+	return config != nil && config.IsEnabled()
+}
+
 func (ac *AlertConfig) IsEnabled() bool {
 	if ac.Disabled == nil {
 		return true

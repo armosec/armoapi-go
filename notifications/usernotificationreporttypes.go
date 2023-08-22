@@ -42,10 +42,12 @@ type NewClusterAdmin struct {
 type Misconfigurations []Misconfiguration
 type Misconfiguration struct {
 	Name                      string
+	FullName                  string
 	Type                      ScanType
 	Link                      string
 	PercentageIncrease        uint64
 	FrameworksComplianceDrift map[string]int
+	PercentageThreshold       uint8
 }
 type ScanType string
 
