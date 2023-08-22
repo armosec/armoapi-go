@@ -3,6 +3,7 @@ package notifications
 import (
 	"encoding/json"
 	"fmt"
+	"k8s.io/utils/ptr"
 	"reflect"
 	"testing"
 	"time"
@@ -290,6 +291,20 @@ func TestNotificationsConfigChannels(t *testing.T) {
 				Namespaces: []string{"testNamespace"},
 			},
 		},
+		Alerts: []AlertConfig{
+			{
+				NotificationConfigIdentifier: NotificationConfigIdentifier{
+					NotificationType: NotificationTypeNewClusterAdmin,
+				},
+				Disabled: ptr.To(false),
+			},
+			{
+				NotificationConfigIdentifier: NotificationConfigIdentifier{
+					NotificationType: NotificationTypeComplianceDrift,
+				},
+				Disabled: ptr.To(true),
+			},
+		},
 	}
 	nc.AlertChannels["testProvider"] = []AlertChannel{ac}
 
@@ -319,6 +334,14 @@ func TestNotificationsConfigChannels(t *testing.T) {
 	}
 	if !channels[0].IsInScope("testCluster", "testNamespace") {
 		t.Errorf("Expected true, got false")
+	}
+
+	// Test IsNotificationTypeEnabled for AlertChannel
+	if !ac.IsNotificationTypeEnabled(NotificationTypeNewClusterAdmin) {
+		t.Errorf("Expected true, got false")
+	}
+	if ac.IsNotificationTypeEnabled(NotificationTypeComplianceDrift) {
+		t.Errorf("Expected false, got true")
 	}
 
 	// Test AddAlertConfig and GetAlertConfig
