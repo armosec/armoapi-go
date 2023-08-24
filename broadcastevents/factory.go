@@ -143,19 +143,8 @@ func NewFeatureFlagsEvent(customerGUID, userEmail, userName, userPreferredName s
 }
 
 func NewLoginEvent(customerGUID, email, name, preferredName string) LoginEvent {
-	now := time.Now().UTC()
-	nowDate := now.Format("2006-01-02")
-	nowMonth := now.Format("2006-01")
-	_, nowWeekOfTheYear := now.ISOWeek()
 	return LoginEvent{
-		EventBase: EventBase{
-			CustomerGUID:       customerGUID,
-			EventName:          "UserLoggedIn",
-			EventTime:          now,
-			EventDate:          nowDate,
-			EventMonth:         nowMonth,
-			EventWeekOfTheYear: nowWeekOfTheYear,
-		},
+		EventBase:         NewBaseEvent(customerGUID, "UserLoggedIn"),
 		Email:             email,
 		UserName:          name,
 		PreferredUserName: preferredName,
@@ -164,11 +153,7 @@ func NewLoginEvent(customerGUID, email, name, preferredName string) LoginEvent {
 
 func NewClusterImageScanSessionStartedEvent(jobId, clusterName, customerId string, timeStarted time.Time) AggregationEvent {
 	return AggregationEvent{
-		EventBase: EventBase{
-			CustomerGUID: customerId,
-			EventName:    "ClusterImageScanSessionStarted",
-			EventTime:    timeStarted,
-		},
+		EventBase:   NewBaseEvent(customerId, "ClusterImageScanSessionStarted"),
 		JobID:       jobId,
 		ClusterName: clusterName,
 	}
@@ -176,34 +161,22 @@ func NewClusterImageScanSessionStartedEvent(jobId, clusterName, customerId strin
 
 func NewRegistryImageScanSessionStartedEvent(jobId string, customerId string, timeStarted time.Time) AggregationEvent {
 	aggEvent := AggregationEvent{
-		EventBase: EventBase{
-			CustomerGUID: customerId,
-			EventName:    "RegistryImageScanSessionStarted",
-			EventTime:    timeStarted,
-		},
-		JobID: jobId,
+		EventBase: NewBaseEvent(customerId, "RegistryImageScanSessionStarted"),
+		JobID:     jobId,
 	}
 	return aggEvent
 }
 
 func NewImageScanEventHookNotify(customerGUID, jobId string, scanTime time.Time) AggregationEvent {
 	return AggregationEvent{
-		EventBase: EventBase{
-			CustomerGUID: customerGUID,
-			EventName:    "ContainerImageScanSubmitted",
-			EventTime:    scanTime,
-		},
-		JobID: jobId,
+		EventBase: NewBaseEvent(customerGUID, "ContainerImageScanSubmitted"),
+		JobID:     jobId,
 	}
 }
 
 func NewGitRepositoryRiskScanEvent(customerGUID, jodID, reportGUID, clusterName string, eventTime time.Time) AggregationEvent {
 	return AggregationEvent{
-		EventBase: EventBase{
-			CustomerGUID: customerGUID,
-			EventName:    "RepoRiskScanSubmitted",
-			EventTime:    eventTime,
-		},
+		EventBase:   NewBaseEvent(customerGUID, "RepoRiskScanSubmitted"),
 		JobID:       jodID,
 		ReportGUID:  reportGUID,
 		ClusterName: clusterName,
@@ -212,11 +185,7 @@ func NewGitRepositoryRiskScanEvent(customerGUID, jodID, reportGUID, clusterName 
 
 func NewClusterRiskScanV2Event(customerGUID, jobID, reportGUID, clusterName, kubescapeVersion, cloudProvider, K8sVersion, helmVersion string, numOfWorkerNodes int, scanTime time.Time) AggregationEvent {
 	aggEvent := AggregationEvent{
-		EventBase: EventBase{
-			CustomerGUID: customerGUID,
-			EventName:    "RiskScanSubmitted",
-			EventTime:    scanTime,
-		},
+		EventBase:   NewBaseEvent(customerGUID, "RiskScanSubmitted"),
 		JobID:       jobID,
 		ReportGUID:  reportGUID,
 		ClusterName: clusterName,
@@ -231,11 +200,7 @@ func NewClusterRiskScanV2Event(customerGUID, jobID, reportGUID, clusterName, kub
 
 func NewHelmInstalledEvent(clusterName, customerGUID string, installationData *armotypes.InstallationData) HelmInstalledEvent {
 	aggEvent := HelmInstalledEvent{
-		EventBase: EventBase{
-			CustomerGUID: customerGUID,
-			EventName:    "HelmInstalled",
-			EventTime:    time.Now(),
-		},
+		EventBase:        NewBaseEvent(customerGUID, "HelmInstalled"),
 		ClusterName:      clusterName,
 		InstallationData: installationData,
 	}
@@ -246,11 +211,7 @@ func NewKubescapePodRunningConditionErrorEvent(clusterName, customerId, objId, c
 	// TODO: add objId, reason, meassage to the event
 	return PodInTroubleConditionEvent{
 		PodInTroubleEvent: PodInTroubleEvent{
-			EventBase: EventBase{
-				CustomerGUID: customerId,
-				EventName:    "KubescapePodRunningError",
-				EventTime:    time.Now(),
-			},
+			EventBase:   NewBaseEvent(customerId, "KubescapePodRunningError"),
 			ClusterName: clusterName,
 			ObjId:       objId,
 			Reason:      reason,
@@ -264,11 +225,7 @@ func NewKubescapePodRunningContainerErrorEvent(clusterName, customerId, objId, c
 	// TODO: add objId, reason, meassage to the event
 	return PodInTroubleContainerEvent{
 		PodInTroubleEvent: PodInTroubleEvent{
-			EventBase: EventBase{
-				CustomerGUID: customerId,
-				EventName:    "KubescapePodRunningError",
-				EventTime:    time.Now(),
-			},
+			EventBase:   NewBaseEvent(customerId, "KubescapePodRunningError"),
 			ClusterName: clusterName,
 			ObjId:       objId,
 			Reason:      reason,
@@ -283,11 +240,7 @@ func NewKubescapePodRunningContainerErrorEvent(clusterName, customerId, objId, c
 func NewKubescapePodPendingConditionErrorEvent(clusterName, customerId, objId, condition, reason, meassage string) PodInTroubleConditionEvent {
 	return PodInTroubleConditionEvent{
 		PodInTroubleEvent: PodInTroubleEvent{
-			EventBase: EventBase{
-				CustomerGUID: customerId,
-				EventName:    "KubescapePodPendingError",
-				EventTime:    time.Now(),
-			},
+			EventBase:   NewBaseEvent(customerId, "KubescapePodPendingError"),
 			ClusterName: clusterName,
 			ObjId:       objId,
 			Reason:      reason,
@@ -300,11 +253,7 @@ func NewKubescapePodPendingConditionErrorEvent(clusterName, customerId, objId, c
 func NewKubescapePodPendingContainerErrorEvent(clusterName, customerId, objId, conainerName, reason, meassage string, exitCode, restartCount int32) PodInTroubleContainerEvent {
 	return PodInTroubleContainerEvent{
 		PodInTroubleEvent: PodInTroubleEvent{
-			EventBase: EventBase{
-				CustomerGUID: customerId,
-				EventName:    "KubescapePodPendingError",
-				EventTime:    time.Now(),
-			},
+			EventBase:   NewBaseEvent(customerId, "KubescapePodPendingError"),
 			ClusterName: clusterName,
 			ObjId:       objId,
 			Reason:      reason,
