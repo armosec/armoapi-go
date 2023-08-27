@@ -1,0 +1,38 @@
+{
+    "channelType": "teams",
+    "scope": [
+        {
+            "cluster": "cluster1",
+            "namespaces": [
+                "ns1",
+                "ns2",
+                "kubescape"
+            ]
+        }
+    ],
+    "collaborationConfigId": "teamsCollabGUID",
+    "notifications": [
+        {
+            "notificationType": "containerScanPush:newVulnerability",
+            "parameters": {
+                "minSeverity": 200
+            }
+        },
+        {
+            "notificationType": "containerScanPush:vulnerabilityNewFix",
+            "parameters": {
+                "minSeverity": 400
+            }
+        },
+        {
+            "notificationType": "push:complianceDrift",
+            "parameters": {
+                "driftPercentage": 25
+            }
+        },
+        {
+            "notificationType": "push:newClusterAdmin",
+            "parameters": {}
+        }
+    ]
+}
