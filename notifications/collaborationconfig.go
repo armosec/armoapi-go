@@ -78,4 +78,6 @@ type CollaborationConfig struct {
 	IconBase64 string `json:"iconBase64,omitempty" bson:"iconBase64,omitempty"`
 
 	CreationTime string `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
+
+	UpdatedTime string `json:"updatedTime,omitempty" bson:"updatedTime,omitempty"`
 }
