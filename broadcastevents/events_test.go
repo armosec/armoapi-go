@@ -1,6 +1,8 @@
 package broadcastevents
 
 import (
+	_ "embed"
+	"encoding/json"
 	"net/http"
 	"testing"
 	"time"
@@ -16,6 +18,9 @@ func TestNewBaseEvent(t *testing.T) {
 	assert.Equal(t, "testEvent", event.EventName)
 }
 
+//go:embed fixtures/alertChannel.json
+var alertChannelJSON []byte
+
 func TestNewAlertChannelDeletedEvent(t *testing.T) {
 	event := NewAlertChannelDeletedEvent("testGUID", "testName", "testProvider")
 	assert.Equal(t, "testName", event.Name)
@@ -23,12 +28,37 @@ func TestNewAlertChannelDeletedEvent(t *testing.T) {
 }
 
 func TestNewAlertChannelCreatedEvent(t *testing.T) {
-	channel := notifications.AlertChannel{
-		ChannelType: notifications.CollaborationTypeTeams,
+	var channel notifications.AlertChannel
+	err := json.Unmarshal(alertChannelJSON, &channel)
+	if err != nil {
+		t.Error(err)
 	}
 	event := NewAlertChannelCreatedEvent("testGUID", "testName", channel)
+	assert.Equal(t, "AlertChannelCreated", event.EventName)
 	assert.Equal(t, "testName", event.Name)
 	assert.Equal(t, "teams", event.Type)
+	assert.Equal(t, "testGUID", event.CustomerGUID)
+	assert.Equal(t, "Low and above", event.NewVulnerability)
+	assert.Equal(t, "High and above", event.NewFix)
+	assert.Equal(t, "true", event.NewAdmin)
+}
+
+func TestNewAlertChannelUpdatedEvent(t *testing.T) {
+	var channel notifications.AlertChannel
+	err := json.Unmarshal(alertChannelJSON, &channel)
+	if err != nil {
+		t.Error(err)
+	}
+	event := NewAlertChannelUpdatedEvent("testGUID", "testName", channel)
+	assert.Equal(t, "testName", event.Name)
+	assert.Equal(t, "teams", event.Type)
+	assert.Equal(t, "testGUID", event.CustomerGUID)
+	assert.Equal(t, "AlertChannelUpdated", event.EventName)
+	assert.Equal(t, "Low and above", event.NewVulnerability)
+	assert.Equal(t, "High and above", event.NewFix)
+	assert.Equal(t, "true", event.NewAdmin)
+	assert.Equal(t, "25%", event.Compliance)
+
 }
 
 func TestNewPostureExceptionEvent(t *testing.T) {

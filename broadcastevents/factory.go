@@ -52,41 +52,11 @@ func NewAlertChannelDeletedEvent(customerGUID, name, provider string) AlertChann
 }
 
 func NewAlertChannelCreatedEvent(customerGUID, name string, channel notifications.AlertChannel) AlertChannelEvent {
-	event := AlertChannelEvent{
-		EventBase:   NewBaseEvent(customerGUID, AlertChannelPrefix+"Created"),
-		Name:        name,
-		Type:        string(channel.ChannelType),
-		AllClusters: ptr.To(len(channel.Scope) == 0),
-	}
-	alert := channel.GetAlertConfig(notifications.NotificationTypeComplianceDrift)
-	if alert != nil && alert.IsEnabled() {
-		drift := 0
-		if alert.Parameters.DriftPercentage != nil {
-			drift = *alert.Parameters.DriftPercentage
-		}
-		event.Compliance = fmt.Sprintf("%d%%", drift)
-	}
-	alert = channel.GetAlertConfig(notifications.NotificationTypeNewVulnerability)
-	if alert != nil && alert.IsEnabled() {
-		severityScore := 0
-		if alert.Parameters.MinSeverity != nil {
-			severityScore = *alert.Parameters.MinSeverity
-		}
-		event.NewVulnerability = containerscan.SeverityScoreToString(severityScore) + " and above"
-	}
-	alert = channel.GetAlertConfig(notifications.NotificationTypeVulnerabilityNewFix)
-	if alert != nil && alert.IsEnabled() {
-		severityScore := 0
-		if alert.Parameters.MinSeverity != nil {
-			severityScore = *alert.Parameters.MinSeverity
-		}
-		event.NewFix = containerscan.SeverityScoreToString(severityScore) + " and above"
-	}
-	alert = channel.GetAlertConfig(notifications.NotificationTypeNewClusterAdmin)
-	if alert != nil && alert.IsEnabled() {
-		event.NewAdmin = "true"
-	}
-	return event
+	return newAlertChannelDetailedEvent(customerGUID, name, channel, "Created")
+}
+
+func NewAlertChannelUpdatedEvent(customerGUID, name string, channel notifications.AlertChannel) AlertChannelEvent {
+	return newAlertChannelDetailedEvent(customerGUID, name, channel, "Updated")
 }
 
 func NewPostureExceptionEvent(customerGUID, changeMethod string, exception armotypes.PostureExceptionPolicy) IgnoreRuleEvent {
@@ -296,4 +266,42 @@ func newIgnoreRuleEvent(customerGUID string, changeMethod string, ruleType Ignor
 		Resources:      resourcesCount,
 		ExpirationType: expirationType,
 	}
+}
+
+func newAlertChannelDetailedEvent(customerGUID, name string, channel notifications.AlertChannel, eventOp string) AlertChannelEvent {
+	event := AlertChannelEvent{
+		EventBase:   NewBaseEvent(customerGUID, AlertChannelPrefix+eventOp),
+		Name:        name,
+		Type:        string(channel.ChannelType),
+		AllClusters: ptr.To(len(channel.Scope) == 0),
+	}
+	alert := channel.GetAlertConfig(notifications.NotificationTypeComplianceDrift)
+	if alert != nil && alert.IsEnabled() {
+		drift := 0
+		if alert.Parameters.DriftPercentage != nil {
+			drift = *alert.Parameters.DriftPercentage
+		}
+		event.Compliance = fmt.Sprintf("%d%%", drift)
+	}
+	alert = channel.GetAlertConfig(notifications.NotificationTypeNewVulnerability)
+	if alert != nil && alert.IsEnabled() {
+		severityScore := 0
+		if alert.Parameters.MinSeverity != nil {
+			severityScore = *alert.Parameters.MinSeverity
+		}
+		event.NewVulnerability = containerscan.SeverityScoreToString(severityScore) + " and above"
+	}
+	alert = channel.GetAlertConfig(notifications.NotificationTypeVulnerabilityNewFix)
+	if alert != nil && alert.IsEnabled() {
+		severityScore := 0
+		if alert.Parameters.MinSeverity != nil {
+			severityScore = *alert.Parameters.MinSeverity
+		}
+		event.NewFix = containerscan.SeverityScoreToString(severityScore) + " and above"
+	}
+	alert = channel.GetAlertConfig(notifications.NotificationTypeNewClusterAdmin)
+	if alert != nil && alert.IsEnabled() {
+		event.NewAdmin = "true"
+	}
+	return event
 }
