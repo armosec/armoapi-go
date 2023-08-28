@@ -1,6 +1,9 @@
 package postgresmodels
 
 import (
+	"time"
+
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -8,13 +11,41 @@ import (
 Related resources, controls info and posture data will be enriched in backend business logic level until ready in postgres.
 */
 
+type AttackChainState struct {
+	// BaseModel.CreatedAt is the former FirstSeen and CreationTime which are the same
+	BaseModel
+
+	// primary keys
+	AttackChainID   string `gorm:"primaryKey;not null"` // name/cluster/resourceID
+	CustomerGUID    string `gorm:"primaryKey;not null"`
+	AttackTrackName string `gorm:"primaryKey;not null"`
+
+	AttackTrackDescription string
+
+	// attributes["cluster"], attributes["namespace"], attributes["kind"], attributes["name"]
+	Resource     datatypes.JSON // designator attributes
+	ResourceHash string         `gorm:"not null"` // hash of resource name/namespace/kind/apiversion/cluster (Extracted from designator attribues)
+	ClusterName  string         `gorm:"not null"`
+
+	LatestReportGUID string `gorm:"not null"` // latest reportGUID in which this attack chain was identified
+
+	Status string // "active"/ "fixed"
+
+	// processing status is updated by the UI once a scan is initiated for all relevant clusters (connected) of the customerGUID.
+	// "done" is updated by the attack chain engine once finished processing.
+	ProcessingStatus string     `gorm:"not null"`     // "processing"/ "done"
+	ViewedMainScreen *time.Time `gorm:"default:NULL"` // updated by UI - if the attack chain was viewed by the user// New badge
+
+	RootNode   AttackChainNode `gorm:"foreignKey:RootNodeID"`
+	RootNodeID uint            `gorm:"not null"`
+}
+
 type AttackChainNode struct {
-	gorm.Model            // ID, CreatedAt, UpdatedAt, DeletedAt - ID is required for linking nodes
-	Name          string  `gorm:"not null"`
-	Description   *string `gorm:"type:varchar(255)" `
-	AttackChainID string  `gorm:"not null"` // hash of cluster/resourceID
-	CustomerGUID  string  `gorm:"not null"`
-	IsRoot        bool    `gorm:"not null"`
+	gorm.Model           // ID, CreatedAt, UpdatedAt, DeletedAt - ID is required for linking nodes
+	Name          string `gorm:"not null"`
+	AttackChainID string `gorm:"not null"` // hash of cluster/resourceID
+	CustomerGUID  string `gorm:"not null"`
+	IsRoot        bool   `gorm:"not null"`
 }
 
 type AttackChainNodeRelation struct {
@@ -30,7 +61,8 @@ type AttackChainNodeImageScanRelation struct {
 	NodeID uint            `gorm:"primaryKey; not null"`
 	Node   AttackChainNode `gorm:"foreignKey:NodeID"`
 
-	// ImageScanId = ContainerScanId (required for attack chain.)
+	// ImageScanId = hash of customerGUID, cluster, containerSpecID
+	// Should be used instead of ContainersScanID
 	ImageScanId string `gorm:"primaryKey; not null"`
 
 	ImageScanSummary VulnerabilityScanSummary `gorm:"foreignKey:ImageScanId"`
@@ -50,6 +82,10 @@ type AttackChainNodeControlsRelation struct {
 
 	// ControlID = failed or ignored control ID that is associated with the node.
 	ControlID string `gorm:"primaryKey; type:varchar(255);not null"`
+}
+
+func (AttackChainState) TableName() string {
+	return "attack_chains_states"
 }
 
 func (AttackChainNode) TableName() string {

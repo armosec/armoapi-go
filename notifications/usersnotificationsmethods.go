@@ -48,6 +48,15 @@ func (ac *AlertChannel) IsInScope(cluster, namespace string) bool {
 	return false
 }
 
+func (ac *AlertChannel) IsNotificationTypeEnabled(notificationType NotificationType) bool {
+	if ac.Alerts == nil {
+		return false
+	}
+
+	config := ac.GetAlertConfig(notificationType)
+	return config != nil && config.IsEnabled()
+}
+
 func (ac *AlertConfig) IsEnabled() bool {
 	if ac.Disabled == nil {
 		return true
@@ -90,6 +99,17 @@ func (nc *NotificationsConfig) GetProviderChannels(provider ChannelProvider) []A
 	return nc.AlertChannels[provider]
 }
 
+func (nc *NotificationsConfig) GetAllChannels() []AlertChannel {
+	if len(nc.AlertChannels) == 0 {
+		return nil
+	}
+	var channels []AlertChannel
+	for i := range nc.AlertChannels {
+		channels = append(channels, nc.AlertChannels[i]...)
+	}
+	return channels
+}
+
 func (nc *NotificationsConfig) GetAlertConfigurations(notificationType NotificationType) []AlertConfig {
 	alerts := make([]AlertConfig, 0)
 	for _, typesChannels := range nc.AlertChannels {
@@ -117,6 +137,30 @@ func (nc *NotificationsConfig) GetLatestPushReport(cluster string, scanType Scan
 		return val
 	}
 	return nil
+}
+
+func (nc *NotificationsConfig) GetAlertChannelByCollaborationID(collaborationId string) (*AlertChannel, error) {
+	providerToChannels := nc.AlertChannels
+	for _, alertChannels := range providerToChannels {
+		for _, alertChannel := range alertChannels {
+			if alertChannel.CollaborationConfigGUID == collaborationId {
+				return &alertChannel, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("alert channel with collaboration id %s not found", collaborationId)
+}
+
+func (nc *NotificationsConfig) RemoveAlertChannel(collaborationId string) error {
+	for key, alertChannels := range nc.AlertChannels {
+		for i, alertChannel := range alertChannels {
+			if alertChannel.CollaborationConfigGUID == collaborationId {
+				nc.AlertChannels[key] = append(alertChannels[:i], alertChannels[i+1:]...)
+				return nil
+			}
+		}
+	}
+	return fmt.Errorf("alert channel with collaboration id %s not found", collaborationId)
 }
 
 func (nci *NotificationConfigIdentifier) Validate() error {

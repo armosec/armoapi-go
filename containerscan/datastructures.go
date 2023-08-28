@@ -16,6 +16,13 @@ const (
 	CriticalSeverity   = "Critical"
 
 	ContainerScanRedisPrefix = "_containerscan"
+
+	UnknownScore    = 1
+	NegligibleScore = 100
+	LowScore        = 200
+	MediumScore     = 300
+	HighScore       = 400
+	CriticalScore   = 500
 )
 
 var KnownSeverities = map[string]bool{
@@ -25,6 +32,19 @@ var KnownSeverities = map[string]bool{
 	MediumSeverity:     true,
 	HighSeverity:       true,
 	CriticalSeverity:   true,
+}
+
+var knowScores = map[int]string{
+	UnknownScore:    UnknownSeverity,
+	NegligibleScore: NegligibleSeverity,
+	LowScore:        LowSeverity,
+	MediumScore:     MediumSeverity,
+	HighScore:       HighSeverity,
+	CriticalScore:   CriticalSeverity,
+}
+
+func SeverityScoreToString(score int) string {
+	return knowScores[score]
 }
 
 func CalculateFixed(Fixes []FixedIn) int {

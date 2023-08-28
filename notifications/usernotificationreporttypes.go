@@ -30,18 +30,24 @@ type PushNotification struct {
 
 type NewClusterAdmins []NewClusterAdmin
 type NewClusterAdmin struct {
-	Resource    string
-	Link        string
-	ClusterName string
+	Resource          string
+	Link              string
+	ClusterName       string
+	ClusterFullName   string
+	ResourceName      string
+	ResourceKind      string
+	ResourceNamespace string
 }
 
 type Misconfigurations []Misconfiguration
 type Misconfiguration struct {
 	Name                      string
+	FullName                  string
 	Type                      ScanType
 	Link                      string
 	PercentageIncrease        uint64
 	FrameworksComplianceDrift map[string]int
+	PercentageThreshold       uint8
 }
 type ScanType string
 

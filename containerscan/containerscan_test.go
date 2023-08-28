@@ -129,6 +129,13 @@ func TestExceptions(t *testing.T) {
 func TestUnmarshalScanReport(t *testing.T) {
 	ds := GenerateContainerScanReportMock(GenerateVulnerability)
 	str1 := ds.AsFNVHash()
+
+	str2 := identifiers.CalcHashFNV(fmt.Sprintf("%v", ds))
+
+	if str1 != str2 {
+		t.Errorf("hashes are different: %v != %v", str1, str2)
+	}
+
 	rhs := &ScanResultReport{}
 
 	bolB, _ := json.Marshal(ds)
