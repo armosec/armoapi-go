@@ -41,7 +41,7 @@ type AttackChainNode struct {
 }
 
 type Vulnerabilities struct {
-	ImageScanID string   `json:"imageScanID" bson:"containersScanID,omitempty"`
+	ImageScanID string   `json:"imageScanID" bson:"imageScanID,omitempty"`
 	Names       []string `json:"names" bson:"names,omitempty"` // CVE names
 }
 
