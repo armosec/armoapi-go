@@ -251,7 +251,7 @@ type PostureResourceSummary struct {
 
 	//gives upto PostureResourceMaxCtrls controls as an example
 	FailedControl   []string `json:"failedControls"`
-	WarningControls []string `json:"warningControls"` // Deprecated
+	WarningControls []string `json:"warningControls"`
 	SkippedControls []string `json:"skippedControls"`
 	//maps statusText 2 list of controlIDs
 	StatusToControls map[string][]string `json:"statusToControls"`
