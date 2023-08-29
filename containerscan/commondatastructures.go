@@ -123,3 +123,8 @@ type CommonContainerScanSummaryResultStub struct {
 	IsStub                           bool     `json:"isStub,omitempty"`
 	ErrorsList                       []string `json:"errors,omitempty"`
 }
+
+type DesignatorsToVulnerabilityNames struct {
+	Designators        identifiers.PortalDesignator `json:"designators"`
+	VulnerabilityNames []string                     `json:"vulnerabilityNames"`
+}
