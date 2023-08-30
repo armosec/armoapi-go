@@ -51,8 +51,8 @@ type AttackChainUIStatus struct {
 	// fields updated by the BE
 	FirstSeen string `json:"firstSeen,omitempty" bson:"firstSeen,omitempty"` // timestamp of first scan in which the attack chain was identified
 	// fields updated by the UI
-	ViewedMainScreen string `json:"wasViewedMainScreen,omitempty" bson:"wasViewedMainScreen,omitempty"` // if the attack chain was viewed by the user// New badge
-	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"`       // "processing"/ "done"
+	ViewedMainScreen string `json:"viewedMainScreen,omitempty" bson:"viewedMainScreen,omitempty"` // if the attack chain was viewed by the user// New badge
+	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"` // "processing"/ "done"
 }
 
 // --------- Ingesters structs and consts -------------
