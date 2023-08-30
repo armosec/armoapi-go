@@ -71,7 +71,7 @@ const (
 	MsgPropAction            = "action"
 	MsgPropActionValueUpdate = "update"
 
-	viewedMainScreenField = "viewedMainScreen"
+	ViewedMainScreenField = "viewedMainScreen"
 	ProcessingStatusField = "processingStatus"
 )
 
