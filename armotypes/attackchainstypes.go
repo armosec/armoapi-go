@@ -71,8 +71,8 @@ const (
 	MsgPropAction            = "action"
 	MsgPropActionValueUpdate = "update"
 
-	WasViewedMainScreenField = "wasViewedMainScreen"
-	ProcessingStatusField    = "processingStatus"
+	viewedMainScreenField = "viewedMainScreen"
+	ProcessingStatusField = "processingStatus"
 )
 
 // struct for ConsumerAttackChainsStatesUpdate ingester as payloads
