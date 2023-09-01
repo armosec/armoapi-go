@@ -11,6 +11,11 @@ import (
 
 // TODO: add explicit column names, add validation
 
+const (
+	SummaryStatusSuccess = "Success"
+	SummaryStatusPending = "Pending"
+)
+
 type Vulnerability struct {
 	BaseModel
 	Name          string `gorm:"primaryKey"`
