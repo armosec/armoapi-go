@@ -88,6 +88,13 @@ type AttackChainScanStatus struct {
 	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"` // "processing"/ "done"
 }
 
+type AttackChainEngineIngesterMessage struct {
+	ImageScanID  string `json:"imageScanID"`
+	ReportGUID   string `json:"reportGUID"`
+	CustomerGUID string `json:"customerGUID"`
+	ClusterName  string `json:"clusterName"`
+}
+
 func (acps *AttackChainScanStatus) GetCustomerGUID() string {
 	return acps.CustomerGUID
 }
