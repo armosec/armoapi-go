@@ -13,7 +13,7 @@ import (
 )
 
 func TestNewBaseEvent(t *testing.T) {
-	event := NewBaseEvent("testGUID", "testEvent")
+	event := NewBaseEvent("testGUID", "testEvent", nil)
 	assert.Equal(t, "testGUID", event.CustomerGUID)
 	assert.Equal(t, "testEvent", event.EventName)
 }
@@ -88,10 +88,11 @@ func TestNewLoginEvent(t *testing.T) {
 }
 
 func TestNewClusterImageScanSessionStartedEvent(t *testing.T) {
-	eventTime := time.Now()
+	eventTime := time.Now().Add(-time.Hour)
 	event := NewClusterImageScanSessionStartedEvent("testJobId", "testClusterName", "testCustomerId", eventTime)
 	assert.Equal(t, "testJobId", event.JobID)
 	assert.Equal(t, "testClusterName", event.ClusterName)
+	assert.Equal(t, eventTime, event.EventTime)
 }
 
 // ... Add more tests for other methods ...
