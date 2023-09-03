@@ -6,6 +6,9 @@ type AttackChainStatus string
 type ProcessingStatus string
 
 const (
+	ViewedMainScreenField = "viewedMainScreen"
+	ProcessingStatusField = "processingStatus"
+	//AttackChainStatuss
 	StatusActive AttackChainStatus = "active"
 	StatusFixed  AttackChainStatus = "fixed"
 	// StatusFixedSeen AttackChainStatus = "fixedSeen"
@@ -53,52 +56,4 @@ type AttackChainUIStatus struct {
 	// fields updated by the UI
 	ViewedMainScreen string `json:"viewedMainScreen,omitempty" bson:"viewedMainScreen,omitempty"` // if the attack chain was viewed by the user// New badge
 	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"` // "processing"/ "done"
-}
-
-// --------- Ingesters structs and consts -------------
-
-// supported topics and properties:
-// [topic]/[propName]/[propValue]
-
-// attack-chain-scan-state-v1/action/update
-// attack-chain-viewed-v1/action/update
-
-const (
-	AttackChainStateScanStateTopic   = "attack-chain-scan-state-v1"
-	AttackChainStateViewedTopic      = "attack-chain-viewed-v1"
-	KubescapeScanReportFinishedTopic = "kubescape-scan-report-finished-v1"
-
-	MsgPropAction            = "action"
-	MsgPropActionValueUpdate = "update"
-
-	ViewedMainScreenField = "viewedMainScreen"
-	ProcessingStatusField = "processingStatus"
-)
-
-// structs for Pulsar messages
-type AttackChainFirstSeen struct {
-	AttackChainID    string `json:"attackChainID,omitempty" bson:"attackChainID,omitempty"` // name/cluster/resourceID
-	CustomerGUID     string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
-	ViewedMainScreen string `json:"viewedMainScreen,omitempty" bson:"viewedMainScreen,omitempty"`
-}
-
-type AttackChainScanStatus struct {
-	ClusterName      string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
-	CustomerGUID     string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
-	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"` // "processing"/ "done"
-}
-
-type AttackChainEngineIngesterMessage struct {
-	ImageScanID  string `json:"imageScanID"`
-	ReportGUID   string `json:"reportGUID"`
-	CustomerGUID string `json:"customerGUID"`
-	ClusterName  string `json:"clusterName"`
-}
-
-func (acps *AttackChainScanStatus) GetCustomerGUID() string {
-	return acps.CustomerGUID
-}
-
-func (acfs *AttackChainFirstSeen) GetCustomerGUID() string {
-	return acfs.CustomerGUID
 }
