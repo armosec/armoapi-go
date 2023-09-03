@@ -75,7 +75,7 @@ const (
 	ProcessingStatusField = "processingStatus"
 )
 
-// struct for ConsumerAttackChainsStatesUpdate ingester as payloads
+// structs for Pulsar messages
 type AttackChainFirstSeen struct {
 	AttackChainID    string `json:"attackChainID,omitempty" bson:"attackChainID,omitempty"` // name/cluster/resourceID
 	CustomerGUID     string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
