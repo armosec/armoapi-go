@@ -98,7 +98,7 @@ func TestGetControlIDsFromAllNodes(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to unmarshal node: %v", err)
 			}
-			result := node.getControlIDsFromAllNodes([]string{})
+			result := node.GetControlIDsFromAllNodes([]string{})
 			if !reflect.DeepEqual(result, tc.expectedResult) {
 				t.Fatalf("expected: %v, got: %v", tc.expectedResult, result)
 			}
