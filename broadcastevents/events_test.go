@@ -95,7 +95,20 @@ func TestNewClusterImageScanSessionStartedEvent(t *testing.T) {
 	assert.Equal(t, eventTime, event.EventTime)
 }
 
-// ... Add more tests for other methods ...
+func TestNewClusterRiskScanV2Event(t *testing.T) {
+	eventTime := time.Now().Add(-time.Hour)
+	event := NewClusterRiskScanV2Event("customerGUID", "testJobId", "testReportGUID", "testClusterName", "testKubescapeVersion", "testCloudProvider", "testK8sVer", "testHelBVersion", 10, eventTime)
+	assert.Equal(t, "testJobId", event.JobID)
+	assert.Equal(t, "testClusterName", event.ClusterName)
+	assert.Equal(t, eventTime, event.EventTime)
+	assert.Equal(t, "testReportGUID", event.ReportGUID)
+	assert.Equal(t, "testKubescapeVersion", event.KSVersion)
+	assert.Equal(t, "testCloudProvider", event.K8sVendor)
+	assert.Equal(t, "testK8sVer", event.K8sVersion)
+	assert.Equal(t, "testHelBVersion", event.HelmChartVersion)
+	assert.Equal(t, 10, event.WorkerNodesCount)
+
+}
 
 func TestNewIgnoreRuleEvent(t *testing.T) {
 	event := newIgnoreRuleEvent("testGUID", http.MethodPost, IgnoreRuleTypeMisconfiguration, IgnoreRuleExpirationTypeNone, []string{"id1", "id2"}, 2)
