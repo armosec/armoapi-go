@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"k8s.io/utils/ptr"
 	"reflect"
+	"sort"
 	"testing"
 	"time"
 
@@ -622,9 +623,16 @@ func TestGetAllChannels(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.config.GetAllChannels()
+			sortAlertChannelsByType(got)
 			if !reflect.DeepEqual(got, tt.expected) {
 				t.Errorf("GetAllChannels() = %v, want %v", got, tt.expected)
 			}
 		})
 	}
+}
+
+func sortAlertChannelsByType(channels []AlertChannel) {
+	sort.Slice(channels, func(i, j int) bool {
+		return channels[i].ChannelType < channels[j].ChannelType
+	})
 }
