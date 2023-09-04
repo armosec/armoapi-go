@@ -172,9 +172,10 @@ type NodeUsage struct {
 
 // CustomerState holds the state of the customer, used for UI purposes
 type CustomerState struct {
-	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
-	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
-	NodeUsage      *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
+	Onboarding           *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
+	GettingStarted       *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
+	NodeUsage            *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
+	AttackChainsLastScan string                   `json:"attackChainsLastScan,omitempty" bson:"attackChainsLastScan,omitempty"`
 }
 
 type User struct {
