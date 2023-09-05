@@ -13,5 +13,5 @@ type AlertChannelAPI struct {
 
 	// Scope selected clusters/namespaces
 	// Example cluster123, [nspace1, nspace2]
-	Scope []AlertScope `json:"scope"`
+	Scope []EnrichedScope `json:"scope"`
 }
