@@ -14,6 +14,8 @@ require (
 	github.com/stripe/stripe-go/v74 v74.28.0
 	golang.org/x/exp v0.0.0-20230728194245-b0cb94b80691
 	golang.org/x/oauth2 v0.10.0
+	k8s.io/api v0.27.4
+	k8s.io/apimachinery v0.27.4
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 )
 
@@ -43,7 +45,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.5.0 // indirect
-	k8s.io/apimachinery v0.27.4 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect

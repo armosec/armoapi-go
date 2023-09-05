@@ -23,8 +23,5 @@ func getSIDFromArgs(args map[string]interface{}) (string, error) {
 	if !ok || sid == "" {
 		return "", fmt.Errorf("sid found in args but empty")
 	}
-	// if _, err := secrethandling.SplitSecretID(sid); err != nil {
-	// 	return "", err
-	// }
 	return sid, nil
 }
