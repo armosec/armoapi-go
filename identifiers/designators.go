@@ -141,11 +141,11 @@ type AttributesDesignators struct {
 func CalcResourceHash(customerGUID string, identifiers map[string]string) string {
 	hash := (fmt.Sprintf("%s/%s/%s/%s/%s/%s",
 		customerGUID,
-		identifiers[AttributeKind],
-		identifiers[AttributeName],
-		identifiers[AttributeNamespace],
-		identifiers[AttributeApiVersion],
-		identifiers[AttributeCluster]))
+		strings.ToLower(identifiers[AttributeKind]),
+		strings.ToLower(identifiers[AttributeName]),
+		strings.ToLower(identifiers[AttributeNamespace]),
+		strings.ToLower(identifiers[AttributeApiVersion]),
+		strings.ToLower(identifiers[AttributeCluster])))
 
 	return hash
 }
