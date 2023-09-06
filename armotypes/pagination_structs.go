@@ -87,10 +87,12 @@ type RespTotal64 struct {
 	Relation string `json:"relation"`
 }
 
+type V2ListResponse V2ListResponseGeneric[interface{}]
+
 // V2ListResponse holds the response of some list request with some metadata
-type V2ListResponse struct {
-	Total    RespTotal   `json:"total"`
-	Response interface{} `json:"response"`
+type V2ListResponseGeneric[T any] struct {
+	Total    RespTotal `json:"total"`
+	Response T         `json:"response"`
 	// Cursor for quick access to the next page. Not supported yet
 	Cursor string `json:"cursor"`
 }
