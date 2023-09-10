@@ -61,7 +61,7 @@ type PortalCluster struct {
 }
 
 type AttackChainState struct {
-	LastPostureScanTriggered string `json:"lastScanTriggered,omitempty" bson:"lastScanTriggered,omitempty"`
+	LastPostureScanTriggered string `json:"lastPostureScanTriggered,omitempty" bson:"lastPostureScanTriggered,omitempty"`
 	LastTimeEngineCompleted  string `json:"lastTimeEngineCompleted,omitempty" bson:"lastTimeEngineCompleted,omitempty"`
 }
 
