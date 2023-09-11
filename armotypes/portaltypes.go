@@ -61,7 +61,7 @@ type PortalCluster struct {
 
 type ClusterAttackChainState struct {
 	PortalBase               `json:",inline" bson:"inline"`
-	CreationDate             string `json:"creationDate,omitempty" bson:"creationDate,omitempty"`
+	CreationTime             string `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 	ClusterName              string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
 	CustomerGUID             string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
 	LastPostureScanTriggered string `json:"lastPostureScanTriggered,omitempty" bson:"lastPostureScanTriggered,omitempty"`
