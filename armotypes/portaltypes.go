@@ -57,10 +57,13 @@ type PortalCluster struct {
 	SubscriptionDate string            `json:"subscription_date,omitempty" bson:"subscription_date,omitempty"`
 	LastLoginDate    string            `json:"last_login_date,omitempty" bson:"last_login_date,omitempty"`
 	InstallationData *InstallationData `json:"installationData" bson:"installationData,omitempty"`
-	AttackChainState *AttackChainState `json:"attackChainState,omitempty" bson:"attackChainState,omitempty"`
 }
 
-type AttackChainState struct {
+type ClusterAttackChainState struct {
+	PortalBase               `json:",inline" bson:"inline"`
+	CreationDate             string `json:"creationDate,omitempty" bson:"creationDate,omitempty"`
+	ClusterName              string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
+	CustomerGUID             string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
 	LastPostureScanTriggered string `json:"lastPostureScanTriggered,omitempty" bson:"lastPostureScanTriggered,omitempty"`
 	LastTimeEngineCompleted  string `json:"lastTimeEngineCompleted,omitempty" bson:"lastTimeEngineCompleted,omitempty"`
 }
