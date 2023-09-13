@@ -59,6 +59,15 @@ type PortalCluster struct {
 	InstallationData *InstallationData `json:"installationData" bson:"installationData,omitempty"`
 }
 
+type ClusterAttackChainState struct {
+	PortalBase               `json:",inline" bson:"inline"`
+	CreationTime             string `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
+	ClusterName              string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
+	CustomerGUID             string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
+	LastPostureScanTriggered string `json:"lastPostureScanTriggered,omitempty" bson:"lastPostureScanTriggered,omitempty"`
+	LastTimeEngineCompleted  string `json:"lastTimeEngineCompleted,omitempty" bson:"lastTimeEngineCompleted,omitempty"`
+}
+
 type RelevantImageVulnerabilitiesConfiguration string
 
 const (
