@@ -80,6 +80,10 @@ func (a *AttackChainNode) Equals(b *AttackChainNode) bool {
 		return b.Vulnerabilities[i].ContainerName < b.Vulnerabilities[j].ContainerName
 	})
 
+	if a.Description != b.Description || a.Name != b.Name {
+		return false
+	}
+
 	// Recursively sort and compare NextNodes
 	for i := range a.NextNodes {
 		if !a.NextNodes[i].Equals(&b.NextNodes[i]) {
