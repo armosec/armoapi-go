@@ -21,6 +21,7 @@ const (
 	ProcessingStatusProcessing ProcessingStatus = "processing"
 	ProcessingStatusDone       ProcessingStatus = "done"
 	ProcessingStatusFailed     ProcessingStatus = "failed"
+	ProcessingStatusTimeout    ProcessingStatus = "timeout"
 )
 
 type AttackChain struct {
