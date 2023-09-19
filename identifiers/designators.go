@@ -1,6 +1,9 @@
 package identifiers
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // Type of the designator
 //
@@ -133,4 +136,15 @@ type AttributesDesignators struct {
 	path       string
 	labels     map[string]string
 	resourceID string
+}
+
+func CalcResourceHash(customerGUID string, identifiers map[string]string) string {
+	hash := (fmt.Sprintf("%s/%s/%s/%s/%s",
+		customerGUID,
+		strings.ToLower(identifiers[AttributeKind]),
+		strings.ToLower(identifiers[AttributeName]),
+		strings.ToLower(identifiers[AttributeNamespace]),
+		strings.ToLower(identifiers[AttributeCluster])))
+
+	return hash
 }
