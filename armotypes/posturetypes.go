@@ -311,7 +311,7 @@ type PostureSummary struct {
 }
 type PosturePaths struct {
 	ResourceID string `json:"resourceID,omitempty"` // resource on which the remediation needs to be applied
-	// must have FailedPath OR FixPath OR DeletePath
+	// must have only one of the following
 	FailedPath string  `json:"failedPath,omitempty"`
 	ReviewPath string  `json:"reviewPath,omitempty"`
 	DeletePath string  `json:"deletePath,omitempty"`
