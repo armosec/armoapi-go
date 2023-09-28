@@ -238,10 +238,11 @@ type PostureResource struct {
 }
 
 type HighlightsByControl struct {
-	ControlID  string    `json:"controlID"`
-	Highlights []string  `json:"highlights"`
-	FixPaths   []FixPath `json:"fixPaths"`
-	FixCommand string    `json:"fixCommand"`
+	ControlID   string    `json:"controlID"`
+	Highlights  []string  `json:"highlights"`
+	DeletePaths []string  `json:"deletePaths"`
+	FixPaths    []FixPath `json:"fixPaths"`
+	FixCommand  string    `json:"fixCommand"`
 }
 
 type PostureResourceSummary struct {
@@ -309,8 +310,9 @@ type PostureSummary struct {
 }
 type PosturePaths struct {
 	ResourceID string `json:"resourceID,omitempty"` // resource on which the remediation needs to be applied
-	// must have FailedPath or FixPath, not both
+	// must have FailedPath OR FixPath OR DeletePath
 	FailedPath string  `json:"failedPath,omitempty"`
+	DeletePath string  `json:"deletePath,omitempty"`
 	FixPath    FixPath `json:"fixPath,omitempty"`
 	FixCommand string  `json:"fixCommand,omitempty"`
 }
