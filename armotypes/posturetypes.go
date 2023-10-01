@@ -239,7 +239,7 @@ type PostureResource struct {
 
 type HighlightsByControl struct {
 	ControlID   string    `json:"controlID"`
-	Highlights  []string  `json:"highlights"`
+	Highlights  []string  `json:"highlights"` // TODO: deprecate (failedPath)
 	ReviewPaths []string  `json:"reviewPaths"`
 	DeletePaths []string  `json:"deletePaths"`
 	FixPaths    []FixPath `json:"fixPaths"`
@@ -312,7 +312,7 @@ type PostureSummary struct {
 type PosturePaths struct {
 	ResourceID string `json:"resourceID,omitempty"` // resource on which the remediation needs to be applied
 	// must have only one of the following
-	FailedPath string  `json:"failedPath,omitempty"`
+	FailedPath string  `json:"failedPath,omitempty"` // TODO: deprecate
 	ReviewPath string  `json:"reviewPath,omitempty"`
 	DeletePath string  `json:"deletePath,omitempty"`
 	FixPath    FixPath `json:"fixPath,omitempty"`
