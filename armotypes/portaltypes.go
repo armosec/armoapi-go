@@ -61,10 +61,11 @@ type PortalCluster struct {
 
 type ClusterAttackChainState struct {
 	PortalBase               `json:",inline" bson:"inline"`
-	CreationTime             string `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
-	ClusterName              string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
-	LastPostureScanTriggered string `json:"lastPostureScanTriggered,omitempty" bson:"lastPostureScanTriggered,omitempty"`
-	LastTimeEngineCompleted  string `json:"lastTimeEngineCompleted,omitempty" bson:"lastTimeEngineCompleted,omitempty"`
+	CreationTime             string           `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
+	ClusterName              string           `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
+	LastPostureScanTriggered string           `json:"lastPostureScanTriggered,omitempty" bson:"lastPostureScanTriggered,omitempty"`
+	LastTimeEngineCompleted  string           `json:"lastTimeEngineCompleted,omitempty" bson:"lastTimeEngineCompleted,omitempty"`
+	ProcessingStatus         ProcessingStatus `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"`
 }
 
 type RelevantImageVulnerabilitiesConfiguration string
