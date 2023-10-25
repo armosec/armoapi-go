@@ -19,7 +19,6 @@ type EventBase struct {
 type AttackChainCreated struct {
 	EventBase        `json:",inline"`
 	ClusterName      string `json:"clusterName"`
-	HelmChartVersion string `json:"helmChartVersion,omitempty"`
 	KSVersion        string `json:"kubescapeVersion,omitempty"`
 	ACName           string `json:"ACName"`
 	ACId             string `json:"ACId"`
@@ -30,7 +29,6 @@ type AttackChainCreated struct {
 type AttackChainResolved struct {
 	EventBase        `json:",inline"`
 	ClusterName      string `json:"clusterName"`
-	HelmChartVersion string `json:"helmChartVersion,omitempty"`
 	KSVersion        string `json:"kubescapeVersion,omitempty"`
 	ACName           string `json:"ACName"`
 	ACId             string `json:"ACId"`
