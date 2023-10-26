@@ -19,7 +19,6 @@ type EventBase struct {
 type AttackChainCreated struct {
 	EventBase        `json:",inline"`
 	ClusterName      string `json:"clusterName"`
-	ACName           string `json:"ACName"`
 	ACId             string `json:"ACId"`
 	ACType           string `json:"ACType"`
 	ACFirstSeeing    string `json:"ACFirstSeeing"`
@@ -28,7 +27,6 @@ type AttackChainCreated struct {
 type AttackChainResolved struct {
 	EventBase        `json:",inline"`
 	ClusterName      string `json:"clusterName"`
-	ACName           string `json:"ACName"`
 	ACId             string `json:"ACId"`
 	ACType           string `json:"ACType"`
 	ACFirstSeeing    string `json:"ACFirstSeeing"`
