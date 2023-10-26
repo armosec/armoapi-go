@@ -16,6 +16,26 @@ type EventBase struct {
 	EventWeekOfTheYear int    `json:"eventWeekOfTheYear,omitempty"`
 }
 
+type AttackChainCreated struct {
+	EventBase        `json:",inline"`
+	ClusterName      string `json:"clusterName"`
+	KSVersion        string `json:"kubescapeVersion,omitempty"`
+	ACName           string `json:"ACName"`
+	ACId             string `json:"ACId"`
+	ACType           string `json:"ACType"`
+	ACFirstSeeing    string `json:"ACFirstSeeing"`
+}
+
+type AttackChainResolved struct {
+	EventBase        `json:",inline"`
+	ClusterName      string `json:"clusterName"`
+	KSVersion        string `json:"kubescapeVersion,omitempty"`
+	ACName           string `json:"ACName"`
+	ACId             string `json:"ACId"`
+	ACType           string `json:"ACType"`
+	ACFirstSeeing    string `json:"ACFirstSeeing"`
+}
+
 type AggregationEvent struct {
 	EventBase        `json:",inline"`
 	JobID            string `json:"jobID"`
