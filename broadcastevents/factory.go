@@ -310,3 +310,10 @@ func newAlertChannelDetailedEvent(customerGUID, name string, channel notificatio
 	}
 	return event
 }
+
+func NewScanWithoutAccessKeyEvent(customerGUID, clusterName string) ScanWithoutAccessKeyEvent {
+	return ScanWithoutAccessKeyEvent{
+		EventBase:   NewBaseEvent(customerGUID, "ScanWithoutAccessKey", nil),
+		ClusterName: clusterName,
+	}
+}

@@ -17,19 +17,19 @@ type EventBase struct {
 }
 
 type AttackChainCreated struct {
-	EventBase        `json:",inline"`
-	ClusterName      string `json:"clusterName"`
-	ACId             string `json:"ACId"`
-	ACType           string `json:"ACType"`
-	ACFirstSeeing    string `json:"ACFirstSeeing"`
+	EventBase     `json:",inline"`
+	ClusterName   string `json:"clusterName"`
+	ACId          string `json:"ACId"`
+	ACType        string `json:"ACType"`
+	ACFirstSeeing string `json:"ACFirstSeeing"`
 }
 
 type AttackChainResolved struct {
-	EventBase        `json:",inline"`
-	ClusterName      string `json:"clusterName"`
-	ACId             string `json:"ACId"`
-	ACType           string `json:"ACType"`
-	ACFirstSeeing    string `json:"ACFirstSeeing"`
+	EventBase     `json:",inline"`
+	ClusterName   string `json:"clusterName"`
+	ACId          string `json:"ACId"`
+	ACType        string `json:"ACType"`
+	ACFirstSeeing string `json:"ACFirstSeeing"`
 }
 
 type AggregationEvent struct {
@@ -94,4 +94,9 @@ type AlertChannelEvent struct {
 	NewFix           string `json:"new fix is available for vulnerability,omitempty"`
 	Compliance       string `json:"compliance score has decreased,omitempty"`
 	NewAdmin         string `json:"new cluster admin was added,omitempty"`
+}
+
+type ScanWithoutAccessKeyEvent struct {
+	EventBase   `json:",inline"`
+	ClusterName string `json:"clusterName"`
 }

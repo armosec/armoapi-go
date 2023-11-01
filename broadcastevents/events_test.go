@@ -117,3 +117,10 @@ func TestNewIgnoreRuleEvent(t *testing.T) {
 	assert.Equal(t, "id1,id2", event.IgnoredIds)
 	assert.Equal(t, 2, event.Resources)
 }
+
+func TestNewScanWithoutAccessKeyEvent(t *testing.T) {
+	event := NewScanWithoutAccessKeyEvent("testGUID", "cluster123")
+	assert.Equal(t, "testGUID", event.CustomerGUID)
+	assert.Equal(t, "cluster123", event.ClusterName)
+	assert.Equal(t, "ScanWithoutAccessKey", event.EventName)
+}
