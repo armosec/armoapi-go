@@ -33,6 +33,7 @@ type PosturePolicy struct {
 	ControlName   string `json:"controlName,omitempty" bson:"controlName,omitempty"`
 	ControlID     string `json:"controlID,omitempty" bson:"controlID,omitempty"`
 	RuleName      string `json:"ruleName,omitempty" bson:"ruleName,omitempty"`
+	SeverityScore string `json:"severityScore,omitempty" bson:"severityScore,omitempty"`
 }
 
 func (exceptionPolicy *PostureExceptionPolicy) IsAlertOnly() bool {
