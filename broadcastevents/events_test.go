@@ -122,5 +122,5 @@ func TestNewScanWithoutAccessKeyEvent(t *testing.T) {
 	event := NewScanWithoutAccessKeyEvent("testGUID", "cluster123")
 	assert.Equal(t, "testGUID", event.CustomerGUID)
 	assert.Equal(t, "cluster123", event.ClusterName)
-	assert.Equal(t, "ScanWithoutAccessKey", event.EventName)
+	assert.Equal(t, "ClusterScanWithoutAccessKey", event.EventName)
 }
