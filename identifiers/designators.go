@@ -72,6 +72,7 @@ const (
 	AttributePath            = "path"
 	AttributeResourceID      = "resourceID"
 	AttributeContainerScanId = "containerScanId"
+	AttributeSyncKind        = "syncKind"
 )
 
 // Repository scan related attributes
