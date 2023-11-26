@@ -65,6 +65,7 @@ const (
 	AttributeName            = "name"
 	AttributeContainerName   = "containerName"
 	AttributeApiVersion      = "apiVersion"
+	AttributeApiGroup        = "apiGroup"
 	AttributeWorkloadHash    = "workloadHash"
 	AttributeIsIncomplete    = "isIncomplete"
 	AttributeSensor          = "sensor"
