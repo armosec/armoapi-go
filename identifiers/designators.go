@@ -65,12 +65,14 @@ const (
 	AttributeName            = "name"
 	AttributeContainerName   = "containerName"
 	AttributeApiVersion      = "apiVersion"
+	AttributeApiGroup        = "apiGroup"
 	AttributeWorkloadHash    = "workloadHash"
 	AttributeIsIncomplete    = "isIncomplete"
 	AttributeSensor          = "sensor"
 	AttributePath            = "path"
 	AttributeResourceID      = "resourceID"
 	AttributeContainerScanId = "containerScanId"
+	AttributeSyncKind        = "syncKind"
 )
 
 // Repository scan related attributes
