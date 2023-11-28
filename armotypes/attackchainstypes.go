@@ -1,17 +1,27 @@
 package armotypes
 
-import "github.com/armosec/armoapi-go/identifiers"
+import (
+	"reflect"
+	"sort"
+
+	"github.com/armosec/armoapi-go/identifiers"
+)
 
 type AttackChainStatus string
 type ProcessingStatus string
 
 const (
+	ViewedMainScreenField = "viewedMainScreen"
+	ProcessingStatusField = "processingStatus"
+	//AttackChainStatuss
 	StatusActive AttackChainStatus = "active"
 	StatusFixed  AttackChainStatus = "fixed"
 	// StatusFixedSeen AttackChainStatus = "fixedSeen"
 
 	ProcessingStatusProcessing ProcessingStatus = "processing"
 	ProcessingStatusDone       ProcessingStatus = "done"
+	ProcessingStatusFailed     ProcessingStatus = "failed"
+	ProcessingStatusTimeout    ProcessingStatus = "timeout"
 )
 
 type AttackChain struct {
@@ -42,8 +52,9 @@ type AttackChainNode struct {
 }
 
 type Vulnerabilities struct {
-	ImageScanID string   `json:"imageScanID" bson:"imageScanID,omitempty"`
-	Names       []string `json:"names" bson:"names,omitempty"` // CVE names
+	ContainerName string   `json:"containerName" bson:"containerName,omitempty"`
+	ImageScanID   string   `json:"imageScanID" bson:"imageScanID,omitempty"`
+	Names         []string `json:"names" bson:"names,omitempty"` // CVE names
 }
 
 // struct for UI support. All strings are timestamps
@@ -55,43 +66,31 @@ type AttackChainUIStatus struct {
 	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"` // "processing"/ "done"
 }
 
-// --------- Ingesters structs and consts -------------
+func (a *AttackChainNode) Equals(b *AttackChainNode) bool {
+	// Sort string slices
+	sort.Strings(a.ControlIDs)
+	sort.Strings(b.ControlIDs)
 
-// supported topics and properties:
-// [topic]/[propName]/[propValue]
+	// Sort Vulnerabilities slice (assuming Vulnerabilities has a defined order)
+	sort.Slice(a.Vulnerabilities, func(i, j int) bool {
+		// Provide logic for sorting Vulnerabilities here, e.g.,
+		return a.Vulnerabilities[i].ContainerName < a.Vulnerabilities[j].ContainerName
+	})
+	sort.Slice(b.Vulnerabilities, func(i, j int) bool {
+		// Provide logic for sorting Vulnerabilities here
+		return b.Vulnerabilities[i].ContainerName < b.Vulnerabilities[j].ContainerName
+	})
 
-// attack-chain-scan-state-v1/action/update
-// attack-chain-viewed-v1/action/update
+	if a.Description != b.Description || a.Name != b.Name {
+		return false
+	}
 
-const (
-	AttackChainStateScanStateTopic   = "attack-chain-scan-state-v1"
-	AttackChainStateViewedTopic      = "attack-chain-viewed-v1"
-	KubescapeScanReportFinishedTopic = "kubescape-scan-report-finished-v1"
+	// Recursively sort and compare NextNodes
+	for i := range a.NextNodes {
+		if !a.NextNodes[i].Equals(&b.NextNodes[i]) {
+			return false
+		}
+	}
 
-	MsgPropAction            = "action"
-	MsgPropActionValueUpdate = "update"
-
-	ViewedMainScreenField = "viewedMainScreen"
-	ProcessingStatusField = "processingStatus"
-)
-
-// struct for ConsumerAttackChainsStatesUpdate ingester as payloads
-type AttackChainFirstSeen struct {
-	AttackChainID    string `json:"attackChainID,omitempty" bson:"attackChainID,omitempty"` // name/cluster/resourceID
-	CustomerGUID     string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
-	ViewedMainScreen string `json:"viewedMainScreen,omitempty" bson:"viewedMainScreen,omitempty"`
-}
-
-type AttackChainScanStatus struct {
-	ClusterName      string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
-	CustomerGUID     string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
-	ProcessingStatus string `json:"processingStatus,omitempty" bson:"processingStatus,omitempty"` // "processing"/ "done"
-}
-
-func (acps *AttackChainScanStatus) GetCustomerGUID() string {
-	return acps.CustomerGUID
-}
-
-func (acfs *AttackChainFirstSeen) GetCustomerGUID() string {
-	return acfs.CustomerGUID
+	return reflect.DeepEqual(a, b)
 }

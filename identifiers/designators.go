@@ -65,12 +65,14 @@ const (
 	AttributeName            = "name"
 	AttributeContainerName   = "containerName"
 	AttributeApiVersion      = "apiVersion"
+	AttributeApiGroup        = "apiGroup"
 	AttributeWorkloadHash    = "workloadHash"
 	AttributeIsIncomplete    = "isIncomplete"
 	AttributeSensor          = "sensor"
 	AttributePath            = "path"
 	AttributeResourceID      = "resourceID"
 	AttributeContainerScanId = "containerScanId"
+	AttributeSyncKind        = "syncKind"
 )
 
 // Repository scan related attributes
@@ -139,13 +141,12 @@ type AttributesDesignators struct {
 }
 
 func CalcResourceHash(customerGUID string, identifiers map[string]string) string {
-	hash := (fmt.Sprintf("%s/%s/%s/%s/%s/%s",
+	hash := (fmt.Sprintf("%s/%s/%s/%s/%s",
 		customerGUID,
-		identifiers[AttributeKind],
-		identifiers[AttributeName],
-		identifiers[AttributeNamespace],
-		identifiers[AttributeApiVersion],
-		identifiers[AttributeCluster]))
+		strings.ToLower(identifiers[AttributeKind]),
+		strings.ToLower(identifiers[AttributeName]),
+		strings.ToLower(identifiers[AttributeNamespace]),
+		strings.ToLower(identifiers[AttributeCluster])))
 
 	return hash
 }

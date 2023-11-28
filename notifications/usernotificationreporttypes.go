@@ -90,6 +90,11 @@ type AlertScope struct {
 	Namespaces []string `json:"namespaces,omitempty" bson:"namespaces,omitempty"`
 }
 
+type EnrichedScope struct {
+	AlertScope       `json:",inline"`
+	ClusterShortName string `json:"clusterShortName,omitempty"`
+}
+
 type NotificationType string
 
 const (

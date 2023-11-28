@@ -59,6 +59,14 @@ type PortalCluster struct {
 	InstallationData *InstallationData `json:"installationData" bson:"installationData,omitempty"`
 }
 
+type ClusterAttackChainState struct {
+	PortalBase               `json:",inline" bson:"inline"`
+	CreationTime             string `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
+	ClusterName              string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
+	LastPostureScanTriggered string `json:"lastPostureScanTriggered,omitempty" bson:"lastPostureScanTriggered,omitempty"`
+	LastTimeEngineCompleted  string `json:"lastTimeEngineCompleted,omitempty" bson:"lastTimeEngineCompleted,omitempty"`
+}
+
 type RelevantImageVulnerabilitiesConfiguration string
 
 const (
@@ -172,9 +180,10 @@ type NodeUsage struct {
 
 // CustomerState holds the state of the customer, used for UI purposes
 type CustomerState struct {
-	Onboarding     *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
-	GettingStarted *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
-	NodeUsage      *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
+	Onboarding           *CustomerOnboarding      `json:"onboarding,omitempty" bson:"onboarding,omitempty"`
+	GettingStarted       *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
+	NodeUsage            *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
+	AttackChainsLastScan string                   `json:"attackChainsLastScan,omitempty" bson:"attackChainsLastScan,omitempty"`
 }
 
 type User struct {
