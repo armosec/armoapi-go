@@ -206,7 +206,7 @@ type PostureControlSummary struct {
 	IsLastScan                     int                          `json:"isLastScan"`
 	HighlightPathsCount            int64                        `json:"highlightPathsCount"`
 	ClusterShortName               string                       `json:"clusterShortName"`
-	SupportsSmartRemediation       string                       `json:"supportsSmartRemediation"`
+	SupportsSmartRemediation       bool                         `json:"supportsSmartRemediation"`
 }
 
 //---------/api/v1/posture/resources
