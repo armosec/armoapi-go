@@ -16,8 +16,8 @@ type SlackChannels struct {
 }
 
 type SlackChannel struct {
-	ChannelID   string `json:"id"   bson:"channelID"`
-	ChannelName string `json:"name" bson:"channelName"`
+	ChannelID   string `json:"id"`
+	ChannelName string `json:"name"`
 }
 
 type SlackChannelStatus struct {
