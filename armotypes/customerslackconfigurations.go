@@ -1,14 +1,32 @@
 package armotypes
 
-type AlertLevel string
+type SlackSettings struct {
+	Token         string `json:"token" bson:"token"`
+	Alert2Channel `json:",inline,omitempty" bson:"inline,omitempty"`
+	Notifications `json:"notifications,omitempty" bson:"notifications,omitempty"`
+}
 
+type Alert2Channel struct {
+	Critical []SlackChannel `json:"criticalChannels,omitempty" bson:"criticalChannels,omitempty"`
+	Error    []SlackChannel `json:"errorChannels,omitempty" bson:"errorChannels,omitempty"`
+	Info     []SlackChannel `json:"infoChannels,omitempty" bson:"infoChannels,omitempty"`
+}
 type SlackChannels struct {
 	Channels []SlackChannel `json:"channels"`
 }
 
+// todo : check bson anotate
 type SlackChannel struct {
-	ChannelID   string `json:"channelID"   bson:"channelID"`
-	ChannelName string `json:"channelName" bson:"channelName"`
+	ChannelID   string `json:"id"   bson:"channelID"`
+	ChannelName string `json:"name" bson:"channelName"`
+}
+
+type SlackChannelStatus struct {
+	ChannelID string `json:"channelID"   bson:"channelID"`
+	Exists    bool   `json:"exists" bson:"channelName"`
+}
+type SlackChannelStatusRequest struct {
+	ChannelID string `json:"channelID"   bson:"channelID"`
 }
 
 type SlackNotification struct {
