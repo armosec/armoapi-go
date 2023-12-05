@@ -13,7 +13,7 @@ type NetworkPoliciesWorkload struct {
 }
 
 const (
-    NetworkPolicyRequired = 0
-    NetworkPolicyApplied = 1
-    MissingRuntimeInfo = 2
+    MissingRuntimeInfo = 1
+    NetworkPolicyRequired = 2
+    NetworkPolicyApplied = 3
 )
