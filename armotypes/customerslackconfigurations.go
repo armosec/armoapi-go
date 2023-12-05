@@ -15,7 +15,6 @@ type SlackChannels struct {
 	Channels []SlackChannel `json:"channels"`
 }
 
-// todo : check bson anotate
 type SlackChannel struct {
 	ChannelID   string `json:"id"   bson:"channelID"`
 	ChannelName string `json:"name" bson:"channelName"`
