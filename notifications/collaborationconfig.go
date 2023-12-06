@@ -79,3 +79,8 @@ type CollaborationConfig struct {
 
 	CreationTime string `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 }
+
+type ConnectionStatus struct {
+	IsConnected bool            `json:"connected"`
+	Provider    ChannelProvider `json:"provider"`
+}
