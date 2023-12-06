@@ -1,13 +1,5 @@
 package armotypes
 
-type AlertLevel string
-
-const (
-	AlertInfo     AlertLevel = "info"
-	AlertCritical AlertLevel = "critical"
-	AlertError    AlertLevel = "error"
-)
-
 type SlackSettings struct {
 	Token         string `json:"token" bson:"token"`
 	Alert2Channel `json:",inline,omitempty" bson:"inline,omitempty"`
@@ -20,10 +12,13 @@ type Alert2Channel struct {
 	Info     []SlackChannel `json:"infoChannels,omitempty" bson:"infoChannels,omitempty"`
 }
 
+type SlackChannels struct {
+	Channels []SlackChannel `json:"channels"`
+}
+
 type SlackChannel struct {
-	ChannelID   string     `json:"channelID" bson:"channelID"`
-	ChannelName string     `json:"channelName" bson:"channelName"`
-	AlertLevel  AlertLevel `json:"alertLevel" bson:"alertLevel"`
+	ChannelID   string `json:"id"`
+	ChannelName string `json:"name"`
 }
 
 type SlackNotification struct {
