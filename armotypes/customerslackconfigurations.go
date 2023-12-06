@@ -11,6 +11,7 @@ type Alert2Channel struct {
 	Error    []SlackChannel `json:"errorChannels,omitempty" bson:"errorChannels,omitempty"`
 	Info     []SlackChannel `json:"infoChannels,omitempty" bson:"infoChannels,omitempty"`
 }
+
 type SlackChannels struct {
 	Channels []SlackChannel `json:"channels"`
 }
@@ -18,14 +19,6 @@ type SlackChannels struct {
 type SlackChannel struct {
 	ChannelID   string `json:"id"`
 	ChannelName string `json:"name"`
-}
-
-type SlackChannelStatus struct {
-	ChannelID string `json:"channelID"   bson:"channelID"`
-	Exists    bool   `json:"exists" bson:"channelName"`
-}
-type SlackChannelStatusRequest struct {
-	ChannelID string `json:"channelID"   bson:"channelID"`
 }
 
 type SlackNotification struct {
