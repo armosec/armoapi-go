@@ -194,3 +194,7 @@ type Banner struct {
 	CustomerGUID string `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"` // customerGUID of the account which clicked the banner
 	ScanID       string `json:"scanID,omitempty" bson:"scanID,omitempty"`             // for detailed view, unique key for banner is combination of scanID and bannerID
 }
+
+type DeleteCountResponse struct {
+	DeletedCount int64 `json:"deletedCount"`
+}

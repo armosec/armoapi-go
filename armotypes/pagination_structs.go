@@ -182,10 +182,6 @@ type UniqueValuesResponseV2 struct {
 	// UniqueTotalCount map[string]ElasticRespTotal `json:"totalCount"`
 }
 
-type DeleteCountResponse struct {
-	DeletedCount int64 `json:"deletedCount"`
-}
-
 type Duration time.Duration
 
 var defaultDuration = Duration(5 * time.Minute)
