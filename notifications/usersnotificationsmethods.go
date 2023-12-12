@@ -163,6 +163,14 @@ func (nc *NotificationsConfig) RemoveAlertChannel(collaborationId string) error 
 	return fmt.Errorf("alert channel with collaboration id %s not found", collaborationId)
 }
 
+func (nc *NotificationsConfig) RemoveProviderConfig(provider ChannelProvider) error {
+	if _, exists := nc.AlertChannels[provider]; exists {
+		delete(nc.AlertChannels, provider)
+		return nil
+	}
+	return fmt.Errorf("provider with identifier %v not found", provider)
+}
+
 func (nci *NotificationConfigIdentifier) Validate() error {
 	if slices.Contains(notificationTypes, nci.NotificationType) {
 		return nil
