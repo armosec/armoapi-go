@@ -631,6 +631,111 @@ func TestGetAllChannels(t *testing.T) {
 	}
 }
 
+func TestRemoveProviderConfig(t *testing.T) {
+	tests := []struct {
+		name             string
+		config           *NotificationsConfig
+		providerToRemove ChannelProvider
+		isError          bool
+	}{
+		{
+			name: "multiple providers",
+			config: &NotificationsConfig{
+				AlertChannels: map[ChannelProvider][]AlertChannel{
+					CollaborationTypeSlack: {
+						{
+							ChannelType: CollaborationTypeSlack,
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypeWeekly,
+									},
+								},
+							},
+						},
+					},
+					CollaborationTypeTeams: {
+						{
+							ChannelType: CollaborationTypeTeams,
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypeWeekly,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			providerToRemove: CollaborationTypeSlack,
+		},
+		{
+			name: "single provider with multiple channels",
+			config: &NotificationsConfig{
+				AlertChannels: map[ChannelProvider][]AlertChannel{
+					CollaborationTypeSlack: {
+						{
+							ChannelType: CollaborationTypeSlack,
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypeWeekly,
+									},
+								},
+							},
+						},
+						{
+							ChannelType: CollaborationTypeSlack,
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypePush,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			providerToRemove: CollaborationTypeSlack,
+		},
+		{
+			name: "provider doesn't exist",
+			config: &NotificationsConfig{
+				AlertChannels: map[ChannelProvider][]AlertChannel{
+					CollaborationTypeSlack: {
+						{
+							ChannelType: CollaborationTypeSlack,
+							Alerts: []AlertConfig{
+								{
+									NotificationConfigIdentifier: NotificationConfigIdentifier{
+										NotificationType: NotificationTypeWeekly,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			providerToRemove: CollaborationTypeTeams,
+			isError:          true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := test.config.RemoveProviderConfig(test.providerToRemove)
+			if test.isError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Empty(t, test.config.AlertChannels[test.providerToRemove])
+			}
+		})
+	}
+}
+
 func sortAlertChannelsByType(channels []AlertChannel) {
 	sort.Slice(channels, func(i, j int) bool {
 		return channels[i].ChannelType < channels[j].ChannelType
