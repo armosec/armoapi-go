@@ -6,7 +6,7 @@ type NetworkPoliciesWorkload struct {
 	Name                       string   `json:"name"`
 	Kind                       string   `json:"kind"`
 	Namespace                  string   `json:"namespace"`
-	ClusterName                string   `json:"clusterName"`
+	ClusterName                string   `json:"cluster"`
 	ClusterShortName           string   `json:"clusterShortName"`
 	NetworkPolicyStatus        int      `json:"networkPolicyStatus"`
 	NetworkPolicyStatusMessage string   `json:"networkPolicyStatusMessage"`
