@@ -9,6 +9,7 @@ import (
 // KubernetesObject represents a single Kubernetes object, either native or kubescape CRD
 type KubernetesObject struct {
 	Designators       identifiers.PortalDesignator `json:"designators"`
+	ResourceHash      string                       `json:"resourceHash"`
 	ResourceObjectRef string                       `json:"resourceObjectRef"`
 	ResourceVersion   string                       `json:"resourceVersion"`
 	Checksum          string                       `json:"checksum"`
