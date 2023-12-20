@@ -18,10 +18,12 @@ type KubernetesObject struct {
 	OwnerReferenceKind string `json:"ownerReferenceKind"`
 
 	// related only to kubescape DRDs.
-	RelatedName            string `json:"relatedName"`
-	RelatedKind            string `json:"relatedKind"`
-	RelatedAPIGroup        string `json:"relatedAPIGroup"`
-	RelatedNamespace       string `json:"relatedNamespace"`
-	RelatedAPIVersion      string `json:"relatedAPIVersion"`
-	RelatedResourceVersion string `json:"relatedResourceVersion"`
+	RelatedName            string            `json:"relatedName"`
+	RelatedKind            string            `json:"relatedKind"`
+	RelatedAPIGroup        string            `json:"relatedAPIGroup"`
+	RelatedNamespace       string            `json:"relatedNamespace"`
+	RelatedAPIVersion      string            `json:"relatedAPIVersion"`
+	RelatedResourceVersion string            `json:"relatedResourceVersion"`
+	NetworkPolicyStatus    string            `json:"networkPolicyStatus"`
+	Labels                 map[string]string `json:"labels"`
 }
