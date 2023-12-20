@@ -17,9 +17,9 @@ type EventBase struct {
 }
 
 type NetworkPolicyGenerated struct {
-	EventBase     `json:",inline"`
-	ClusterName   string `json:"clusterName"`
-	WorkloadsAmount          string `json:"WorkloadsAmount"`
+	EventBase       `json:",inline"`
+	ClusterName     string `json:"clusterName"`
+	WorkloadsAmount string `json:"WorkloadsAmount"`
 }
 
 type AttackChainCreated struct {
