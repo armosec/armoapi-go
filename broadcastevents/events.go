@@ -16,6 +16,12 @@ type EventBase struct {
 	EventWeekOfTheYear int    `json:"eventWeekOfTheYear,omitempty"`
 }
 
+type NetworkPolicyGenerated struct {
+	EventBase     `json:",inline"`
+	ClusterName   string `json:"clusterName"`
+	WorkloadsAmount          string `json:"WorkloadsAmount"`
+}
+
 type AttackChainCreated struct {
 	EventBase     `json:",inline"`
 	ClusterName   string `json:"clusterName"`
