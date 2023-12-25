@@ -4,6 +4,7 @@ import (
 	"github.com/armosec/armoapi-go/armotypes"
 	"github.com/armosec/armoapi-go/identifiers"
 	cautils "github.com/armosec/utils-k8s-go/armometadata"
+	"strings"
 )
 
 var SeverityStr2Score = map[string]int{
@@ -47,11 +48,12 @@ func (scanresult *ScanResultReport) ToFlatVulnerabilities() []ContainerScanVulne
 			result.Layers = make([]ESLayer, 0)
 			result.Layers = append(result.Layers, esLayer)
 			result.ContainerScanID = scanID
-
+			vulnLink := scanresult.getVulnLink(vul.Name)
 			result.IsFixed = CalculateFixed(vul.Fixes)
-			result.RelevantLinks = append(result.RelevantLinks, "https://nvd.nist.gov/vuln/detail/"+vul.Name)
+			result.RelevantLinks = append(result.RelevantLinks, vulnLink)
 			result.RelevantLinks = append(result.RelevantLinks, vul.Link)
-			result.Vulnerability.SetLink("https://nvd.nist.gov/vuln/detail/" + vul.Name)
+
+			result.Vulnerability.SetLink(vulnLink)
 			result.GetVulnerability().SetCategories(VulnerabilityCategory{IsRCE: vul.IsRCE()})
 			vuls = append(vuls, result)
 			vul2indx[vul.Name] = len(vuls) - 1
@@ -74,6 +76,13 @@ func (scanresult *ScanResultReport) ToFlatVulnerabilities() []ContainerScanVulne
 		vulnsArr[i] = &v
 	}
 	return vulnsArr
+}
+
+func (scanresult *ScanResultReport) getVulnLink(vulName string) string {
+	if strings.HasPrefix(vulName, "GHSA-") {
+		return "https://github.com/advisories/" + vulName
+	}
+	return "https://nvd.nist.gov/vuln/detail/" + vulName
 }
 
 func (scanresult *ScanResultReport) Summarize() *CommonContainerScanSummaryResult {
