@@ -100,6 +100,7 @@ type ContainerScanVulnerabilityResult interface {
 	SetIsLastScan(isLastScan int)
 	SetIsFixed(isFixed int)
 	SetIntroducedInLayer(introducedInLayer string)
+	SetLink(link string)
 	SetRelevantLinks(relevantLinks []string)
 	SetRelatedExceptions(relatedExceptions []armotypes.VulnerabilityExceptionPolicy)
 	SetRelevantLabel(relevantLabel RelevantLabel)

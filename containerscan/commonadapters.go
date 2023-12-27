@@ -48,11 +48,10 @@ func (scanresult *ScanResultReport) ToFlatVulnerabilities() []ContainerScanVulne
 			result.Layers = make([]ESLayer, 0)
 			result.Layers = append(result.Layers, esLayer)
 			result.ContainerScanID = scanID
-			vulnLink := scanresult.getVulnLink(vul.Name)
 			result.IsFixed = CalculateFixed(vul.Fixes)
+			vulnLink := GetVulnLink(vul.Name)
 			result.RelevantLinks = append(result.RelevantLinks, vulnLink)
 			result.RelevantLinks = append(result.RelevantLinks, vul.Link)
-
 			result.Vulnerability.SetLink(vulnLink)
 			result.GetVulnerability().SetCategories(VulnerabilityCategory{IsRCE: vul.IsRCE()})
 			vuls = append(vuls, result)
@@ -78,7 +77,7 @@ func (scanresult *ScanResultReport) ToFlatVulnerabilities() []ContainerScanVulne
 	return vulnsArr
 }
 
-func (scanresult *ScanResultReport) getVulnLink(vulName string) string {
+func GetVulnLink(vulName string) string {
 	if strings.HasPrefix(vulName, "GHSA-") {
 		return "https://github.com/advisories/" + vulName
 	}
