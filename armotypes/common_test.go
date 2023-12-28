@@ -25,12 +25,12 @@ func TestGetControlIDsByRiskFactors(t *testing.T) {
 		{
 			name:     "No Risk Factors",
 			input:    "",
-			expected: []string{},
+			expected: nil,
 		},
 		{
 			name:     "Invalid Risk Factor",
 			input:    "RiskFactorNonExistent",
-			expected: []string{},
+			expected: nil,
 		},
 		{
 			name:     "Duplicate Risk Factors",
