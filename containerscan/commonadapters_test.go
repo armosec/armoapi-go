@@ -14,16 +14,14 @@ func TestToFlatVulnerabilities_EmptyReport(t *testing.T) {
 }
 
 func TestGetVulnLink_GitHub(t *testing.T) {
-	report := &ScanResultReport{}
-	link := report.getVulnLink("GHSA-xxxx-xxxx-xxxx")
+	link := GetVulnLink("GHSA-xxxx-xxxx-xxxx")
 	if !strings.HasPrefix(link, "https://github.com/advisories/") {
 		t.Errorf("Expected GitHub advisory link, got %s", link)
 	}
 }
 
 func TestGetVulnLink_NVD(t *testing.T) {
-	report := &ScanResultReport{}
-	link := report.getVulnLink("CVE-2023-0001")
+	link := GetVulnLink("CVE-2023-0001")
 	if !strings.HasPrefix(link, "https://nvd.nist.gov/vuln/detail/") {
 		t.Errorf("Expected NVD link, got %s", link)
 	}
