@@ -51,7 +51,9 @@ func (scanresult *ScanResultReport) ToFlatVulnerabilities() []ContainerScanVulne
 			result.IsFixed = CalculateFixed(vul.Fixes)
 			vulnLink := GetVulnLink(vul.Name)
 			result.RelevantLinks = append(result.RelevantLinks, vulnLink)
-			result.RelevantLinks = append(result.RelevantLinks, vul.Link)
+			if vulnLink != vul.Link {
+				result.RelevantLinks = append(result.RelevantLinks, vul.Link)
+			}
 			result.Vulnerability.SetLink(vulnLink)
 			result.GetVulnerability().SetCategories(VulnerabilityCategory{IsRCE: vul.IsRCE()})
 			vuls = append(vuls, result)
