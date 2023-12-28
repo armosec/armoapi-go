@@ -49,7 +49,8 @@ func GetControlIDsByRiskFactors(riskFactorsStr string) []string {
 	controlIDSet := make(map[string]bool)
 
 	for _, rfStr := range riskFactors {
-		rf := RiskFactor(rfStr) // Assuming risk factor strings match the enum names
+		rfStr = strings.TrimSpace(rfStr)
+		rf := RiskFactor(rfStr)
 		for controlID, mappedRF := range RiskFactorMapping {
 			if mappedRF == rf {
 				controlIDSet[controlID] = true

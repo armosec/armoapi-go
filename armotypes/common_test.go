@@ -14,12 +14,12 @@ func TestGetControlIDsByRiskFactors(t *testing.T) {
 	}{
 		{
 			name:     "Single Risk Factor",
-			input:    "RiskFactorInternetFacing",
+			input:    "Internet facing",
 			expected: []string{"C-0256"},
 		},
 		{
 			name:     "Multiple Risk Factors",
-			input:    "RiskFactorPrivileged,RiskFactorSecretAccess",
+			input:    "Privileged,Secret access",
 			expected: []string{"C-0046", "C-0057", "C-0255"},
 		},
 		{
@@ -34,7 +34,12 @@ func TestGetControlIDsByRiskFactors(t *testing.T) {
 		},
 		{
 			name:     "Duplicate Risk Factors",
-			input:    "RiskFactorHostAccess,RiskFactorHostAccess",
+			input:    "Host access,Host access",
+			expected: []string{"C-0038", "C-0041", "C-0044", "C-0048"},
+		},
+		{
+			name:     "Risk Factors with spaces",
+			input:    " Host access,Host access ",
 			expected: []string{"C-0038", "C-0041", "C-0044", "C-0048"},
 		},
 	}
