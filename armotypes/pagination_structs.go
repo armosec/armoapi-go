@@ -22,7 +22,7 @@ const (
 	V2ListLikeOperator     string = "like"
 	V2ListRangeOperator    string = "range"
 	V2ListIgnoreCaseOption string = "ignorecase"
-	V2ListArrayOperator    string = "arrayMatch"
+	V2ListArrayOperator    string = "arraymatch"
 
 	V2ListAscendingSort  string = "asc"
 	V2ListDescendingSort string = "desc"
