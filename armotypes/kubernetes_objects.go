@@ -39,17 +39,8 @@ type KubernetesObject struct {
 	NetworkPolicyAppliedKubescape bool `json:"networkPolicyAppliedKubescape"`
 	NetworkPolicyStatusKnown      bool `json:"networkPolicyStatusKnown"`
 
+	NumberNetworkPoliciesApplied          int `json:"numberNetworkPoliciesApplied"`
+	NumberNetworkPoliciesAppliedKubescape int `json:"numberNetworkPoliciesAppliedKubescape"`
+
 	Labels map[string]string `json:"labels"`
-}
-
-func (ko *KubernetesObject) GetNetworkPolicyStatus() NetworkPolicyStatus {
-	if !ko.NetworkPolicyStatusKnown {
-		return StatusNetworkPolicyUknown
-	}
-
-	if ko.NetworkPolicyAppliedCustomer || ko.NetworkPolicyAppliedKubescape {
-		return StatusNetworkPolicyApplied
-	}
-
-	return StatusNetworkPolicyNotApplied
 }
