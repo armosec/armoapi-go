@@ -79,9 +79,13 @@ func (scanresult *ScanResultReport) Validate() bool {
 }
 
 func (v *Vulnerability) IsRCE() bool {
-	desc := strings.ToLower(v.Description)
+	return IsRceFromDescription(v.Description)
+}
 
-	isRCE, _ := regexp.MatchString(`[^A-Za-z]rce[^A-Za-z]`, v.Description)
+func IsRceFromDescription(description string) bool {
+	desc := strings.ToLower(description)
+
+	isRCE, _ := regexp.MatchString(`[^A-Za-z]rce[^A-Za-z]`, description)
 
 	return isRCE || strings.Contains(desc, "remote code execution") || strings.Contains(desc, "remote command execution") || strings.Contains(desc, "arbitrary code") || strings.Contains(desc, "code execution") || strings.Contains(desc, "code injection") || strings.Contains(desc, "command injection") || strings.Contains(desc, "inject arbitrary commands")
 }
