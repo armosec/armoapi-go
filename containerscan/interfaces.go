@@ -112,6 +112,7 @@ type VulnerabilityResult interface {
 	GetImageID() string
 	GetImageTag() string
 	GetRelatedPackageName() string
+	GetPackageType() string
 	GetPackageVersion() string
 	GetLink() string
 	GetDescription() string
@@ -129,6 +130,7 @@ type VulnerabilityResult interface {
 	SetImageID(string)
 	SetImageTag(string)
 	SetRelatedPackageName(string)
+	SetPackageType(string)
 	SetPackageVersion(string)
 	SetLink(string)
 	SetDescription(string)

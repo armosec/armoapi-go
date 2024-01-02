@@ -52,6 +52,7 @@ type Vulnerability struct {
 	ImageID            string                                   `json:"imageHash"`
 	ImageTag           string                                   `json:"imageTag"`
 	RelatedPackageName string                                   `json:"packageName"`
+	PackageType        string                                   `json:"packageType"`
 	PackageVersion     string                                   `json:"packageVersion"`
 	Link               string                                   `json:"link"`
 	Description        string                                   `json:"description"`
