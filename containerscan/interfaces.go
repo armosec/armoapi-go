@@ -125,6 +125,7 @@ type VulnerabilityResult interface {
 	GetHealthStatus() string
 	GetCategories() VulnerabilityCategory
 	GetExceptionApplied() []armotypes.VulnerabilityExceptionPolicy
+	GetCoordinates() []Coordinates
 
 	SetName(string)
 	SetImageID(string)
@@ -143,4 +144,5 @@ type VulnerabilityResult interface {
 	SetHealthStatus(string)
 	SetCategories(VulnerabilityCategory)
 	SetExceptionApplied([]armotypes.VulnerabilityExceptionPolicy)
+	SetCoordinates([]Coordinates)
 }

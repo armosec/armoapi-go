@@ -64,6 +64,11 @@ type Vulnerability struct {
 	NeglectedCount     int                                      `json:"neglected"`
 	UrgentCount        int                                      `json:"urgent"`
 	Categories         VulnerabilityCategory                    `json:"categories"`
+	Coordinates        []Coordinates                            `json:"coordinates,omitempty"`
+}
+type Coordinates struct {
+	RealPath     string `json:"path"`
+	FileSystemID string `json:"layerID,omitempty"`
 }
 
 // FixedIn when and which pkg was fixed (which version as well)
