@@ -6,14 +6,6 @@ import (
 	"github.com/armosec/armoapi-go/identifiers"
 )
 
-type NetworkPolicyStatus int
-
-const (
-	StatusNetworkPolicyApplied    NetworkPolicyStatus = 1
-	StatusNetworkPolicyNotApplied NetworkPolicyStatus = 2
-	StatusNetworkPolicyUknown     NetworkPolicyStatus = 3
-)
-
 // KubernetesObject represents a single Kubernetes object, either native or kubescape CRD
 type KubernetesObject struct {
 	Designators       identifiers.PortalDesignator `json:"designators"`
@@ -33,14 +25,11 @@ type KubernetesObject struct {
 	RelatedNamespace       string `json:"relatedNamespace"`
 	RelatedAPIVersion      string `json:"relatedAPIVersion"`
 	RelatedResourceVersion string `json:"relatedResourceVersion"`
-	NetworkPolicyStatus    string `json:"networkPolicyStatus"` // DEPRECATED
 
-	NetworkPolicyAppliedCustomer  bool `json:"networkPolicyAppliedCustomer"`
-	NetworkPolicyAppliedKubescape bool `json:"networkPolicyAppliedKubescape"`
-	NetworkPolicyStatusKnown      bool `json:"networkPolicyStatusKnown"`
-
-	NumberNetworkPoliciesApplied          int `json:"numberNetworkPoliciesApplied"`
-	NumberNetworkPoliciesAppliedKubescape int `json:"numberNetworkPoliciesAppliedKubescape"`
+	NetworkPolicyStatus NetworkPolicyStatus `json:"networkPolicyStatus"`
 
 	Labels map[string]string `json:"labels"`
+
+	// used for network policies
+	PodSelectorLabels map[string]string `json:"podSelectorLabels"`
 }
