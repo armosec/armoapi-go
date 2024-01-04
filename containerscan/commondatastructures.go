@@ -102,6 +102,7 @@ type CommonContainerScanSummaryResult struct {
 	ClusterName                   string                     `json:"cluster"`
 	ClusterShortName              string                     `json:"clusterShortName"`
 	Namespace                     string                     `json:"namespace"`
+	ApiVersion                    string                     `json:"apiVersion"`
 	ContainerName                 string                     `json:"containerName"`
 	ImageTagSuffix                string                     `json:"versionImage"`
 	Status                        string                     `json:"status"`
