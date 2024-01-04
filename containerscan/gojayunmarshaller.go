@@ -121,6 +121,9 @@ func (v *Vulnerability) UnmarshalJSONObject(dec *gojay.Decoder, key string) (err
 	case "packageName":
 		err = dec.String(&(v.RelatedPackageName))
 
+	case "packageType":
+		err = dec.String(&(v.PackageType))
+
 	case "packageVersion":
 		err = dec.String(&(v.PackageVersion))
 

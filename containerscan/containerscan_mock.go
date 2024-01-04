@@ -82,6 +82,7 @@ func GenerateVulnerability(v *Vulnerability) error {
 	r := bytes.NewReader(b)
 	er := gojay.NewDecoder(r).DecodeObject(v)
 	v.RelatedPackageName = "coreutils"
+	v.PackageType = "python"
 	v.Severity = HighSeverity
 	v.Name = "CVE-" + randSeq(4, nums) + "-" + randSeq(4, nums)
 	return er
@@ -94,6 +95,7 @@ func GenerateVulnerabilityRCEAndFixed(v *Vulnerability) error {
 	r := bytes.NewReader(b)
 	er := gojay.NewDecoder(r).DecodeObject(v)
 	v.RelatedPackageName = "coreutils"
+	v.PackageType = "python"
 	v.Severity = HighSeverity
 	v.Name = "CVE-" + randSeq(4, nums) + "-" + randSeq(4, nums)
 	return er
@@ -106,6 +108,7 @@ func GenerateVulnerabilityRCENotFixed(v *Vulnerability) error {
 	r := bytes.NewReader(b)
 	er := gojay.NewDecoder(r).DecodeObject(v)
 	v.RelatedPackageName = "coreutils"
+	v.PackageType = "python"
 	v.Severity = HighSeverity
 	v.Name = "CVE-" + randSeq(4, nums) + "-" + randSeq(4, nums)
 	return er
@@ -117,6 +120,7 @@ func GenerateVulnerabilityNoRCENoFixed(v *Vulnerability) error {
 	r := bytes.NewReader(b)
 	er := gojay.NewDecoder(r).DecodeObject(v)
 	v.RelatedPackageName = "coreutils"
+	v.PackageType = "python"
 	v.Severity = HighSeverity
 	v.Name = "CVE-" + randSeq(4, nums) + "-" + randSeq(4, nums)
 	return er
@@ -128,6 +132,7 @@ func GenerateVulnerabilityNoRCEAndFixed(v *Vulnerability) error {
 	r := bytes.NewReader(b)
 	er := gojay.NewDecoder(r).DecodeObject(v)
 	v.RelatedPackageName = "coreutils"
+	v.PackageType = "python"
 	v.Severity = HighSeverity
 	v.Name = "CVE-" + randSeq(4, nums) + "-" + randSeq(4, nums)
 	return er

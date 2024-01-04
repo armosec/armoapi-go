@@ -44,6 +44,10 @@ func (summary *CommonContainerScanSummaryResult) GetNamespace() string {
 	return summary.Namespace
 }
 
+func (summary *CommonContainerScanSummaryResult) GetApiVersion() string {
+	return summary.ApiVersion
+}
+
 func (summary *CommonContainerScanSummaryResult) GetContainerName() string {
 	return summary.ContainerName
 }
@@ -151,6 +155,10 @@ func (summary *CommonContainerScanSummaryResult) SetContext(context []identifier
 
 func (summary *CommonContainerScanSummaryResult) SetSeverityStats(severityStats SeverityStats) {
 	summary.SeverityStats = severityStats
+}
+
+func (summary *CommonContainerScanSummaryResult) SetApiVersion(apiVersion string) {
+	summary.ApiVersion = apiVersion
 }
 
 func (summary *CommonContainerScanSummaryResult) SetSeveritiesStats(severitiesStats []SeverityStats) {

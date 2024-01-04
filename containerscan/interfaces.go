@@ -112,6 +112,7 @@ type VulnerabilityResult interface {
 	GetImageID() string
 	GetImageTag() string
 	GetRelatedPackageName() string
+	GetPackageType() string
 	GetPackageVersion() string
 	GetLink() string
 	GetDescription() string
@@ -124,11 +125,13 @@ type VulnerabilityResult interface {
 	GetHealthStatus() string
 	GetCategories() VulnerabilityCategory
 	GetExceptionApplied() []armotypes.VulnerabilityExceptionPolicy
+	GetCoordinates() []Coordinates
 
 	SetName(string)
 	SetImageID(string)
 	SetImageTag(string)
 	SetRelatedPackageName(string)
+	SetPackageType(string)
 	SetPackageVersion(string)
 	SetLink(string)
 	SetDescription(string)
@@ -141,4 +144,5 @@ type VulnerabilityResult interface {
 	SetHealthStatus(string)
 	SetCategories(VulnerabilityCategory)
 	SetExceptionApplied([]armotypes.VulnerabilityExceptionPolicy)
+	SetCoordinates([]Coordinates)
 }

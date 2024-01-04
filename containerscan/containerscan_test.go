@@ -280,6 +280,7 @@ func TestVulnerabilityToShort(t *testing.T) {
 		ImageID:            "imageHash",
 		ImageTag:           "imageTag",
 		RelatedPackageName: "packageName",
+		PackageType:        "packageType",
 		PackageVersion:     "packageVersion",
 		Link:               "link",
 		Description:        "description",
