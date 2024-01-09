@@ -37,6 +37,7 @@ type ContainerScanSummaryResult interface {
 	GetClusterName() string
 	GetClusterShortName() string
 	GetNamespace() string
+	GetApiVersion() string
 	GetContainerName() string
 	GetStatus() string
 	GetRegistry() string
