@@ -28,14 +28,6 @@ var RiskFactorMapping = map[string]RiskFactor{
 	"C-0048": RiskFactorHostAccess,
 }
 
-func GetRiskFactor2Controls() map[RiskFactor][]string {
-	riskFactor2Controls := make(map[RiskFactor][]string)
-	for controlID, riskFactor := range RiskFactorMapping {
-		riskFactor2Controls[riskFactor] = append(riskFactor2Controls[riskFactor], controlID)
-	}
-	return riskFactor2Controls
-}
-
 // GetRiskFactors returns a list of unique risk factors for given control IDs.
 func GetRiskFactors(controlIDs []string) []RiskFactor {
 	riskFactorSet := make(map[RiskFactor]bool)
