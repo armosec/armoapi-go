@@ -3,7 +3,7 @@ package apis
 import (
 	"net/http"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
 )
 
 // Connector - interface for any connector (BE/Portal and so on)
@@ -27,9 +27,9 @@ type Connector interface {
 type ImageScanCommand interface {
 	GetWlid() string
 	GetImageHash() string
-	GetCreds() *types.AuthConfig
-	GetCredentialsList() []types.AuthConfig
-	SetCredentialsList([]types.AuthConfig)
+	GetCreds() *registry.AuthConfig
+	GetCredentialsList() []registry.AuthConfig
+	SetCredentialsList([]registry.AuthConfig)
 	GetArgs() map[string]interface{}
 	SetArgs(map[string]interface{})
 	GetSession() SessionChain

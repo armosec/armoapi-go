@@ -7,7 +7,7 @@ require (
 	github.com/armosec/utils-go v0.0.20
 	github.com/armosec/utils-k8s-go v0.0.16
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/docker/docker v24.0.5+incompatible
+	github.com/docker/docker v25.0.0+incompatible
 	github.com/francoispqt/gojay v1.2.13
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.8.4
@@ -21,8 +21,6 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/docker/go-connections v0.4.0 // indirect
-	github.com/docker/go-units v0.5.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
