@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/armosec/armoapi-go/identifiers"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
 )
 
 const (
@@ -135,11 +135,11 @@ func (r *RegistryScanCommand) GetWlid() string {
 	return ""
 }
 
-func (r *RegistryScanCommand) GetCredentialsList() []types.AuthConfig {
+func (r *RegistryScanCommand) GetCredentialsList() []registry.AuthConfig {
 	return r.ImageScanParams.Credentialslist
 }
 
-func (r *RegistryScanCommand) SetCredentialsList(credentialslist []types.AuthConfig) {
+func (r *RegistryScanCommand) SetCredentialsList(credentialslist []registry.AuthConfig) {
 	r.ImageScanParams.Credentialslist = credentialslist
 }
 
@@ -183,7 +183,7 @@ func (r *RegistryScanCommand) SetParentJobID(parentJobID string) {
 	r.ImageScanParams.ParentJobID = parentJobID
 }
 
-func (r *RegistryScanCommand) GetCreds() *types.AuthConfig {
+func (r *RegistryScanCommand) GetCreds() *registry.AuthConfig {
 	return nil
 }
 
@@ -195,11 +195,11 @@ func (r *RegistryScanCommand) GetImageHash() string {
 
 var _ ImageScanCommand = &WebsocketScanCommand{}
 
-func (c *WebsocketScanCommand) GetCredentialsList() []types.AuthConfig {
+func (c *WebsocketScanCommand) GetCredentialsList() []registry.AuthConfig {
 	return c.Credentialslist
 }
 
-func (c *WebsocketScanCommand) SetCredentialsList(credentialslist []types.AuthConfig) {
+func (c *WebsocketScanCommand) SetCredentialsList(credentialslist []registry.AuthConfig) {
 	c.Credentialslist = credentialslist
 }
 
@@ -247,7 +247,7 @@ func (c *WebsocketScanCommand) GetImageHash() string {
 	return c.ImageHash
 }
 
-func (c *WebsocketScanCommand) GetCreds() *types.AuthConfig {
+func (c *WebsocketScanCommand) GetCreds() *registry.AuthConfig {
 	return c.Credentials
 }
 

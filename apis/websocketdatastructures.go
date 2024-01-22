@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
 )
 
 // Commands contains a collection of commands for the in-cluster components
@@ -93,12 +93,12 @@ type WebsocketScanCommand struct {
 	// Deprecated: Credentials to the Container Registry that holds the image to be scanned
 	//
 	// Kept for backward compatibility
-	Credentials *types.AuthConfig `json:"credentials,omitempty"`
+	Credentials *registry.AuthConfig `json:"credentials,omitempty"`
 }
 
 type ImageScanParams struct {
 	// A list of credentials for private Container Registries that store images to be scanned
-	Credentialslist []types.AuthConfig `json:"credentialsList,omitempty"`
+	Credentialslist []registry.AuthConfig `json:"credentialsList,omitempty"`
 	// Arguments to pass to the scan command
 	//
 	// Example: {"useHTTP": true, "skipTLSVerify": true, "registryName": "", "repository": "", "tag": ""}

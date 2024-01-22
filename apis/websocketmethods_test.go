@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,11 +46,11 @@ func TestRegistryScanCommandGetWlid(t *testing.T) {
 }
 
 func TestRegistryScanCommandGetCredentialsList(t *testing.T) {
-	r := &RegistryScanCommand{ImageScanParams: ImageScanParams{Credentialslist: []types.AuthConfig{{
+	r := &RegistryScanCommand{ImageScanParams: ImageScanParams{Credentialslist: []registry.AuthConfig{{
 		Username: "username",
 		Password: "password",
 	}}}}
-	expected := []types.AuthConfig{{
+	expected := []registry.AuthConfig{{
 		Username: "username",
 		Password: "password",
 	}}
@@ -61,7 +61,7 @@ func TestRegistryScanCommandGetCredentialsList(t *testing.T) {
 
 func TestRegistryScanCommandSetCredentialsList(t *testing.T) {
 	r := &RegistryScanCommand{}
-	expected := []types.AuthConfig{{
+	expected := []registry.AuthConfig{{
 		Username: "username",
 		Password: "password",
 	}}
@@ -231,7 +231,7 @@ func TestWebsocketScanCommandGetCreds(t *testing.T) {
 	creds := w.GetCreds()
 	assert.Nil(t, creds)
 
-	w.Credentials = &types.AuthConfig{
+	w.Credentials = &registry.AuthConfig{
 		Username: "user",
 	}
 	assert.Equal(t, "user", w.GetCreds().Username)
@@ -244,12 +244,12 @@ func TestWebsocketScanCommandGetImageHash(t *testing.T) {
 }
 
 func TestWebsocketScanCommandGetCredentialsList(t *testing.T) {
-	authConfig := types.AuthConfig{
+	authConfig := registry.AuthConfig{
 		Username:      "user1",
 		Password:      "password1",
 		ServerAddress: "https://registry1.com",
 	}
-	expected := []types.AuthConfig{authConfig}
+	expected := []registry.AuthConfig{authConfig}
 
 	cmd := &WebsocketScanCommand{
 		ImageScanParams: ImageScanParams{
@@ -269,12 +269,12 @@ func TestWebsocketScanCommandGetCredentialsList(t *testing.T) {
 }
 
 func TestWebsocketScanCommandSetCredentialsList(t *testing.T) {
-	authConfig := types.AuthConfig{
+	authConfig := registry.AuthConfig{
 		Username:      "user1",
 		Password:      "password1",
 		ServerAddress: "https://registry1.com",
 	}
-	expected := []types.AuthConfig{authConfig}
+	expected := []registry.AuthConfig{authConfig}
 
 	cmd := &WebsocketScanCommand{}
 
