@@ -39,6 +39,7 @@ const (
 	FreeCustomer    CustomerAccessStatus = "free"
 	TrialCustomer   CustomerAccessStatus = "trial"
 	BlockedCustomer CustomerAccessStatus = "blocked"
+	LimitedCustomer CustomerAccessStatus = "limited"
 )
 
 var ActiveSubscriptionStatuses = []string{SubscriptionStatusIncomplete, SubscriptionStatusTrialing, SubscriptionStatusActive}
