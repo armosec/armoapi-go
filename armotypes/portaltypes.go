@@ -22,6 +22,7 @@ const (
 	SubscriptionStatusPastDue           = string(stripe.SubscriptionStatusPastDue)
 	SubscriptionStatusCanceled          = string(stripe.SubscriptionStatusCanceled)
 	SubscriptionStatusUnpaid            = string(stripe.SubscriptionStatusUnpaid)
+	SubscriptionStatusTrialExpired      = "trial expired"
 )
 
 type LicenseType string
@@ -39,6 +40,7 @@ const (
 	FreeCustomer    CustomerAccessStatus = "free"
 	TrialCustomer   CustomerAccessStatus = "trial"
 	BlockedCustomer CustomerAccessStatus = "blocked"
+	LimitedCustomer CustomerAccessStatus = "limited"
 )
 
 var ActiveSubscriptionStatuses = []string{SubscriptionStatusIncomplete, SubscriptionStatusTrialing, SubscriptionStatusActive}
