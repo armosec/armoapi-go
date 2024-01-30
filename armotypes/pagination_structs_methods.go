@@ -117,8 +117,8 @@ func zeroIntPtr() *int {
 // ValidatePageProperties validate page size and page number to be valid
 func (lr *V2ListRequest) ValidatePageProperties(maxPageSize int) {
 	// we are counting from 0 while the user counts from 1... so:
-	if !lr.fixedPageNum {
-		lr.fixedPageNum = true
+	if !lr.FixedPageNum {
+		lr.FixedPageNum = true
 		if lr.PageNum == nil {
 			lr.PageNum = zeroIntPtr()
 		} else {

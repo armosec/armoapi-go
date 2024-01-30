@@ -30,7 +30,7 @@ func TestValidatePageProperties(t *testing.T) {
 	if *req.PageNum != 0 || *req.PageSize != 235 {
 		t.Errorf("page properties validation failed")
 	}
-	req.fixedPageNum = false
+	req.FixedPageNum = false
 	*req.PageNum = 43
 	req.ValidatePageProperties(154)
 	if *req.PageNum != 42 || *req.PageSize != 154 {
@@ -41,7 +41,7 @@ func TestValidatePageProperties(t *testing.T) {
 	if *req.PageNum != 42 || *req.PageSize != 154 {
 		t.Errorf("page properties validation failed")
 	}
-	req.fixedPageNum = false
+	req.FixedPageNum = false
 	req.ValidatePageProperties(-45)
 	if *req.PageNum != 41 || *req.PageSize != 154 {
 		t.Errorf("page properties validation failed")
