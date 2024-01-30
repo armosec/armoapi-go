@@ -22,6 +22,7 @@ const (
 	SubscriptionStatusPastDue           = string(stripe.SubscriptionStatusPastDue)
 	SubscriptionStatusCanceled          = string(stripe.SubscriptionStatusCanceled)
 	SubscriptionStatusUnpaid            = string(stripe.SubscriptionStatusUnpaid)
+	SubscriptionStatusTrialExpired      = "trial expired"
 )
 
 type LicenseType string
