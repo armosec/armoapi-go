@@ -135,6 +135,8 @@ type V2ListRequest struct {
 	// For PUT request, can be used to update only specific fields with specific values
 	// map of field name to new value
 	FieldsToUpdate map[string]string `json:"fieldsToUpdate"`
+	//internal flag to indicate if the request is validated (avoid fixing pagination twice in the same request)
+	fixedPageNum bool
 }
 
 type Cursor struct {

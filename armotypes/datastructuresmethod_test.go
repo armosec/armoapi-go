@@ -30,15 +30,23 @@ func TestValidatePageProperties(t *testing.T) {
 	if *req.PageNum != 0 || *req.PageSize != 235 {
 		t.Errorf("page properties validation failed")
 	}
+	req.fixedPageNum = false
 	*req.PageNum = 43
 	req.ValidatePageProperties(154)
 	if *req.PageNum != 42 || *req.PageSize != 154 {
 		t.Errorf("page properties validation failed")
 	}
+	//validate again wihtout reseting the validate flag - make sure ignored
+	req.ValidatePageProperties(500)
+	if *req.PageNum != 42 || *req.PageSize != 154 {
+		t.Errorf("page properties validation failed")
+	}
+	req.fixedPageNum = false
 	req.ValidatePageProperties(-45)
 	if *req.PageNum != 41 || *req.PageSize != 154 {
 		t.Errorf("page properties validation failed")
 	}
+
 }
 
 func TestGetFieldsNames(t *testing.T) {
