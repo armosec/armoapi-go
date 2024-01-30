@@ -136,7 +136,7 @@ type V2ListRequest struct {
 	// map of field name to new value
 	FieldsToUpdate map[string]string `json:"fieldsToUpdate"`
 	//internal flag to indicate if the request is validated (avoid fixing pagination twice in the same request)
-	FixedPageNum bool `json:"_FixedPageNum"`
+	FixedPageNum bool `json:"_fixedPageNum"`
 }
 
 type Cursor struct {
