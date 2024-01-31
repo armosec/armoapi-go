@@ -14,7 +14,7 @@ func TestGetControlIDsByRiskFactors(t *testing.T) {
 	}{
 		{
 			name:     "Single Risk Factor",
-			input:    "Internet facing",
+			input:    "External facing",
 			expected: []string{"C-0256"},
 		},
 		{
@@ -64,7 +64,7 @@ func TestGetRiskFactors(t *testing.T) {
 		{
 			name:     "Multiple Risk Factors",
 			input:    []string{"C-0256", "C-0046", "C-0057", "C-0255"},
-			expected: []RiskFactor{RiskFactorInternetFacing, RiskFactorPrivileged, RiskFactorSecretAccess},
+			expected: []RiskFactor{RiskFactorExternalFacing, RiskFactorPrivileged, RiskFactorSecretAccess},
 		},
 		{
 			name:     "Empty controls list",
@@ -79,7 +79,7 @@ func TestGetRiskFactors(t *testing.T) {
 		{
 			name:     "Single Risk Factor",
 			input:    []string{"C-0256"},
-			expected: []RiskFactor{RiskFactorInternetFacing},
+			expected: []RiskFactor{RiskFactorExternalFacing},
 		},
 		{
 			name:     "No Risk Factors",

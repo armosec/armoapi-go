@@ -9,7 +9,7 @@ type GUID string
 type RiskFactor string
 
 const (
-	RiskFactorInternetFacing RiskFactor = "Internet facing"
+	RiskFactorExternalFacing RiskFactor = "External facing"
 	RiskFactorPrivileged     RiskFactor = "Privileged"
 	RiskFactorSecretAccess   RiskFactor = "Secret access"
 	RiskFactorDataAccess     RiskFactor = "Data access"
@@ -17,7 +17,7 @@ const (
 )
 
 var RiskFactorMapping = map[string]RiskFactor{
-	"C-0256": RiskFactorInternetFacing,
+	"C-0256": RiskFactorExternalFacing,
 	"C-0046": RiskFactorPrivileged,
 	"C-0057": RiskFactorPrivileged,
 	"C-0255": RiskFactorSecretAccess,
