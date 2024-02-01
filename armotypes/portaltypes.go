@@ -169,9 +169,11 @@ type GettingStartedChecklist struct {
 	EverConnectedCluster   *bool `json:"everConnectedCluster,omitempty" bson:"everConnectedCluster,omitempty"`
 	EverScannedRepository  *bool `json:"everScannedRepository,omitempty" bson:"everScannedRepository,omitempty"`
 	EverScannedRegistry    *bool `json:"everScannedRegistry,omitempty" bson:"everScannedRegistry,omitempty"`
-	EverCollaborated       *bool `json:"everCollaborated,omitempty" bson:"everCollaborated,omitempty"`
+	EverCollaborated       *bool `json:"everCollaborated,omitempty" bson:"everCollaborated,omitempty"` // TODO - deprecated, replaced by EverConnectedTicketing + EverConnectedAlerting
 	EverInvitedTeammate    *bool `json:"everInvitedTeammate,omitempty" bson:"everInvitedTeammate,omitempty"`
 	EverUsedRbacVisualizer *bool `json:"everUsedRbacVisualizer,omitempty" bson:"everUsedRbacVisualizer,omitempty"`
+	EverConnectedTicketing *bool `json:"everConnectedTicketing,omitempty" bson:"everConnectedTicketing,omitempty"`
+	EverConnectedAlerting  *bool `json:"everConnectedAlerting,omitempty" bson:"everConnectedAlerting,omitempty"`
 }
 
 type NodeUsage struct {
