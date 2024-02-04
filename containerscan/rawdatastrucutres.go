@@ -13,20 +13,19 @@ import (
 // ScanResultReport - the report given from scanner to event receiver
 // TODO: remove
 type ScanResultReport struct {
-	Designators              identifiers.PortalDesignator `json:"designators"`
-	CustomerGUID             string                       `json:"customerGUID"`
-	ImgTag                   string                       `json:"imageTag"`
-	ImgHash                  string                       `json:"imageHash"`
-	WLID                     string                       `json:"wlid"`
-	ContainerName            string                       `json:"containerName"`
-	Timestamp                int64                        `json:"timestamp"`
-	Layers                   LayersList                   `json:"layers"`
-	ListOfDangerousArtifcats []string                     `json:"listOfDangerousArtifcats"`
-	Session                  apis.SessionChain            `json:"session,omitempty"`
-
-	ImageSignatureValid           bool   `json:"imageSignatureValid,omitempty"`
-	ImageHasSignature             bool   `json:"imageHasSignature,omitempty"`
-	ImageSignatureValidationError string `json:"imageSignatureValidationError,omitempty"`
+	Designators                   identifiers.PortalDesignator `json:"designators"`
+	CustomerGUID                  string                       `json:"customerGUID"`
+	ImgTag                        string                       `json:"imageTag"`
+	ImgHash                       string                       `json:"imageHash"`
+	WLID                          string                       `json:"wlid"`
+	ContainerName                 string                       `json:"containerName"`
+	Timestamp                     int64                        `json:"timestamp"`
+	Layers                        LayersList                   `json:"layers"`
+	ListOfDangerousArtifcats      []string                     `json:"listOfDangerousArtifcats"`
+	Session                       apis.SessionChain            `json:"session,omitempty"`
+	ImageSignatureValid           bool                         `json:"imageSignatureValid,omitempty"`
+	ImageHasSignature             bool                         `json:"imageHasSignature,omitempty"`
+	ImageSignatureValidationError string                       `json:"imageSignatureValidationError,omitempty"`
 }
 
 func (v *ScanResultReport) AsFNVHash() string {
@@ -48,6 +47,7 @@ type VulnerabilityCategory struct {
 // Vulnerability - a vul object
 type Vulnerability struct {
 	IsRelevant         *bool                                    `json:"isRelevant,omitempty"`
+	SBOMToolVersion    string                                   `json:"sbomToolVersion"`
 	HealthStatus       string                                   `json:"healthStatus"`
 	ImageID            string                                   `json:"imageHash"`
 	ImageTag           string                                   `json:"imageTag"`
