@@ -52,6 +52,10 @@ func (summary *CommonContainerScanSummaryResult) GetContainerName() string {
 	return summary.ContainerName
 }
 
+func (summary *CommonContainerScanSummaryResult) GetSBOMToolVersion() string {
+	return summary.SBOMToolVersion
+}
+
 func (summary *CommonContainerScanSummaryResult) GetStatus() string {
 	return summary.Status
 }
@@ -159,6 +163,10 @@ func (summary *CommonContainerScanSummaryResult) SetSeverityStats(severityStats 
 
 func (summary *CommonContainerScanSummaryResult) SetApiVersion(apiVersion string) {
 	summary.ApiVersion = apiVersion
+}
+
+func (summary *CommonContainerScanSummaryResult) SetSBOMToolVersion(sbomToolVersion string) {
+	summary.SBOMToolVersion = sbomToolVersion
 }
 
 func (summary *CommonContainerScanSummaryResult) SetSeveritiesStats(severitiesStats []SeverityStats) {

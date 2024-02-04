@@ -91,7 +91,8 @@ type CommonContainerScanSeveritySummary struct {
 type CommonContainerScanSummaryResult struct {
 	Designators identifiers.PortalDesignator `json:"designators"`
 	SeverityStats
-	Version                       string                     `json:"version"`
+	Version                       string                     `json:"version"`         // this is the version of the image
+	SBOMToolVersion               string                     `json:"sbomToolVersion"` // version of the sbom tool
 	Registry                      string                     `json:"registry"`
 	CustomerGUID                  string                     `json:"customerGUID"`
 	ContainerScanID               string                     `json:"containersScanID"`

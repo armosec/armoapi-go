@@ -266,3 +266,18 @@ func TestGetHasRelevancyData(t *testing.T) {
 		t.Error("Expected GetHasRelevancyData() to return false for a ScanResultReportV1 without relevancy data, but it returned true")
 	}
 }
+func TestCommonContainerScanSummaryResult_GetSBOMToolVersion(t *testing.T) {
+	summary := &CommonContainerScanSummaryResult{
+		SBOMToolVersion: "1.2.3",
+	}
+	if summary.GetSBOMToolVersion() != "1.2.3" {
+		t.Errorf("Expected SBOMToolVersion to be %s, but got %s", "1.2.3", summary.GetSBOMToolVersion())
+	}
+}
+func TestCommonContainerScanSummaryResult_SetSBOMToolVersion(t *testing.T) {
+	summary := &CommonContainerScanSummaryResult{}
+	summary.SetSBOMToolVersion("1.2.3")
+	if summary.SBOMToolVersion != "1.2.3" {
+		t.Errorf("Expected SBOMToolVersion to be %s, but got %s", "1.2.3", summary.SBOMToolVersion)
+	}
+}
