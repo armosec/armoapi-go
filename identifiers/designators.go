@@ -74,6 +74,7 @@ const (
 	AttributeResourceID       = "resourceID"
 	AttributeContainerScanId  = "containerScanId"
 	AttributeSyncKind         = "syncKind"
+	AttributeSBOMToolVersion  = "sbomToolVersion"
 )
 
 // Repository scan related attributes
