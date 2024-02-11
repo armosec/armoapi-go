@@ -157,7 +157,9 @@ type UniqueValuesRequestV2 struct {
 	InnerFilters []map[string]string `json:"innerFilters"`
 	PageSize     int                 `json:"pageSize,omitempty"`
 	//for apis that support pagination
-	PageNum                 *int              `json:"pageNum,omitempty"`
+	PageNum *int `json:"pageNum,omitempty"`
+	//Include hit counts for each field
+	CountFields             *bool             `json:"includeCount,omitempty"`
 	FieldsReverseKeywordMap map[string]string `json:"-"`
 	Cursor                  string            `json:"-"`
 	// The time window to search (Default: since - beginning of the time, until - now)
