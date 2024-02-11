@@ -159,7 +159,7 @@ type UniqueValuesRequestV2 struct {
 	//for apis that support pagination
 	PageNum *int `json:"pageNum,omitempty"`
 	//Include hit counts for each field
-	CountFields             *bool             `json:"includeCount,omitempty"`
+	CountFields             *bool             `json:"countFields,omitempty"`
 	FieldsReverseKeywordMap map[string]string `json:"-"`
 	Cursor                  string            `json:"-"`
 	// The time window to search (Default: since - beginning of the time, until - now)
