@@ -136,6 +136,7 @@ type V2ListRequest struct {
 	// map of field name to new value
 	FieldsToUpdate map[string]string `json:"fieldsToUpdate"`
 	//internal flag to indicate if the request is validated (avoid fixing pagination twice in the same request)
+	// swagger:ignore
 	FixedPageNum bool `json:"_fixedPageNum"`
 }
 
