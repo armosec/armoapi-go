@@ -66,7 +66,7 @@ func (u *UniqueValuesRequestV2) ValidatePageProperties(maxPageSize int) {
 	}
 }
 
-func (u *UniqueValuesRequestV2) ShouldCount(countDefault bool) bool {
+func (u *UniqueValuesRequestV2) ValidateCountFields(countDefault bool) bool {
 	if u.CountFields == nil {
 		u.CountFields = &countDefault
 	}
