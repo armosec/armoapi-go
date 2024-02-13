@@ -8,6 +8,7 @@ import (
 
 type SecurityIssueStatus string
 type RiskType string
+type SecurityIssueSeverity string
 
 const (
 	SecurityIssueStatusDetected SecurityIssueStatus = "Detected"
@@ -15,6 +16,11 @@ const (
 
 	RiskTypeControl    RiskType = "Control"
 	RiskTypeAttackPath RiskType = "AttackPath"
+
+	SecurityIssueSeverityCritical SecurityIssueSeverity = "Critical"
+	SecurityIssueSeverityHigh     SecurityIssueSeverity = "High"
+	SecurityIssueSeverityMedium   SecurityIssueSeverity = "Medium"
+	SecurityIssueSeverityLow      SecurityIssueSeverity = "Low"
 )
 
 // Risk represents an individual risk with an ID and type
@@ -74,6 +80,45 @@ type SecurityIssuesSummary struct {
 	AffectedNamespacesCount int    `json:"affectedNamespacesCount"`
 	AffectedResourcesCount  int    `json:"affectedResourcesCount"`
 	AffectedResourcesChange int    `json:"affectedResourcesChange"`
+}
+
+type SecurityIssuesCategories struct {
+	CategoryResourceCounters map[string]int `json:"categoryResourceCounter"`
+	TotalResources           int            `json:"totalResources"`
+}
+
+func (sic *SecurityIssuesCategories) SetCategoryTotal(category string, total int) {
+	sic.CategoryResourceCounters[category] = total
+}
+
+type SecurityIssuesSeverities struct {
+	SeverityResourceCounters map[SecurityIssueSeverity]int `json:"severityResourceCounter"`
+	TotalResources           int                           `json:"totalResources"`
+}
+
+func NewSecurityIssuesCategories() SecurityIssuesCategories {
+	return SecurityIssuesCategories{
+		CategoryResourceCounters: map[string]int{},
+		TotalResources:           0,
+	}
+
+}
+
+func (sis *SecurityIssuesSeverities) SetSeverityTotal(severity SecurityIssueSeverity, total int) {
+	sis.SeverityResourceCounters[severity] = total
+}
+
+func NewSecurityIssuesSeverities() SecurityIssuesSeverities {
+	return SecurityIssuesSeverities{
+		SeverityResourceCounters: map[SecurityIssueSeverity]int{
+			SecurityIssueSeverityCritical: 0,
+			SecurityIssueSeverityHigh:     0,
+			SecurityIssueSeverityMedium:   0,
+			SecurityIssueSeverityLow:      0,
+		},
+		TotalResources: 0,
+	}
+
 }
 
 type SecurityIssue struct {
