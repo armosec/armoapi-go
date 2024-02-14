@@ -64,6 +64,16 @@ func (u *UniqueValuesRequestV2) ValidatePageProperties(maxPageSize int) {
 	if u.PageSize > maxPageSize || u.PageSize <= 0 {
 		u.PageSize = maxPageSize
 	}
+
+	if u.PageNum == nil {
+		u.PageNum = zeroIntPtr()
+	} else {
+		if *u.PageNum > 0 {
+			*u.PageNum--
+		} else {
+			*u.PageNum = 0
+		}
+	}
 }
 
 func (u *UniqueValuesRequestV2) ValidateCountFields(countDefault bool) bool {
