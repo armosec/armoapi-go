@@ -8,12 +8,21 @@ type GUID string
 
 type RiskFactor string
 
+type ScanType string
+
 const (
+	//risk factors
 	RiskFactorExternalFacing RiskFactor = "External facing"
 	RiskFactorPrivileged     RiskFactor = "Privileged"
 	RiskFactorSecretAccess   RiskFactor = "Secret access"
 	RiskFactorDataAccess     RiskFactor = "Data access"
 	RiskFactorHostAccess     RiskFactor = "Host access"
+
+	//scan types
+	ClusterPosture           ScanType = "cluster"
+	RepositoryPosture        ScanType = "repository"
+	ContainerVulnerabilities ScanType = "container"
+	RegistryVulnerabilities  ScanType = "registry"
 )
 
 var RiskFactorMapping = map[string]RiskFactor{
