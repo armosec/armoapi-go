@@ -5,7 +5,7 @@ import "time"
 type TimeValueCordindate struct {
 	Value       interface{} `json:"value"`
 	Timestamp   time.Time   `json:"timestamp"`
-	UniqueValue interface{} `json:"uniqueValue,omitempty"`
+	UniqueValue interface{} `json:"uniqueValue"`
 }
 
 type ContainerSummmaryTimeValueCordindate struct {
