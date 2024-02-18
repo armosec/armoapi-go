@@ -3,9 +3,9 @@ package containerscan
 import "time"
 
 type TimeValueCordindate struct {
-	Value       interface{} `json:"value"`
-	Timestamp   time.Time   `json:"timestamp"`
-	UniqueValue interface{} `json:"uniqueValue"`
+	Value                interface{} `json:"value"`
+	Timestamp            time.Time   `json:"timestamp"`
+	VulnerabilitiesTypes int64       `json:"vulnerabilitiesTypes"`
 }
 
 type ContainerSummmaryTimeValueCordindate struct {
