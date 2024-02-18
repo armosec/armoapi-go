@@ -5,7 +5,7 @@ import "time"
 type TimeValueCordindate struct {
 	Value                interface{} `json:"value"`
 	Timestamp            time.Time   `json:"timestamp"`
-	VulnerabilitiesKinds int64       `json:"vulnerabilitiesKinds"`
+	VulnerabilitiesKinds uint        `json:"vulnerabilitiesKinds"`
 }
 
 type ContainerSummmaryTimeValueCordindate struct {
