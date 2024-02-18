@@ -3,7 +3,6 @@ package armotypes
 import (
 	"encoding/json"
 	"errors"
-	"time"
 )
 
 type SecurityIssueStatus string
@@ -46,14 +45,15 @@ func (rt *RiskType) UnmarshalJSON(data []byte) error {
 
 // SecurityRisk represents the main object with various fields and an array of Risks
 type SecurityRisk struct {
-	ID          string `json:"ID"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	WhatIs      string `json:"whatIs"`
-	Severity    string `json:"severity"`
-	Category    string `json:"category"`
-	Remediation string `json:"remediation"`
-	Risks       []Risk `json:"risks"`
+	ID             string           `json:"ID"`
+	Name           string           `json:"name"`
+	Description    string           `json:"description"`
+	WhatIs         string           `json:"whatIs"`
+	Severity       string           `json:"severity"`
+	Category       string           `json:"category"`
+	Remediation    string           `json:"remediation"`
+	Risks          []Risk           `json:"risks"`
+	SecurityIssues []ISecurityIssue `json:"securityIssues,omitempty"`
 }
 
 func (sr *SecurityRisk) GetRisks() []Risk {
@@ -68,6 +68,23 @@ func (sr *SecurityRisk) GetRisksIDsByType(riskType RiskType) []string {
 		}
 	}
 	return risksIDs
+}
+
+func (sr *SecurityRisk) GetRiskTypes() []RiskType {
+
+	riskTypes := make(map[RiskType]interface{})
+
+	for _, risk := range sr.Risks {
+		riskTypes[risk.Type] = nil
+	}
+
+	keys := make([]RiskType, 0, len(riskTypes))
+	for key := range riskTypes {
+		keys = append(keys, key)
+	}
+
+	return keys
+
 }
 
 type SecurityIssuesSummary struct {
@@ -121,17 +138,37 @@ func NewSecurityIssuesSeverities() SecurityIssuesSeverities {
 
 }
 
-type SecurityIssue struct {
-	CustomerGUID string `json:"customerGUID"`
+type ISecurityIssue interface {
+}
 
-	SecurityRiskID  string `json:"securityRiskID"`
-	K8sResourceHash string `json:"k8sResourceHash"`
+type SecurityIssue struct {
+	ISecurityIssue  `json:",inline,omitempty"`
+	Cluster         string   `json:"cluster"`
+	Namespace       string   `json:"namespace"`
+	ResourceName    string   `json:"resourceName"`
+	ResourceID      string   `json:"resourceID"`
+	K8sResourceHash string   `json:"k8sResourceHash"`
+	RiskID          string   `json:"riskID"` // controlID/attackTrackID
+	RiskType        RiskType `json:"riskType,omitempty"`
+
+	SecurityRiskID string `json:"securityRiskID"`
 
 	Status SecurityIssueStatus `json:"status"`
 
-	RiskID   string   `json:"riskID"`
-	RiskType RiskType `json:"riskType"`
+	IsNew bool `json:"isNew"`
 
-	LastTimeDetected time.Time `json:"lastTimeDetected"`
-	LastTimeResolved time.Time `json:"lastTimeResolved"`
+	LastTimeDetected string `json:"lastTimeDetected,omitempty"`
+	LastTimeResolved string `json:"lastTimeResolved,omitempty"`
+}
+
+type SecurityIssueControl struct {
+	SecurityIssue `json:",inline"`
+	ControlID     string `json:"controlID"`
+	ReportGUID    string `json:"reportGUID"`
+	FrameworkName string `json:"frameworkName"`
+}
+
+type SecurityIssueAttackPath struct {
+	SecurityIssue `json:",inline"`
+	AttackChainID string `json:"attackChainID"`
 }
