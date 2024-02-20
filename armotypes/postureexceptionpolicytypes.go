@@ -24,7 +24,7 @@ type PostureExceptionPolicy struct {
 	Resources       []identifiers.PortalDesignator  `json:"resources" bson:"resources,omitempty"`
 	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
 	Reason          *string                         `json:"reason,omitempty" bson:"reason,omitempty"`
-	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
+	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate"`
 	CreatedBy       string                          `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
 
