@@ -88,15 +88,17 @@ func (sr *SecurityRisk) GetRiskTypes() []RiskType {
 }
 
 type SecurityIssuesSummary struct {
-	SecurityRiskID          string `json:"securityRiskID"`
-	SecurityRiskName        string `json:"securityRiskName"`
-	Category                string `json:"category"`
-	Severity                string `json:"severity"`
-	LastUpdated             string `json:"lastUpdated"`
-	AffectedClustersCount   int    `json:"affectedClustersCount"`
-	AffectedNamespacesCount int    `json:"affectedNamespacesCount"`
-	AffectedResourcesCount  int    `json:"affectedResourcesCount"`
-	AffectedResourcesChange int    `json:"affectedResourcesChange"`
+	SecurityRiskID                   string `json:"securityRiskID"`
+	SecurityRiskName                 string `json:"securityRiskName"`
+	Category                         string `json:"category"`
+	Severity                         string `json:"severity"`
+	LastUpdated                      string `json:"lastUpdated"`
+	AffectedClustersCount            int    `json:"affectedClustersCount"`
+	AffectedNamespacesCount          int    `json:"affectedNamespacesCount"`
+	AffectedResourcesCount           int    `json:"affectedResourcesCount"`
+	ResourcesDetectedLastUpdateCount int    `json:"resourcesDetectedLastUpdateCount"`
+	ResourcesResolvedLastUpdateCount int    `json:"resourcesResolvedLastUpdateCount"`
+	AffectedResourcesChange          int    `json:"affectedResourcesChange"`
 }
 
 type SecurityIssuesCategories struct {
