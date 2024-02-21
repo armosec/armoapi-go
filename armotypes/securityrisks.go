@@ -88,16 +88,17 @@ func (sr *SecurityRisk) GetRiskTypes() []RiskType {
 }
 
 type SecurityIssuesSummary struct {
-	CustomerGUID            string `json:"customerGUID"`
-	SecurityRiskID          string `json:"securityRiskID"`
-	SecurityRiskName        string `json:"securityRiskName"`
-	Category                string `json:"category"`
-	Severity                string `json:"severity"`
-	LastUpdated             string `json:"lastUpdated"`
-	AffectedClustersCount   int    `json:"affectedClustersCount"`
-	AffectedNamespacesCount int    `json:"affectedNamespacesCount"`
-	AffectedResourcesCount  int    `json:"affectedResourcesCount"`
-	AffectedResourcesChange int    `json:"affectedResourcesChange"`
+	SecurityRiskID                   string `json:"securityRiskID"`
+	SecurityRiskName                 string `json:"securityRiskName"`
+	Category                         string `json:"category"`
+	Severity                         string `json:"severity"`
+	LastUpdated                      string `json:"lastUpdated"`
+	AffectedClustersCount            int    `json:"affectedClustersCount"`
+	AffectedNamespacesCount          int    `json:"affectedNamespacesCount"`
+	AffectedResourcesCount           int    `json:"affectedResourcesCount"`
+	ResourcesDetectedLastUpdateCount int    `json:"resourcesDetectedLastUpdateCount"`
+	ResourcesResolvedLastUpdateCount int    `json:"resourcesResolvedLastUpdateCount"`
+	AffectedResourcesChange          int    `json:"affectedResourcesChange"`
 }
 
 type SecurityIssuesCategories struct {
@@ -147,6 +148,7 @@ type SecurityIssue struct {
 	Cluster         string   `json:"cluster"`
 	Namespace       string   `json:"namespace"`
 	ResourceName    string   `json:"resourceName"`
+	Kind            string   `json:"kind"`
 	ResourceID      string   `json:"resourceID"`
 	K8sResourceHash string   `json:"k8sResourceHash"`
 	RiskID          string   `json:"riskID"` // controlID/attackTrackID
