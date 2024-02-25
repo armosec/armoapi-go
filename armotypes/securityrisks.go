@@ -98,6 +98,8 @@ type SecurityIssuesSummary struct {
 	AffectedResourcesCount           int    `json:"affectedResourcesCount"`
 	ResourcesDetectedLastUpdateCount int    `json:"resourcesDetectedLastUpdateCount"`
 	ResourcesResolvedLastUpdateCount int    `json:"resourcesResolvedLastUpdateCount"`
+	ResourcesDetectedLastChangeCount int    `json:"resourcesDetectedLastChangeCount"`
+	ResourcesResolvedLastChangeCount int    `json:"resourcesResolvedLastChangeCount"`
 	AffectedResourcesChange          int    `json:"affectedResourcesChange"`
 }
 
