@@ -91,6 +91,7 @@ type SecurityIssueResource struct {
 	Cluster   string `json:"cluster"`
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
+	Kind      string `json:"kind"`
 }
 
 type SecurityIssuesSummary struct {
