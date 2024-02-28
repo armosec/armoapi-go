@@ -87,20 +87,28 @@ func (sr *SecurityRisk) GetRiskTypes() []RiskType {
 
 }
 
+type SecurityIssueResource struct {
+	Cluster   string `json:"cluster"`
+	Namespace string `json:"namespace"`
+	Name      string `json:"name"`
+}
+
 type SecurityIssuesSummary struct {
-	SecurityRiskID                   string `json:"securityRiskID"`
-	SecurityRiskName                 string `json:"securityRiskName"`
-	Category                         string `json:"category"`
-	Severity                         string `json:"severity"`
-	LastUpdated                      string `json:"lastUpdated"`
-	AffectedClustersCount            int    `json:"affectedClustersCount"`
-	AffectedNamespacesCount          int    `json:"affectedNamespacesCount"`
-	AffectedResourcesCount           int    `json:"affectedResourcesCount"`
-	ResourcesDetectedLastUpdateCount int    `json:"resourcesDetectedLastUpdateCount"`
-	ResourcesResolvedLastUpdateCount int    `json:"resourcesResolvedLastUpdateCount"`
-	ResourcesDetectedLastChangeCount int    `json:"resourcesDetectedLastChangeCount"`
-	ResourcesResolvedLastChangeCount int    `json:"resourcesResolvedLastChangeCount"`
-	AffectedResourcesChange          int    `json:"affectedResourcesChange"`
+	SecurityRiskID                   string                  `json:"securityRiskID"`
+	SecurityRiskName                 string                  `json:"securityRiskName"`
+	Category                         string                  `json:"category"`
+	Severity                         string                  `json:"severity"`
+	LastUpdated                      string                  `json:"lastUpdated"`
+	AffectedClustersCount            int                     `json:"affectedClustersCount"`
+	AffectedNamespacesCount          int                     `json:"affectedNamespacesCount"`
+	AffectedResourcesCount           int                     `json:"affectedResourcesCount"`
+	ResourcesDetectedLastUpdateCount int                     `json:"resourcesDetectedLastUpdateCount"`
+	ResourcesResolvedLastUpdateCount int                     `json:"resourcesResolvedLastUpdateCount"`
+	ResourcesDetectedLastChangeCount int                     `json:"resourcesDetectedLastChangeCount"`
+	ResourcesResolvedLastChangeCount int                     `json:"resourcesResolvedLastChangeCount"`
+	AffectedResourcesChange          int                     `json:"affectedResourcesChange"`
+	ResourcesDetectedLastChange      []SecurityIssueResource `json:"resourcesDetectedLastChange"`
+	ResourcesResolvedLastChange      []SecurityIssueResource `json:"resourcesResolvedLastChange"`
 }
 
 type SecurityIssuesCategories struct {
