@@ -20,6 +20,8 @@ const (
 	SecurityIssueSeverityHigh     SecurityIssueSeverity = "High"
 	SecurityIssueSeverityMedium   SecurityIssueSeverity = "Medium"
 	SecurityIssueSeverityLow      SecurityIssueSeverity = "Low"
+
+	SecurityRiskExceptionPolicyType PolicyType = "securityRiskExceptionPolicy"
 )
 
 // Risk represents an individual risk with an ID and type
@@ -185,4 +187,8 @@ type SecurityIssueControl struct {
 type SecurityIssueAttackPath struct {
 	SecurityIssue `json:",inline"`
 	AttackChainID string `json:"attackChainID"`
+}
+
+type SecurityRiskExceptionPolicy struct {
+	BaseExceptionPolicy `json:",inline"`
 }
