@@ -102,14 +102,6 @@ func (v *Version) populate() error {
 func (v *Version) Compare(pkgType pkg.Type, other *Version) (int, error) {
 	var compRes int
 	var err error
-	/*
-		semVer        *semanticVersion
-		apkVer        *apkVersion
-		golangVersion *golangVersion
-		mavenVer      *mavenVersion
-		kbVer         *kbVersion
-		portVer       *portageVersion
-	*/
 	switch pkgType {
 	case pkg.ApkPkg:
 		compRes, err = v.rich.apkVer.Compare(other)
@@ -121,13 +113,14 @@ func (v *Version) Compare(pkgType pkg.Type, other *Version) (int, error) {
 		compRes, err = v.rich.rpmVer.Compare(other)
 	case pkg.PythonPkg:
 		compRes, err = v.rich.pep440version.Compare(other)
-	//TODO : add the others
-	//case pkg.:
-	//	compRes, err = v.rich.semVer.Compare(other)
-	//case :
-	//	compRes, err = v.rich.kbVer.Compare(other)
-	//case :
-	//	compRes, err = v.rich.portVer.Compare(other)
+	case pkg.GoModulePkg:
+		compRes, err = v.rich.golangVersion.Compare(other)
+	case pkg.KbPkg:
+		compRes, err = v.rich.kbVer.Compare(other)
+	case pkg.PortagePkg:
+		compRes, err = v.rich.portVer.Compare(other)
+	case pkg.GemPkg:
+		compRes, err = v.rich.semVer.Compare(other)
 	default:
 		return -1, fmt.Errorf("unsupported package type: %v", pkgType)
 	}
