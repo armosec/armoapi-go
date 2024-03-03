@@ -5,7 +5,6 @@ import (
 	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/pkg"
 
-	//TODO : check whether to fork
 	"github.com/anchore/grype/grype/version"
 	"sort"
 )
