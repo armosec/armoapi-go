@@ -2,8 +2,6 @@ module github.com/armosec/armoapi-go
 
 go 1.21
 
-toolchain go1.21.3
-
 require (
 	github.com/armosec/gojay v1.2.15
 	github.com/armosec/utils-go v0.0.57

@@ -15,6 +15,7 @@ const (
 	V2ListExistsOperator   string = "exists"
 	V2ListEqualOperator    string = "equal"
 	V2ListMissingOperator  string = "missing"
+	V2ListEmptyOperator    string = "empty"
 	V2ListMatchOperator    string = "match"
 	V2ListGreaterOperator  string = "greater"
 	V2ListLowerOperator    string = "lower"

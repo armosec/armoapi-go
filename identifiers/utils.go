@@ -18,3 +18,9 @@ func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersio
 	return CalcHashFNV(strLower)
 
 }
+
+func CalcSecurityRiskExceptionHash(customerGUID, securityRiskID string) string {
+	strLower := strings.ToLower(fmt.Sprintf("%s/%s", customerGUID, securityRiskID))
+	return CalcHashFNV(strLower)
+
+}

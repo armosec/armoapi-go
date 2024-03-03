@@ -90,10 +90,12 @@ func (sr *SecurityRisk) GetRiskTypes() []RiskType {
 }
 
 type SecurityIssueResource struct {
-	Cluster   string `json:"cluster"`
-	Namespace string `json:"namespace"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
+	Cluster          string `json:"cluster"`
+	ClusterShortName string `json:"clusterShortName"`
+	Namespace        string `json:"namespace"`
+	Name             string `json:"name"`
+	Kind             string `json:"kind"`
+	K8sResourceHash  string `json:"k8sResourceHash"`
 }
 
 type SecurityIssuesSummary struct {
@@ -191,4 +193,7 @@ type SecurityIssueAttackPath struct {
 
 type SecurityRiskExceptionPolicy struct {
 	BaseExceptionPolicy `json:",inline"`
+	Name                string `json:"name"`
+	Category            string `json:"category"`
+	Severity            string `json:"severity"`
 }
