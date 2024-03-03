@@ -89,31 +89,22 @@ func (sr *SecurityRisk) GetRiskTypes() []RiskType {
 
 }
 
-type SecurityIssueResource struct {
-	Cluster          string `json:"cluster"`
-	ClusterShortName string `json:"clusterShortName"`
-	Namespace        string `json:"namespace"`
-	Name             string `json:"name"`
-	Kind             string `json:"kind"`
-	K8sResourceHash  string `json:"k8sResourceHash"`
-}
-
 type SecurityIssuesSummary struct {
-	SecurityRiskID                   string                  `json:"securityRiskID"`
-	SecurityRiskName                 string                  `json:"securityRiskName"`
-	Category                         string                  `json:"category"`
-	Severity                         string                  `json:"severity"`
-	LastUpdated                      string                  `json:"lastUpdated"`
-	AffectedClustersCount            int                     `json:"affectedClustersCount"`
-	AffectedNamespacesCount          int                     `json:"affectedNamespacesCount"`
-	AffectedResourcesCount           int                     `json:"affectedResourcesCount"`
-	ResourcesDetectedLastUpdateCount int                     `json:"resourcesDetectedLastUpdateCount"`
-	ResourcesResolvedLastUpdateCount int                     `json:"resourcesResolvedLastUpdateCount"`
-	ResourcesDetectedLastChangeCount int                     `json:"resourcesDetectedLastChangeCount"`
-	ResourcesResolvedLastChangeCount int                     `json:"resourcesResolvedLastChangeCount"`
-	AffectedResourcesChange          int                     `json:"affectedResourcesChange"`
-	ResourcesDetectedLastChange      []SecurityIssueResource `json:"resourcesDetectedLastChange"`
-	ResourcesResolvedLastChange      []SecurityIssueResource `json:"resourcesResolvedLastChange"`
+	SecurityRiskID                   string     `json:"securityRiskID"`
+	SecurityRiskName                 string     `json:"securityRiskName"`
+	Category                         string     `json:"category"`
+	Severity                         string     `json:"severity"`
+	LastUpdated                      string     `json:"lastUpdated"`
+	AffectedClustersCount            int        `json:"affectedClustersCount"`
+	AffectedNamespacesCount          int        `json:"affectedNamespacesCount"`
+	AffectedResourcesCount           int        `json:"affectedResourcesCount"`
+	ResourcesDetectedLastUpdateCount int        `json:"resourcesDetectedLastUpdateCount"`
+	ResourcesResolvedLastUpdateCount int        `json:"resourcesResolvedLastUpdateCount"`
+	ResourcesDetectedLastChangeCount int        `json:"resourcesDetectedLastChangeCount"`
+	ResourcesResolvedLastChangeCount int        `json:"resourcesResolvedLastChangeCount"`
+	AffectedResourcesChange          int        `json:"affectedResourcesChange"`
+	ResourcesDetectedLastChange      []Resource `json:"resourcesDetectedLastChange"`
+	ResourcesResolvedLastChange      []Resource `json:"resourcesResolvedLastChange"`
 }
 
 type SecurityIssuesCategories struct {
