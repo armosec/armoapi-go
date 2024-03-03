@@ -1,4 +1,4 @@
-package version
+package packages_versions
 
 import (
 	"github.com/anchore/grype/grype/version"

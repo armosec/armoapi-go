@@ -1,4 +1,4 @@
-package version
+package packages_versions
 
 import (
 	"fmt"

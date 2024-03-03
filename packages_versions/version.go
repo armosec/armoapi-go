@@ -1,8 +1,8 @@
-package version
+package packages_versions
 
 import (
 	"fmt"
-	"github.com/anchore/syft/syft/cpe"
+	cpe "github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/pkg"
 
 	"github.com/anchore/grype/grype/version"
@@ -29,17 +29,17 @@ type rich struct {
 }
 
 func NewVersion(raw string, format version.Format) (*Version, error) {
-	version := &Version{
+	ver := &Version{
 		Raw:    raw,
 		Format: format,
 	}
 
-	err := version.populate()
+	err := ver.populate()
 	if err != nil {
 		return nil, err
 	}
 
-	return version, nil
+	return ver, nil
 }
 
 func NewVersionFromPkgType(versionStr, pkgTypeStr string) (*Version, error) {
@@ -102,7 +102,14 @@ func (v *Version) populate() error {
 func (v *Version) Compare(pkgType pkg.Type, other *Version) (int, error) {
 	var compRes int
 	var err error
-
+	/*
+		semVer        *semanticVersion
+		apkVer        *apkVersion
+		golangVersion *golangVersion
+		mavenVer      *mavenVersion
+		kbVer         *kbVersion
+		portVer       *portageVersion
+	*/
 	switch pkgType {
 	case pkg.ApkPkg:
 		compRes, err = v.rich.apkVer.Compare(other)
@@ -115,7 +122,12 @@ func (v *Version) Compare(pkgType pkg.Type, other *Version) (int, error) {
 	case pkg.PythonPkg:
 		compRes, err = v.rich.pep440version.Compare(other)
 	//TODO : add the others
-
+	//case pkg.:
+	//	compRes, err = v.rich.semVer.Compare(other)
+	//case :
+	//	compRes, err = v.rich.kbVer.Compare(other)
+	//case :
+	//	compRes, err = v.rich.portVer.Compare(other)
 	default:
 		return -1, fmt.Errorf("unsupported package type: %v", pkgType)
 	}

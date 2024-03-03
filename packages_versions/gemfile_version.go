@@ -1,6 +1,7 @@
-package version
+package packages_versions
 
 import (
+	"Armo/armoapi-go/vulnerabilities/version"
 	"strings"
 )
 
@@ -33,7 +34,7 @@ func extractSemVer(raw string) string {
 	return raw
 }
 
-func newGemfileVersion(raw string) (*semanticVersion, error) {
+func newGemfileVersion(raw string) (*version.semanticVersion, error) {
 	cleaned := extractSemVer(raw)
-	return newSemanticVersion(cleaned)
+	return version.newSemanticVersion(cleaned)
 }

@@ -1,4 +1,4 @@
-package version
+package packages_versions
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	hashiVer "github.com/anchore/go-version"
+	hashiVer "github.com/hashicorp/go-version"
 )
 
 func TestNewGolangVersion(t *testing.T) {

@@ -1,11 +1,11 @@
-package version
+package packages_versions
 
 import (
 	"fmt"
 	"github.com/anchore/grype/grype/version"
 	"strings"
 
-	hashiVer "github.com/anchore/go-version"
+	hashiVer "github.com/hashicorp/go-version"
 )
 
 var normalizer = strings.NewReplacer(".alpha", "-alpha", ".beta", "-beta", ".rc", "-rc")

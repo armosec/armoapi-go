@@ -1,4 +1,4 @@
-package version
+package packages_versions
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/anchore/grype/grype/version"
 
-	hashiVer "github.com/anchore/go-version"
+	hashiVer "github.com/hashicorp/go-version"
 )
 
 type golangVersion struct {
