@@ -20,6 +20,8 @@ const (
 	SecurityIssueSeverityHigh     SecurityIssueSeverity = "High"
 	SecurityIssueSeverityMedium   SecurityIssueSeverity = "Medium"
 	SecurityIssueSeverityLow      SecurityIssueSeverity = "Low"
+
+	SecurityRiskExceptionPolicyType PolicyType = "securityRiskExceptionPolicy"
 )
 
 // Risk represents an individual risk with an ID and type
@@ -87,29 +89,22 @@ func (sr *SecurityRisk) GetRiskTypes() []RiskType {
 
 }
 
-type SecurityIssueResource struct {
-	Cluster   string `json:"cluster"`
-	Namespace string `json:"namespace"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-}
-
 type SecurityIssuesSummary struct {
-	SecurityRiskID                   string                  `json:"securityRiskID"`
-	SecurityRiskName                 string                  `json:"securityRiskName"`
-	Category                         string                  `json:"category"`
-	Severity                         string                  `json:"severity"`
-	LastUpdated                      string                  `json:"lastUpdated"`
-	AffectedClustersCount            int                     `json:"affectedClustersCount"`
-	AffectedNamespacesCount          int                     `json:"affectedNamespacesCount"`
-	AffectedResourcesCount           int                     `json:"affectedResourcesCount"`
-	ResourcesDetectedLastUpdateCount int                     `json:"resourcesDetectedLastUpdateCount"`
-	ResourcesResolvedLastUpdateCount int                     `json:"resourcesResolvedLastUpdateCount"`
-	ResourcesDetectedLastChangeCount int                     `json:"resourcesDetectedLastChangeCount"`
-	ResourcesResolvedLastChangeCount int                     `json:"resourcesResolvedLastChangeCount"`
-	AffectedResourcesChange          int                     `json:"affectedResourcesChange"`
-	ResourcesDetectedLastChange      []SecurityIssueResource `json:"resourcesDetectedLastChange"`
-	ResourcesResolvedLastChange      []SecurityIssueResource `json:"resourcesResolvedLastChange"`
+	SecurityRiskID                   string     `json:"securityRiskID"`
+	SecurityRiskName                 string     `json:"securityRiskName"`
+	Category                         string     `json:"category"`
+	Severity                         string     `json:"severity"`
+	LastUpdated                      string     `json:"lastUpdated"`
+	AffectedClustersCount            int        `json:"affectedClustersCount"`
+	AffectedNamespacesCount          int        `json:"affectedNamespacesCount"`
+	AffectedResourcesCount           int        `json:"affectedResourcesCount"`
+	ResourcesDetectedLastUpdateCount int        `json:"resourcesDetectedLastUpdateCount"`
+	ResourcesResolvedLastUpdateCount int        `json:"resourcesResolvedLastUpdateCount"`
+	ResourcesDetectedLastChangeCount int        `json:"resourcesDetectedLastChangeCount"`
+	ResourcesResolvedLastChangeCount int        `json:"resourcesResolvedLastChangeCount"`
+	AffectedResourcesChange          int        `json:"affectedResourcesChange"`
+	ResourcesDetectedLastChange      []Resource `json:"resourcesDetectedLastChange"`
+	ResourcesResolvedLastChange      []Resource `json:"resourcesResolvedLastChange"`
 }
 
 type SecurityIssuesCategories struct {
@@ -185,4 +180,11 @@ type SecurityIssueControl struct {
 type SecurityIssueAttackPath struct {
 	SecurityIssue `json:",inline"`
 	AttackChainID string `json:"attackChainID"`
+}
+
+type SecurityRiskExceptionPolicy struct {
+	BaseExceptionPolicy `json:",inline"`
+	Name                string `json:"name"`
+	Category            string `json:"category"`
+	Severity            string `json:"severity"`
 }

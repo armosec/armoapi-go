@@ -33,3 +33,12 @@ type KubernetesObject struct {
 	// used for network policies
 	PodSelectorLabels map[string]string `json:"podSelectorLabels"`
 }
+
+type Resource struct {
+	K8sResourceHash  string `json:"k8sResourceHash,omitempty" bson:"k8sResourceHash,omitempty"`
+	Cluster          string `json:"cluster,omitempty" bson:"cluster,omitempty"`
+	ClusterShortName string `json:"clusterShortName"`
+	Namespace        string `json:"namespace,omitempty" bson:"namespace,omitempty"`
+	Kind             string `json:"kind,omitempty" bson:"kind,omitempty"`
+	Name             string `json:"name,omitempty" bson:"name,omitempty"`
+}
