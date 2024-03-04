@@ -24,7 +24,7 @@ func newRpmVersion(raw string) (rpmVersion, error) {
 	}
 
 	fields := strings.SplitN(remainingVersion, "-", 2)
-	version := fields[0]
+	vers := fields[0]
 
 	var release string
 	if len(fields) > 1 {
@@ -34,7 +34,7 @@ func newRpmVersion(raw string) (rpmVersion, error) {
 
 	return rpmVersion{
 		epoch:   epoch,
-		version: version,
+		version: vers,
 		release: release,
 	}, nil
 }
