@@ -168,6 +168,8 @@ type SecurityIssue struct {
 
 	LastTimeDetected string `json:"lastTimeDetected,omitempty"`
 	LastTimeResolved string `json:"lastTimeResolved,omitempty"`
+
+	ExceptionApplied bool `json:"exceptionApplied"`
 }
 
 type SecurityIssueControl struct {
