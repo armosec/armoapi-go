@@ -2,7 +2,6 @@ package packages_versions
 
 import (
 	"fmt"
-	cpe "github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/pkg"
 
 	"github.com/anchore/grype/grype/version"
@@ -16,7 +15,6 @@ type Version struct {
 }
 
 type rich struct {
-	cpeVers       []cpe.CPE
 	semVer        *semanticVersion
 	apkVer        *apkVersion
 	debVer        *debVersion
