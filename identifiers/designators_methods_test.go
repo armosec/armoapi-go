@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var attribute = map[string]string{AttributeCluster: "cluster1", AttributeNamespace: "namespace1", AttributeKind: "kind1", AttributeName: "name1", AttributePath: "path1", AttributeResourceID: "resourceID1"}
+var attribute = map[string]string{AttributeCluster: "cluster1", AttributeNamespace: "namespace1", AttributeKind: "kind1", AttributeName: "name1", AttributePath: "path1", AttributeResourceID: "resourceID1", AttributeK8sResourceHash: "12345"}
 var portalDesignator = PortalDesignator{DesignatorType: DesignatorAttribute, Attributes: attribute}
 
 func TestGetCluster(t *testing.T) {
@@ -46,6 +46,12 @@ func TestGetResourceID(t *testing.T) {
 	er := attribute[AttributeResourceID]
 	path := portalDesignator.GetResourceID()
 	assert.Equal(t, er, path)
+}
+
+func TestGetK8sResourceHash(t *testing.T) {
+	er := attribute[AttributeK8sResourceHash]
+	id := portalDesignator.GetK8sResourceHash()
+	assert.Equal(t, er, id)
 }
 
 func TestAttributesDesignatorsFromWLID(t *testing.T) {

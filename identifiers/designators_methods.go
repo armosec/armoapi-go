@@ -40,6 +40,12 @@ func (designator *PortalDesignator) GetResourceID() string {
 	return attributes.resourceID
 }
 
+func (designator *PortalDesignator) GetK8sResourceHash() string {
+	attributes := designator.DigestPortalDesignator()
+	return attributes.k8sResourceHash
+
+}
+
 // DigestPortalDesignator - get cluster namespace and labels from designator
 func (designator *PortalDesignator) DigestPortalDesignator() AttributesDesignators {
 	switch designator.DesignatorType {
@@ -85,6 +91,8 @@ func (designator *PortalDesignator) DigestAttributesDesignator() AttributesDesig
 			attributes.path = v
 		case AttributeResourceID:
 			attributes.resourceID = v
+		case AttributeK8sResourceHash:
+			attributes.k8sResourceHash = v
 		default:
 			attributes.labels[k] = v
 		}
