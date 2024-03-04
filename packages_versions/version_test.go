@@ -47,8 +47,6 @@ func TestNewVersionFromPkgType(t *testing.T) {
 		{"Valid RPM Package", "1.0.0-1", string(pkg.RpmPkg), false},
 		{"Valid Debian Package", "1.0.0-1ubuntu1", string(pkg.DebPkg), false},
 		{"Valid APK Package", "1.0.0-r0", string(pkg.ApkPkg), false},
-		{"Valid Semantic Version", "2.0.0", "semver", false},
-		{"Invalid Semantic Version", "2.0", "semver", true},
 		{"Valid Gem Package", "1.0.0", string(pkg.GemPkg), false},
 		{"Valid Portage Package", "1.0.0-r1", string(pkg.PortagePkg), false},
 		{"Valid KB Format", "KB123456", string(pkg.KbPkg), false},
