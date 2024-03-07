@@ -83,7 +83,7 @@ func TestSortVersions(t *testing.T) {
 			name:        "one version",
 			pkgType:     "java-archive",
 			versionStrs: []string{"1.0.1"},
-			want:        []string{"1.0.0"},
+			want:        []string{"1.0.1"},
 			wantError:   false,
 		},
 		{
