@@ -80,6 +80,13 @@ func TestSortVersions(t *testing.T) {
 			wantError:   false,
 		},
 		{
+			name:        "one version",
+			pkgType:     "java-archive",
+			versionStrs: []string{"1.0.1"},
+			want:        []string{"1.0.1"},
+			wantError:   false,
+		},
+		{
 			name:        "Sort Semantic Versions",
 			pkgType:     "java-archive",
 			versionStrs: []string{"1.0.1", "1.0.0", "1.10.0"},
