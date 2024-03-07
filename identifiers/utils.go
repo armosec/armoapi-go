@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"hash/fnv"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 // CalcHashFNV calculates the hash (FNV) of the string
@@ -19,8 +21,11 @@ func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersio
 
 }
 
-func CalcSecurityRiskExceptionHash(customerGUID, securityRiskID string) string {
-	strLower := strings.ToLower(fmt.Sprintf("%s/%s", customerGUID, securityRiskID))
-	return CalcHashFNV(strLower)
+func GenerateExceptionUID() (string, error) {
+	newUUID, err := uuid.NewUUID()
+	if err != nil {
+		return "", err
+	}
 
+	return newUUID.String(), nil
 }

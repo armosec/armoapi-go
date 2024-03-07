@@ -135,13 +135,14 @@ var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
 
 // AttributeDesignators describe a kubernetes object, with its labels.
 type AttributesDesignators struct {
-	cluster    string
-	namespace  string
-	kind       string
-	name       string
-	path       string
-	labels     map[string]string
-	resourceID string
+	cluster         string
+	namespace       string
+	kind            string
+	name            string
+	path            string
+	labels          map[string]string
+	resourceID      string
+	k8sResourceHash string
 }
 
 func CalcResourceHash(customerGUID string, identifiers map[string]string) string {
