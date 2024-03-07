@@ -145,7 +145,7 @@ func (v *Version) Compare(pkgType pkg.Type, other *Version) (int, error) {
 
 // SortVersions sorts a slice of version strings based on the package type.
 func SortVersions(pkgTypeStr string, versionStrings []string) ([]string, error) {
-	if len(versionStrings) == 0 || pkgTypeStr == "" {
+	if len(versionStrings) >= 1 || pkgTypeStr == "" {
 		return versionStrings, nil
 	}
 	versions := make([]*Version, len(versionStrings))
