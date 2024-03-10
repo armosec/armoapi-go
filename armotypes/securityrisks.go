@@ -154,6 +154,7 @@ type ISecurityIssue interface {
 }
 
 type SecurityIssue struct {
+	ISecurityIssue   `json:",inline,omitempty"`
 	Cluster          string   `json:"cluster"`
 	ClusterShortName string   `json:"clusterShortName"`
 	Namespace        string   `json:"namespace"`
