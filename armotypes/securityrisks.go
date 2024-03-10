@@ -177,19 +177,19 @@ type SecurityIssue struct {
 	ExceptionApplied bool `json:"exceptionApplied"`
 }
 
-func (si *SecurityIssue) GetClusterName() string {
+func (si SecurityIssue) GetClusterName() string {
 	return si.Cluster
 }
 
-func (si *SecurityIssue) GetShortClusterName() string {
+func (si SecurityIssue) GetShortClusterName() string {
 	return si.ClusterShortName
 }
 
-func (si *SecurityIssue) SetClusterName(clusterName string) {
+func (si SecurityIssue) SetClusterName(clusterName string) {
 	si.Cluster = clusterName
 }
 
-func (si *SecurityIssue) SetShortClusterName(clusterShortName string) {
+func (si SecurityIssue) SetShortClusterName(clusterShortName string) {
 	si.ClusterShortName = clusterShortName
 }
 
