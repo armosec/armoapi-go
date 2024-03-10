@@ -43,12 +43,20 @@ type AttackChainConfig struct {
 }
 
 type AttackChainNode struct {
-	Name             string                         `json:"name" bson:"name,omitempty"`
-	Description      string                         `json:"description" bson:"description,omitempty"`
-	ControlIDs       []string                       `json:"controlIDs,omitempty" bson:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
-	Vulnerabilities  []Vulnerabilities              `json:"vulnerabilities,omitempty" bson:"vulnerabilities,omitempty"`
-	RelatedResources []identifiers.PortalDesignator `json:"relatedResources" bson:"relatedResources,omitempty"`
-	NextNodes        []AttackChainNode              `json:"nextNodes,omitempty" bson:"nextNodes,omitempty"`
+	Name                           string             `json:"name" bson:"name,omitempty"`
+	Description                    string             `json:"description" bson:"description,omitempty"`
+	ControlIDs                     []string           `json:"controlIDs,omitempty" bson:"controlIDs,omitempty"` // failed/ignored controls that are associated to this attack chain node
+	Vulnerabilities                []Vulnerabilities  `json:"vulnerabilities,omitempty" bson:"vulnerabilities,omitempty"`
+	RelatedResources               []RelatedResources `json:"relatedResources" bson:"relatedResources,omitempty"`
+	NextNodes                      []AttackChainNode  `json:"nextNodes,omitempty" bson:"nextNodes,omitempty"`
+	FlattenRelatedResourcesDisplay bool               `json:"flattenRelatedResourcesDisplay,omitempty" bson:"flattenRelatedResourcesDisplay,omitempty"`
+}
+
+type RelatedResources struct {
+	identifiers.PortalDesignator `json:",inline" bson:",inline"`
+	Clickable                    bool               `json:"clickable,omitempty" bson:"clickable,omitempty"`
+	EdgeText                     []string           `json:"edgeText,omitempty" bson:"edgeText,omitempty"`
+	RelatedResources             []RelatedResources `json:"relatedResources" bson:"relatedResources,omitempty"`
 }
 
 type Vulnerabilities struct {
