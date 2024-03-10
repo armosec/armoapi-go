@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/anchore/grype v0.74.2
-	github.com/anchore/syft v0.101.1
+	github.com/anchore/syft v0.98.0
 	github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46
 	github.com/armosec/gojay v1.2.15
 	github.com/armosec/utils-go v0.0.57
