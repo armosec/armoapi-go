@@ -1,18 +1,20 @@
 module github.com/armosec/armoapi-go
 
-go 1.21
+go 1.21.1
+
+toolchain go1.21.6
 
 require (
-	github.com/anchore/grype v0.74.2
+	github.com/anchore/grype v0.73.4
 	github.com/anchore/syft v0.98.0
 	github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46
 	github.com/armosec/gojay v1.2.15
 	github.com/armosec/utils-go v0.0.57
 	github.com/armosec/utils-k8s-go v0.0.26
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/docker/docker v25.0.3+incompatible
+	github.com/docker/docker v25.0.1+incompatible
 	github.com/francoispqt/gojay v1.2.13
-	github.com/google/uuid v1.6.0
+	github.com/google/uuid v1.5.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d
@@ -204,6 +206,6 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect
 )
 
-replace github.com/anchore/syft => github.com/anchore/syft v0.98.0
+replace github.com/anchore/stereoscope => github.com/matthyx/stereoscope v0.0.0-20240227133833-a9e97778940b
 
-replace github.com/anchore/grype => github.com/anchore/grype v0.74.2
+replace github.com/google/go-containerregistry => github.com/matthyx/go-containerregistry v0.0.0-20240227132928-63ceb71ae0b9
