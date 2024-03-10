@@ -207,8 +207,4 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect
 )
 
-replace github.com/anchore/stereoscope => github.com/matthyx/stereoscope v0.0.0-20240227133833-a9e97778940b
-
-replace github.com/google/go-containerregistry => github.com/matthyx/go-containerregistry v0.0.0-20240227132928-63ceb71ae0b9
-
 replace github.com/anchore/packageurl-go => github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501
