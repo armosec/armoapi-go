@@ -2,8 +2,6 @@ module github.com/armosec/armoapi-go
 
 go 1.21.1
 
-toolchain go1.21.6
-
 require (
 	github.com/anchore/grype v0.74.2
 	github.com/anchore/syft v0.101.1
