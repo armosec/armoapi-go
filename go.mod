@@ -207,3 +207,5 @@ require (
 )
 
 replace github.com/anchore/syft => github.com/anchore/syft v0.98.0
+
+replace github.com/anchore/grype => github.com/anchore/grype v0.74.2
