@@ -56,7 +56,7 @@ type RelatedResource struct {
 	identifiers.PortalDesignator `json:",inline" bson:",inline"`
 	Clickable                    bool              `json:"clickable,omitempty" bson:"clickable,omitempty"`
 	EdgeText                     []string          `json:"edgeText,omitempty" bson:"edgeText,omitempty"`
-	RelatedResources             []RelatedResource `json:"relatedResources" bson:"relatedResources,omitempty"`
+	RelatedResources             []RelatedResource `json:"relatedResources,omitempty" bson:"relatedResources,omitempty"`
 }
 
 type Vulnerabilities struct {
