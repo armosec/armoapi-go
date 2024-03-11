@@ -147,6 +147,10 @@ func NewSecurityIssuesSeverities() SecurityIssuesSeverities {
 }
 
 type ISecurityIssue interface {
+	GetClusterName() string
+	GetShortClusterName() string
+	SetClusterName(string)
+	SetShortClusterName(string)
 }
 
 type SecurityIssue struct {
@@ -171,6 +175,22 @@ type SecurityIssue struct {
 	LastTimeResolved string `json:"lastTimeResolved,omitempty"`
 
 	ExceptionApplied bool `json:"exceptionApplied"`
+}
+
+func (si *SecurityIssue) GetClusterName() string {
+	return si.Cluster
+}
+
+func (si *SecurityIssue) GetShortClusterName() string {
+	return si.ClusterShortName
+}
+
+func (si *SecurityIssue) SetClusterName(clusterName string) {
+	si.Cluster = clusterName
+}
+
+func (si *SecurityIssue) SetShortClusterName(clusterShortName string) {
+	si.ClusterShortName = clusterShortName
 }
 
 type SecurityIssueControl struct {
