@@ -5,6 +5,8 @@ import "time"
 type PodStatus struct {
 	CustomerGUID        string    `json:"customerGUID"`
 	Cluster             string    `json:"cluster"`
+	ResourceHash        string    `json:"resourceHash"`
+	ResourceVersion     string    `json:"resourceVersion"`
 	Name                string    `json:"name"`
 	Namespace           string    `json:"namespace"`
 	NodeName            string    `json:"nodeName"`
