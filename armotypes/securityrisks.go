@@ -105,6 +105,9 @@ type SecurityIssuesSummary struct {
 	AffectedResourcesChange          int        `json:"affectedResourcesChange"`
 	ResourcesDetectedLastChange      []Resource `json:"resourcesDetectedLastChange"`
 	ResourcesResolvedLastChange      []Resource `json:"resourcesResolvedLastChange"`
+
+	// resources that are resolved because of a kubernetes resource deletion
+	ResourcesDeletedLastChange []Resource `json:"resourcesDeletedLastChange"`
 }
 
 type SecurityIssuesCategories struct {
@@ -203,6 +206,7 @@ type SecurityIssueControl struct {
 type SecurityIssueAttackPath struct {
 	SecurityIssue `json:",inline"`
 	AttackChainID string `json:"attackChainID"`
+	FirstSeen     string `json:"firstSeen"`
 }
 
 type SecurityRiskExceptionPolicy struct {
