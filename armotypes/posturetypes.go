@@ -207,6 +207,7 @@ type PostureControlSummary struct {
 	HighlightPathsCount            int64                        `json:"highlightPathsCount"`
 	ClusterShortName               string                       `json:"clusterShortName"`
 	SupportsSmartRemediation       bool                         `json:"supportsSmartRemediation"`
+	FixByNetworkPolicy             bool                         `json:"fixByNetworkPolicy"`
 }
 
 //---------/api/v1/posture/resources
