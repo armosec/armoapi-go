@@ -98,13 +98,17 @@ type EnrichedScope struct {
 type NotificationType string
 
 const (
-	NotificationTypeWeekly              NotificationType = "weekly"            //weekly report
-	NotificationTypePush                NotificationType = "push"              //posture scan
-	NotificationTypeContainerPush       NotificationType = "containerScanPush" //container scan
+	NotificationTypeWeekly           NotificationType = "weekly"            //weekly report
+	NotificationTypePush             NotificationType = "push"              //posture scan
+	NotificationTypeContainerPush    NotificationType = "containerScanPush" //container scan
+	NotificationTypeSecurityRiskPush NotificationType = "securityRiskPush"  //security risk
+
 	NotificationTypeComplianceDrift     NotificationType = NotificationTypePush + ":complianceDrift"
 	NotificationTypeNewClusterAdmin     NotificationType = NotificationTypePush + ":newClusterAdmin"
 	NotificationTypeNewVulnerability    NotificationType = NotificationTypeContainerPush + ":newVulnerability"
 	NotificationTypeVulnerabilityNewFix NotificationType = NotificationTypeContainerPush + ":vulnerabilityNewFix"
+
+	NotificationTypeSecurityRiskNew NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
 )
 
 var notificationTypes = []NotificationType{
