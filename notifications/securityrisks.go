@@ -14,5 +14,5 @@ type NewSecurityIssue struct {
 	SecurityRiskName     string `json:"securityRiskName"`
 	SecurityRiskSeverity string `json:"securityRiskSeverity"`
 	SecurityRiskCategory string `json:"securityRiskCategory"`
-	Designators          []identifiers.PortalDesignator
+	Resources            []identifiers.PortalDesignator
 }
