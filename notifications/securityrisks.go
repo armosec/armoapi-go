@@ -9,10 +9,10 @@ type SecurityIssuePushNotification struct {
 type NewSecurityIssues []NewSecurityIssue
 
 type NewSecurityIssue struct {
-	CustomerGUID         string `json:"customerGUID"`
-	SecurityRiskID       string `json:"securityRiskID"`
-	SecurityRiskName     string `json:"securityRiskName"`
-	SecurityRiskSeverity string `json:"securityRiskSeverity"`
-	SecurityRiskCategory string `json:"securityRiskCategory"`
-	Resources            []identifiers.PortalDesignator
+	CustomerGUID         string                         `json:"customerGUID"`
+	SecurityRiskID       string                         `json:"securityRiskID"`
+	SecurityRiskName     string                         `json:"securityRiskName"`
+	SecurityRiskSeverity string                         `json:"securityRiskSeverity"`
+	SecurityRiskCategory string                         `json:"securityRiskCategory"`
+	Resources            []identifiers.PortalDesignator `json:"resources"`
 }
