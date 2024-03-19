@@ -23,6 +23,25 @@ func (ac *AlertChannel) GetAlertConfig(notificationType NotificationType) *Alert
 	return nil
 }
 
+func (ac *AlertChannel) IsEqualOrGreaterThanMinSeverity(severity int, notificationType NotificationType) bool {
+	if ac.Alerts == nil {
+		return true
+	}
+
+	for _, alert := range ac.Alerts {
+		if alert.IsEnabled() && alert.NotificationType == notificationType {
+			if alert.Parameters.MinSeverity != nil {
+				if *alert.Parameters.MinSeverity > severity {
+					return false
+				}
+			}
+		}
+
+	}
+
+	return true
+}
+
 func (ac *AlertChannel) AddAlertConfig(config AlertConfig) error {
 	if config.NotificationType == "" {
 		return fmt.Errorf("notification type is required")

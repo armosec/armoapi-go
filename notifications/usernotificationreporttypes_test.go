@@ -3,11 +3,12 @@ package notifications
 import (
 	"encoding/json"
 	"fmt"
-	"k8s.io/utils/ptr"
 	"reflect"
 	"sort"
 	"testing"
 	"time"
+
+	"k8s.io/utils/ptr"
 
 	_ "embed"
 
@@ -740,4 +741,51 @@ func sortAlertChannelsByType(channels []AlertChannel) {
 	sort.Slice(channels, func(i, j int) bool {
 		return channels[i].ChannelType < channels[j].ChannelType
 	})
+}
+
+func TestIsEqualOrGreaterThanMinSeverity(t *testing.T) {
+	tests := []struct {
+		name     string
+		severity int
+		min      int
+		expected bool
+	}{
+		{
+			name:     "equal",
+			severity: 3,
+			min:      3,
+			expected: true,
+		},
+		{
+			name:     "greater",
+			severity: 4,
+			min:      3,
+			expected: true,
+		},
+		{
+			name:     "less",
+			severity: 2,
+			min:      3,
+			expected: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			min := test.min
+			params := AlertChannel{
+				Alerts: []AlertConfig{
+					{
+						NotificationConfigIdentifier: NotificationConfigIdentifier{
+							NotificationType: NotificationTypePush,
+						},
+						Parameters: NotificationParams{
+							MinSeverity: &min,
+						},
+					},
+				},
+			}
+			assert.Equal(t, test.expected, params.IsEqualOrGreaterThanMinSeverity(test.severity, NotificationTypePush))
+		})
+	}
 }
