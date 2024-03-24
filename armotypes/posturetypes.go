@@ -293,6 +293,9 @@ type PostureResourceSummary struct {
 	MediumSeverityControls   int    `json:"mediumSeverityControls"`
 	LowSeverityControls      int    `json:"lowSeverityControls"`
 	ClusterShortName         string `json:"clusterShortName"`
+
+	// if True, at least one failed control supports smart remediation
+	SupportsSmartRemediation bool `json:"supportsSmartRemediation"`
 }
 
 type PostureAttributesList struct {
@@ -370,4 +373,7 @@ type ControlInfo struct {
 	// How many failed resources for this control
 	// Example: 3
 	FailedResources int `json:"failedResources"`
+
+	// if True, this control supports smart remediation
+	SupportsSmartRemediation bool `json:"supportsSmartRemediation"`
 }
