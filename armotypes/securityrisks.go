@@ -47,15 +47,16 @@ func (rt *RiskType) UnmarshalJSON(data []byte) error {
 
 // SecurityRisk represents the main object with various fields and an array of Risks
 type SecurityRisk struct {
-	ID             string           `json:"ID"`
-	Name           string           `json:"name"`
-	Description    string           `json:"description"`
-	WhatIs         string           `json:"whatIs"`
-	Severity       string           `json:"severity"`
-	Category       string           `json:"category"`
-	Remediation    string           `json:"remediation"`
-	Risks          []Risk           `json:"risks"`
-	SecurityIssues []ISecurityIssue `json:"securityIssues,omitempty"`
+	ID              string           `json:"ID"`
+	Name            string           `json:"name"`
+	Description     string           `json:"description"`
+	WhatIs          string           `json:"whatIs"`
+	Severity        string           `json:"severity"`
+	Category        string           `json:"category"`
+	Remediation     string           `json:"remediation"`
+	Risks           []Risk           `json:"risks"`
+	SecurityIssues  []ISecurityIssue `json:"securityIssues,omitempty"`
+	SmartRemedation bool             `json:"smartRemediation"`
 }
 
 func (sr *SecurityRisk) GetRisks() []Risk {
@@ -108,6 +109,9 @@ type SecurityIssuesSummary struct {
 
 	// resources that are resolved because of a kubernetes resource deletion
 	ResourcesDeletedLastChange []Resource `json:"resourcesDeletedLastChange"`
+
+	// if True, control supports smart remediation
+	SupportsSmartRemediation bool `json:"supportsSmartRemediation"`
 }
 
 type SecurityIssuesCategories struct {
