@@ -20,12 +20,12 @@ type RuntimeIncident struct {
 	RuntimeIncidentResource `json:",inline" bson:"inline"`
 	RuntimeAlert            `json:",inline" bson:"inline"`
 	// category of the incident
-	IncidentCategory IncidentCategory `json:"incidentCategory" bson:"incidentCategory" `
-	Timestamp        time.Time        `json:"timestamp" bson:"timestamp"`
-	Title            string           `json:"title" bson:"title"`
-	Severity         string           `json:"incidentSeverity" bson:"incidentSeverity"`
-	SeverityScore    int              `json:"severityScore" bson:"severityScore"`
-	Mitigation       string           `json:"mitigation" bson:"mitigation"`
+	IncidentCategory  IncidentCategory `json:"incidentCategory" bson:"incidentCategory" `
+	CreationTimestamp time.Time        `json:"timestamp" bson:"timestamp"`
+	Title             string           `json:"title" bson:"title"`
+	Severity          string           `json:"incidentSeverity" bson:"incidentSeverity"`
+	SeverityScore     int              `json:"severityScore" bson:"severityScore"`
+	Mitigation        string           `json:"mitigation" bson:"mitigation"`
 	// alerts / events that are part of this incident
 	RelatedAlerts []RuntimeAlert `json:"relatedAlerts" bson:"relatedAlerts"`
 	// user gestures
