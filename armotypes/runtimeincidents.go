@@ -21,7 +21,7 @@ type RuntimeIncident struct {
 	RuntimeAlert            `json:",inline" bson:"inline"`
 	// category of the incident
 	IncidentCategory  IncidentCategory `json:"incidentCategory" bson:"incidentCategory" `
-	CreationTimestamp time.Time        `json:"timestamp" bson:"timestamp"`
+	CreationTimestamp time.Time        `json:"creationTimestamp" bson:"creationTimestamp"`
 	Title             string           `json:"title" bson:"title"`
 	Severity          string           `json:"incidentSeverity" bson:"incidentSeverity"`
 	SeverityScore     int              `json:"severityScore" bson:"severityScore"`
