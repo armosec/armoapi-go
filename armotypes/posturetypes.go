@@ -206,7 +206,8 @@ type PostureControlSummary struct {
 	IsLastScan                     int                          `json:"isLastScan"`
 	HighlightPathsCount            int64                        `json:"highlightPathsCount"`
 	ClusterShortName               string                       `json:"clusterShortName"`
-	SupportsSmartRemediation       bool                         `json:"supportsSmartRemediation"`
+	SupportsSmartRemediation       bool                         `json:"supportsSmartRemediation"` // DEPRECATED
+	SmartRemediation               bool                         `json:"smartRemediation"`
 	FixByNetworkPolicy             bool                         `json:"fixByNetworkPolicy"`
 }
 
@@ -295,7 +296,8 @@ type PostureResourceSummary struct {
 	ClusterShortName         string `json:"clusterShortName"`
 
 	// if True, at least one failed control supports smart remediation
-	SupportsSmartRemediation bool `json:"supportsSmartRemediation"`
+	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
+	SmartRemediation         bool `json:"smartRemediation"`
 }
 
 type PostureAttributesList struct {
@@ -375,5 +377,7 @@ type ControlInfo struct {
 	FailedResources int `json:"failedResources"`
 
 	// if True, this control supports smart remediation
-	SupportsSmartRemediation bool `json:"supportsSmartRemediation"`
+	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
+
+	SmartRemediation bool `json:"smartRemediation"`
 }
