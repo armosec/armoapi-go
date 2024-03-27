@@ -47,16 +47,16 @@ func (rt *RiskType) UnmarshalJSON(data []byte) error {
 
 // SecurityRisk represents the main object with various fields and an array of Risks
 type SecurityRisk struct {
-	ID              string           `json:"ID"`
-	Name            string           `json:"name"`
-	Description     string           `json:"description"`
-	WhatIs          string           `json:"whatIs"`
-	Severity        string           `json:"severity"`
-	Category        string           `json:"category"`
-	Remediation     string           `json:"remediation"`
-	Risks           []Risk           `json:"risks"`
-	SecurityIssues  []ISecurityIssue `json:"securityIssues,omitempty"`
-	SmartRemedation bool             `json:"smartRemediation"`
+	ID               string           `json:"ID"`
+	Name             string           `json:"name"`
+	Description      string           `json:"description"`
+	WhatIs           string           `json:"whatIs"`
+	Severity         string           `json:"severity"`
+	Category         string           `json:"category"`
+	Remediation      string           `json:"remediation"`
+	Risks            []Risk           `json:"risks"`
+	SecurityIssues   []ISecurityIssue `json:"securityIssues,omitempty"`
+	SmartRemediation bool             `json:"smartRemediation"`
 }
 
 func (sr *SecurityRisk) GetRisks() []Risk {
@@ -112,7 +112,7 @@ type SecurityIssuesSummary struct {
 
 	// if True, control supports smart remediation
 	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
-	SmartRemedation          bool `json:"smartRemediation"`
+	SmartRemediation         bool `json:"smartRemediation"`
 }
 
 type SecurityIssuesCategories struct {
