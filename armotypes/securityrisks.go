@@ -111,7 +111,8 @@ type SecurityIssuesSummary struct {
 	ResourcesDeletedLastChange []Resource `json:"resourcesDeletedLastChange"`
 
 	// if True, control supports smart remediation
-	SupportsSmartRemediation bool `json:"supportsSmartRemediation"`
+	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
+	SmartRemedation          bool `json:"smartRemediation"`
 }
 
 type SecurityIssuesCategories struct {
