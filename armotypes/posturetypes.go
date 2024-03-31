@@ -368,6 +368,8 @@ type ControlInfo struct {
 	// Example: C-0034
 	ID string `json:"id"`
 
+	Name string `json:"name"`
+
 	// How much this control is critical
 	// Example: 6
 	BaseScore float32 `json:"baseScore"`
