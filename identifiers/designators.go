@@ -119,14 +119,17 @@ const (
 
 // Worker nodes attribute related consts
 const (
-	AttributeWorkerNodes             = "workerNodes"
-	WorkerNodesmax                   = "max"
-	WorkerNodeslastReported          = "lastReported"
-	WorkerNodeslastReportDate        = "lastReportDate"
-	WorkerNodesmaxPerMonth           = "maxPerMonth"
-	WorkerNodesmaxReportGUID         = "maxReportGUID"
-	WorkerNodesmaxPerMonthReportGUID = "maxPerMonthReportGUID"
-	WorkerNodeslastReportGUID        = "lastReportGUID"
+	AttributeWorkerNodes              = "workerNodes"
+	WorkerNodesmax                    = "max"
+	WorkerNodeslastReported           = "lastReported"
+	WorkerNodeslastReportDate         = "lastReportDate"
+	WorkerNodesmaxPerMonth            = "maxPerMonth"
+	WorkerNodesmaxReportGUID          = "maxReportGUID"
+	WorkerNodesmaxPerMonthReportGUID  = "maxPerMonthReportGUID"
+	WorkerNodeslastReportGUID         = "lastReportGUID"
+	LastPostureScanTriggered          = "lastPostureScanTriggered"
+	LastTimeACEngineCompleted         = "lastTimeACEngineCompleted"
+	LastTimeSecurityRiskScanCompleted = "lastTimeSecurityRiskScanCompleted"
 )
 
 type mapString2String map[string]string
