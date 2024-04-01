@@ -220,3 +220,34 @@ type SecurityRiskExceptionPolicy struct {
 	Category            string `json:"category"`
 	Severity            string `json:"severity"`
 }
+
+type SecurityIssuesTrends struct {
+
+	// date in format yyyy-mm-dd
+	Date string `json:"date"`
+
+	// new detected issues on the date
+	NewDetected int `json:"newDetected"`
+
+	// new resolved issues on the date
+	NewResolved int `json:"newResolved"`
+
+	// total detected from the beginning of the period until current date
+	TotalDetectedUpToDate int `json:"totalDetectedUpToDate"`
+}
+
+type SecurityIssuesTrendsSummary struct {
+	SecurityIssuesTrends []SecurityIssuesTrends `json:"securityIssuesTrends"`
+
+	// total issues detected for the period
+	TotalDetectedForPeriod int `json:"totalDetectedForPeriod"`
+
+	// total issues resolved for the period
+	TotalResolvedForPeriod int `json:"totalResolvedForPeriod"`
+
+	// current detected issues
+	CurrentDetected int `json:"currentDetected"`
+
+	// CurrentDetected - TotalDetectedUpToDate of first date of period.
+	ChangeFromBeginningOfPeriod int `json:"changeFromBeginningOfPeriod"`
+}
