@@ -250,9 +250,10 @@ type HighlightsByControl struct {
 }
 
 type PostureResourceSummary struct {
-	Designators identifiers.PortalDesignator `json:"designators"`
-	Name        string                       `json:"name"`       // wlid/sid and etc.
-	ResourceID  string                       `json:"resourceID"` //as given by kscape
+	Designators  identifiers.PortalDesignator `json:"designators"`
+	Name         string                       `json:"name"`         // wlid/sid and etc.
+	ResourceID   string                       `json:"resourceID"`   //as given by kscape
+	ResourceHash string                       `json:"resourceHash"` //common hash of customerGUID, cluster, kind, name, namespace, apiVersion
 
 	//gives upto PostureResourceMaxCtrls controls as an example
 	FailedControl   []string `json:"failedControls"`
