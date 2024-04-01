@@ -247,4 +247,7 @@ type SecurityIssuesTrendsSummary struct {
 
 	// current detected issues
 	CurrentDetected int `json:"currentDetected"`
+
+	// CurrentDetected - TotalDetectedUpToDate of first date of period.
+	ChangeFromBeginningOfPeriod int `json:"changeFromBeginningOfPeriod"`
 }
