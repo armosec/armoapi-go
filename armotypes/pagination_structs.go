@@ -12,27 +12,29 @@ type RespTotal struct {
 }
 
 const (
-	V2ListExistsOperator   string = "exists"
-	V2ListEqualOperator    string = "equal"
-	V2ListMissingOperator  string = "missing"
-	V2ListEmptyOperator    string = "empty"
-	V2ListMatchOperator    string = "match"
-	V2ListGreaterOperator  string = "greater"
-	V2ListLowerOperator    string = "lower"
-	V2ListRegexOperator    string = "regex"
-	V2ListLikeOperator     string = "like"
-	V2ListRangeOperator    string = "range"
-	V2ListIgnoreCaseOption string = "ignorecase"
-	V2ListArrayOperator    string = "arraymatch"
+	V2ListExistsOperator       string = "exists"
+	V2ListEqualOperator        string = "equal"
+	V2ListMissingOperator      string = "missing"
+	V2ListEmptyOperator        string = "empty"
+	V2ListMatchOperator        string = "match"
+	V2ListGreaterOperator      string = "greater"
+	V2ListLowerOperator        string = "lower"
+	V2ListRegexOperator        string = "regex"
+	V2ListLikeOperator         string = "like"
+	V2ListRangeOperator        string = "range"
+	V2ListIgnoreCaseOption     string = "ignorecase"
+	V2ListElementMatchOperator string = "elemMatch" // for matching elements in array e.g. {"myObjectsArray": "name:John;age:30|elemMatch"}
 
 	V2ListAscendingSort  string = "asc"
 	V2ListDescendingSort string = "desc"
 
-	V2ListValueSeparator    = ","
-	V2ListOperatorSeparator = "|"
-	V2ListSubQuerySeparator = "&"
-	V2ListSortTypeSeparator = ":"
-	V2ListEscapeChar        = "\\"
+	V2ListValueSeparator                = ","
+	V2ListOperatorSeparator             = "|"
+	V2ListSubQuerySeparator             = "&"
+	V2ListSortTypeSeparator             = ":"
+	V2ListEscapeChar                    = "\\"
+	V2ListElementMatchFieldsSeperator   = ";"
+	V2ListElementMatchKeyValueSeperator = ":"
 )
 
 type QueryScopeParams struct {

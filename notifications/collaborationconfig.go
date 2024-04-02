@@ -108,16 +108,10 @@ const (
 // Referance to external integration (e.g link to jira ticket)
 type IntegrationReference struct {
 	armotypes.PortalBase `json:",inline" bson:"inline"`
-	//integration provider (e.g jira, slack, teams)
-	Provider ChannelProvider `json:"provider,omitempty" bson:"provider,omitempty"`
-	//integration provider data (e.g jira ticket data)
-	ProviderData map[string]interface{} `json:"providerData,omitempty" bson:"providerData,omitempty"`
-	//type of the reference (e.g tickets kind)
-	Type ReferenceType `json:"type,omitempty" bson:"type,omitempty"`
-	//owner identifiers of this reference (e.g resourceHash, wlid)
-	Owner map[string]string `json:"owner,omitempty" bson:"owner,omitempty"`
-	//related entities identifiers of this reference (e.g cves, controls)
-	RelatedObjects []map[string]string `json:"relatedObjects,omitempty" bson:"relatedObjects,omitempty"`
-	//creation time of the reference
-	CreationTime time.Time `json:"creationTime" bson:"creationTime"`
+	Provider             ChannelProvider        `json:"provider,omitempty" bson:"provider,omitempty"`             //integration provider (e.g jira, slack, teams)
+	ProviderData         map[string]interface{} `json:"providerData,omitempty" bson:"providerData,omitempty"`     //integration provider data (e.g jira ticket data)
+	Type                 ReferenceType          `json:"type,omitempty" bson:"type,omitempty"`                     //type of the reference (e.g tickets kind)
+	Owner                map[string]string      `json:"owner,omitempty" bson:"owner,omitempty"`                   //owner identifiers of this reference (e.g resourceHash, wlid)
+	RelatedObjects       []map[string]string    `json:"relatedObjects,omitempty" bson:"relatedObjects,omitempty"` //related entities identifiers of this reference (e.g cves, controls)
+	CreationTime         time.Time              `json:"creationTime" bson:"creationTime"`                         //creation time of the reference
 }

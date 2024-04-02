@@ -3,6 +3,7 @@ package armotypes
 import (
 	"encoding/json"
 	"errors"
+	"slices"
 	"strings"
 	"time"
 )
@@ -54,6 +55,23 @@ func (qsp *QueryScopeParams) FixOrAddAsInnerFiltersMap(paginationReq *V2ListRequ
 			paginationReq.InnerFilters[filterIdx][filters.TagField] = strings.Join(qsp.Tag, ",")
 		}
 	}
+}
+
+func Filter2ElementMatchString(filter map[string]string) string {
+	keys := make([]string, 0, len(filter))
+	for key := range filter {
+		keys = append(keys, key)
+	}
+	slices.Sort(keys)
+	res := ""
+	for _, key := range keys {
+		value := filter[key]
+		if res != "" {
+			res += V2ListElementMatchFieldsSeperator
+		}
+		res += key + V2ListElementMatchKeyValueSeperator + value
+	}
+	return res + V2ListOperatorSeparator + V2ListElementMatchOperator
 }
 
 // ValidatePageProperties validate page size and page number to be valid
