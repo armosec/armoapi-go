@@ -57,6 +57,7 @@ func (qsp *QueryScopeParams) FixOrAddAsInnerFiltersMap(paginationReq *V2ListRequ
 	}
 }
 
+// Filter2ElementMatchString converts a map of filters to a string of element match query 
 func Filter2ElementMatchString(filter map[string]string) string {
 	keys := make([]string, 0, len(filter))
 	for key := range filter {

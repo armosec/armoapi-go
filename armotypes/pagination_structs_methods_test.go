@@ -8,12 +8,12 @@ import (
 
 func TestInnerFilterToElementMatchString(t *testing.T) {
 	innerFilters := map[string]string{
-		"filter1": "value1",
-		"filter2": "value2",
-		"filter3": "|operator",
+		"address": "|missing",
+		"age":     "30|greater",
+		"name":    "john",
 	}
 
-	expectedResult := "filter1:value1;filter2:value2;filter3:|operator|elemMatch"
+	expectedResult := "address:|missing;age:30|greater;name:john|elemMatch"
 	result := Filter2ElementMatchString(innerFilters)
 
 	assert.Equal(t, expectedResult, result)
