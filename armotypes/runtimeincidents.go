@@ -120,5 +120,6 @@ type RuntimeAlert struct {
 	NodeName      string    `json:"nodeName" bson:"nodeName"`
 	WorkloadName  string    `json:"workloadName" bson:"workloadName"`
 	WorkloadKind  string    `json:"workloadKind" bson:"workloadKind"`
+	ClusterName   string    `json:"clusterName" bson:"clusterName"`
 	Timestamp     time.Time `json:"timestamp" bson:"timestamp"`
 }
