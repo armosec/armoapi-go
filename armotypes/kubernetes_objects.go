@@ -25,6 +25,8 @@ type KubernetesObject struct {
 	RelatedNamespace       string `json:"relatedNamespace"`
 	RelatedAPIVersion      string `json:"relatedAPIVersion"`
 	RelatedResourceVersion string `json:"relatedResourceVersion"`
+	Status                 string `json:"status"`
+	CompletionStatus       string `json:"completionStatus"`
 
 	NetworkPolicyStatus NetworkPolicyStatus `json:"networkPolicyStatus"`
 
