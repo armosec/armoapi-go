@@ -91,3 +91,27 @@ type IntegrationsConnectionStatus struct {
 	Provider ChannelProvider             `json:"provider"`
 	Status   IntegrationConnectionStatus `json:"status"`
 }
+
+type ReferenceType string
+
+const (
+	ReferenceTypeClusterControlTicket    ReferenceType = "ticket:cluster:control"
+	ReferenceTypeRepositoryControlTicket ReferenceType = "ticket:repository:control"
+	ReferenceTypeImageTicket             ReferenceType = "ticket:image"
+	ReferenceTypeVulnerabilityTicket     ReferenceType = "ticket:vulnerability"
+)
+
+//Referance to external integration (e.g link to jira ticket)
+type IntegrationReference struct {
+	armotypes.PortalBase `json:",inline" bson:"inline"`
+	//integration provider (e.g jira, slack, teams)
+	Provider             ChannelProvider `json:"provider,omitempty" bson:"provider,omitempty"`
+	//integration provider data (e.g jira ticket data)
+	ProviderData 	   map[string]interface{} `json:"providerData,omitempty" bson:"providerData,omitempty"`
+	//type of the reference (e.g tickets kind)
+	Type                 ReferenceType   `json:"type,omitempty" bson:"type,omitempty"`
+	//owner identifiers of this reference (e.g resourceHash, wlid)
+	Owner    map[string]string `json:"owner,omitempty" bson:"owner,omitempty"`
+	//related entities identifiers of this reference (e.g cves, controls)
+	Related []map[string]string `json:"related,omitempty" bson:"related,omitempty"`
+}
