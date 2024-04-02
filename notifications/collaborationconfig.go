@@ -1,6 +1,10 @@
 package notifications
 
-import "github.com/armosec/armoapi-go/armotypes"
+import (
+	"time"
+
+	"github.com/armosec/armoapi-go/armotypes"
+)
 
 // Config option type
 // swagger:model CollaborationConfigOptionType
@@ -114,4 +118,6 @@ type IntegrationReference struct {
 	Owner map[string]string `json:"owner,omitempty" bson:"owner,omitempty"`
 	//related entities identifiers of this reference (e.g cves, controls)
 	RelatedObjects []map[string]string `json:"relatedObjects,omitempty" bson:"relatedObjects,omitempty"`
+	//creation time of the reference
+	CreationTime time.Time `json:"creationTime" bson:"creationTime"`
 }
