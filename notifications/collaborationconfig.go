@@ -101,17 +101,17 @@ const (
 	ReferenceTypeVulnerabilityTicket     ReferenceType = "ticket:vulnerability"
 )
 
-//Referance to external integration (e.g link to jira ticket)
+// Referance to external integration (e.g link to jira ticket)
 type IntegrationReference struct {
 	armotypes.PortalBase `json:",inline" bson:"inline"`
 	//integration provider (e.g jira, slack, teams)
-	Provider             ChannelProvider `json:"provider,omitempty" bson:"provider,omitempty"`
+	Provider ChannelProvider `json:"provider,omitempty" bson:"provider,omitempty"`
 	//integration provider data (e.g jira ticket data)
-	ProviderData 	   map[string]interface{} `json:"providerData,omitempty" bson:"providerData,omitempty"`
+	ProviderData map[string]interface{} `json:"providerData,omitempty" bson:"providerData,omitempty"`
 	//type of the reference (e.g tickets kind)
-	Type                 ReferenceType   `json:"type,omitempty" bson:"type,omitempty"`
+	Type ReferenceType `json:"type,omitempty" bson:"type,omitempty"`
 	//owner identifiers of this reference (e.g resourceHash, wlid)
-	Owner    map[string]string `json:"owner,omitempty" bson:"owner,omitempty"`
+	Owner map[string]string `json:"owner,omitempty" bson:"owner,omitempty"`
 	//related entities identifiers of this reference (e.g cves, controls)
-	Related []map[string]string `json:"related,omitempty" bson:"related,omitempty"`
+	RelatedObjects []map[string]string `json:"relatedObjects,omitempty" bson:"relatedObjects,omitempty"`
 }
