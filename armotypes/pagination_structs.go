@@ -23,18 +23,17 @@ const (
 	V2ListLikeOperator         string = "like"
 	V2ListRangeOperator        string = "range"
 	V2ListIgnoreCaseOption     string = "ignorecase"
-	V2ListElementMatchOperator string = "elemMatch" // for matching elements in array e.g. {"myObjectsArray": "name:John;age:30|elemMatch"}
+	V2ListArrayOperator        string = "arraymatch"
+	V2ListElementMatchOperator string = "elemMatch" // for matching elements in array e.g. {"users.name|elemMatch": "users.age|elemMatch" : "30|greater"}
 
 	V2ListAscendingSort  string = "asc"
 	V2ListDescendingSort string = "desc"
 
-	V2ListValueSeparator                = ","
-	V2ListOperatorSeparator             = "|"
-	V2ListSubQuerySeparator             = "&"
-	V2ListSortTypeSeparator             = ":"
-	V2ListEscapeChar                    = "\\"
-	V2ListElementMatchFieldsSeperator   = ";"
-	V2ListElementMatchKeyValueSeperator = ":"
+	V2ListValueSeparator    = ","
+	V2ListOperatorSeparator = "|"
+	V2ListSubQuerySeparator = "&"
+	V2ListSortTypeSeparator = ":"
+	V2ListEscapeChar        = "\\"
 )
 
 type QueryScopeParams struct {
