@@ -111,6 +111,7 @@ type SecurityIssuesSummary struct {
 	ResourcesDeletedLastChange []Resource `json:"resourcesDeletedLastChange"`
 
 	// if True, control supports smart remediation
+	// swagger:ignore
 	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
 	SmartRemediation         bool `json:"smartRemediation"`
 }
