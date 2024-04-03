@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 type IncidentCategory string
@@ -42,44 +41,92 @@ type RuntimeIncidentResource struct {
 	Designators identifiers.PortalDesignator `json:"designators" bson:"designators"`
 }
 
-type RuleAlert struct {
-	Severity       int    `json:"severity,omitempty" bson:"severity,omitempty"`       // PriorityToStatus(failedRule.Priority()),
-	ProcessName    string `json:"processName,omitempty" bson:"processName,omitempty"` // failedRule.Event().Comm,
+type AlertType int
+
+const (
+	AlertTypeRule AlertType = iota
+	AlertTypeMalware
+)
+
+type BaseRuntimeAlert struct {
+	// AlertName is either RuleName or MalwareName
+	AlertName string `json:"alertName,omitempty" bson:"name,omitempty"`
+	// Arguments of specific alerts (e.g. for unexpected files: open file flags; for unexpected process: return code)
+	Arguments map[string]interface{} `json:"arguments,omitempty" bson:"arguments,omitempty"`
+	// Command line of the process
+	CommandLine string `json:"commandLine,omitempty" bson:"commandLine,omitempty"`
+	// Fix suggestions
 	FixSuggestions string `json:"fixSuggestions,omitempty" bson:"fixSuggestions,omitempty"`
-	PID            uint32 `json:"pid,omitempty" bson:"pid,omitempty"`   // Process ID
-	PPID           uint32 `json:"ppid,omitempty" bson:"ppid,omitempty"` //  Parent Process ID
-	UID            uint32 `json:"uid,omitempty" bson:"uid,omitempty"`   // User ID of the process
-	GID            uint32 `json:"gid,omitempty" bson:"gid,omitempty"`   // Group ID of the process
+	// Is part of the image
+	IsPartOfImage bool `json:"isPartOfImage,omitempty" bson:"isPartOfImage,omitempty"`
+	// Parent Process ID
+	PPID uint32 `json:"ppid,omitempty" bson:"ppid,omitempty"`
+	// PPIDComm - Parent Process Name
+	PPIDComm string `json:"ppidComm,omitempty" bson:"ppidComm,omitempty"`
+	// MD5 hash of the file that was infected
+	MD5Hash string `json:"md5Hash,omitempty" bson:"md5Hash,omitempty"`
+	// SHA1 hash of the file that was infected
+	SHA1Hash string `json:"sha1Hash,omitempty" bson:"sha1Hash,omitempty"`
+	// SHA256 hash of the file that was infected
+	SHA256Hash string `json:"sha256Hash,omitempty" bson:"sha256Hash,omitempty"`
+	// Severity of the alert
+	Severity int `json:"severity,omitempty" bson:"severity,omitempty"`
+	// Size of the file that was infected
+	Size string `json:"size,omitempty" bson:"size,omitempty"`
+	// Command line
+	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
+}
+
+type RuleAlert struct {
+	// Rule ID
+	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 }
 
 type MalwareAlert struct {
-	MalwareName        string `json:"malwareName,omitempty" bson:"malwareName,omitempty"`
 	MalwareDescription string `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
+}
+
+type RuntimeAlertProcessDetails struct {
+	// Process Name
+	Comm string `json:"comm,omitempty" bson:"comm,omitempty"`
+	// GID of the process
+	GID uint32 `json:"gid,omitempty" bson:"gid,omitempty"`
+	// Group name of the process
+	GroupName string `json:"groupName,omitempty" bson:"groupName,omitempty"`
 	// Path to the file that was infected
 	Path string `json:"path,omitempty" bson:"path,omitempty"`
-	// Hash of the file that was infected
-	Hash string `json:"hash,omitempty" bson:"hash,omitempty"`
-	// Size of the file that was infected
-	Size string `json:"size,omitempty" bson:"size,omitempty"`
-	// Is part of the image
-	IsPartOfImage bool `json:"isPartOfImage,omitempty" bson:"isPartOfImage,omitempty"`
-	// K8s resource that was infected
-	Resource schema.GroupVersionResource `json:"resource,omitempty" bson:"resource,omitempty"`
-	// K8s container image that was infected
-	ContainerImage string `json:"containerImage,omitempty" bson:"containerImage,omitempty"`
+	// Process ID
+	PID uint32 `json:"pid,omitempty" bson:"pid,omitempty"`
+	// UID of the process
+	UID uint32 `json:"uid,omitempty" bson:"uid,omitempty"`
+	// User name of the process
+	UserName string `json:"userName,omitempty" bson:"userName,omitempty"`
+}
+
+type RuntimeAlertK8sDetails struct {
+	ClusterName       string `json:"clusterName" bson:"clusterName"`
+	ContainerName     string `json:"containerName,omitempty" bson:"containerName,omitempty"`
+	HostNetwork       bool   `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
+	Image             string `json:"image,omitempty" bson:"image,omitempty"`
+	ImageDigest       string `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
+	Namespace         string `json:"namespace,omitempty" bson:"namespace,omitempty"`
+	NodeName          string `json:"nodeName,omitempty" bson:"nodeName,omitempty"`
+	ContainerID       string `json:"containerID,omitempty" bson:"containerID,omitempty"`
+	PodName           string `json:"podName,omitempty" bson:"podName,omitempty"`
+	PodNamespace      string `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
+	WorkloadName      string `json:"workloadName" bson:"workloadName"`
+	WorkloadNamespace string `json:"workloadNamespace,omitempty" bson:"namespace,omitempty"`
+	WorkloadKind      string `json:"workloadKind" bson:"workloadKind"`
 }
 
 type RuntimeAlert struct {
-	RuleAlert     `json:",inline"`
-	MalwareAlert  `json:",inline"`
-	RuleName      string    `json:"ruleName" bson:"ruleName"`
-	RuleID        string    `json:"ruleID" bson:"ruleID"`
-	Message       string    `json:"message" bson:"message"`
-	ContainerID   string    `json:"containerID,omitempty" bson:"containerID,omitempty"`
-	ContainerName string    `json:"containerName,omitempty" bson:"containerName,omitempty"`
-	PodNamespace  string    `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
-	PodName       string    `json:"podName,omitempty" bson:"podName,omitempty"`
-	HostName      string    `json:"hostName" bson:"hostName"`
-	NodeName      string    `json:"nodeName" bson:"nodeName"`
-	Timestamp     time.Time `json:"timestamp" bson:"timestamp"`
+	BaseRuntimeAlert           `json:",inline"`
+	RuleAlert                  `json:",inline"`
+	MalwareAlert               `json:",inline"`
+	RuntimeAlertProcessDetails `json:",inline"`
+	RuntimeAlertK8sDetails     `json:",inline"`
+	AlertType                  AlertType `json:"alertType" bson:"alertType"`
+	// Hostname is the name of the node agent pod
+	HostName string `json:"hostName" bson:"hostName"`
+	Message  string `json:"message" bson:"message"`
 }
