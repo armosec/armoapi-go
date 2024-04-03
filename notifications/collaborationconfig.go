@@ -1,8 +1,6 @@
 package notifications
 
-import (
-	"github.com/armosec/armoapi-go/armotypes"
-)
+import "github.com/armosec/armoapi-go/armotypes"
 
 // Config option type
 // swagger:model CollaborationConfigOptionType
