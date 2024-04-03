@@ -76,8 +76,7 @@ const (
 	AttributeSyncKind         = "syncKind"
 	AttributeSBOMToolVersion  = "sbomToolVersion"
 	AttributeSecurityRiskID   = "securityRiskID"
-	AttributeK8sResourceHash  = "k8sResourceHash"
-	AttributeResourceHash     = "resourceHash"
+	AttributeK8sResourceHash  = "k8sResourceHash"		
 )
 
 // Repository scan related attributes
