@@ -76,7 +76,21 @@ const (
 	AttributeSyncKind         = "syncKind"
 	AttributeSBOMToolVersion  = "sbomToolVersion"
 	AttributeSecurityRiskID   = "securityRiskID"
-	AttributeK8sResourceHash  = "k8sResourceHash"		
+	AttributeK8sResourceHash  = "k8sResourceHash"
+	AttributeType             = "type"
+	AttributeOwner            = "owner"
+	AttributeRelated          = "relatedObjects"
+	AttributeLayerHash        = "layerHash"
+	AttributeImageRepository  = "imageRepository"
+	AttributeResourceHash     = "resourceHash"
+	AttributeComponentVersion = "componentVersion"
+	AttributeComponent        = "component"
+	AttributeSeverityScore    = "severityScore"
+	AttributeSeverity         = "severity"
+	AttributeCVEID            = "cveID"
+	AttributeCVEName          = "cveName"
+	AttributeControlID        = "controlID"
+	AttributeBaseScore        = "baseScore"
 )
 
 // Repository scan related attributes
