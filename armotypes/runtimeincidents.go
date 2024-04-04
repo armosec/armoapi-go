@@ -54,15 +54,15 @@ type BaseRuntimeAlert struct {
 	// Arguments of specific alerts (e.g. for unexpected files: open file flags; for unexpected process: return code)
 	Arguments map[string]interface{} `json:"arguments,omitempty" bson:"arguments,omitempty"`
 	// Command line of the process
-	CommandLine string `json:"commandLine,omitempty" bson:"commandLine,omitempty"`
+	CommandLine *string `json:"commandLine,omitempty" bson:"commandLine,omitempty"`
 	// Fix suggestions
 	FixSuggestions string `json:"fixSuggestions,omitempty" bson:"fixSuggestions,omitempty"`
 	// Is part of the image
-	IsPartOfImage bool `json:"isPartOfImage,omitempty" bson:"isPartOfImage,omitempty"`
+	IsPartOfImage *bool `json:"isPartOfImage,omitempty" bson:"isPartOfImage,omitempty"`
 	// Parent Process ID
-	PPID uint32 `json:"ppid,omitempty" bson:"ppid,omitempty"`
+	PPID *uint32 `json:"ppid,omitempty" bson:"ppid,omitempty"`
 	// PPIDComm - Parent Process Name
-	PPIDComm string `json:"ppidComm,omitempty" bson:"ppidComm,omitempty"`
+	PPIDComm *string `json:"ppidComm,omitempty" bson:"ppidComm,omitempty"`
 	// MD5 hash of the file that was infected
 	MD5Hash string `json:"md5Hash,omitempty" bson:"md5Hash,omitempty"`
 	// SHA1 hash of the file that was infected
@@ -72,7 +72,7 @@ type BaseRuntimeAlert struct {
 	// Severity of the alert
 	Severity int `json:"severity,omitempty" bson:"severity,omitempty"`
 	// Size of the file that was infected
-	Size string `json:"size,omitempty" bson:"size,omitempty"`
+	Size *string `json:"size,omitempty" bson:"size,omitempty"`
 	// Command line
 	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
 }
@@ -80,6 +80,8 @@ type BaseRuntimeAlert struct {
 type RuleAlert struct {
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
+	// Rule Description
+	RuleDescription string `json:"ruleDescription,omitempty" bson:"ruleDescription,omitempty"`
 }
 
 type MalwareAlert struct {
@@ -92,7 +94,7 @@ type RuntimeAlertProcessDetails struct {
 	// GID of the process
 	GID uint32 `json:"gid,omitempty" bson:"gid,omitempty"`
 	// Group name of the process
-	GroupName string `json:"groupName,omitempty" bson:"groupName,omitempty"`
+	GroupName *string `json:"groupName,omitempty" bson:"groupName,omitempty"`
 	// Path to the file that was infected
 	Path string `json:"path,omitempty" bson:"path,omitempty"`
 	// Process ID
@@ -100,23 +102,23 @@ type RuntimeAlertProcessDetails struct {
 	// UID of the process
 	UID uint32 `json:"uid,omitempty" bson:"uid,omitempty"`
 	// User name of the process
-	UserName string `json:"userName,omitempty" bson:"userName,omitempty"`
+	UserName *string `json:"userName,omitempty" bson:"userName,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
-	ClusterName       string `json:"clusterName" bson:"clusterName"`
-	ContainerName     string `json:"containerName,omitempty" bson:"containerName,omitempty"`
-	HostNetwork       bool   `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
-	Image             string `json:"image,omitempty" bson:"image,omitempty"`
-	ImageDigest       string `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
-	Namespace         string `json:"namespace,omitempty" bson:"namespace,omitempty"`
-	NodeName          string `json:"nodeName,omitempty" bson:"nodeName,omitempty"`
-	ContainerID       string `json:"containerID,omitempty" bson:"containerID,omitempty"`
-	PodName           string `json:"podName,omitempty" bson:"podName,omitempty"`
-	PodNamespace      string `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
-	WorkloadName      string `json:"workloadName" bson:"workloadName"`
-	WorkloadNamespace string `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
-	WorkloadKind      string `json:"workloadKind" bson:"workloadKind"`
+	ClusterName       *string `json:"clusterName" bson:"clusterName"`
+	ContainerName     string  `json:"containerName,omitempty" bson:"containerName,omitempty"`
+	HostNetwork       *bool   `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
+	Image             string  `json:"image,omitempty" bson:"image,omitempty"`
+	ImageDigest       string  `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
+	Namespace         string  `json:"namespace,omitempty" bson:"namespace,omitempty"`
+	NodeName          string  `json:"nodeName,omitempty" bson:"nodeName,omitempty"`
+	ContainerID       string  `json:"containerID,omitempty" bson:"containerID,omitempty"`
+	PodName           string  `json:"podName,omitempty" bson:"podName,omitempty"`
+	PodNamespace      string  `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
+	WorkloadName      string  `json:"workloadName" bson:"workloadName"`
+	WorkloadNamespace string  `json:"workloadNamespace,omitempty" bson:"namespace,omitempty"`
+	WorkloadKind      string  `json:"workloadKind" bson:"workloadKind"`
 }
 
 type RuntimeAlert struct {
