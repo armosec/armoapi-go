@@ -63,14 +63,6 @@ type RepoEntitySummary struct {
 	// This record is marked for deletion or not
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 
-	// Fields of resource summary that we might want to add in the future
-	//
-	// Status                 int                         `json:"status"`
-	// Remediation            []string                    `json:"remediation"`
-	// ExceptionRecommendaion string                      `json:"exceptionRecommendaion"`
-	// RelatedExceptions      []PostureExceptionPolicy    `json:"relatedExceptions"` // configured in portal
-	// ExceptionApplied       []PostureExceptionPolicy    `json:"exceptionApplied"`  //actual ruleResponse
-	// Images                 []PostureContainerSummary   `json:"containers,omitempty"`
-	// Recommendations        []RecommendationAssociation `json:"recommendations"`
-	// ArmoBestScore int64        `json:"armoBestScore"`
+	//tickets opened for in this entity (repository or repository file)
+	Tickets []Ticket `json:"tickets,omitempty"`
 }

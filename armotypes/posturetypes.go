@@ -138,6 +138,9 @@ type PostureClusterSummary struct {
 	FullName   string `json:"clusterFullName"`
 	ShortName  string `json:"clusterShortName"`
 	PrefixName string `json:"clusterPrefixName"`
+
+	//tickets opened for in this cluster
+	Tickets []Ticket `json:"tickets,omitempty"`
 }
 
 type PostureFrameworkSubsectionSummary struct {
@@ -210,6 +213,8 @@ type PostureControlSummary struct {
 	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
 	SmartRemediation         bool `json:"smartRemediation"`
 	FixByNetworkPolicy       bool `json:"fixByNetworkPolicy"`
+	//tickets opened for this control
+	Tickets []Ticket `json:"tickets,omitempty"`
 }
 
 //---------/api/v1/posture/resources
@@ -301,6 +306,9 @@ type PostureResourceSummary struct {
 	// swagger:ignore
 	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
 	SmartRemediation         bool `json:"smartRemediation"`
+
+	//tickets opened for this resource
+	Tickets []Ticket `json:"tickets,omitempty"`
 }
 
 type PostureAttributesList struct {

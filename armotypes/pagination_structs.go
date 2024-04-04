@@ -12,18 +12,19 @@ type RespTotal struct {
 }
 
 const (
-	V2ListExistsOperator   string = "exists"
-	V2ListEqualOperator    string = "equal"
-	V2ListMissingOperator  string = "missing"
-	V2ListEmptyOperator    string = "empty"
-	V2ListMatchOperator    string = "match"
-	V2ListGreaterOperator  string = "greater"
-	V2ListLowerOperator    string = "lower"
-	V2ListRegexOperator    string = "regex"
-	V2ListLikeOperator     string = "like"
-	V2ListRangeOperator    string = "range"
-	V2ListIgnoreCaseOption string = "ignorecase"
-	V2ListArrayOperator    string = "arraymatch"
+	V2ListExistsOperator       string = "exists"
+	V2ListEqualOperator        string = "equal"
+	V2ListMissingOperator      string = "missing"
+	V2ListEmptyOperator        string = "empty"
+	V2ListMatchOperator        string = "match"
+	V2ListGreaterOperator      string = "greater"
+	V2ListLowerOperator        string = "lower"
+	V2ListRegexOperator        string = "regex"
+	V2ListLikeOperator         string = "like"
+	V2ListRangeOperator        string = "range"
+	V2ListIgnoreCaseOption     string = "ignorecase"
+	V2ListArrayOperator        string = "arraymatch"
+	V2ListElementMatchOperator string = "elemMatch" // for matching elements in array e.g. {"users.name|elemMatch": "users.age|elemMatch" : "30|greater"}
 
 	V2ListAscendingSort  string = "asc"
 	V2ListDescendingSort string = "desc"
