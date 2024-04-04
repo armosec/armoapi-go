@@ -115,7 +115,7 @@ type RuntimeAlertK8sDetails struct {
 	PodName           string `json:"podName,omitempty" bson:"podName,omitempty"`
 	PodNamespace      string `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
 	WorkloadName      string `json:"workloadName" bson:"workloadName"`
-	WorkloadNamespace string `json:"workloadNamespace,omitempty" bson:"namespace,omitempty"`
+	WorkloadNamespace string `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
 	WorkloadKind      string `json:"workloadKind" bson:"workloadKind"`
 }
 
