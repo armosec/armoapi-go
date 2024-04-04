@@ -80,6 +80,8 @@ type BaseRuntimeAlert struct {
 type RuleAlert struct {
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
+	// Rule Description
+	RuleDescription string `json:"ruleDescription,omitempty" bson:"ruleDescription,omitempty"`
 }
 
 type MalwareAlert struct {
