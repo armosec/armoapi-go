@@ -1,8 +1,9 @@
-package armotypes
+package notifications
 
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -171,4 +172,50 @@ func TestEntity_Validate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestEntityIdentifiers_ToMap(t *testing.T) {
+	entity := EntityIdentifiers{
+		Cluster:          "cluster1",
+		RepoHash:         "repoHash1",
+		Namespace:        "namespace1",
+		Name:             "name1",
+		Kind:             "kind1",
+		ResourceHash:     "resourceHash1",
+		ResourceID:       "resourceID1",
+		CVEName:          "cveName1",
+		CVEID:            "cveID1",
+		Severity:         "severity1",
+		SeverityScore:    10,
+		Component:        "component1",
+		ComponentVersion: "componentVersion1",
+		ImageReposiotry:  "imageRepository1",
+		LayerHash:        "layerHash1",
+		ControlID:        "controlID1",
+		BaseScore:        5.6,
+	}
+
+	entityMap := entity.ToMap()
+
+	expectedMap := map[string]string{
+		"cluster":          "cluster1",
+		"repoHash":         "repoHash1",
+		"namespace":        "namespace1",
+		"name":             "name1",
+		"kind":             "kind1",
+		"resourceHash":     "resourceHash1",
+		"resourceID":       "resourceID1",
+		"cveName":          "cveName1",
+		"cveID":            "cveID1",
+		"severity":         "severity1",
+		"severityScore":    "10",
+		"component":        "component1",
+		"componentVersion": "componentVersion1",
+		"imageRepository":  "imageRepository1",
+		"layerHash":        "layerHash1",
+		"controlID":        "controlID1",
+		"baseScore":        "5.600000",
+	}
+
+	assert.Equal(t, expectedMap, entityMap)
 }
