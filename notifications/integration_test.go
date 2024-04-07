@@ -26,6 +26,8 @@ func TestEntity_Validate(t *testing.T) {
 		LayerHash:        "testLayerHash",
 		ControlID:        "testControlID",
 		BaseScore:        5.0,
+		RepoHash:         "testRepoHash",
+		FilePath:         "testFilePath",
 	}
 
 	// Test cases
@@ -58,7 +60,8 @@ func TestEntity_Validate(t *testing.T) {
 			name: "Valid repository resource entity",
 			entity: EntityIdentifiers{
 				Type:       EntityTypeRepositoryResource,
-				RepoHash:   "testRepoHash",
+				RepoHash:   validBaseEntity.RepoHash,
+				FilePath:   validBaseEntity.FilePath,
 				Namespace:  validBaseEntity.Namespace,
 				Name:       validBaseEntity.Name,
 				Kind:       validBaseEntity.Kind,

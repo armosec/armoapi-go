@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/armotypes"
+	"github.com/armosec/armoapi-go/identifiers"
 )
 
 type ReferenceType string //type of the reference (e.g cve-ticket, slack-message etc)
@@ -44,7 +45,7 @@ const (
 type EntitiesIdentifiers []EntityIdentifiers
 
 func (e *EntitiesIdentifiers) ToMap() []map[string]string {
-	entitiesMap := make([]map[string]string, len(*e))
+	entitiesMap := make([]map[string]string, 0)
 	for _, entity := range *e {
 		entitiesMap = append(entitiesMap, entity.ToMap())
 	}
@@ -75,6 +76,55 @@ type EntityIdentifiers struct {
 
 	ControlID string  `json:"controlID,omitempty" bson:"controlID,omitempty"`
 	BaseScore float32 `json:"baseScore,omitempty" bson:"baseScore,omitempty"`
+	FilePath  string  `json:"filePath,omitempty" bson:"filePath,omitempty"`
+}
+
+func NewClusterResourceIdentifiers(resource armotypes.PostureResourceSummary) EntityIdentifiers {
+	return EntityIdentifiers{
+		Type:         EntityTypePostureResource,
+		Cluster:      resource.Designators.Attributes[identifiers.AttributeCluster],
+		Namespace:    resource.Designators.Attributes[identifiers.AttributeNamespace],
+		Kind:         resource.Designators.Attributes[identifiers.AttributeKind],
+		Name:         resource.Designators.Attributes[identifiers.AttributeName],
+		ResourceHash: resource.ResourceHash,
+		ResourceID:   resource.ResourceID,
+	}
+}
+
+func NewRepositoryResourceIdentifiers(resource armotypes.PostureResourceSummary) EntityIdentifiers {
+	return EntityIdentifiers{
+		Type:       EntityTypeRepositoryResource,
+		RepoHash:   resource.Designators.Attributes[identifiers.AttributeRepoHash],
+		Namespace:  resource.Designators.Attributes[identifiers.AttributeNamespace],
+		Kind:       resource.Designators.Attributes[identifiers.AttributeKind],
+		Name:       resource.Designators.Attributes[identifiers.AttributeName],
+		FilePath:   resource.Designators.Attributes[identifiers.AttributeFilePath],
+		ResourceID: resource.ResourceID,
+	}
+}
+
+func NewContainerScanWorkloadIdentifiers(workload armotypes.VulnerabilityWorkload) EntityIdentifiers {
+	return EntityIdentifiers{
+		Type:         EntityTypeContainerScanWorkload,
+		ResourceHash: workload.ResourceHash,
+		Cluster:      workload.Cluster,
+		Namespace:    workload.Namespace,
+		Kind:         workload.Kind,
+		Name:         workload.Name,
+	}
+}
+
+// Vulnerability
+func NewVulnerabilityIdentifiers(vulnerability armotypes.Vulnerability) EntityIdentifiers {
+	return EntityIdentifiers{
+		Type:             EntityTypeVulanrability,
+		CVEName:          vulnerability.Name,
+		CVEID:            vulnerability.ID,
+		Severity:         vulnerability.Severity,
+		SeverityScore:    vulnerability.SeverityScore,
+		Component:        vulnerability.ComponentInfo.Name,
+		ComponentVersion: vulnerability.ComponentInfo.Version,
+	}
 }
 
 func (e *EntityIdentifiers) Validate() error {
@@ -91,8 +141,8 @@ func (e *EntityIdentifiers) Validate() error {
 			return fmt.Errorf("namespace, name, kind, resource hash and cluster are required for %s", e.Type)
 		}
 	case EntityTypeRepositoryResource:
-		if e.RepoHash == "" || e.Namespace == "" || e.Name == "" || e.Kind == "" || e.ResourceID == "" {
-			return fmt.Errorf("namespace, name, kind, resource hash, repo hash and resource id are required for %s", e.Type)
+		if e.RepoHash == "" || e.FilePath == "" || e.Namespace == "" || e.Name == "" || e.Kind == "" || e.ResourceID == "" {
+			return fmt.Errorf("namespace, name, kind, resource hash, repo hash, file path and resource id are required for %s", e.Type)
 		}
 	case EntityTypeImage:
 		if e.ImageReposiotry == "" {
@@ -120,55 +170,58 @@ func (e *EntityIdentifiers) ToMap() map[string]string {
 	//avoid empty values
 	entityMap := make(map[string]string)
 	if e.Cluster != "" {
-		entityMap["cluster"] = e.Cluster
+		entityMap[identifiers.AttributeCluster] = e.Cluster
 	}
 	if e.RepoHash != "" {
-		entityMap["repoHash"] = e.RepoHash
+		entityMap[identifiers.AttributeRepoHash] = e.RepoHash
 	}
 	if e.Namespace != "" {
-		entityMap["namespace"] = e.Namespace
+		entityMap[identifiers.AttributeNamespace] = e.Namespace
 	}
 	if e.Name != "" {
-		entityMap["name"] = e.Name
+		entityMap[identifiers.AttributeName] = e.Name
 	}
 	if e.Kind != "" {
-		entityMap["kind"] = e.Kind
+		entityMap[identifiers.AttributeKind] = e.Kind
 	}
 	if e.ResourceHash != "" {
-		entityMap["resourceHash"] = e.ResourceHash
+		entityMap[identifiers.AttributeResourceHash] = e.ResourceHash
 	}
 	if e.ResourceID != "" {
-		entityMap["resourceID"] = e.ResourceID
+		entityMap[identifiers.AttributeResourceID] = e.ResourceID
 	}
 	if e.CVEName != "" {
-		entityMap["cveName"] = e.CVEName
+		entityMap[identifiers.AttributeCVEName] = e.CVEName
 	}
 	if e.CVEID != "" {
-		entityMap["cveID"] = e.CVEID
+		entityMap[identifiers.AttributeCVEID] = e.CVEID
 	}
 	if e.Severity != "" {
-		entityMap["severity"] = e.Severity
+		entityMap[identifiers.AttributeSeverity] = e.Severity
 	}
 	if e.SeverityScore != 0 {
-		entityMap["severityScore"] = fmt.Sprintf("%d", e.SeverityScore)
+		entityMap[identifiers.AttributeSeverityScore] = fmt.Sprintf("%d", e.SeverityScore)
 	}
 	if e.Component != "" {
-		entityMap["component"] = e.Component
+		entityMap[identifiers.AttributeComponent] = e.Component
 	}
 	if e.ComponentVersion != "" {
-		entityMap["componentVersion"] = e.ComponentVersion
+		entityMap[identifiers.AttributeComponentVersion] = e.ComponentVersion
 	}
 	if e.ImageReposiotry != "" {
-		entityMap["imageRepository"] = e.ImageReposiotry
+		entityMap[identifiers.AttributeImageRepository] = e.ImageReposiotry
 	}
 	if e.LayerHash != "" {
-		entityMap["layerHash"] = e.LayerHash
+		entityMap[identifiers.AttributeLayerHash] = e.LayerHash
 	}
 	if e.ControlID != "" {
-		entityMap["controlID"] = e.ControlID
+		entityMap[identifiers.AttributeControlID] = e.ControlID
 	}
 	if e.BaseScore != 0 {
-		entityMap["baseScore"] = fmt.Sprintf("%f", e.BaseScore)
+		entityMap[identifiers.AttributeBaseScore] = fmt.Sprintf("%f", e.BaseScore)
+	}
+	if e.FilePath != "" {
+		entityMap[identifiers.AttributeFilePath] = e.FilePath
 	}
 	return entityMap
 }
