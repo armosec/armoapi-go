@@ -14,6 +14,7 @@ type RespTotal struct {
 const (
 	V2ListExistsOperator       string = "exists"
 	V2ListEqualOperator        string = "equal"
+	V2ListNotEqualOperator     string = "notequal"
 	V2ListMissingOperator      string = "missing"
 	V2ListEmptyOperator        string = "empty"
 	V2ListMatchOperator        string = "match"
