@@ -91,24 +91,29 @@ func (sr *SecurityRisk) GetRiskTypes() []RiskType {
 }
 
 type SecurityIssuesSummary struct {
-	SecurityRiskID                   string     `json:"securityRiskID"`
-	SecurityRiskName                 string     `json:"securityRiskName"`
-	Category                         string     `json:"category"`
-	Severity                         string     `json:"severity"`
-	LastUpdated                      string     `json:"lastUpdated"`
-	AffectedClustersCount            int        `json:"affectedClustersCount"`
-	AffectedNamespacesCount          int        `json:"affectedNamespacesCount"`
-	AffectedResourcesCount           int        `json:"affectedResourcesCount"`
-	ResourcesDetectedLastUpdateCount int        `json:"resourcesDetectedLastUpdateCount"`
-	ResourcesResolvedLastUpdateCount int        `json:"resourcesResolvedLastUpdateCount"`
+	SecurityRiskID                   string `json:"securityRiskID"`
+	SecurityRiskName                 string `json:"securityRiskName"`
+	Category                         string `json:"category"`
+	Severity                         string `json:"severity"`
+	LastUpdated                      string `json:"lastUpdated"`
+	AffectedClustersCount            int    `json:"affectedClustersCount"`
+	AffectedNamespacesCount          int    `json:"affectedNamespacesCount"`
+	AffectedResourcesCount           int    `json:"affectedResourcesCount"`
+	ResourcesDetectedLastUpdateCount int    `json:"resourcesDetectedLastUpdateCount"`
+	ResourcesResolvedLastUpdateCount int    `json:"resourcesResolvedLastUpdateCount"`
+
 	ResourcesDetectedLastChangeCount int        `json:"resourcesDetectedLastChangeCount"`
-	ResourcesResolvedLastChangeCount int        `json:"resourcesResolvedLastChangeCount"`
-	AffectedResourcesChange          int        `json:"affectedResourcesChange"`
 	ResourcesDetectedLastChange      []Resource `json:"resourcesDetectedLastChange"`
+
+	// resources that are resolved excluding deleted
+	ResourcesResolvedLastChangeCount int        `json:"resourcesResolvedLastChangeCount"`
 	ResourcesResolvedLastChange      []Resource `json:"resourcesResolvedLastChange"`
 
-	// resources that are resolved because of a kubernetes resource deletion
-	ResourcesDeletedLastChange []Resource `json:"resourcesDeletedLastChange"`
+	// resources that are resolved because of a kubernetes resource deletion or cluster deletion
+	ResourcesDeletedLastChangeCount int        `json:"resourcesDeletedLastChangeCount"`
+	ResourcesDeletedLastChange      []Resource `json:"resourcesDeletedLastChange"`
+
+	AffectedResourcesChange int `json:"affectedResourcesChange"`
 
 	// if True, control supports smart remediation
 	// swagger:ignore
