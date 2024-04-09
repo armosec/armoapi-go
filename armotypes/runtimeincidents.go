@@ -92,7 +92,7 @@ type RuntimeAlertProcessDetails struct {
 	// Process Name
 	Comm string `json:"comm,omitempty" bson:"comm,omitempty"`
 	// GID of the process
-	GID uint32 `json:"gid,omitempty" bson:"gid,omitempty"`
+	GID *uint32 `json:"gid,omitempty" bson:"gid,omitempty"`
 	// Group name of the process
 	GroupName *string `json:"groupName,omitempty" bson:"groupName,omitempty"`
 	// Path to the file that was infected
@@ -100,25 +100,25 @@ type RuntimeAlertProcessDetails struct {
 	// Process ID
 	PID uint32 `json:"pid,omitempty" bson:"pid,omitempty"`
 	// UID of the process
-	UID uint32 `json:"uid,omitempty" bson:"uid,omitempty"`
+	UID *uint32 `json:"uid,omitempty" bson:"uid,omitempty"`
 	// User name of the process
 	UserName *string `json:"userName,omitempty" bson:"userName,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
-	ClusterName       *string `json:"clusterName" bson:"clusterName"`
-	ContainerName     string  `json:"containerName,omitempty" bson:"containerName,omitempty"`
-	HostNetwork       *bool   `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
-	Image             string  `json:"image,omitempty" bson:"image,omitempty"`
-	ImageDigest       string  `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
-	Namespace         string  `json:"namespace,omitempty" bson:"namespace,omitempty"`
-	NodeName          string  `json:"nodeName,omitempty" bson:"nodeName,omitempty"`
-	ContainerID       string  `json:"containerID,omitempty" bson:"containerID,omitempty"`
-	PodName           string  `json:"podName,omitempty" bson:"podName,omitempty"`
-	PodNamespace      string  `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
-	WorkloadName      string  `json:"workloadName" bson:"workloadName"`
-	WorkloadNamespace string  `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
-	WorkloadKind      string  `json:"workloadKind" bson:"workloadKind"`
+	ClusterName       string `json:"clusterName" bson:"clusterName"`
+	ContainerName     string `json:"containerName,omitempty" bson:"containerName,omitempty"`
+	HostNetwork       *bool  `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
+	Image             string `json:"image,omitempty" bson:"image,omitempty"`
+	ImageDigest       string `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
+	Namespace         string `json:"namespace,omitempty" bson:"namespace,omitempty"`
+	NodeName          string `json:"nodeName,omitempty" bson:"nodeName,omitempty"`
+	ContainerID       string `json:"containerID,omitempty" bson:"containerID,omitempty"`
+	PodName           string `json:"podName,omitempty" bson:"podName,omitempty"`
+	PodNamespace      string `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
+	WorkloadName      string `json:"workloadName" bson:"workloadName"`
+	WorkloadNamespace string `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
+	WorkloadKind      string `json:"workloadKind" bson:"workloadKind"`
 }
 
 type RuntimeAlert struct {
