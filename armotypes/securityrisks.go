@@ -8,6 +8,7 @@ import (
 type SecurityIssueStatus string
 type RiskType string
 type SecurityIssueSeverity string
+type ResolvedReason string
 
 const (
 	SecurityIssueStatusDetected SecurityIssueStatus = "Detected"
@@ -22,6 +23,10 @@ const (
 	SecurityIssueSeverityLow      SecurityIssueSeverity = "Low"
 
 	SecurityRiskExceptionPolicyType PolicyType = "securityRiskExceptionPolicy"
+
+	ResolvedReasonResourceDeleted ResolvedReason = "ResourceDeleted"
+	ResolvedReasonClusterDeleted  ResolvedReason = "ClusterDeleted"
+	ResolvedReasonRiskResolved    ResolvedReason = "RiskResolved"
 )
 
 // Risk represents an individual risk with an ID and type
