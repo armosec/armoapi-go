@@ -41,6 +41,20 @@ type RuntimeIncidentResource struct {
 	Designators identifiers.PortalDesignator `json:"designators" bson:"designators"`
 }
 
+type Process struct {
+	PID        uint32    `json:"pid,omitempty" bson:"pid,omitempty"`
+	Cmdline    string    `json:"cmdline,omitempty" bson:"cmdline,omitempty"`
+	Comm       string    `json:"comm,omitempty" bson:"comm,omitempty"`
+	PPID       uint32    `json:"ppid,omitempty" bson:"ppid,omitempty"`
+	Pcomm      string    `json:"pcomm,omitempty" bson:"pcomm,omitempty"`
+	Hardlink   string    `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
+	Uid        uint32    `json:"uid,omitempty" bson:"uid,omitempty"`
+	Gid        uint32    `json:"gid,omitempty" bson:"gid,omitempty"`
+	UpperLayer bool      `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
+	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
+	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
+}
+
 type AlertType int
 
 const (
@@ -53,16 +67,12 @@ type BaseRuntimeAlert struct {
 	AlertName string `json:"alertName,omitempty" bson:"name,omitempty"`
 	// Arguments of specific alerts (e.g. for unexpected files: open file flags; for unexpected process: return code)
 	Arguments map[string]interface{} `json:"arguments,omitempty" bson:"arguments,omitempty"`
-	// Command line of the process
-	CommandLine *string `json:"commandLine,omitempty" bson:"commandLine,omitempty"`
+	// Infected process id
+	InfectedPID uint32 `json:"infectedPID,omitempty" bson:"infectedPID,omitempty"`
+	// Process tree unique id
+	ProcessTreeUniqueID uint32 `json:"processTreeUniqueID,omitempty" bson:"processTreeUniqueID,omitempty"`
 	// Fix suggestions
 	FixSuggestions string `json:"fixSuggestions,omitempty" bson:"fixSuggestions,omitempty"`
-	// Is part of the image
-	IsPartOfImage *bool `json:"isPartOfImage,omitempty" bson:"isPartOfImage,omitempty"`
-	// Parent Process ID
-	PPID *uint32 `json:"ppid,omitempty" bson:"ppid,omitempty"`
-	// PPIDComm - Parent Process Name
-	PPIDComm *string `json:"ppidComm,omitempty" bson:"ppidComm,omitempty"`
 	// MD5 hash of the file that was infected
 	MD5Hash string `json:"md5Hash,omitempty" bson:"md5Hash,omitempty"`
 	// SHA1 hash of the file that was infected
@@ -88,23 +98,6 @@ type MalwareAlert struct {
 	MalwareDescription string `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
 }
 
-type RuntimeAlertProcessDetails struct {
-	// Process Name
-	Comm string `json:"comm,omitempty" bson:"comm,omitempty"`
-	// GID of the process
-	GID *uint32 `json:"gid,omitempty" bson:"gid,omitempty"`
-	// Group name of the process
-	GroupName *string `json:"groupName,omitempty" bson:"groupName,omitempty"`
-	// Path to the file that was infected
-	Path string `json:"path,omitempty" bson:"path,omitempty"`
-	// Process ID
-	PID uint32 `json:"pid,omitempty" bson:"pid,omitempty"`
-	// UID of the process
-	UID *uint32 `json:"uid,omitempty" bson:"uid,omitempty"`
-	// User name of the process
-	UserName *string `json:"userName,omitempty" bson:"userName,omitempty"`
-}
-
 type RuntimeAlertK8sDetails struct {
 	ClusterName       string `json:"clusterName" bson:"clusterName"`
 	ContainerName     string `json:"containerName,omitempty" bson:"containerName,omitempty"`
@@ -122,13 +115,18 @@ type RuntimeAlertK8sDetails struct {
 }
 
 type RuntimeAlert struct {
-	BaseRuntimeAlert           `json:",inline"`
-	RuleAlert                  `json:",inline"`
-	MalwareAlert               `json:",inline"`
-	RuntimeAlertProcessDetails `json:",inline"`
-	RuntimeAlertK8sDetails     `json:",inline"`
-	AlertType                  AlertType `json:"alertType" bson:"alertType"`
+	BaseRuntimeAlert       `json:",inline"`
+	RuleAlert              `json:",inline"`
+	MalwareAlert           `json:",inline"`
+	RuntimeAlertK8sDetails `json:",inline"`
+	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Hostname is the name of the node agent pod
 	HostName string `json:"hostName" bson:"hostName"`
 	Message  string `json:"message" bson:"message"`
+}
+
+type ProcessTree struct {
+	ProcessTree Process `json:"processTree" bson:"processTree"`
+	UniqueID    uint32  `json:"uniqueID" bson:"uniqueID"`
+	ContainerID string  `json:"containerID" bson:"containerID"`
 }
