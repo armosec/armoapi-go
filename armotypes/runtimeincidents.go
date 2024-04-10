@@ -42,17 +42,17 @@ type RuntimeIncidentResource struct {
 }
 
 type Process struct {
-	PID        uint32     `json:"pid,omitempty" bson:"pid,omitempty"`
-	Cmdline    string     `json:"cmdline,omitempty" bson:"cmdline,omitempty"`
-	Comm       string     `json:"comm,omitempty" bson:"comm,omitempty"`
-	PPID       uint32     `json:"ppid,omitempty" bson:"ppid,omitempty"`
-	Pcomm      string     `json:"pcomm,omitempty" bson:"pcomm,omitempty"`
-	Hardlink   string     `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
-	Uid        uint32     `json:"uid,omitempty" bson:"uid,omitempty"`
-	Gid        uint32     `json:"gid,omitempty" bson:"gid,omitempty"`
-	UpperLayer bool       `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
-	Cwd        string     `json:"cwd,omitempty" bson:"cwd,omitempty"`
-	Children   []*Process `json:"children,omitempty" bson:"children,omitempty"`
+	PID        uint32    `json:"pid,omitempty" bson:"pid,omitempty"`
+	Cmdline    string    `json:"cmdline,omitempty" bson:"cmdline,omitempty"`
+	Comm       string    `json:"comm,omitempty" bson:"comm,omitempty"`
+	PPID       uint32    `json:"ppid,omitempty" bson:"ppid,omitempty"`
+	Pcomm      string    `json:"pcomm,omitempty" bson:"pcomm,omitempty"`
+	Hardlink   string    `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
+	Uid        uint32    `json:"uid,omitempty" bson:"uid,omitempty"`
+	Gid        uint32    `json:"gid,omitempty" bson:"gid,omitempty"`
+	UpperLayer bool      `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
+	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
+	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
 }
 
 type AlertType int
@@ -68,7 +68,7 @@ type BaseRuntimeAlert struct {
 	// Arguments of specific alerts (e.g. for unexpected files: open file flags; for unexpected process: return code)
 	Arguments map[string]interface{} `json:"arguments,omitempty" bson:"arguments,omitempty"`
 	// Process tree
-	ProcessTree *Process `json:"processTree,omitempty" bson:"processTree,omitempty"`
+	ProcessTree Process `json:"processTree,omitempty" bson:"processTree,omitempty"`
 	// Fix suggestions
 	FixSuggestions string `json:"fixSuggestions,omitempty" bson:"fixSuggestions,omitempty"`
 	// MD5 hash of the file that was infected
