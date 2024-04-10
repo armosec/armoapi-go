@@ -69,8 +69,8 @@ type BaseRuntimeAlert struct {
 	Arguments map[string]interface{} `json:"arguments,omitempty" bson:"arguments,omitempty"`
 	// Infected process id
 	InfectedPID uint32 `json:"infectedPID,omitempty" bson:"infectedPID,omitempty"`
-	// Process tree
-	ProcessTree Process `json:"processTree,omitempty" bson:"processTree,omitempty"`
+	// Process tree unique id
+	ProcessTreeUniqueID uint32 `json:"processTreeUniqueID,omitempty" bson:"processTreeUniqueID,omitempty"`
 	// Fix suggestions
 	FixSuggestions string `json:"fixSuggestions,omitempty" bson:"fixSuggestions,omitempty"`
 	// MD5 hash of the file that was infected
@@ -123,4 +123,10 @@ type RuntimeAlert struct {
 	// Hostname is the name of the node agent pod
 	HostName string `json:"hostName" bson:"hostName"`
 	Message  string `json:"message" bson:"message"`
+}
+
+type ProcessTree struct {
+	ProcessTree Process `json:"processTree" bson:"processTree"`
+	UniqueID    uint32  `json:"uniqueID" bson:"uniqueID"`
+	ContainerID string  `json:"containerID" bson:"containerID"`
 }
