@@ -67,6 +67,8 @@ type BaseRuntimeAlert struct {
 	AlertName string `json:"alertName,omitempty" bson:"name,omitempty"`
 	// Arguments of specific alerts (e.g. for unexpected files: open file flags; for unexpected process: return code)
 	Arguments map[string]interface{} `json:"arguments,omitempty" bson:"arguments,omitempty"`
+	// Infected process id
+	InfectedPID uint32 `json:"infectedPID,omitempty" bson:"infectedPID,omitempty"`
 	// Process tree
 	ProcessTree Process `json:"processTree,omitempty" bson:"processTree,omitempty"`
 	// Fix suggestions
