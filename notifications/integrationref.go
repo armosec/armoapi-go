@@ -22,7 +22,7 @@ const (
 type IntegrationReference struct {
 	armotypes.PortalBase `json:",inline" bson:"inline"`
 	Provider             ChannelProvider     `json:"provider,omitempty" bson:"provider,omitempty"`             //integration provider (e.g jira, slack, teams)
-	ProviderData         interface{}         `json:"providerData,omitempty" bson:"providerData,omitempty"`     //integration provider data (e.g jira ticket data)
+	ProviderData         map[string]string   `json:"providerData,omitempty" bson:"providerData,omitempty"`     //integration provider data (e.g jira ticket data)
 	Type                 ReferenceType       `json:"type,omitempty" bson:"type,omitempty"`                     //type of the reference (e.g cve-ticket, slack-message etc)
 	Owner                *EntityIdentifiers  `json:"owner,omitempty" bson:"owner,omitempty"`                   //owner identifiers of this reference (e.g resourceHash, wlid)
 	RelatedObjects       EntitiesIdentifiers `json:"relatedObjects,omitempty" bson:"relatedObjects,omitempty"` //related entities identifiers of this reference (e.g cves, controls)
