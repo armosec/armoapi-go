@@ -9,7 +9,7 @@ const (
 type Ticket struct {
 	GUID          string              `json:"guid,omitempty"`         //ticket guid in armo
 	TicketManager TicketManager       `json:"ticketManager"`          //ticket service provider
-	Owner         map[string]string   `json:"ownerID,omitempty"`      //armo entity that owns the ticket
+	Owner         map[string]string   `json:"owner,omitempty"`        //armo entity that owns the ticket
 	Subjects      []map[string]string `json:"subjects,omitempty"`     //armo entities mentioned in the ticket
 	Link          string              `json:"link,omitempty"`         //link to the ticket
 	Status        string              `json:"status,omitempty"`       //status of the ticket
