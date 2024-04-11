@@ -168,7 +168,9 @@ func (e *EntityIdentifiers) Validate() error {
 
 func (e *EntityIdentifiers) ToMap() map[string]string {
 	entityMap := make(map[string]string)
-	entityMap[identifiers.AttributeType] = string(e.Type)
+	if e.Type != "" {
+		entityMap[identifiers.AttributeType] = string(e.Type)
+	}
 	if e.Cluster != "" {
 		entityMap[identifiers.AttributeCluster] = e.Cluster
 	}
