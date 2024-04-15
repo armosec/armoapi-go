@@ -33,6 +33,7 @@ type RuntimeIncident struct {
 	MarkedAsFalsePositive bool       `json:"markedAsFalsePositive" bson:"markedAsFalsePositive"`
 	// for future use
 	RelatedResources []RuntimeIncidentResource `json:"relatedResources" bson:"relatedResources"`
+	ProcessTree      *ProcessTree              `json:"processTree,omitempty" bson:"processTree,omitempty"`
 }
 
 type RuntimeIncidentResource struct {
