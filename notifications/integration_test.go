@@ -50,6 +50,18 @@ func TestEntity_Validate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Valid posture resource entity (no namespace)",
+			entity: EntityIdentifiers{
+				Type:         EntityTypePostureResource,
+				Cluster:      validBaseEntity.Cluster,				
+				Name:         validBaseEntity.Name,
+				Kind:         validBaseEntity.Kind,
+				ResourceHash: validBaseEntity.ResourceHash,
+				ResourceID:   validBaseEntity.ResourceID,
+			},
+			wantErr: false,
+		},
+		{
 			name: "Invalid posture resource entity",
 			entity: EntityIdentifiers{
 				Type: EntityTypePostureResource,
@@ -63,6 +75,18 @@ func TestEntity_Validate(t *testing.T) {
 				RepoHash:   validBaseEntity.RepoHash,
 				FilePath:   validBaseEntity.FilePath,
 				Namespace:  validBaseEntity.Namespace,
+				Name:       validBaseEntity.Name,
+				Kind:       validBaseEntity.Kind,
+				ResourceID: validBaseEntity.ResourceID,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid repository resource entity (no namespace)",
+			entity: EntityIdentifiers{
+				Type:       EntityTypeRepositoryResource,
+				RepoHash:   validBaseEntity.RepoHash,
+				FilePath:   validBaseEntity.FilePath,		
 				Name:       validBaseEntity.Name,
 				Kind:       validBaseEntity.Kind,
 				ResourceID: validBaseEntity.ResourceID,
