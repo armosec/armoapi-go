@@ -14,7 +14,7 @@ type BaseExceptionPolicy struct {
 	PolicyIDs      []string                       `json:"policyIDs,omitempty" bson:"policyIDs,omitempty"`
 	CreationTime   string                         `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 	Reason         string                         `json:"reason,omitempty" bson:"reason,omitempty"`
-	ExpirationTime *time.Time                     `json:"expirationTime,omitempty" bson:"expirationTime,omitempty"`
+	ExpirationDate *time.Time                     `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
 	CreatedBy      string                         `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 	Resources      []identifiers.PortalDesignator `json:"resources" bson:"resources,omitempty"`
 }
