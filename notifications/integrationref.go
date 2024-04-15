@@ -133,7 +133,7 @@ func (e *EntityIdentifiers) Validate() error {
 	}
 	switch e.Type {
 	case EntityTypePostureResource:
-		if e.Cluster == "" || e.Namespace == "" || e.Name == "" || e.Kind == "" || e.ResourceHash == "" || e.ResourceID == "" {
+		if e.Cluster == "" || e.Name == "" || e.Kind == "" || e.ResourceHash == "" || e.ResourceID == "" {
 			return fmt.Errorf("namespace, name, kind, resource hash, cluster and resource id are required for %s", e.Type)
 		}
 	case EntityTypeContainerScanWorkload:
@@ -141,7 +141,7 @@ func (e *EntityIdentifiers) Validate() error {
 			return fmt.Errorf("namespace, name, kind, resource hash and cluster are required for %s", e.Type)
 		}
 	case EntityTypeRepositoryResource:
-		if e.RepoHash == "" || e.FilePath == "" || e.Namespace == "" || e.Name == "" || e.Kind == "" || e.ResourceID == "" {
+		if e.RepoHash == "" || e.FilePath == "" || e.Name == "" || e.Kind == "" || e.ResourceID == "" {
 			return fmt.Errorf("namespace, name, kind, resource hash, repo hash, file path and resource id are required for %s", e.Type)
 		}
 	case EntityTypeImage:
