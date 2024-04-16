@@ -193,8 +193,6 @@ type SecurityIssue struct {
 	LastTimeDetected string `json:"lastTimeDetected,omitempty"`
 	LastTimeResolved string `json:"lastTimeResolved,omitempty"`
 	ExceptionApplied bool   `json:"exceptionApplied"`
-
-	Exception BaseExceptionPolicy `json:"exception,omitempty"`
 }
 
 func (si *SecurityIssue) GetClusterName() string {
