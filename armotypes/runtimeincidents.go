@@ -49,10 +49,11 @@ type Process struct {
 	PPID       uint32    `json:"ppid,omitempty" bson:"ppid,omitempty"`
 	Pcomm      string    `json:"pcomm,omitempty" bson:"pcomm,omitempty"`
 	Hardlink   string    `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
-	Uid        uint32    `json:"uid,omitempty" bson:"uid,omitempty"`
-	Gid        uint32    `json:"gid,omitempty" bson:"gid,omitempty"`
+	Uid        *uint32   `json:"uid,omitempty" bson:"uid,omitempty"`
+	Gid        *uint32   `json:"gid,omitempty" bson:"gid,omitempty"`
 	UpperLayer bool      `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
 	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
+	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
 	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
 }
 
@@ -83,7 +84,7 @@ type BaseRuntimeAlert struct {
 	// Severity of the alert
 	Severity int `json:"severity,omitempty" bson:"severity,omitempty"`
 	// Size of the file that was infected
-	Size *string `json:"size,omitempty" bson:"size,omitempty"`
+	Size string `json:"size,omitempty" bson:"size,omitempty"`
 	// Command line
 	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
 }
