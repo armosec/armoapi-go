@@ -637,7 +637,6 @@ func TestRemoveProviderConfig(t *testing.T) {
 		name             string
 		config           *NotificationsConfig
 		providerToRemove ChannelProvider
-		isError          bool
 	}{
 		{
 			name: "multiple providers",
@@ -720,19 +719,14 @@ func TestRemoveProviderConfig(t *testing.T) {
 				},
 			},
 			providerToRemove: CollaborationTypeTeams,
-			isError:          true,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := test.config.RemoveProviderConfig(test.providerToRemove)
-			if test.isError {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Empty(t, test.config.AlertChannels[test.providerToRemove])
-			}
+			test.config.RemoveProviderConfig(test.providerToRemove)
+			assert.Empty(t, test.config.AlertChannels[test.providerToRemove])
+
 		})
 	}
 }
