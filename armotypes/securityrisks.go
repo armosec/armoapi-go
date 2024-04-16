@@ -192,8 +192,9 @@ type SecurityIssue struct {
 
 	LastTimeDetected string `json:"lastTimeDetected,omitempty"`
 	LastTimeResolved string `json:"lastTimeResolved,omitempty"`
+	ExceptionApplied bool   `json:"exceptionApplied"`
 
-	ExceptionApplied bool `json:"exceptionApplied"`
+	Exception BaseExceptionPolicy `json:"exception,omitempty"`
 }
 
 func (si *SecurityIssue) GetClusterName() string {
@@ -230,6 +231,8 @@ type SecurityRiskExceptionPolicy struct {
 	Name                string `json:"name"`
 	Category            string `json:"category"`
 	Severity            string `json:"severity"`
+	SecurityRiskID      string `json:"securityRiskID"`
+	Risks               []Risk `json:"risks"`
 }
 
 type SecurityIssuesTrends struct {
