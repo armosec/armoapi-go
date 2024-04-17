@@ -238,11 +238,21 @@ type SecurityIssuesTrends struct {
 	// date in format yyyy-mm-dd
 	Date string `json:"date"`
 
-	// new detected issues on the date
+	// new detected issues within the day
 	NewDetected int `json:"newDetected"`
 
-	// new resolved issues on the date
+	// new resolved issues within the day
 	NewResolved int `json:"newResolved"`
+
+	TotalNewDetectedUpToDate int `json:"totalNewDetectedUpToDate"`
+
+	TotalNewResolvedUpToDate int `json:"totalNewResolvedUpToDate"`
+
+	// new detected issues at the end of the day
+	NewDetectedEndOfDay int `json:"newDetectedEndOfDay"`
+
+	// new resolved issues at the end of the day
+	NewResolvedEndOfDay int `json:"newResolvedEndOfDay"`
 
 	// total detected from the beginning of the period until current date
 	TotalDetectedUpToDate int `json:"totalDetectedUpToDate"`
