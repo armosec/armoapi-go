@@ -190,9 +190,10 @@ type SecurityIssue struct {
 
 	IsNew bool `json:"isNew"`
 
-	LastTimeDetected string `json:"lastTimeDetected,omitempty"`
-	LastTimeResolved string `json:"lastTimeResolved,omitempty"`
-	ExceptionApplied bool   `json:"exceptionApplied"`
+	LastTimeDetected    string `json:"lastTimeDetected,omitempty"`
+	LastTimeResolved    string `json:"lastTimeResolved,omitempty"`
+	ExceptionApplied    bool   `json:"exceptionApplied"`
+	ExceptionPolicyGUID string `json:"exceptionPolicyGUID"`
 }
 
 func (si *SecurityIssue) GetClusterName() string {
