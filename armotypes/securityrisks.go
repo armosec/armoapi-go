@@ -14,8 +14,9 @@ const (
 	SecurityIssueStatusDetected SecurityIssueStatus = "Detected"
 	SecurityIssueStatusResolved SecurityIssueStatus = "Resolved"
 
-	RiskTypeControl    RiskType = "Control"
-	RiskTypeAttackPath RiskType = "AttackPath"
+	RiskTypeControl                  RiskType = "Control"
+	RiskTypeControlWithNetworkPolicy RiskType = "ControlWithNetworkPolicy"
+	RiskTypeAttackPath               RiskType = "AttackPath"
 
 	SecurityIssueSeverityCritical SecurityIssueSeverity = "Critical"
 	SecurityIssueSeverityHigh     SecurityIssueSeverity = "High"
@@ -33,6 +34,9 @@ const (
 type Risk struct {
 	ID   string   `json:"ID"`
 	Type RiskType `json:"type"`
+
+	// field to be enriched by the backend, relevant only to type Control
+	FixByNetworkPolicy bool `json:"fixByNetworkPolicy,omitempty"`
 }
 
 // UnmarshalJSON is a custom unmarshaler for RiskType that validates its value
@@ -217,6 +221,9 @@ type SecurityIssueControl struct {
 	ControlID     string `json:"controlID"`
 	ReportGUID    string `json:"reportGUID"`
 	FrameworkName string `json:"frameworkName"`
+
+	// relevant for controls with network policy fix
+	NetworkPolicyStatus NetworkPolicyStatus `json:"networkPolicyStatus,omitempty"`
 }
 
 type SecurityIssueAttackPath struct {
