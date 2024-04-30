@@ -36,7 +36,7 @@ type Risk struct {
 	Type RiskType `json:"type"`
 
 	// field to be enriched by the backend, relevant only to type Control
-	FixByNetworkPolicy bool `json:"fixByNetworkPolicy,omitempty"`
+	FixByNetworkPolicy bool `json:"fixByNetworkPolicy"`
 }
 
 // UnmarshalJSON is a custom unmarshaler for RiskType that validates its value
