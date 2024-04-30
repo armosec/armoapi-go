@@ -224,6 +224,8 @@ type SecurityIssueControl struct {
 
 	// relevant for controls with network policy fix
 	NetworkPolicyStatus NetworkPolicyStatus `json:"networkPolicyStatus,omitempty"`
+
+	MissingRuntimeInfoReason MissingRuntimeInfoReason `json:"missingRuntimeInfoReason,omitempty"`
 }
 
 type SecurityIssueAttackPath struct {
