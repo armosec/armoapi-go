@@ -117,10 +117,10 @@ type RuntimeAlertK8sDetails struct {
 }
 
 type RuntimeAlert struct {
-	BaseRuntimeAlert       `json:",inline"`
-	RuleAlert              `json:",inline"`
-	MalwareAlert           `json:",inline"`
-	RuntimeAlertK8sDetails `json:",inline"`
+	BaseRuntimeAlert       `json:",inline" bson:"inline"`
+	RuleAlert              `json:",inline" bson:"inline"`
+	MalwareAlert           `json:",inline" bson:"inline"`
+	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Hostname is the name of the node agent pod
 	HostName string `json:"hostName" bson:"hostName"`
