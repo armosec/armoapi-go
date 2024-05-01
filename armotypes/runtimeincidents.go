@@ -132,3 +132,11 @@ type ProcessTree struct {
 	UniqueID    uint32  `json:"uniqueID" bson:"uniqueID"`
 	ContainerID string  `json:"containerID" bson:"containerID"`
 }
+
+func (ri *RuntimeIncident) GetTimestampFieldName() string {
+	return "creationTimestamp"
+}
+
+func (ra *RuntimeAlert) GetTimestampFieldName() string {
+	return "timestamp"
+}

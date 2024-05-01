@@ -44,6 +44,10 @@ func (p *PortalBase) GetUpdatedTime() *time.Time {
 	return &updatedTime
 }
 
+func (p *PortalBase) GetTimestampFieldName() string {
+	return "updatedTime"
+}
+
 func ValidateContainerScanID(containerScanID string) bool {
 	return !strings.Contains(containerScanID, "/")
 }
