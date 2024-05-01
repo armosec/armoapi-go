@@ -35,6 +35,7 @@ const (
 	V2ListSubQuerySeparator = "&"
 	V2ListSortTypeSeparator = ":"
 	V2ListEscapeChar        = "\\"
+	V2ListAndValueSeparator = ";" // for not equal operator ("field": "1;2|notequal" -> field != 1 AND field != 2)
 )
 
 type QueryScopeParams struct {
