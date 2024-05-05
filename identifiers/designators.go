@@ -78,7 +78,6 @@ const (
 	AttributeSecurityRiskID       = "securityRiskID"
 	AttributeSecurityRiskCategory = "securityRiskCategory"
 	AttributeSecurityRiskName     = "securityRiskName"
-	AttributeSmartRemediation     = "smartRemediation"
 	AttributeK8sResourceHash      = "k8sResourceHash"
 	AttributeType                 = "type"
 	AttributeOwner                = "owner"
