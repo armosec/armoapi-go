@@ -251,5 +251,17 @@ func (e *EntityIdentifiers) ToMap() map[string]string {
 	if e.FilePath != "" {
 		entityMap[identifiers.AttributeFilePath] = e.FilePath
 	}
+	if e.SecurityRiskCategory != "" {
+		entityMap[identifiers.AttributeSecurityRiskCategory] = e.SecurityRiskCategory
+	}
+
+	if e.SecurityRiskID != "" {
+		entityMap[identifiers.AttributeSecurityRiskID] = e.SecurityRiskID
+	}
+
+	if e.SecurityRiskName != "" {
+		entityMap[identifiers.AttributeSecurityRiskName] = e.SecurityRiskName
+	}
+
 	return entityMap
 }
