@@ -16,6 +16,7 @@ const (
 	ReferenceTypeRepositoryControlTicket ReferenceType = "ticket:repository:control"
 	ReferenceTypeImageTicket             ReferenceType = "ticket:image"
 	ReferenceTypeVulnerabilityTicket     ReferenceType = "ticket:vulnerability"
+	ReferenceTypeSecurityIssueTicket     ReferenceType = "ticket:securityIssue"
 )
 
 // Referance to external integration (e.g link to jira ticket)
@@ -40,6 +41,8 @@ const (
 	EntityTypeImageLayer            EntityType = "imageLayer"
 	EntityTypeVulanrability         EntityType = "vulnerability"
 	EntityTypeControl               EntityType = "control"
+	EntityTypeSecurityRiskResource  EntityType = "securityRiskResource"
+	EntityTypeSecurityRisk          EntityType = "securityRisk"
 )
 
 type EntitiesIdentifiers []EntityIdentifiers
@@ -77,6 +80,11 @@ type EntityIdentifiers struct {
 	ControlID string  `json:"controlID,omitempty" bson:"controlID,omitempty"`
 	BaseScore float32 `json:"baseScore,omitempty" bson:"baseScore,omitempty"`
 	FilePath  string  `json:"filePath,omitempty" bson:"filePath,omitempty"`
+
+	SecurityRiskID       string `json:"securityRiskID,omitempty" bson:"securityRiskID,omitempty"`
+	SecurityRiskCategory string `json:"securityRiskCategory,omitempty" bson:"securityRiskCategory,omitempty"`
+	SecurityRiskName     string `json:"securityRiskName,omitempty" bson:"securityRiskName,omitempty"`
+	SmartRemediation     bool   `json:"smartRemediation,omitempty" bson:"smartRemediation,omitempty"`
 }
 
 func NewClusterResourceIdentifiers(resource armotypes.PostureResourceSummary) EntityIdentifiers {
@@ -127,6 +135,20 @@ func NewVulnerabilityIdentifiers(vulnerability armotypes.Vulnerability) EntityId
 	}
 }
 
+// security risk
+func NewSecurityRiskResourceIdentifiers(issue armotypes.ISecurityIssue) EntityIdentifiers {
+	ttt := issue.(*armotypes.SecurityIssue)
+	// convert armotypes.ISecurityIssue to armotypes.SecurityRisk
+	return EntityIdentifiers{
+		Type:         EntityTypeSecurityRiskResource,
+		ResourceHash: ttt.K8sResourceHash,
+		Cluster:      ttt.Cluster,
+		Namespace:    ttt.Namespace,
+		Kind:         ttt.Kind,
+		Name:         ttt.ResourceName,
+	}
+}
+
 func (e *EntityIdentifiers) Validate() error {
 	if e.Type == "" {
 		return fmt.Errorf("entity type is required")
@@ -159,6 +181,10 @@ func (e *EntityIdentifiers) Validate() error {
 	case EntityTypeControl:
 		if e.ControlID == "" || e.Severity == "" || e.BaseScore == 0 {
 			return fmt.Errorf("control id, severity and base score are required for %s", e.Type)
+		}
+	case EntityTypeSecurityRiskResource:
+		if e.ResourceHash == "" || e.Cluster == "" || e.Kind == "" || e.Name == "" {
+			return fmt.Errorf("resource hash, cluster, kind and name are required for %s", e.Type)
 		}
 	default:
 		return fmt.Errorf("entity type %s is not supported", e.Type)
