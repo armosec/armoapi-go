@@ -186,6 +186,10 @@ func (e *EntityIdentifiers) Validate() error {
 		if e.ResourceHash == "" || e.Cluster == "" || e.Kind == "" || e.Name == "" {
 			return fmt.Errorf("resource hash, cluster, kind and name are required for %s", e.Type)
 		}
+	case EntityTypeSecurityRisk:
+		if e.SecurityRiskID == "" {
+			return fmt.Errorf("security risk id, category and name are required for %s", e.Type)
+		}
 	default:
 		return fmt.Errorf("entity type %s is not supported", e.Type)
 	}
