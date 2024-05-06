@@ -182,9 +182,13 @@ func (e *EntityIdentifiers) Validate() error {
 		if e.ControlID == "" || e.Severity == "" || e.BaseScore == 0 {
 			return fmt.Errorf("control id, severity and base score are required for %s", e.Type)
 		}
-	case EntityTypeSecurityRisk:
+	case EntityTypeSecurityRiskResource:
 		if e.ResourceHash == "" || e.Cluster == "" || e.Kind == "" || e.Name == "" {
 			return fmt.Errorf("resource hash, cluster, kind and name are required for %s", e.Type)
+		}
+	case EntityTypeSecurityRisk:
+		if e.SecurityRiskID == "" {
+			return fmt.Errorf("security risk id, category and name are required for %s", e.Type)
 		}
 	default:
 		return fmt.Errorf("entity type %s is not supported", e.Type)
