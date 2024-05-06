@@ -128,6 +128,8 @@ type SecurityIssuesSummary struct {
 	// swagger:ignore
 	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
 	SmartRemediation         bool `json:"smartRemediation"`
+
+	Tickets []Ticket `json:"tickets,omitempty"`
 }
 
 type SecurityIssuesCategories struct {
@@ -174,6 +176,8 @@ type ISecurityIssue interface {
 	GetShortClusterName() string
 	SetClusterName(string)
 	SetShortClusterName(string)
+	GetK8sResourceHash() string
+	SetTickets([]Ticket)
 }
 
 type SecurityIssue struct {
@@ -198,6 +202,8 @@ type SecurityIssue struct {
 	LastTimeResolved    string `json:"lastTimeResolved,omitempty"`
 	ExceptionApplied    bool   `json:"exceptionApplied"`
 	ExceptionPolicyGUID string `json:"exceptionPolicyGUID"`
+
+	Tickets []Ticket `json:"tickets,omitempty"`
 }
 
 func (si *SecurityIssue) GetClusterName() string {
@@ -214,6 +220,14 @@ func (si *SecurityIssue) SetClusterName(clusterName string) {
 
 func (si *SecurityIssue) SetShortClusterName(clusterShortName string) {
 	si.ClusterShortName = clusterShortName
+}
+
+func (si *SecurityIssue) GetK8sResourceHash() string {
+	return si.K8sResourceHash
+}
+
+func (si *SecurityIssue) SetTickets(tickets []Ticket) {
+	si.Tickets = tickets
 }
 
 type SecurityIssueControl struct {
