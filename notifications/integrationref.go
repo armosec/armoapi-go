@@ -136,16 +136,15 @@ func NewVulnerabilityIdentifiers(vulnerability armotypes.Vulnerability) EntityId
 }
 
 // security risk
-func NewSecurityRiskResourceIdentifiers(issue armotypes.ISecurityIssue) EntityIdentifiers {
-	ttt := issue.(*armotypes.SecurityIssue)
+func NewSecurityRiskResourceIdentifiers(issue armotypes.SecurityIssue) EntityIdentifiers {
 	// convert armotypes.ISecurityIssue to armotypes.SecurityRisk
 	return EntityIdentifiers{
 		Type:         EntityTypeSecurityRiskResource,
-		ResourceHash: ttt.K8sResourceHash,
-		Cluster:      ttt.Cluster,
-		Namespace:    ttt.Namespace,
-		Kind:         ttt.Kind,
-		Name:         ttt.ResourceName,
+		ResourceHash: issue.K8sResourceHash,
+		Cluster:      issue.Cluster,
+		Namespace:    issue.Namespace,
+		Kind:         issue.Kind,
+		Name:         issue.ResourceName,
 	}
 }
 

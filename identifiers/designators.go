@@ -64,6 +64,7 @@ const (
 	AttributeNamespace            = "namespace"
 	AttributeKind                 = "kind"
 	AttributeName                 = "name"
+	AttribueResourceName          = "resourceName"
 	AttributeContainerName        = "containerName"
 	AttributeApiVersion           = "apiVersion"
 	AttributeApiGroup             = "apiGroup"
