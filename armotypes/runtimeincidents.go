@@ -7,10 +7,14 @@ import (
 )
 
 type IncidentCategory string
+type RuntimeIncidentResolveReason string
 
 const (
 	RuntimeIncidentCategoryMalware IncidentCategory = "Malware"
 	RuntimeIncidentCategoryAnomaly IncidentCategory = "Anomaly"
+
+	RuntimeResolveReasonFalsePositive RuntimeIncidentResolveReason = "FalsePositive"
+	RuntimeResolveReasonSuspicious    RuntimeIncidentResolveReason = "Suspicious"
 )
 
 type RuntimeIncident struct {
