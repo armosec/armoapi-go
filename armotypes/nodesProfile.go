@@ -6,6 +6,33 @@ type NodeProfile struct {
 	Cluster      string      `json:"cluster"`
 	Name         string      `json:"name"`
 	PodsStatus   []PodStatus `json:"podsStatus"`
+
+	// consider join on PodStatus table to get missingRuntimeInfo
+	NodeAgentRunning bool `json:"nodeAgentRunning"`
+}
+
+func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
+	var monitoredPods []PodStatus
+	for _, pod := range nc.PodsStatus {
+		if pod.HasApplicationProfile && nc.NodeAgentRunning && pod.Phase == "Running" {
+			monitoredPods = append(monitoredPods, pod)
+		}
+	}
+	return monitoredPods
+}
+
+func (nc *NodeProfile) GetMonitoredContainers() []PodContainer {
+	var monitoredContainers []PodContainer
+	monitoredPods := nc.GetMonitoredPods()
+	for _, pod := range monitoredPods {
+		monitoredContainers = append(monitoredContainers, pod.Containers...)
+		monitoredContainers = append(monitoredContainers, pod.InitContainers...)
+	}
+	return monitoredContainers
+}
+
+func (nc *NodeProfile) CountMonitoredPods() int {
+	return len(nc.GetMonitoredPods())
 }
 
 func (nc *NodeProfile) GetRunningPods() []PodStatus {
@@ -26,7 +53,11 @@ func (nc *NodeProfile) CountRunningPodsContainers() int {
 	var containersCount int
 	runningPods := nc.GetRunningPods()
 	for _, pod := range runningPods {
-		containersCount += pod.ContainersCount
+		containersCount += len(pod.Containers) + len(pod.InitContainers)
 	}
 	return containersCount
+}
+
+func (nc *NodeProfile) CountMonitoredContainers() int {
+	return len(nc.GetMonitoredContainers())
 }
