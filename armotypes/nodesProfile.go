@@ -7,10 +7,8 @@ type NodeProfile struct {
 	Name         string      `json:"name"`
 	PodStatuses  []PodStatus `json:"podStatuses"`
 
-	// consider join on PodStatus table to get missingRuntimeInfo
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
 
-	// from configMap?
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
 }
 
