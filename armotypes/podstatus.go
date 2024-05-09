@@ -20,4 +20,6 @@ type PodStatus struct {
 	LastStateMessage    string    `json:"lastStateMessage"`
 	RestartCount        int       `json:"restartCount"`
 	CreationTimestamp   time.Time `json:"creationTimestamp"`
+	ContainersCount     int       `json:"containersCount"`
+	ImagesCount         int       `json:"imagesCount"` // do we really need it?
 }
