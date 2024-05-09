@@ -23,11 +23,38 @@ type PodStatus struct {
 	Containers          []PodContainer `json:"podContainers,omitempty"`
 	InitContainers      []PodContainer `json:"initContainers,omitempty"`
 
-	// Consider if this is necessary or this information should be taken by joining kubernetes resources table.
-	HasApplicationProfile bool `json:"hasApplicationProfile,omitempty"`
+	HasFinalApplicationProfile bool `json:"hasFinalApplicationProfile"`
+
+	HasApplicableRuleBindings bool `json:"hasApplicableRuleBindings"`
+
+	HasRelevancyCalculating bool `json:"hasRelevancyCalculating"`
 }
 
 type PodContainer struct {
-	Name  string `json:"name"`
-	Image string `json:"image"`
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	IsMonitored bool   `json:"isMonitored"`
+}
+
+func (ps *PodStatus) IsMonitored() bool {
+	return ps.HasFinalApplicationProfile && ps.Phase == "Running" && ps.HasApplicableRuleBindings && ps.HasRelevancyCalculating
+}
+
+func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
+	var monitoredContainers []PodContainer
+	if ps.IsMonitored() {
+		for _, container := range ps.Containers {
+			if container.IsMonitored {
+				monitoredContainers = append(monitoredContainers, container)
+			}
+		}
+
+		for _, container := range ps.InitContainers {
+			if container.IsMonitored {
+				monitoredContainers = append(monitoredContainers, container)
+			}
+		}
+
+	}
+	return monitoredContainers
 }

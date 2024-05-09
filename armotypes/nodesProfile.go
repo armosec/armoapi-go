@@ -18,7 +18,7 @@ func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	var monitoredPods []PodStatus
 	if nc.NodeAgentRunning && nc.RuntimeDetectionEnabled {
 		for _, pod := range nc.PodStatuses {
-			if pod.HasApplicationProfile && pod.Phase == "Running" {
+			if pod.IsMonitored() {
 				monitoredPods = append(monitoredPods, pod)
 			}
 		}
@@ -27,12 +27,11 @@ func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	return monitoredPods
 }
 
-func (nc *NodeProfile) GetMonitoredContainers() []PodContainer {
-	var monitoredContainers []PodContainer
+func (nc *NodeProfile) GetMonitoredContainers() map[string][]PodContainer {
+	monitoredContainers := make(map[string][]PodContainer)
 	monitoredPods := nc.GetMonitoredPods()
 	for _, pod := range monitoredPods {
-		monitoredContainers = append(monitoredContainers, pod.Containers...)
-		monitoredContainers = append(monitoredContainers, pod.InitContainers...)
+		monitoredContainers[pod.Name] = pod.GetMonitoredContainers()
 	}
 	return monitoredContainers
 }
