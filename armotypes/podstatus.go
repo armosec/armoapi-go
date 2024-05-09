@@ -29,26 +29,26 @@ type PodStatus struct {
 
 	HasRelevancyCalculating bool `json:"hasRelevancyCalculating"`
 
-	IsPodKDRMonitored bool `json:"isPodKDRMonitored"`
+	IsKDRMonitored bool `json:"isKDRMonitored"`
 }
 
 type PodContainer struct {
-	Name        string `json:"name"`
-	Image       string `json:"image"`
-	IsMonitored bool   `json:"isMonitored"`
+	Name           string `json:"name"`
+	Image          string `json:"image"`
+	IsKDRMonitored bool   `json:"isKDRMonitored"`
 }
 
 func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
 	var monitoredContainers []PodContainer
-	if ps.IsPodKDRMonitored {
+	if ps.IsKDRMonitored {
 		for _, container := range ps.Containers {
-			if container.IsMonitored {
+			if container.IsKDRMonitored {
 				monitoredContainers = append(monitoredContainers, container)
 			}
 		}
 
 		for _, container := range ps.InitContainers {
-			if container.IsMonitored {
+			if container.IsKDRMonitored {
 				monitoredContainers = append(monitoredContainers, container)
 			}
 		}
