@@ -9,15 +9,21 @@ type NodeProfile struct {
 
 	// consider join on PodStatus table to get missingRuntimeInfo
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
+
+	// from configMap?
+	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
 }
 
 func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	var monitoredPods []PodStatus
-	for _, pod := range nc.PodsStatus {
-		if pod.HasApplicationProfile && nc.NodeAgentRunning && pod.Phase == "Running" {
-			monitoredPods = append(monitoredPods, pod)
+	if nc.NodeAgentRunning && nc.RuntimeDetectionEnabled {
+		for _, pod := range nc.PodsStatus {
+			if pod.HasApplicationProfile && pod.Phase == "Running" {
+				monitoredPods = append(monitoredPods, pod)
+			}
 		}
 	}
+
 	return monitoredPods
 }
 
