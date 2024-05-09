@@ -18,7 +18,7 @@ func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	var monitoredPods []PodStatus
 	if nc.NodeAgentRunning && nc.RuntimeDetectionEnabled {
 		for _, pod := range nc.PodStatuses {
-			if pod.IsMonitored() {
+			if pod.IsPodKDRMonitored {
 				monitoredPods = append(monitoredPods, pod)
 			}
 		}

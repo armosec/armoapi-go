@@ -28,6 +28,8 @@ type PodStatus struct {
 	HasApplicableRuleBindings bool `json:"hasApplicableRuleBindings"`
 
 	HasRelevancyCalculating bool `json:"hasRelevancyCalculating"`
+
+	IsPodKDRMonitored bool `json:"isPodKDRMonitored"`
 }
 
 type PodContainer struct {
@@ -36,13 +38,9 @@ type PodContainer struct {
 	IsMonitored bool   `json:"isMonitored"`
 }
 
-func (ps *PodStatus) IsMonitored() bool {
-	return ps.HasFinalApplicationProfile && ps.Phase == "Running" && ps.HasApplicableRuleBindings && ps.HasRelevancyCalculating
-}
-
 func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
 	var monitoredContainers []PodContainer
-	if ps.IsMonitored() {
+	if ps.IsPodKDRMonitored {
 		for _, container := range ps.Containers {
 			if container.IsMonitored {
 				monitoredContainers = append(monitoredContainers, container)
