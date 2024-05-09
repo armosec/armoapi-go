@@ -5,7 +5,7 @@ type NodeProfile struct {
 	CustomerGUID string      `json:"customerGUID"`
 	Cluster      string      `json:"cluster"`
 	Name         string      `json:"name"`
-	PodsStatus   []PodStatus `json:"podsStatus"`
+	PodStatuses  []PodStatus `json:"podStatuses"`
 
 	// consider join on PodStatus table to get missingRuntimeInfo
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
@@ -17,7 +17,7 @@ type NodeProfile struct {
 func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	var monitoredPods []PodStatus
 	if nc.NodeAgentRunning && nc.RuntimeDetectionEnabled {
-		for _, pod := range nc.PodsStatus {
+		for _, pod := range nc.PodStatuses {
 			if pod.HasApplicationProfile && pod.Phase == "Running" {
 				monitoredPods = append(monitoredPods, pod)
 			}
@@ -43,7 +43,7 @@ func (nc *NodeProfile) CountMonitoredPods() int {
 
 func (nc *NodeProfile) GetRunningPods() []PodStatus {
 	var runningPods []PodStatus
-	for _, pod := range nc.PodsStatus {
+	for _, pod := range nc.PodStatuses {
 		if pod.Phase == "Running" {
 			runningPods = append(runningPods, pod)
 		}
