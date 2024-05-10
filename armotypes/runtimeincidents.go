@@ -146,3 +146,12 @@ func (ri *RuntimeIncident) GetTimestampFieldName() string {
 func (ra *RuntimeAlert) GetTimestampFieldName() string {
 	return "timestamp"
 }
+
+type KDRMonitoredEntitiesCounters struct {
+	ClustersCount         int `json:"clustersCount"`
+	NodesCount            int `json:"nodesCount"`
+	NamespaceCount        int `json:"namespaceCount"`
+	PodsCount             int `json:"podsCount"`
+	ContainersCount       int `json:"containersCount"`
+	ContainersImagesCount int `json:"containersImagesCount"`
+}

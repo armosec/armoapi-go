@@ -2,14 +2,30 @@ package armotypes
 
 // information of node-agent pod status can be taken from PodStatus table in postgres
 type NodeProfile struct {
-	CustomerGUID string      `json:"customerGUID"`
-	Cluster      string      `json:"cluster"`
-	Name         string      `json:"name"`
-	PodStatuses  []PodStatus `json:"podStatuses"`
+	CustomerGUID    string      `json:"customerGUID"`
+	Cluster         string      `json:"cluster"`
+	Name            string      `json:"name"`
+	K8sResourceHash string      `json:"k8sResourceHash"`
+	PodStatuses     []PodStatus `json:"podStatuses"`
 
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
 
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
+}
+
+func (nc *NodeProfile) GetMonitoredNamespaces() []string {
+	// Map to keep track of unique namespaces
+	monitoredNamespaceMap := make(map[string]bool)
+	var monitoredNamespaces []string
+
+	for _, pod := range nc.PodStatuses {
+		if pod.IsKDRMonitored && !monitoredNamespaceMap[pod.Namespace] {
+			// Add the namespace to the slice and mark it in the map
+			monitoredNamespaces = append(monitoredNamespaces, pod.Namespace)
+			monitoredNamespaceMap[pod.Namespace] = true
+		}
+	}
+	return monitoredNamespaces
 }
 
 func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
@@ -32,6 +48,10 @@ func (nc *NodeProfile) GetMonitoredContainers() map[string][]PodContainer {
 		monitoredContainers[pod.Name] = pod.GetMonitoredContainers()
 	}
 	return monitoredContainers
+}
+
+func (nc *NodeProfile) CountMonitoredNamespaces() int {
+	return len(nc.GetMonitoredNamespaces())
 }
 
 func (nc *NodeProfile) CountMonitoredPods() int {
