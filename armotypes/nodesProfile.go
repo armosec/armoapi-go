@@ -13,6 +13,10 @@ type NodeProfile struct {
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
 }
 
+func (nc *NodeProfile) IsKDRMonitored() bool {
+	return nc.NodeAgentRunning && nc.RuntimeDetectionEnabled
+}
+
 func (nc *NodeProfile) GetMonitoredNamespaces() []string {
 	// Map to keep track of unique namespaces
 	monitoredNamespaceMap := make(map[string]bool)
@@ -30,7 +34,7 @@ func (nc *NodeProfile) GetMonitoredNamespaces() []string {
 
 func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	var monitoredPods []PodStatus
-	if nc.NodeAgentRunning && nc.RuntimeDetectionEnabled {
+	if nc.IsKDRMonitored() {
 		for _, pod := range nc.PodStatuses {
 			if pod.IsKDRMonitored {
 				monitoredPods = append(monitoredPods, pod)
