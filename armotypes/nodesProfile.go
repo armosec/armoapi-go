@@ -36,7 +36,7 @@ func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	var monitoredPods []PodStatus
 	if nc.IsKDRMonitored() {
 		for _, pod := range nc.PodStatuses {
-			if pod.IsKDRMonitored {
+			if pod.IsKDRMonitored && pod.Phase == "Running" {
 				monitoredPods = append(monitoredPods, pod)
 			}
 		}
