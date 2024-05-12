@@ -96,5 +96,12 @@ func (nc *NodeProfile) CountRunningPodsContainers() int {
 }
 
 func (nc *NodeProfile) CountMonitoredContainers() int {
-	return len(nc.GetMonitoredContainers())
+	count := 0
+	monitoredContainers := nc.GetMonitoredContainers()
+
+	for _, containers := range monitoredContainers {
+		count += len(containers)
+	}
+
+	return count
 }

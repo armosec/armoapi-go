@@ -20,7 +20,7 @@ type PodStatus struct {
 	LastStateMessage    string         `json:"lastStateMessage"`
 	RestartCount        int            `json:"restartCount"`
 	CreationTimestamp   time.Time      `json:"creationTimestamp"`
-	Containers          []PodContainer `json:"podContainers,omitempty"`
+	Containers          []PodContainer `json:"containers,omitempty"`
 	InitContainers      []PodContainer `json:"initContainers,omitempty"`
 
 	HasFinalApplicationProfile bool `json:"hasFinalApplicationProfile"`
