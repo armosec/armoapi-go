@@ -33,6 +33,8 @@ func TestIsKDRMonitored(t *testing.T) {
 
 func TestGetMonitoredNamespaces(t *testing.T) {
 	np := NodeProfile{
+		NodeAgentRunning:        true,
+		RuntimeDetectionEnabled: true,
 		PodStatuses: []PodStatus{
 			{Namespace: "default", IsKDRMonitored: true, Phase: "Running"},
 			{Namespace: "kube-system", IsKDRMonitored: true},
@@ -67,6 +69,8 @@ func TestGetMonitoredPods(t *testing.T) {
 
 func TestCountMonitoredNamespaces(t *testing.T) {
 	np := NodeProfile{
+		NodeAgentRunning:        true,
+		RuntimeDetectionEnabled: true,
 		PodStatuses: []PodStatus{
 			{Namespace: "default", IsKDRMonitored: true, Phase: "Running"},
 			{Namespace: "kube-system", IsKDRMonitored: true, Phase: "Running"},
