@@ -34,14 +34,14 @@ func TestIsKDRMonitored(t *testing.T) {
 func TestGetMonitoredNamespaces(t *testing.T) {
 	np := NodeProfile{
 		PodStatuses: []PodStatus{
-			{Namespace: "default", IsKDRMonitored: true},
+			{Namespace: "default", IsKDRMonitored: true, Phase: "Running"},
 			{Namespace: "kube-system", IsKDRMonitored: true},
 			{Namespace: "default", IsKDRMonitored: true}, // Duplicate
 			{Namespace: "test", IsKDRMonitored: false},
 		},
 	}
 
-	expected := []string{"default", "kube-system"}
+	expected := []string{"default"}
 	namespaces := np.GetMonitoredNamespaces()
 	if !reflect.DeepEqual(namespaces, expected) {
 		t.Errorf("Expected %v, got %v", expected, namespaces)

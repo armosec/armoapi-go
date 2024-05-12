@@ -23,7 +23,7 @@ func (nc *NodeProfile) GetMonitoredNamespaces() []string {
 	var monitoredNamespaces []string
 
 	for _, pod := range nc.PodStatuses {
-		if pod.IsKDRMonitored && !monitoredNamespaceMap[pod.Namespace] {
+		if pod.IsKDRMonitored && pod.Phase == "Running" && !monitoredNamespaceMap[pod.Namespace] {
 			// Add the namespace to the slice and mark it in the map
 			monitoredNamespaces = append(monitoredNamespaces, pod.Namespace)
 			monitoredNamespaceMap[pod.Namespace] = true
