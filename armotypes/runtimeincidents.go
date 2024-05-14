@@ -29,10 +29,13 @@ type RuntimeIncident struct {
 	// alerts / events that are part of this incident
 	RelatedAlerts []RuntimeAlert `json:"relatedAlerts,omitempty" bson:"relatedAlerts,omitempty"`
 	// user gestures
-	SeenAt                *time.Time `json:"seenAt,omitempty" bson:"seenAt,omitempty"`
-	SeenBy                string     `json:"seenBy,omitempty" bson:"seenBy,omitempty"`
+	SeenAt *time.Time `json:"seenAt,omitempty" bson:"seenAt,omitempty"`
+	SeenBy string     `json:"seenBy,omitempty" bson:"seenBy,omitempty"`
+	// Resolve status
 	IsDismissed           bool       `json:"isDismissed" bson:"isDismissed"`
 	MarkedAsFalsePositive bool       `json:"markedAsFalsePositive" bson:"markedAsFalsePositive"`
+	ResolvedAt            *time.Time `json:"resolvedAt,omitempty" bson:"resolvedAt,omitempty"`
+	ResolvedBy            *string    `json:"resolvedBy,omitempty" bson:"resolvedBy,omitempty"`
 	// for future use
 	RelatedResources []RuntimeIncidentResource `json:"relatedResources,omitempty" bson:"relatedResources,omitempty"`
 	ProcessTree      *ProcessTree              `json:"processTree,omitempty" bson:"processTree,omitempty"`
