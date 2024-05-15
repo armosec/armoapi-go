@@ -23,13 +23,13 @@ type PodStatus struct {
 	Containers          []PodContainer `json:"containers,omitempty"`
 	InitContainers      []PodContainer `json:"initContainers,omitempty"`
 
-	HasFinalApplicationProfile bool `json:"hasFinalApplicationProfile"`
+	HasFinalApplicationProfile bool `json:"hasFinalApplicationProfile,omitempty"`
 
-	HasApplicableRuleBindings bool `json:"hasApplicableRuleBindings"`
+	HasApplicableRuleBindings bool `json:"hasApplicableRuleBindings,omitempty"`
 
-	HasRelevancyCalculating bool `json:"hasRelevancyCalculating"`
+	HasRelevancyCalculating bool `json:"hasRelevancyCalculating,omitempty"`
 
-	IsKDRMonitored bool `json:"isKDRMonitored"`
+	IsKDRMonitored bool `json:"isKDRMonitored,omitempty"`
 }
 
 type PodContainer struct {
