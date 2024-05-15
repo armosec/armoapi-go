@@ -24,3 +24,7 @@ func (c *PortalCache[T]) SetExpiryTime(expiryTime time.Time) {
 func (c *PortalCache[T]) SetTTL(ttl time.Duration) {
 	c.ExpiryTime = time.Now().UTC().Add(ttl)
 }
+
+func (c *PortalCache[T]) GetTimestampFieldName() string {
+	return "creationTime"
+}

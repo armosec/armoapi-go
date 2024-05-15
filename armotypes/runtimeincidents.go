@@ -7,10 +7,14 @@ import (
 )
 
 type IncidentCategory string
+type RuntimeIncidentResolveReason string
 
 const (
 	RuntimeIncidentCategoryMalware IncidentCategory = "Malware"
 	RuntimeIncidentCategoryAnomaly IncidentCategory = "Anomaly"
+
+	RuntimeResolveReasonFalsePositive RuntimeIncidentResolveReason = "FalsePositive"
+	RuntimeResolveReasonSuspicious    RuntimeIncidentResolveReason = "Suspicious"
 )
 
 type RuntimeIncident struct {
@@ -21,18 +25,23 @@ type RuntimeIncident struct {
 	// category of the incident
 	IncidentCategory  IncidentCategory `json:"incidentCategory" bson:"incidentCategory" `
 	CreationTimestamp time.Time        `json:"creationTimestamp" bson:"creationTimestamp"`
-	Title             string           `json:"title" bson:"title"`
-	Severity          string           `json:"incidentSeverity" bson:"incidentSeverity"`
-	SeverityScore     int              `json:"severityScore" bson:"severityScore"`
-	Mitigation        string           `json:"mitigation" bson:"mitigation"`
+	Description       string           `json:"description,omitempty" bson:"description,omitempty"`
+	MITRETactic       string           `json:"mitreTactic,omitempty" bson:"mitreTactic,omitempty"`
+	Severity          string           `json:"incidentSeverity,omitempty" bson:"incidentSeverity,omitempty"`
+	SeverityScore     int              `json:"severityScore,omitempty" bson:"severityScore,omitempty"`
+	Mitigation        string           `json:"mitigation,omitempty" bson:"mitigation,omitempty"`
 	// alerts / events that are part of this incident
-	RelatedAlerts []RuntimeAlert `json:"relatedAlerts" bson:"relatedAlerts"`
+	RelatedAlerts []RuntimeAlert `json:"relatedAlerts,omitempty" bson:"relatedAlerts,omitempty"`
 	// user gestures
-	SeenAt                *time.Time `json:"seenAt" bson:"seenAt"`
+	SeenAt *time.Time `json:"seenAt,omitempty" bson:"seenAt,omitempty"`
+	SeenBy string     `json:"seenBy,omitempty" bson:"seenBy,omitempty"`
+	// Resolve status
 	IsDismissed           bool       `json:"isDismissed" bson:"isDismissed"`
 	MarkedAsFalsePositive bool       `json:"markedAsFalsePositive" bson:"markedAsFalsePositive"`
+	ResolvedAt            *time.Time `json:"resolvedAt,omitempty" bson:"resolvedAt,omitempty"`
+	ResolvedBy            *string    `json:"resolvedBy,omitempty" bson:"resolvedBy,omitempty"`
 	// for future use
-	RelatedResources []RuntimeIncidentResource `json:"relatedResources" bson:"relatedResources"`
+	RelatedResources []RuntimeIncidentResource `json:"relatedResources,omitempty" bson:"relatedResources,omitempty"`
 	ProcessTree      *ProcessTree              `json:"processTree,omitempty" bson:"processTree,omitempty"`
 }
 
@@ -131,4 +140,21 @@ type ProcessTree struct {
 	ProcessTree Process `json:"processTree" bson:"processTree"`
 	UniqueID    uint32  `json:"uniqueID" bson:"uniqueID"`
 	ContainerID string  `json:"containerID" bson:"containerID"`
+}
+
+func (ri *RuntimeIncident) GetTimestampFieldName() string {
+	return "creationTimestamp"
+}
+
+func (ra *RuntimeAlert) GetTimestampFieldName() string {
+	return "timestamp"
+}
+
+type KDRMonitoredEntitiesCounters struct {
+	ClustersCount         int `json:"clustersCount"`
+	NodesCount            int `json:"nodesCount"`
+	NamespacesCount       int `json:"namespacesCount"`
+	PodsCount             int `json:"podsCount"`
+	ContainersCount       int `json:"containersCount"`
+	ContainersImagesCount int `json:"containersImagesCount"`
 }
