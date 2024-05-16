@@ -20,9 +20,10 @@ func TestIsKDRMonitored(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			np := NodeProfile{
-				NodeAgentRunning:        test.nodeAgent,
-				RuntimeDetectionEnabled: test.runtime,
+			np := NodeStatus{
+				NodeProfile: NodeProfile{
+					NodeAgentRunning:        test.nodeAgent,
+					RuntimeDetectionEnabled: test.runtime},
 			}
 			if result := np.IsKDRMonitored(); result != test.expected {
 				t.Errorf("Expected %v, got %v", test.expected, result)
@@ -32,7 +33,7 @@ func TestIsKDRMonitored(t *testing.T) {
 }
 
 func TestGetMonitoredNamespaces(t *testing.T) {
-	np := NodeProfile{
+	np := NodeStatus{NodeProfile: NodeProfile{
 		NodeAgentRunning:        true,
 		RuntimeDetectionEnabled: true,
 		PodStatuses: []PodStatus{
@@ -41,6 +42,7 @@ func TestGetMonitoredNamespaces(t *testing.T) {
 			{Namespace: "default", IsKDRMonitored: true}, // Duplicate
 			{Namespace: "test", IsKDRMonitored: false},
 		},
+	},
 	}
 
 	expected := []string{"default"}
@@ -51,13 +53,14 @@ func TestGetMonitoredNamespaces(t *testing.T) {
 }
 
 func TestGetMonitoredPods(t *testing.T) {
-	np := NodeProfile{
+	np := NodeStatus{NodeProfile: NodeProfile{
 		NodeAgentRunning:        true,
 		RuntimeDetectionEnabled: true,
 		PodStatuses: []PodStatus{
 			{Name: "pod1", IsKDRMonitored: true, Phase: "Running"},
 			{Name: "pod2", IsKDRMonitored: false, Phase: "Running"},
 		},
+	},
 	}
 
 	expected := []PodStatus{{Name: "pod1", IsKDRMonitored: true, Phase: "Running"}}
@@ -68,7 +71,7 @@ func TestGetMonitoredPods(t *testing.T) {
 }
 
 func TestCountMonitoredNamespaces(t *testing.T) {
-	np := NodeProfile{
+	np := NodeStatus{NodeProfile: NodeProfile{
 		NodeAgentRunning:        true,
 		RuntimeDetectionEnabled: true,
 		PodStatuses: []PodStatus{
@@ -77,6 +80,7 @@ func TestCountMonitoredNamespaces(t *testing.T) {
 			{Namespace: "default", IsKDRMonitored: true, Phase: "Running"},
 			{Namespace: "test", IsKDRMonitored: false, Phase: "Pending"},
 		},
+	},
 	}
 
 	expectedCount := 2
@@ -87,7 +91,7 @@ func TestCountMonitoredNamespaces(t *testing.T) {
 }
 
 func TestCountMonitoredPods(t *testing.T) {
-	np := NodeProfile{
+	np := NodeStatus{NodeProfile: NodeProfile{
 		NodeAgentRunning:        true,
 		RuntimeDetectionEnabled: true,
 		PodStatuses: []PodStatus{
@@ -95,6 +99,7 @@ func TestCountMonitoredPods(t *testing.T) {
 			{IsKDRMonitored: true, Phase: "Pending"},
 			{IsKDRMonitored: false, Phase: "Running"},
 		},
+	},
 	}
 
 	expectedCount := 1
@@ -105,7 +110,7 @@ func TestCountMonitoredPods(t *testing.T) {
 }
 
 func TestCountMonitoredContainers(t *testing.T) {
-	np := NodeProfile{
+	np := NodeStatus{NodeProfile: NodeProfile{
 		NodeAgentRunning:        true,
 		RuntimeDetectionEnabled: true,
 		PodStatuses: []PodStatus{
@@ -138,6 +143,7 @@ func TestCountMonitoredContainers(t *testing.T) {
 				Containers:     []PodContainer{}, // Monitored pod but no containers
 			},
 		},
+	},
 	}
 
 	expectedCount := 1
