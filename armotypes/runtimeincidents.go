@@ -111,6 +111,7 @@ type MalwareAlert struct {
 
 type RuntimeAlertK8sDetails struct {
 	ClusterName       string `json:"clusterName" bson:"clusterName"`
+	ClusterShortName  string `json:"clusterShortName" bson:"clusterShortName"`
 	ContainerName     string `json:"containerName,omitempty" bson:"containerName,omitempty"`
 	HostNetwork       *bool  `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
 	Image             string `json:"image,omitempty" bson:"image,omitempty"`
