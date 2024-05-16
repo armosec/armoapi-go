@@ -10,9 +10,7 @@ import (
 func TestGenericCRDWithNodeProfile(t *testing.T) {
 	// Setting up a sample NodeProfile
 	nodeProfile := NodeProfile{
-		CustomerGUID:            "1234-5678-9101",
-		Cluster:                 "ClusterA",
-		Name:                    "Node1",
+
 		PodStatuses:             []PodStatus{{Name: "Pod1", HasFinalApplicationProfile: true}},
 		NodeAgentRunning:        true,
 		RuntimeDetectionEnabled: true,

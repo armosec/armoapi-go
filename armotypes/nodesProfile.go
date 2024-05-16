@@ -2,22 +2,26 @@ package armotypes
 
 // information of node-agent pod status can be taken from PodStatus table in postgres
 type NodeProfile struct {
-	CustomerGUID    string      `json:"customerGUID"`
-	Cluster         string      `json:"cluster"`
-	Name            string      `json:"name"`
-	K8sResourceHash string      `json:"k8sResourceHash"`
-	PodStatuses     []PodStatus `json:"podStatuses"`
+	PodStatuses []PodStatus `json:"podStatuses"`
 
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
 
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
 }
 
-func (nc *NodeProfile) IsKDRMonitored() bool {
+type NodeStatus struct {
+	CustomerGUID    string `json:"customerGUID"`
+	Cluster         string `json:"cluster"`
+	Name            string `json:"name"`
+	K8sResourceHash string `json:"k8sResourceHash"`
+	NodeProfile     `json:",inline"`
+}
+
+func (nc *NodeStatus) IsKDRMonitored() bool {
 	return nc.NodeAgentRunning && nc.RuntimeDetectionEnabled
 }
 
-func (nc *NodeProfile) GetMonitoredNamespaces() []string {
+func (nc *NodeStatus) GetMonitoredNamespaces() []string {
 	// Map to keep track of unique namespaces
 	monitoredNamespaceMap := make(map[string]bool)
 	var monitoredNamespaces []string
@@ -36,7 +40,7 @@ func (nc *NodeProfile) GetMonitoredNamespaces() []string {
 	return monitoredNamespaces
 }
 
-func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
+func (nc *NodeStatus) GetMonitoredPods() []PodStatus {
 	var monitoredPods []PodStatus
 	if !nc.IsKDRMonitored() {
 		return monitoredPods
@@ -52,7 +56,7 @@ func (nc *NodeProfile) GetMonitoredPods() []PodStatus {
 	return monitoredPods
 }
 
-func (nc *NodeProfile) GetMonitoredContainers() map[string][]PodContainer {
+func (nc *NodeStatus) GetMonitoredContainers() map[string][]PodContainer {
 	monitoredContainers := make(map[string][]PodContainer)
 	if !nc.IsKDRMonitored() {
 		return monitoredContainers
@@ -64,15 +68,15 @@ func (nc *NodeProfile) GetMonitoredContainers() map[string][]PodContainer {
 	return monitoredContainers
 }
 
-func (nc *NodeProfile) CountMonitoredNamespaces() int {
+func (nc *NodeStatus) CountMonitoredNamespaces() int {
 	return len(nc.GetMonitoredNamespaces())
 }
 
-func (nc *NodeProfile) CountMonitoredPods() int {
+func (nc *NodeStatus) CountMonitoredPods() int {
 	return len(nc.GetMonitoredPods())
 }
 
-func (nc *NodeProfile) GetRunningPods() []PodStatus {
+func (nc *NodeStatus) GetRunningPods() []PodStatus {
 	var runningPods []PodStatus
 	for _, pod := range nc.PodStatuses {
 		if pod.Phase == "Running" {
@@ -82,11 +86,11 @@ func (nc *NodeProfile) GetRunningPods() []PodStatus {
 	return runningPods
 }
 
-func (nc *NodeProfile) CountRunningPods() int {
+func (nc *NodeStatus) CountRunningPods() int {
 	return len(nc.GetRunningPods())
 }
 
-func (nc *NodeProfile) CountRunningPodsContainers() int {
+func (nc *NodeStatus) CountRunningPodsContainers() int {
 	var containersCount int
 	runningPods := nc.GetRunningPods()
 	for _, pod := range runningPods {
@@ -95,7 +99,7 @@ func (nc *NodeProfile) CountRunningPodsContainers() int {
 	return containersCount
 }
 
-func (nc *NodeProfile) CountMonitoredContainers() int {
+func (nc *NodeStatus) CountMonitoredContainers() int {
 	count := 0
 	monitoredContainers := nc.GetMonitoredContainers()
 
