@@ -4,6 +4,8 @@ package armotypes
 type NodeProfile struct {
 	PodStatuses []PodStatus `json:"podStatuses"`
 
+	CurrentState string `json:"currentState"`
+
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
 
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
