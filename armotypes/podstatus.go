@@ -36,6 +36,7 @@ type PodContainer struct {
 	Name           string `json:"name"`
 	Image          string `json:"image"`
 	IsKDRMonitored bool   `json:"isKDRMonitored"`
+	CurrentState   string `json:"currentState"`
 }
 
 func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
