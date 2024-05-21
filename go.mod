@@ -1,6 +1,6 @@
 module github.com/armosec/armoapi-go
 
-go 1.21.1
+go 1.22.2
 
 require (
 	github.com/anchore/grype v0.74.2

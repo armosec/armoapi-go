@@ -96,7 +96,7 @@ func (nc *NodeStatus) CountRunningPodsContainers() int {
 	var containersCount int
 	runningPods := nc.GetRunningPods()
 	for _, pod := range runningPods {
-		containersCount += len(pod.Containers) + len(pod.InitContainers)
+		containersCount += len(pod.Containers) + len(pod.InitContainers) + len(pod.EphemeralContainers)
 	}
 	return containersCount
 }
