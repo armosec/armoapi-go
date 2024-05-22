@@ -16,9 +16,13 @@ type PodStatus struct {
 	App                        string         `json:"app"`
 	Phase                      string         `json:"phase"`
 	CurrentState               string         `json:"currentState"`
+	LastStateExitCode          int            `json:"lastStateExitCode"`   // Deprecated, use PodContainer.LastStateExitCode
+	LastStateFinishedAt        time.Time      `json:"lastStateFinishedAt"` // Deprecated, use PodContainer.LastStateFinishedAt
+	LastStateStartedAt         time.Time      `json:"lastStateStartedAt"`  // Deprecated, use PodContainer.LastStateStartedAt
 	LastStateReason            string         `json:"lastStateReason"`
 	LastStateMessage           string         `json:"lastStateMessage"`
 	LastStateTransitionTime    time.Time      `json:"lastStateTransitionTime"`
+	RestartCount               int            `json:"restartCount"` // Deprecated, use PodContainer.RestartCount
 	CreationTimestamp          time.Time      `json:"creationTimestamp"`
 	Containers                 []PodContainer `json:"containers,omitempty"`
 	InitContainers             []PodContainer `json:"initContainers,omitempty"`
