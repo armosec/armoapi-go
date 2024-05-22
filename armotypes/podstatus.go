@@ -1,6 +1,9 @@
 package armotypes
 
-import "time"
+import (
+	"slices"
+	"time"
+)
 
 type PodStatus struct {
 	CustomerGUID        string         `json:"customerGUID"`
@@ -22,6 +25,7 @@ type PodStatus struct {
 	CreationTimestamp   time.Time      `json:"creationTimestamp"`
 	Containers          []PodContainer `json:"containers,omitempty"`
 	InitContainers      []PodContainer `json:"initContainers,omitempty"`
+	EphemeralContainers []PodContainer `json:"ephemeralContainers,omitempty"`
 
 	HasFinalApplicationProfile bool `json:"hasFinalApplicationProfile"`
 
@@ -42,18 +46,11 @@ type PodContainer struct {
 func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
 	var monitoredContainers []PodContainer
 	if ps.IsKDRMonitored {
-		for _, container := range ps.Containers {
+		for _, container := range slices.Concat(ps.Containers, ps.InitContainers, ps.EphemeralContainers) {
 			if container.IsKDRMonitored {
 				monitoredContainers = append(monitoredContainers, container)
 			}
 		}
-
-		for _, container := range ps.InitContainers {
-			if container.IsKDRMonitored {
-				monitoredContainers = append(monitoredContainers, container)
-			}
-		}
-
 	}
 	return monitoredContainers
 }
