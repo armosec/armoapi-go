@@ -60,7 +60,7 @@ type Process struct {
 	Hardlink   string    `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
 	Uid        *uint32   `json:"uid,omitempty" bson:"uid,omitempty"`
 	Gid        *uint32   `json:"gid,omitempty" bson:"gid,omitempty"`
-	UpperLayer bool      `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
+	UpperLayer *bool     `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
 	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
 	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
