@@ -40,6 +40,7 @@ type AttackChainConfig struct {
 	LatestReportGUID string                       `json:"latestReportGUID,omitempty" bson:"latestReportGUID,omitempty"` // latest reportGUID in which this attack chain was identified
 	UIStatus         *AttackChainUIStatus         `json:"uiStatus,omitempty" bson:"uiStatus,omitempty"`
 	Status           AttackChainStatus            `json:"status,omitempty" bson:"status,omitempty"` // "active"/ "fixed"
+	IsInternetFacing bool                         `json:"isInternetFacing,omitempty" bson:"isInternetFacing,omitempty"`
 }
 
 type AttackChainNode struct {
