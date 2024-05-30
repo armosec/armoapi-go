@@ -1,5 +1,7 @@
 package armotypes
 
+import "encoding/json"
+
 // information of node-agent pod status can be taken from PodStatus table in postgres
 type NodeProfile struct {
 	PodStatuses []PodStatus `json:"podStatuses"`
@@ -9,6 +11,8 @@ type NodeProfile struct {
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
 
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
+
+	LocalhostProfiles map[string]json.RawMessage `json:"localhostProfiles"`
 }
 
 type NodeStatus struct {
