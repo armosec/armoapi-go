@@ -1,7 +1,7 @@
 package armotypes
 
 type WorkloadStatus struct {
-	ResourceHash     string `json:"resourceHash,omitempty"`
-	CustomerGUID     string `json:"customerGUID,omitempty"`
-	IsInternetFacing *bool  `json:"isInternetFacing,omitempty"`
+	ResourceHash     string `json:"resourceHash"`
+	CustomerGUID     string `json:"customerGUID"`
+	IsInternetFacing *bool  `json:"isInternetFacing"`
 }
