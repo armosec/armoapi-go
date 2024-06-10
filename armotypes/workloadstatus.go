@@ -1,8 +1,14 @@
 package armotypes
 
 type WorkloadStatus struct {
-	ResourceHash     string `json:"resourceHash"`
-	CustomerGUID     string `json:"customerGUID"`
-	ClusterName      string `json:"clusterName"`
-	IsInternetFacing *bool  `json:"isInternetFacing"`
+	WorkloadName        string   `json:"workloadName"`
+	Namespace           string   `json:"namespace"`
+	Kind                string   `json:"kind"`
+	ClusterName         string   `json:"clusterName"`
+	CustomerGUID        string   `json:"customerGUID"`
+	ResourceHash        string   `json:"resourceHash"`
+	ResourceHashNumeric float64  `json:"resourceHashNumeric"`
+	WorkloadLabels      []string `json:"workloadLabels"`
+	RiskFactors         []string `json:"riskFactors"`
+	IsInternetFacing    *bool    `json:"isInternetFacing"`
 }
