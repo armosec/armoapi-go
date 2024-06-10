@@ -8,6 +8,8 @@ type WorkloadStatus struct {
 	CustomerGUID        string   `json:"customerGUID"`
 	ResourceHash        string   `json:"resourceHash"`
 	ResourceHashNumeric float64  `json:"resourceHashNumeric"`
+	workloadLabelsCount int      `json:"workloadLabelsCount"`
+	riskFactorsCount    int      `json:"riskFactorsCount"`
 	WorkloadLabels      []string `json:"workloadLabels"`
 	RiskFactors         []string `json:"riskFactors"`
 	IsInternetFacing    *bool    `json:"isInternetFacing"`
