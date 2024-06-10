@@ -122,6 +122,10 @@ func (summary *CommonContainerScanSummaryResult) GetRelevantLabel() RelevantLabe
 	return summary.RelevantLabel
 }
 
+func (summary *CommonContainerScanSummaryResult) GetImageManifest() *ImageManifest {
+	return summary.ImageManifest
+}
+
 func (summary *CommonContainerScanSummaryResult) Validate() bool {
 	return summary.CustomerGUID != "" && summary.ContainerScanID != "" && (summary.ImageTag != "" || summary.ImageID != "") && summary.Timestamp > 0
 }
@@ -211,4 +215,8 @@ func (summary *CommonContainerScanSummaryResult) GetHasRelevancyData() bool {
 
 func (summary *CommonContainerScanSummaryResult) SetHasRelevancyData(hasRelevancy bool) {
 	summary.HasRelevancyData = hasRelevancy
+}
+
+func (summary *CommonContainerScanSummaryResult) SetImageManifest(imageManifest *ImageManifest) {
+	summary.ImageManifest = imageManifest
 }

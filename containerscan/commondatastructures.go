@@ -47,6 +47,7 @@ type LayerInfo struct {
 	CreatedBy   string     `json:"createdBy,omitempty"`
 	CreatedTime *time.Time `json:"createdTime,omitempty"`
 	LayerOrder  int        `json:"layerOrder,omitempty"` // order 0 is first layer in the list
+	Size        int64      `json:"size,omitempty"`
 }
 
 type SeverityStats struct {
@@ -117,6 +118,7 @@ type CommonContainerScanSummaryResult struct {
 	ImageHasSignature             bool                       `json:"imageHasSignature,omitempty"`
 	RelevantLabel                 RelevantLabel              `json:"relevantLabel"`
 	HasRelevancyData              bool                       `json:"hasRelevancyData"`
+	ImageManifest                 *ImageManifest             `json:"imageManifest,omitempty"`
 }
 
 type CommonContainerScanSummaryResultStub struct {
@@ -128,4 +130,11 @@ type CommonContainerScanSummaryResultStub struct {
 type DesignatorsToVulnerabilityNames struct {
 	Designators        identifiers.PortalDesignator `json:"designators"`
 	VulnerabilityNames []string                     `json:"vulnerabilityNames"`
+}
+
+type ImageManifest struct {
+	Architecture string    `json:"architecture"`
+	OS           string    `json:"os"`
+	Size         int64     `json:"size"`
+	Layers       []ESLayer `json:"layers"`
 }

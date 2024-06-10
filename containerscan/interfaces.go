@@ -51,6 +51,7 @@ type ContainerScanSummaryResult interface {
 	GetRelevantLabel() RelevantLabel
 	Validate() bool
 	GetHasRelevancyData() bool
+	GetImageManifest() *ImageManifest
 
 	SetDesignators(identifiers.PortalDesignator)
 	SetContext([]identifiers.ArmoContext)
@@ -72,6 +73,7 @@ type ContainerScanSummaryResult interface {
 	SetTimestamp(int64)
 	SetRelevantLabel(RelevantLabel)
 	SetHasRelevancyData(bool)
+	SetImageManifest(*ImageManifest)
 }
 
 type ContainerScanVulnerabilityResult interface {
