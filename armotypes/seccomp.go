@@ -14,6 +14,7 @@ type SeccompWorkload struct {
 	Kind                     string                   `json:"kind"`
 	Namespace                string                   `json:"namespace"`
 	ClusterName              string                   `json:"clusterName"`
+	K8sResourceHash          string                   `json:"k8sResourceHash"`
 	ProfileStatus            SeccompStatus            `json:"profileStatus"`
 	SyscallsUsedCount        int                      `json:"syscallsUsedCount"`
 	SyscallsUnusedCount      int                      `json:"syscallsUnusedCount"`
