@@ -96,8 +96,10 @@ type BaseRuntimeAlert struct {
 	Severity int `json:"severity,omitempty" bson:"severity,omitempty"`
 	// Size of the file that was infected
 	Size string `json:"size,omitempty" bson:"size,omitempty"`
-	// Command line
+	// Timestamp of the alert
 	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
+	// Nanoseconds of the alert
+	Nanoseconds uint64 `json:"nanoseconds" bson:"nanoseconds"`
 }
 
 type RuleAlert struct {
