@@ -20,10 +20,10 @@ type ContainerStatus struct {
 	Name          string        `json:"name"`          // container name
 	ContainerType ContainerType `json:"containerType"` // initcontainer, container, ephemeralcontainer
 
-	Architecture string `json:"architecture"` // architecture of the container
-	WorkloadName string `json:"workloadName"` // name of the workload
-	Kind         string `json:"kind"`         // kind of the workload
-	Namespace    string `json:"namespace"`    // namespace of the workload
+	Architectures []string `json:"architectures"` // architectures of the container
+	WorkloadName  string   `json:"workloadName"`  // name of the workload
+	Kind          string   `json:"kind"`          // kind of the workload
+	Namespace     string   `json:"namespace"`     // namespace of the workload
 
 	// seccomp related fields (coming from ApplicationProfile)
 	// IsSeccompConfiguredWorkloadLevel  *bool    `json:"isSeccompConfiguredWorkloadLevel"` // if nil, seccomp is not configured
