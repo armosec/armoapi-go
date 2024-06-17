@@ -104,8 +104,6 @@ type BaseRuntimeAlert struct {
 }
 
 type RuleAlert struct {
-	// Rule ID
-	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 	// Rule Description
 	RuleDescription string `json:"ruleDescription,omitempty" bson:"ruleDescription,omitempty"`
 }
@@ -142,6 +140,8 @@ type RuntimeAlert struct {
 	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
+	// Rule ID
+	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 	// Hostname is the name of the node agent pod
 	HostName string `json:"hostName" bson:"hostName"`
 	Message  string `json:"message" bson:"message"`
