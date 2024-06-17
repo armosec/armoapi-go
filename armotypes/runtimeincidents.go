@@ -10,8 +10,9 @@ type IncidentCategory string
 type RuntimeIncidentResolveReason string
 
 const (
-	RuntimeIncidentCategoryMalware IncidentCategory = "Malware"
-	RuntimeIncidentCategoryAnomaly IncidentCategory = "Anomaly"
+	RuntimeIncidentCategoryMalware   IncidentCategory = "Malware"
+	RuntimeIncidentCategoryAnomaly   IncidentCategory = "Anomaly"
+	RuntimeIncidentCategorySignature IncidentCategory = "Signature"
 
 	RuntimeResolveReasonFalsePositive RuntimeIncidentResolveReason = "FalsePositive"
 	RuntimeResolveReasonSuspicious    RuntimeIncidentResolveReason = "Suspicious"
@@ -71,6 +72,7 @@ type AlertType int
 const (
 	AlertTypeRule AlertType = iota
 	AlertTypeMalware
+	AlertTypeAdmission
 )
 
 type BaseRuntimeAlert struct {
@@ -109,6 +111,27 @@ type MalwareAlert struct {
 	MalwareDescription string `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
 }
 
+type AdmissionAlert struct {
+	// The user who sent the request
+	User string `json:"user,omitempty"`
+	// The user groups
+	Groups []string `json:"groups,omitempty"`
+	// The user UID
+	UID string `json:"uid,omitempty"`
+	// The name of the request
+	Name string `json:"name,omitempty"`
+	// The operation of the request
+	Operation string `json:"operation,omitempty"`
+	// The kind of the request
+	Kind string `json:"kind,omitempty"`
+	// The request resource
+	Resource string `json:"resource,omitempty"`
+	// The request subresource
+	Subresource string `json:"subresource,omitempty"`
+	// Admission ID
+	AdmissionID string `json:"admissionID,omitempty"`
+}
+
 type RuntimeAlertK8sDetails struct {
 	ClusterName       string `json:"clusterName" bson:"clusterName"`
 	ContainerName     string `json:"containerName,omitempty" bson:"containerName,omitempty"`
@@ -129,6 +152,7 @@ type RuntimeAlert struct {
 	BaseRuntimeAlert       `json:",inline" bson:"inline"`
 	RuleAlert              `json:",inline" bson:"inline"`
 	MalwareAlert           `json:",inline" bson:"inline"`
+	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Hostname is the name of the node agent pod
