@@ -4,14 +4,16 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
+	admissionv1 "k8s.io/api/admission/v1"
 )
 
 type IncidentCategory string
 type RuntimeIncidentResolveReason string
 
 const (
-	RuntimeIncidentCategoryMalware IncidentCategory = "Malware"
-	RuntimeIncidentCategoryAnomaly IncidentCategory = "Anomaly"
+	RuntimeIncidentCategoryMalware   IncidentCategory = "Malware"
+	RuntimeIncidentCategoryAnomaly   IncidentCategory = "Anomaly"
+	RuntimeIncidentCategorySignature IncidentCategory = "Signature"
 
 	RuntimeResolveReasonFalsePositive RuntimeIncidentResolveReason = "FalsePositive"
 	RuntimeResolveReasonSuspicious    RuntimeIncidentResolveReason = "Suspicious"
@@ -71,6 +73,7 @@ type AlertType int
 const (
 	AlertTypeRule AlertType = iota
 	AlertTypeMalware
+	AlertTypeAdmission
 )
 
 type BaseRuntimeAlert struct {
@@ -94,19 +97,24 @@ type BaseRuntimeAlert struct {
 	Severity int `json:"severity,omitempty" bson:"severity,omitempty"`
 	// Size of the file that was infected
 	Size string `json:"size,omitempty" bson:"size,omitempty"`
-	// Command line
+	// Timestamp of the alert
 	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
+	// Nanoseconds of the alert
+	Nanoseconds uint64 `json:"nanoseconds,omitempty" bson:"nanoseconds,omitempty"`
 }
 
 type RuleAlert struct {
-	// Rule ID
-	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 	// Rule Description
 	RuleDescription string `json:"ruleDescription,omitempty" bson:"ruleDescription,omitempty"`
 }
 
 type MalwareAlert struct {
 	MalwareDescription string `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
+}
+
+type AdmissionAlert struct {
+	// Admission Request
+	AdmissionRequest *admissionv1.AdmissionRequest `json:"admissionRequest,omitempty" bson:"admissionRequest,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
@@ -129,8 +137,11 @@ type RuntimeAlert struct {
 	BaseRuntimeAlert       `json:",inline" bson:"inline"`
 	RuleAlert              `json:",inline" bson:"inline"`
 	MalwareAlert           `json:",inline" bson:"inline"`
+	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
+	// Rule ID
+	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 	// Hostname is the name of the node agent pod
 	HostName string `json:"hostName" bson:"hostName"`
 	Message  string `json:"message" bson:"message"`
