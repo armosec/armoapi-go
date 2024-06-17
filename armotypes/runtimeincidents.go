@@ -117,8 +117,6 @@ type MalwareAlert struct {
 type AdmissionAlert struct {
 	// Admission Request
 	AdmissionRequest *admissionv1.AdmissionRequest `json:"admissionRequest,omitempty" bson:"admissionRequest,omitempty"`
-	// Admission ID
-	AdmissionID string `json:"admissionID,omitempty" bson:"admissionID,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
