@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
+	admissionv1 "k8s.io/api/admission/v1"
 )
 
 type IncidentCategory string
@@ -99,7 +100,7 @@ type BaseRuntimeAlert struct {
 	// Timestamp of the alert
 	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
 	// Nanoseconds of the alert
-	Nanoseconds uint64 `json:"nanoseconds" bson:"nanoseconds"`
+	Nanoseconds uint64 `json:"nanoseconds,omitempty" bson:"nanoseconds,omitempty"`
 }
 
 type RuleAlert struct {
@@ -114,24 +115,10 @@ type MalwareAlert struct {
 }
 
 type AdmissionAlert struct {
-	// The user who sent the request
-	User string `json:"user,omitempty"`
-	// The user groups
-	Groups []string `json:"groups,omitempty"`
-	// The user UID
-	UID string `json:"uid,omitempty"`
-	// The name of the request
-	Name string `json:"name,omitempty"`
-	// The operation of the request
-	Operation string `json:"operation,omitempty"`
-	// The kind of the request
-	Kind string `json:"kind,omitempty"`
-	// The request resource
-	Resource string `json:"resource,omitempty"`
-	// The request subresource
-	Subresource string `json:"subresource,omitempty"`
+	// Admission Request
+	AdmissionRequest *admissionv1.AdmissionRequest `json:"admissionRequest,omitempty" bson:"admissionRequest,omitempty"`
 	// Admission ID
-	AdmissionID string `json:"admissionID,omitempty"`
+	AdmissionID string `json:"admissionID,omitempty" bson:"admissionID,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
