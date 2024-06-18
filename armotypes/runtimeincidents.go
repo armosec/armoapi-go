@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
-	admissionv1 "k8s.io/api/admission/v1"
+	"k8s.io/apiserver/pkg/admission"
 )
 
 type IncidentCategory string
@@ -113,8 +113,8 @@ type MalwareAlert struct {
 }
 
 type AdmissionAlert struct {
-	// Admission Request
-	AdmissionRequest *admissionv1.AdmissionRequest `json:"admissionRequest,omitempty" bson:"admissionRequest,omitempty"`
+	// Admission Attrs
+	AdmissionAttrs *admission.Attributes `json:"admissionAttrs,omitempty" bson:"admissionAttrs,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
