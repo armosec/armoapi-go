@@ -28,6 +28,7 @@ type NetworkPoliciesWorkload struct {
 	Namespace                  string                   `json:"namespace"`
 	ClusterName                string                   `json:"cluster"`
 	ClusterShortName           string                   `json:"clusterShortName"`
+	AppliedNetworkPolicyType   string                   `json:"appliedNetworkPolicyType"`
 	NetworkPolicyStatus        NetworkPolicyStatus      `json:"networkPolicyStatus"`
 	NetworkPolicyStatusMessage string                   `json:"networkPolicyStatusMessage"`
 	MissingRuntimeInfoReason   MissingRuntimeInfoReason `json:"missingRuntimeInfoReason"`
