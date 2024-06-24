@@ -3,10 +3,12 @@ package armotypes
 type SeccompStatus int
 
 const (
+	SeccompStatusUnknown            SeccompStatus = 0
 	SeccompStatusMissingRuntimeInfo SeccompStatus = 1
 	SeccompStatusMissing            SeccompStatus = 2
 	SeccompStatusOverlyPermissive   SeccompStatus = 3
 	SeccompStatusOptimized          SeccompStatus = 4
+	SeccompStatusMisconfigured      SeccompStatus = 5
 )
 
 type SeccompWorkload struct {
