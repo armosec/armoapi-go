@@ -8,7 +8,7 @@ const (
 	SeccompStatusMissing            SeccompStatus = 2
 	SeccompStatusOverlyPermissive   SeccompStatus = 3
 	SeccompStatusOptimized          SeccompStatus = 4
-	SeccompStatusMisconfigured      SeccompStatus = 4
+	SeccompStatusMisconfigured      SeccompStatus = 5
 )
 
 type SeccompWorkload struct {
