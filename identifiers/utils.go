@@ -29,3 +29,20 @@ func GenerateExceptionUID() (string, error) {
 
 	return newUUID.String(), nil
 }
+
+// ConvertResourceIDToResourceHashFNV expects to get resourceID in the format of `apiVersion/namespace/kind/name`
+// for e.g `apps/v1/default/Deployment/deploymenttest1`
+func ConvertResourceIDToResourceHashFNV(customerGUID, clusterName, resourceID string) string {
+	parts := strings.Split(resourceID, "/")
+	if len(parts) < 4 {
+		fmt.Println("Invalid resourceID format. Expected format: apiVersion/namespace/kind/name")
+		return ""
+	}
+	// Adjust the apiVersion to remove the leading '/' if present
+	apiVersion := strings.TrimPrefix(strings.Join(parts[:len(parts)-3], "/"), "/")
+	namespace := parts[len(parts)-3]
+	kind := parts[len(parts)-2]
+	name := parts[len(parts)-1]
+
+	return CalcResourceHashFNV(customerGUID, clusterName, kind, name, namespace, apiVersion)
+}
