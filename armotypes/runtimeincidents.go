@@ -4,7 +4,10 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/authentication/user"
 )
 
 type IncidentCategory string
@@ -113,8 +116,17 @@ type MalwareAlert struct {
 }
 
 type AdmissionAlert struct {
-	// Admission Attrs
-	AdmissionAttrs admission.Attributes `json:"admissionAttrs,omitempty" bson:"admissionAttrs,omitempty"`
+	Kind              schema.GroupVersionKind
+	ResourceNamespace string
+	ResourceName      string
+	Resource          schema.GroupVersionResource
+	Subresource       string
+	Operation         admission.Operation
+	Options           *unstructured.Unstructured
+	DryRun            bool
+	Object            *unstructured.Unstructured
+	OldObject         *unstructured.Unstructured
+	UserInfo          *user.DefaultInfo
 }
 
 type RuntimeAlertK8sDetails struct {
