@@ -114,7 +114,7 @@ type MalwareAlert struct {
 
 type AdmissionAlert struct {
 	// Admission Attrs
-	AdmissionAttrs *admission.Attributes `json:"admissionAttrs,omitempty" bson:"admissionAttrs,omitempty"`
+	AdmissionAttrs admission.Attributes `json:"admissionAttrs,omitempty" bson:"admissionAttrs,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
