@@ -116,17 +116,17 @@ type MalwareAlert struct {
 }
 
 type AdmissionAlert struct {
-	Kind              schema.GroupVersionKind     `json:"kind,omitempty" bson:"kind,omitempty"`
-	ResourceNamespace string                      `json:"resourceNamespace,omitempty" bson:"resourceNamespace,omitempty"`
-	ResourceName      string                      `json:"resourceName,omitempty" bson:"resourceName,omitempty"`
-	Resource          schema.GroupVersionResource `json:"resource,omitempty" bson:"resource,omitempty"`
-	Subresource       string                      `json:"subresource,omitempty" bson:"subresource,omitempty"`
-	Operation         admission.Operation         `json:"operation,omitempty" bson:"operation,omitempty"`
-	Options           *unstructured.Unstructured  `json:"options,omitempty" bson:"options,omitempty"`
-	DryRun            bool                        `json:"dryRun,omitempty" bson:"dryRun,omitempty"`
-	Object            *unstructured.Unstructured  `json:"object,omitempty" bson:"object,omitempty"`
-	OldObject         *unstructured.Unstructured  `json:"oldObject,omitempty" bson:"oldObject,omitempty"`
-	UserInfo          *user.DefaultInfo           `json:"userInfo,omitempty" bson:"userInfo,omitempty"`
+	Kind             schema.GroupVersionKind     `json:"kind,omitempty" bson:"kind,omitempty"`
+	RequestNamespace string                      `json:"requestNamespace,omitempty" bson:"requestNamespace,omitempty"`
+	ObjectName       string                      `json:"objectName,omitempty" bson:"objectName,omitempty"`
+	Resource         schema.GroupVersionResource `json:"resource,omitempty" bson:"resource,omitempty"`
+	Subresource      string                      `json:"subresource,omitempty" bson:"subresource,omitempty"`
+	Operation        admission.Operation         `json:"operation,omitempty" bson:"operation,omitempty"`
+	Options          *unstructured.Unstructured  `json:"options,omitempty" bson:"options,omitempty"`
+	DryRun           bool                        `json:"dryRun,omitempty" bson:"dryRun,omitempty"`
+	Object           *unstructured.Unstructured  `json:"object,omitempty" bson:"object,omitempty"`
+	OldObject        *unstructured.Unstructured  `json:"oldObject,omitempty" bson:"oldObject,omitempty"`
+	UserInfo         *user.DefaultInfo           `json:"userInfo,omitempty" bson:"userInfo,omitempty"`
 }
 
 type RuntimeAlertK8sDetails struct {
