@@ -237,7 +237,8 @@ type SecurityIssueControl struct {
 	FrameworkName string `json:"frameworkName"`
 
 	// relevant for controls with network policy fix
-	NetworkPolicyStatus NetworkPolicyStatus `json:"networkPolicyStatus,omitempty"`
+	AppliedNetworkPolicyType string              `json:"appliedNetworkPolicyType,omitempty"`
+	NetworkPolicyStatus      NetworkPolicyStatus `json:"networkPolicyStatus,omitempty"`
 
 	MissingRuntimeInfoReason MissingRuntimeInfoReason `json:"missingRuntimeInfoReason,omitempty"`
 }
