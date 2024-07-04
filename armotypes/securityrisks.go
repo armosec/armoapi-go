@@ -17,6 +17,7 @@ const (
 	RiskTypeControl                  RiskType = "Control"
 	RiskTypeControlWithNetworkPolicy RiskType = "ControlWithNetworkPolicy"
 	RiskTypeAttackPath               RiskType = "AttackPath"
+	RiskTypeVulnerability            RiskType = "Vulnerability"
 
 	SecurityIssueSeverityCritical SecurityIssueSeverity = "Critical"
 	SecurityIssueSeverityHigh     SecurityIssueSeverity = "High"
@@ -46,7 +47,7 @@ func (rt *RiskType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch s {
-	case string(RiskTypeControl), string(RiskTypeAttackPath):
+	case string(RiskTypeControl), string(RiskTypeAttackPath), string(RiskTypeVulnerability):
 		*rt = RiskType(s)
 		return nil
 	default:
@@ -247,6 +248,10 @@ type SecurityIssueAttackPath struct {
 	SecurityIssue `json:",inline"`
 	AttackChainID string `json:"attackChainID"`
 	FirstSeen     string `json:"firstSeen"`
+}
+
+type SecurityIssueVulnerability struct {
+	SecurityIssue `json:",inline"`
 }
 
 type SecurityRiskExceptionPolicy struct {
