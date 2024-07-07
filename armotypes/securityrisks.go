@@ -251,7 +251,14 @@ type SecurityIssueAttackPath struct {
 }
 
 type SecurityIssueVulnerability struct {
-	SecurityIssue `json:",inline"`
+	SecurityIssue    `json:",inline"`
+	CriticalCount    int                 `json:"criticalCount"`
+	HighCount        int                 `json:"highCount"`
+	MediumCount      int                 `json:"mediumCount"`
+	LowCount         int                 `json:"lowCount"`
+	SeverityStats    map[string][]string `json:"severityStats"`
+	RiskFactorsCount int                 `json:"riskFactorsCount"`
+	RiskFactors      []RiskFactor        `json:"riskFactors"`
 }
 
 type SecurityRiskExceptionPolicy struct {
