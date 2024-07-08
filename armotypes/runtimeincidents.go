@@ -3,58 +3,11 @@ package armotypes
 import (
 	"time"
 
-	"github.com/armosec/armoapi-go/identifiers"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/authentication/user"
 )
-
-type IncidentCategory string
-type RuntimeIncidentResolveReason string
-
-const (
-	RuntimeIncidentCategoryMalware   IncidentCategory = "Malware"
-	RuntimeIncidentCategoryAnomaly   IncidentCategory = "Anomaly"
-	RuntimeIncidentCategorySignature IncidentCategory = "Signature"
-
-	RuntimeResolveReasonFalsePositive RuntimeIncidentResolveReason = "FalsePositive"
-	RuntimeResolveReasonSuspicious    RuntimeIncidentResolveReason = "Suspicious"
-)
-
-type RuntimeIncident struct {
-	PortalBase `json:",inline" bson:"inline"`
-	// details of the incident triggers
-	RuntimeIncidentResource `json:",inline" bson:"inline"`
-	RuntimeAlert            `json:",inline" bson:"inline"`
-	// category of the incident
-	IncidentCategory  IncidentCategory `json:"incidentCategory" bson:"incidentCategory" `
-	CreationTimestamp time.Time        `json:"creationTimestamp" bson:"creationTimestamp"`
-	Description       string           `json:"description,omitempty" bson:"description,omitempty"`
-	MITRETactic       string           `json:"mitreTactic,omitempty" bson:"mitreTactic,omitempty"`
-	Severity          string           `json:"incidentSeverity,omitempty" bson:"incidentSeverity,omitempty"`
-	SeverityScore     int              `json:"severityScore,omitempty" bson:"severityScore,omitempty"`
-	Mitigation        string           `json:"mitigation,omitempty" bson:"mitigation,omitempty"`
-	// alerts / events that are part of this incident
-	RelatedAlerts []RuntimeAlert `json:"relatedAlerts,omitempty" bson:"relatedAlerts,omitempty"`
-	// user gestures
-	SeenAt *time.Time `json:"seenAt,omitempty" bson:"seenAt,omitempty"`
-	SeenBy string     `json:"seenBy,omitempty" bson:"seenBy,omitempty"`
-	// Resolve status
-	IsDismissed           bool       `json:"isDismissed" bson:"isDismissed"`
-	MarkedAsFalsePositive bool       `json:"markedAsFalsePositive" bson:"markedAsFalsePositive"`
-	ResolvedAt            *time.Time `json:"resolvedAt,omitempty" bson:"resolvedAt,omitempty"`
-	ResolvedBy            *string    `json:"resolvedBy,omitempty" bson:"resolvedBy,omitempty"`
-	// for future use
-	RelatedResources []RuntimeIncidentResource `json:"relatedResources,omitempty" bson:"relatedResources,omitempty"`
-	ProcessTree      *ProcessTree              `json:"processTree,omitempty" bson:"processTree,omitempty"`
-}
-
-type RuntimeIncidentResource struct {
-	Spiffe      string                       `json:"spiffe" bson:"spiffe" `
-	ResourceID  string                       `json:"resourceID" bson:"resourceID"` // hash of the resource to cross with various DBs
-	Designators identifiers.PortalDesignator `json:"designators" bson:"designators"`
-}
 
 type Process struct {
 	PID        uint32    `json:"pid,omitempty" bson:"pid,omitempty"`
@@ -163,14 +116,6 @@ type ProcessTree struct {
 	ProcessTree Process `json:"processTree" bson:"processTree"`
 	UniqueID    uint32  `json:"uniqueID" bson:"uniqueID"`
 	ContainerID string  `json:"containerID" bson:"containerID"`
-}
-
-func (ri *RuntimeIncident) GetTimestampFieldName() string {
-	return "creationTimestamp"
-}
-
-func (ra *RuntimeAlert) GetTimestampFieldName() string {
-	return "timestamp"
 }
 
 type KDRMonitoredEntitiesCounters struct {
