@@ -94,6 +94,8 @@ const (
 	AttributeCVEName              = "cveName"
 	AttributeControlID            = "controlID"
 	AttributeBaseScore            = "baseScore"
+	AttributeNodeName             = "nodeName"
+	AttributePodName              = "podName"
 )
 
 // Repository scan related attributes

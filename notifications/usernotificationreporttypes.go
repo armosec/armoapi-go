@@ -75,8 +75,9 @@ type AlertChannel struct {
 }
 
 type NotificationParams struct {
-	DriftPercentage *int `json:"driftPercentage,omitempty" bson:"driftPercentage,omitempty"`
-	MinSeverity     *int `json:"minSeverity,omitempty" bson:"minSeverity,omitempty"`
+	DriftPercentage     *int     `json:"driftPercentage,omitempty" bson:"driftPercentage,omitempty"`
+	MinSeverity         *int     `json:"minSeverity,omitempty" bson:"minSeverity,omitempty"`
+	IncidentPolicyGUIDs []string `json:"incidentPolicyGUIDs,omitempty" bson:"incidentPolicyGUIDs,omitempty"`
 }
 
 type AlertConfig struct {
@@ -98,17 +99,19 @@ type EnrichedScope struct {
 type NotificationType string
 
 const (
-	NotificationTypeWeekly           NotificationType = "weekly"            //weekly report
-	NotificationTypePush             NotificationType = "push"              //posture scan
-	NotificationTypeContainerPush    NotificationType = "containerScanPush" //container scan
-	NotificationTypeSecurityRiskPush NotificationType = "securityRiskPush"  //security risk
+	NotificationTypeWeekly              NotificationType = "weekly"              //weekly report
+	NotificationTypePush                NotificationType = "push"                //posture scan
+	NotificationTypeContainerPush       NotificationType = "containerScanPush"   //container scan
+	NotificationTypeSecurityRiskPush    NotificationType = "securityRiskPush"    //security risk
+	NotificationTypeRuntimeIncidentPush NotificationType = "runtimeIncidentPush" // runtime incident (kdr)
 
 	NotificationTypeComplianceDrift     NotificationType = NotificationTypePush + ":complianceDrift"
 	NotificationTypeNewClusterAdmin     NotificationType = NotificationTypePush + ":newClusterAdmin"
 	NotificationTypeNewVulnerability    NotificationType = NotificationTypeContainerPush + ":newVulnerability"
 	NotificationTypeVulnerabilityNewFix NotificationType = NotificationTypeContainerPush + ":vulnerabilityNewFix"
 
-	NotificationTypeSecurityRiskNew NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
+	NotificationTypeSecurityRiskNew    NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
+	NotificationTypeRuntimeIncidentNew NotificationType = NotificationTypeRuntimeIncidentPush + ":newRuntimeIncident"
 )
 
 var notificationTypes = []NotificationType{
