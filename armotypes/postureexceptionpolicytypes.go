@@ -13,6 +13,8 @@ const Disable PostureExceptionPolicyActions = "disable"
 
 type PolicyType string
 
+const globalRegex = "*/*"
+
 const PostureExceptionPolicyType PolicyType = "postureExceptionPolicy"
 const VulnerabilityExceptionPolicyType PolicyType = "vulnerabilityExceptionPolicy"
 
