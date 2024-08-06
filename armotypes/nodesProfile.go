@@ -11,7 +11,7 @@ type NodeProfile struct {
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
 }
 type NodeSpec struct {
-	AllocatedCPU int `json:"allocatedCPU,omitempty"`
+	AllocatedCPU *int `json:"allocatedCPU,omitempty"`
 }
 type NodeStatus struct {
 	CustomerGUID    string `json:"customerGUID"`
