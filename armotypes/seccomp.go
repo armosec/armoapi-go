@@ -11,6 +11,8 @@ const (
 	SeccompStatusMisconfigured      SeccompStatus = 5
 )
 
+var MandatorySeccompSyscalls = []string{"epoll_wait", "tgkill", "sched_yield"}
+
 type SeccompWorkload struct {
 	Name                     string                   `json:"name"`
 	Kind                     string                   `json:"kind"`
