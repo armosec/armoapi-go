@@ -24,8 +24,6 @@ const (
 	SecurityIssueSeverityMedium   SecurityIssueSeverity = "Medium"
 	SecurityIssueSeverityLow      SecurityIssueSeverity = "Low"
 
-	SecurityRiskExceptionPolicyType PolicyType = "securityRiskExceptionPolicy"
-
 	ResolvedReasonResourceDeleted ResolvedReason = "ResourceDeleted"
 	ResolvedReasonClusterDeleted  ResolvedReason = "ClusterDeleted"
 	ResolvedReasonRiskResolved    ResolvedReason = "RiskResolved"
