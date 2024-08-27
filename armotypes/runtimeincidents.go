@@ -130,5 +130,4 @@ type KDRMonitoredEntitiesCounters struct {
 type RuntimeIncidentExceptionPolicy struct {
 	BaseExceptionPolicy `json:",inline"`
 	Name                string `json:"name"`
-	IncidentTypeId      string `json:"incidentTypeId"`
 }
