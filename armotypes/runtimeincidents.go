@@ -126,3 +126,9 @@ type KDRMonitoredEntitiesCounters struct {
 	PodsCount       int `json:"podsCount"`
 	ContainersCount int `json:"containersCount"`
 }
+
+type RuntimeIncidentExceptionPolicy struct {
+	BaseExceptionPolicy `json:",inline"`
+	Name                string `json:"name"`
+	IncidentTypeId      string `json:"incidentTypeId"`
+}

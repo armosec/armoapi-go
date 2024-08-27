@@ -11,7 +11,7 @@ const (
 	SecurityRiskExceptionPolicyType PolicyType = "securityRiskExceptionPolicy"
 
 	// RuntimeIncidentPolicy - policy for runtime incidents
-	RuntimeIncidentExceptionPolicy PolicyType = "runtimeIncidentExceptionPolicy"
+	RuntimeIncidentExceptionPolicyType PolicyType = "runtimeIncidentExceptionPolicy"
 )
 
 type BaseExceptionPolicy struct {
