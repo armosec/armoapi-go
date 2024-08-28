@@ -2,5 +2,13 @@ package armotypes
 
 type UserApplicationProfileRequest struct {
 	IncidentGUID string `json:"incidentGUID"`
-	ResourseHash string `json:"resourseHash"`
+	ApplicationProfileIdentifiers 
+}
+
+
+type ApplicationProfileIdentifiers struct {
+	WorkloadKind string `json:"workloadKind"`
+	WorkloadName string `json:"workloadName"`
+	Namespace    string `json:"namespace"`
+	Cluster 	string `json:"cluster"`
 }
