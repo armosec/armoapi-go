@@ -11,8 +11,9 @@ type SecurityIssueSeverity string
 type ResolvedReason string
 
 const (
-	SecurityIssueStatusDetected SecurityIssueStatus = "Detected"
-	SecurityIssueStatusResolved SecurityIssueStatus = "Resolved"
+	SecurityIssueStatusDetected  SecurityIssueStatus = "Detected"
+	SecurityIssueStatusResolved  SecurityIssueStatus = "Resolved"
+	SecurityIssueStatusException SecurityIssueStatus = "Exception"
 
 	RiskTypeControl                  RiskType = "Control"
 	RiskTypeControlWithNetworkPolicy RiskType = "ControlWithNetworkPolicy"
