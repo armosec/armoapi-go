@@ -78,6 +78,20 @@ type NotificationParams struct {
 	DriftPercentage     *int     `json:"driftPercentage,omitempty" bson:"driftPercentage,omitempty"`
 	MinSeverity         *int     `json:"minSeverity,omitempty" bson:"minSeverity,omitempty"`
 	IncidentPolicyGUIDs []string `json:"incidentPolicyGUIDs,omitempty" bson:"incidentPolicyGUIDs,omitempty"`
+
+	// params for workflows
+	Severities []string `json:"severities,omitempty" bson:"severities,omitempty"`
+
+	// vulnerability params
+	KnownExploited *bool   `json:"knownExploited,omitempty" bson:"knownExploited,omitempty"` // Known Exploited (CISA KEV)
+	HighLikelihood *bool   `json:"highLikelihood,omitempty" bson:"highLikelihood,omitempty"` // High Likelihood (EPSS ≥ 10%)
+	CVSS           float32 `json:"cvss,omitempty" bson:"cvss,omitempty"`                     // CVSS (Common Vulnerability Scoring System)
+	InUse          *bool   `json:"inUse,omitempty" bson:"inUse,omitempty"`                   // In Use (CISA IU)
+	Fixable        *bool   `json:"fixable,omitempty" bson:"fixable,omitempty"`               // Fixable (CISA FX)
+
+	// security risks params
+	SecurityRiskID string `json:"securityRiskID,omitempty" bson:"securityRiskID,omitempty"` // Security Risk ID
+
 }
 
 type AlertConfig struct {
