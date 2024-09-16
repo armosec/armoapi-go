@@ -90,7 +90,7 @@ type NotificationParams struct {
 	Fixable        *bool   `json:"fixable,omitempty" bson:"fixable,omitempty"`               // Fixable (CISA FX)
 
 	// security risks params
-	SecurityRiskID string `json:"securityRiskID,omitempty" bson:"securityRiskID,omitempty"` // Security Risk ID
+	SecurityRiskIDs []string `json:"securityRiskIDs,omitempty" bson:"securityRiskIDs,omitempty"` // Security Risk ID
 
 }
 
