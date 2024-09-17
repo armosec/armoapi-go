@@ -1,11 +1,11 @@
 package armotypes
 
 var SeverityToInt = map[string]int{
-	"critical":   500,
-	"high":       400,
-	"medium":     300,
-	"low":        200,
-	"Negligible": 100,
+	"critical": 500,
+	"high":     400,
+	"medium":   300,
+	"low":      200,
+	"info":     100,
 }
 
 var CheckStatusToInt = map[string]int{
