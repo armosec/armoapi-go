@@ -151,12 +151,12 @@ const (
 
 // CSPM related attributes
 const (
-	AttributeAccountID   = "accountID"
-	AttributeAccountName = "accountName"
+	AttributeCloudAccountID   = "accountID"
+	AttributeCloudAccountName = "accountName"
 	AttributeFramework   = "framework"
-	AttributeScanID      = "scanID"
-	AttributeTaskID      = "taskID"
-	AttributeFindingType = "findingType"
+	AttributeCloudScanID      = "scanID"
+	AttributeCloudTaskID      = "taskID"
+	AttributeCloudFindingType = "findingType"
 )
 
 type mapString2String map[string]string

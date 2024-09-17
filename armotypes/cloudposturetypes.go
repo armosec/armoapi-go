@@ -1,6 +1,6 @@
 package armotypes
 
-var SeverityToInt = map[string]int{
+var CloudSeverityToInt = map[string]int{
 	"critical": 500,
 	"high":     400,
 	"medium":   300,
@@ -8,7 +8,7 @@ var SeverityToInt = map[string]int{
 	"info":     100,
 }
 
-var CheckStatusToInt = map[string]int{
+var CloudCheckStatusToInt = map[string]int{
 	"EMPTY":   -1,
 	"MANUAL":  0,
 	"FAIL":    1,
@@ -16,7 +16,7 @@ var CheckStatusToInt = map[string]int{
 	"SKIPPED": 3,
 }
 
-var ScanStatusToInt = map[string]int{
+var CloudPostureScanStatusToInt = map[string]int{
 	ScanFailed:     1,
 	ScanInProgress: 2,
 	ScanSuccess:    3,
