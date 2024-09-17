@@ -155,6 +155,16 @@ const (
 	LastTimeSecurityRiskScanCompleted = "lastTimeSecurityRiskScanCompleted"
 )
 
+// CSPM related attributes
+const (
+	AttributeAccountID   = "accountID"
+	AttributeAccountName = "accountName"
+	AttributeFramework   = "framework"
+	AttributeScanID      = "scanID"
+	AttributeTaskID      = "taskID"
+	AttributeFindingType = "findingType"
+)
+
 type mapString2String map[string]string
 
 var IgnoreLabels = []string{AttributeCluster, AttributeNamespace}
