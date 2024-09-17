@@ -7,10 +7,11 @@ var CloudSeverityToInt = map[string]int{
 	"medium":   300,
 	"low":      200,
 	"info":     100,
+	"unknown":  1,
 }
 
 var CloudIntToSeverity = map[int]string{
-	UnknownScore:  "Unknown",
+	UnknownScore:  "unknown",
 	InfoScore:     "info",
 	LowScore:      "low",
 	MediumScore:   "medium",
