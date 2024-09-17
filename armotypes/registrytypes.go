@@ -1,5 +1,7 @@
 package armotypes
 
+import "time"
+
 type RegistryJobParams struct {
 	Name            string `json:"name,omitempty"`
 	ID              string `json:"id,omitempty"`
@@ -31,4 +33,36 @@ type AuthMethod struct {
 
 type Repository struct {
 	RepositoryName string `json:"repositoryName"`
+}
+
+type RegistryProvider int
+
+const (
+	Quay RegistryProvider = iota
+	Harbor
+)
+
+type BaseContainerImageRegistry struct {
+	PortalBase    `json:",inline" bson:"inline"`
+	Provider      RegistryProvider `json:"provider" bson:"provider"`
+	ClusterName   string           `json:"clusterName" bson:"clusterName"`
+	Repositories  []string         `json:"repositories" bson:"repositories"`
+	LastScan      *time.Time       `json:"lastScan,omitempty" bson:"lastScan,omitempty"`
+	ScanFrequency string           `json:"scanFrequency,omitempty" bson:"scanFrequency,omitempty"`
+	ResourceHash  string           `json:"resourceHash,omitempty" bson:"resourceHash,omitempty"`
+	AuthID        string           `json:"authID,omitempty" bson:"authID"`
+}
+
+type QuayImageRegistry struct {
+	BaseContainerImageRegistry `json:",inline"`
+	ContainerRegistryName      string `json:"containerRegistryName"`
+	RobotAccountName           string `json:"RobotAccountName"`
+	RobotAccountToken          string `json:"RobotAccountToken"`
+}
+
+type HarborImageRegistry struct {
+	BaseContainerImageRegistry `json:",inline"`
+	InstanceURL                string `json:"instanceURL"`
+	Username                   string `json:"username"`
+	Password                   string `json:"password"`
 }
