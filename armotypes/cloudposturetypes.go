@@ -17,7 +17,13 @@ var CheckStatusToInt = map[string]int{
 }
 
 var ScanStatusToInt = map[string]int{
-	"FAILED":     1,
-	"INPROGRESS": 2,
-	"SUCCESS":    3,
+	ScanFailed:     1,
+	ScanInProgress: 2,
+	ScanSuccess:    3,
 }
+
+const (
+	ScanFailed     = "FAILED"
+	ScanInProgress = "INPROGRESS"
+	ScanSuccess    = "SUCCESS"
+)
