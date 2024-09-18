@@ -124,3 +124,23 @@ func TestNewScanWithoutAccessKeyEvent(t *testing.T) {
 	assert.Equal(t, "cluster123", event.ClusterName)
 	assert.Equal(t, "ClusterScanWithoutAccessKey", event.EventName)
 }
+
+func TestNewNodeStatusEventHookNotify(t *testing.T) {
+	allocatedCPU := 1
+	node := armotypes.NodeStatus{
+		CustomerGUID:    "testGUID",
+		Cluster:         "testCluster",
+		Name:            "testName",
+		K8sResourceHash: "testHash",
+		NodeProfile:     armotypes.NodeProfile{},
+		NodeSpec: armotypes.NodeSpec{
+			AllocatedCPU: &allocatedCPU,
+		},
+	}
+	event := NewNodeStatusEventHookNotify("testGUID", &node)
+	assert.Equal(t, "testGUID", event.CustomerGUID)
+	assert.Equal(t, 1, *event.AllocatedCPU)
+	assert.Equal(t, "testName", event.NodeName)
+	assert.Equal(t, "testCluster", event.Cluster)
+
+}
