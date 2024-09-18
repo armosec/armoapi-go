@@ -317,3 +317,12 @@ func NewScanWithoutAccessKeyEvent(customerGUID, clusterName string) ScanWithoutA
 		ClusterName: clusterName,
 	}
 }
+
+func NewNodeStatusEventHookNotify(customerGUID string, nodeStatus *armotypes.NodeStatus) NodeStatusEvent {
+	return NodeStatusEvent{
+		EventBase:    NewBaseEvent(customerGUID, "NodeStatusEvent", nil),
+		Cluster:      nodeStatus.Cluster,
+		NodeName:     nodeStatus.Name,
+		AllocatedCPU: nodeStatus.NodeSpec.AllocatedCPU,
+	}
+}
