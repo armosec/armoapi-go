@@ -62,6 +62,14 @@ type NotificationsConfig struct {
 	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
 	LatestPushReports  map[string]*PushReport                    `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
 	AlertChannels      map[ChannelProvider][]AlertChannel        `json:"alertChannels,omitempty" bson:"alertChannels,omitempty"`
+	EnableWorkflows    *bool                                     `json:"enableWorkflows,omitempty" bson:"enableWorkflows,omitempty"`
+}
+
+func (nc *NotificationsConfig) GetEnableWorkflows() bool {
+	if nc.EnableWorkflows == nil {
+		return false
+	}
+	return *nc.EnableWorkflows
 }
 
 type NotificationConfigIdentifier struct {
