@@ -17,8 +17,8 @@ type EventBase struct {
 }
 
 type NetworkPolicyGenerated struct {
-	EventBase       `json:",inline"`
-	WorkloadName    string `json:"WorkloadName"`
+	EventBase    `json:",inline"`
+	WorkloadName string `json:"WorkloadName"`
 }
 
 type AttackChainCreated struct {
@@ -104,4 +104,12 @@ type AlertChannelEvent struct {
 type ScanWithoutAccessKeyEvent struct {
 	EventBase   `json:",inline"`
 	ClusterName string `json:"clusterName"`
+}
+
+type NodeStatusEvent struct {
+	EventBase    `json:",inline"`
+	CustomerName string `json:"customerName"`
+	Cluster      string `json:"cluster"`
+	NodeName     string `json:"nodeName"`
+	AllocatedCPU *int   `json:"allocatedCPU"`
 }

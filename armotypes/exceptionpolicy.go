@@ -6,9 +6,17 @@ import (
 	"github.com/armosec/armoapi-go/identifiers"
 )
 
+const (
+	// SecurityRiskPolicy - policy for security risks
+	SecurityRiskExceptionPolicyType PolicyType = "securityRiskExceptionPolicy"
+
+	// RuntimeIncidentPolicy - policy for runtime incidents
+	RuntimeIncidentExceptionPolicyType PolicyType = "runtimeIncidentExceptionPolicy"
+)
+
 type BaseExceptionPolicy struct {
 	PortalBase `json:",inline" bson:"inline"`
-	PolicyType string `json:"policyType,omitempty" bson:"policyType,omitempty"`
+	PolicyType PolicyType `json:"policyType,omitempty" bson:"policyType,omitempty"`
 
 	// IDs of the policies (SecurityRiskID, ControlID, etc.)
 	PolicyIDs      []string                       `json:"policyIDs,omitempty" bson:"policyIDs,omitempty"`

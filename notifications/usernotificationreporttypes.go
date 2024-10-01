@@ -62,6 +62,14 @@ type NotificationsConfig struct {
 	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
 	LatestPushReports  map[string]*PushReport                    `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
 	AlertChannels      map[ChannelProvider][]AlertChannel        `json:"alertChannels,omitempty" bson:"alertChannels,omitempty"`
+	EnableWorkflows    *bool                                     `json:"enableWorkflows,omitempty" bson:"enableWorkflows,omitempty"`
+}
+
+func (nc *NotificationsConfig) GetEnableWorkflows() bool {
+	if nc.EnableWorkflows == nil {
+		return false
+	}
+	return *nc.EnableWorkflows
 }
 
 type NotificationConfigIdentifier struct {
@@ -75,8 +83,23 @@ type AlertChannel struct {
 }
 
 type NotificationParams struct {
-	DriftPercentage *int `json:"driftPercentage,omitempty" bson:"driftPercentage,omitempty"`
-	MinSeverity     *int `json:"minSeverity,omitempty" bson:"minSeverity,omitempty"`
+	DriftPercentage     *int     `json:"driftPercentage,omitempty" bson:"driftPercentage,omitempty"`
+	MinSeverity         *int     `json:"minSeverity,omitempty" bson:"minSeverity,omitempty"`
+	IncidentPolicyGUIDs []string `json:"incidentPolicyGUIDs,omitempty" bson:"incidentPolicyGUIDs,omitempty"`
+
+	// params for workflows
+	Severities []string `json:"severities,omitempty" bson:"severities,omitempty"`
+
+	// vulnerability params
+	KnownExploited *bool   `json:"knownExploited,omitempty" bson:"knownExploited,omitempty"` // Known Exploited (CISA KEV)
+	HighLikelihood *bool   `json:"highLikelihood,omitempty" bson:"highLikelihood,omitempty"` // High Likelihood (EPSS ≥ 10%)
+	CVSS           float32 `json:"cvss,omitempty" bson:"cvss,omitempty"`                     // CVSS (Common Vulnerability Scoring System)
+	InUse          *bool   `json:"inUse,omitempty" bson:"inUse,omitempty"`                   // In Use (CISA IU)
+	Fixable        *bool   `json:"fixable,omitempty" bson:"fixable,omitempty"`               // Fixable (CISA FX)
+
+	// security risks params
+	SecurityRiskIDs []string `json:"securityRiskIDs,omitempty" bson:"securityRiskIDs,omitempty"` // Security Risk ID
+
 }
 
 type AlertConfig struct {
@@ -98,17 +121,19 @@ type EnrichedScope struct {
 type NotificationType string
 
 const (
-	NotificationTypeWeekly           NotificationType = "weekly"            //weekly report
-	NotificationTypePush             NotificationType = "push"              //posture scan
-	NotificationTypeContainerPush    NotificationType = "containerScanPush" //container scan
-	NotificationTypeSecurityRiskPush NotificationType = "securityRiskPush"  //security risk
+	NotificationTypeWeekly              NotificationType = "weekly"              //weekly report
+	NotificationTypePush                NotificationType = "push"                //posture scan
+	NotificationTypeContainerPush       NotificationType = "containerScanPush"   //container scan
+	NotificationTypeSecurityRiskPush    NotificationType = "securityRiskPush"    //security risk
+	NotificationTypeRuntimeIncidentPush NotificationType = "runtimeIncidentPush" // runtime incident (kdr)
 
 	NotificationTypeComplianceDrift     NotificationType = NotificationTypePush + ":complianceDrift"
 	NotificationTypeNewClusterAdmin     NotificationType = NotificationTypePush + ":newClusterAdmin"
 	NotificationTypeNewVulnerability    NotificationType = NotificationTypeContainerPush + ":newVulnerability"
 	NotificationTypeVulnerabilityNewFix NotificationType = NotificationTypeContainerPush + ":vulnerabilityNewFix"
 
-	NotificationTypeSecurityRiskNew NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
+	NotificationTypeSecurityRiskNew    NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
+	NotificationTypeRuntimeIncidentNew NotificationType = NotificationTypeRuntimeIncidentPush + ":newRuntimeIncident"
 )
 
 var notificationTypes = []NotificationType{

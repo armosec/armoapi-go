@@ -1,9 +1,9 @@
 package armotypes
 
 import (
-	"time"
-
+	"encoding/json"
 	"github.com/armosec/armoapi-go/identifiers"
+	"time"
 )
 
 type PostureExceptionPolicyActions string
@@ -13,8 +13,16 @@ const Disable PostureExceptionPolicyActions = "disable"
 
 type PolicyType string
 
+const GlobalRegex = "*/*"
+
 const PostureExceptionPolicyType PolicyType = "postureExceptionPolicy"
 const VulnerabilityExceptionPolicyType PolicyType = "vulnerabilityExceptionPolicy"
+
+type IgnoreRuleUserInputMessage struct {
+	PolicyType PolicyType      `json:"policyType"`
+	NewData    json.RawMessage `json:"newData"`
+	OldData    json.RawMessage `json:"oldData"`
+}
 
 type PostureExceptionPolicy struct {
 	PortalBase      `json:",inline" bson:"inline"`

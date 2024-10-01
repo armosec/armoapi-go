@@ -83,19 +83,20 @@ type AdmissionAlert struct {
 }
 
 type RuntimeAlertK8sDetails struct {
-	ClusterName       string `json:"clusterName" bson:"clusterName"`
-	ContainerName     string `json:"containerName,omitempty" bson:"containerName,omitempty"`
-	HostNetwork       *bool  `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
-	Image             string `json:"image,omitempty" bson:"image,omitempty"`
-	ImageDigest       string `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
-	Namespace         string `json:"namespace,omitempty" bson:"namespace,omitempty"`
-	NodeName          string `json:"nodeName,omitempty" bson:"nodeName,omitempty"`
-	ContainerID       string `json:"containerID,omitempty" bson:"containerID,omitempty"`
-	PodName           string `json:"podName,omitempty" bson:"podName,omitempty"`
-	PodNamespace      string `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
-	WorkloadName      string `json:"workloadName" bson:"workloadName"`
-	WorkloadNamespace string `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
-	WorkloadKind      string `json:"workloadKind" bson:"workloadKind"`
+	ClusterName       string            `json:"clusterName" bson:"clusterName"`
+	ContainerName     string            `json:"containerName,omitempty" bson:"containerName,omitempty"`
+	HostNetwork       *bool             `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
+	Image             string            `json:"image,omitempty" bson:"image,omitempty"`
+	ImageDigest       string            `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
+	Namespace         string            `json:"namespace,omitempty" bson:"namespace,omitempty"`
+	NodeName          string            `json:"nodeName,omitempty" bson:"nodeName,omitempty"`
+	ContainerID       string            `json:"containerID,omitempty" bson:"containerID,omitempty"`
+	PodName           string            `json:"podName,omitempty" bson:"podName,omitempty"`
+	PodNamespace      string            `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
+	PodLabels         map[string]string `json:"podLabels,omitempty" bson:"podLabels,omitempty"`
+	WorkloadName      string            `json:"workloadName" bson:"workloadName"`
+	WorkloadNamespace string            `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
+	WorkloadKind      string            `json:"workloadKind" bson:"workloadKind"`
 }
 
 type RuntimeAlert struct {
@@ -124,4 +125,12 @@ type KDRMonitoredEntitiesCounters struct {
 	NamespacesCount int `json:"namespacesCount"`
 	PodsCount       int `json:"podsCount"`
 	ContainersCount int `json:"containersCount"`
+}
+
+type RuntimeIncidentExceptionPolicy struct {
+	BaseExceptionPolicy `json:",inline"`
+	Name                string `json:"name"`
+	IncidentTypeId      string `json:"incidentTypeId"`
+	Severity            string `json:"severity"`
+	SeverityScore       int    `json:"severityScore"`
 }

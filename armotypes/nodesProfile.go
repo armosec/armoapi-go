@@ -10,13 +10,16 @@ type NodeProfile struct {
 
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
 }
-
+type NodeSpec struct {
+	AllocatedCPU *int `json:"allocatedCPU,omitempty"`
+}
 type NodeStatus struct {
 	CustomerGUID    string `json:"customerGUID"`
 	Cluster         string `json:"cluster"`
 	Name            string `json:"name"`
 	K8sResourceHash string `json:"k8sResourceHash"`
 	NodeProfile     `json:",inline"`
+	NodeSpec        `json:",inline"`
 }
 
 func (nc *NodeStatus) IsKDRMonitored() bool {

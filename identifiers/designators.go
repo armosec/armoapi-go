@@ -94,6 +94,12 @@ const (
 	AttributeCVEName              = "cveName"
 	AttributeControlID            = "controlID"
 	AttributeBaseScore            = "baseScore"
+	AttributeNodeName             = "nodeName"
+	AttributePodName              = "podName"
+	AttributeSiteID               = "siteId"       // Jira site ID
+	AttributeProjectID            = "projectId"    // Jira project ID
+	AttributeIssueTypeID          = "issueTypeId"  // Jira issue type ID
+	AttributeWorkflowGUID         = "workflowGUID" // workflow GUID
 )
 
 // Repository scan related attributes
