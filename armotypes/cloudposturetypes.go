@@ -29,20 +29,27 @@ const (
 )
 
 // cloud check statuses
+const (
+	CloudCheckStatusEmpty   = "EMPTY"
+	CloudCheckStatusFail    = "FAIL"
+	CloudCheckStatusManual  = "MANUAL"
+	CloudCheckStatusPass    = "PASS"
+	CloudCheckStatusSkipped = "SKIPPED"
+)
 var CloudCheckStatusToInt = map[string]int{
-	"EMPTY":   -1,
-	"FAIL":    10,
-	"MANUAL":  20,
-	"PASS":    30,
-	"SKIPPED": 40,
+	CloudCheckStatusEmpty:   -1,
+	CloudCheckStatusFail:    10,
+	CloudCheckStatusManual:  20,
+	CloudCheckStatusPass:    30,
+	CloudCheckStatusSkipped: 40,
 }
 
 var CloudIntToCheckStatus = map[int]string{
-	-1: "EMPTY",
-	10:  "FAIL",
-	20:  "MANUAL",
-	30:  "PASS",
-	40:  "SKIPPED",
+	-1: CloudCheckStatusEmpty,
+	10: CloudCheckStatusFail,
+	20: CloudCheckStatusManual,
+	30: CloudCheckStatusPass,
+	40: CloudCheckStatusSkipped,
 }
 
 // cloud posture scans statuses
