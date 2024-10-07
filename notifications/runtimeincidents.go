@@ -14,4 +14,9 @@ type NewRuntimeIncident struct {
 	Severity            string                       `json:"severity"`
 	Resource            identifiers.PortalDesignator `json:"resource"` // Pod, Node, Workload, Namespace, Cluster, etc.
 	Link                string                       `json:"link"`
+	Response            *RuntimeIncidentResponse     `json:"response,omitempty"`
+}
+
+type RuntimeIncidentResponse struct {
+	Action string `json:"action"`
 }
