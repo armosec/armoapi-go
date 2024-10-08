@@ -35,7 +35,7 @@ type CollaborationConfigOption struct {
 	Name string `json:"name" bson:"name,omitempty"`
 
 	// ID of the option
-	// Example: 8313c5a0-bee1-4a3c-8f4f-71ce698259876 or https://teams/mywebhook
+	// Example: 8313c5a0-bee1-4a3c-8f4f-71ce698259876 or https://teams/mywebhook or jira siteID
 	ID string `json:"id" bson:"id,omitempty"`
 
 	// Icon url for the option. Optional
