@@ -12,4 +12,7 @@ type SynchronizerClient struct {
 	HelmVersion         string    `json:"helmVersion"`
 	SynchronizerVersion string    `json:"synchronizerVersion"`
 	ConnectionId        string    `json:"connectionId"`
+	FirstConnected      time.Time `json:"firstConnected"`
+	GitVersion          string    `json:"gitVersion"`
+	CloudProvider       string    `json:"cloudProvider"`
 }
