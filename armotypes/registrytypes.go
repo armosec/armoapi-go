@@ -2,6 +2,14 @@ package armotypes
 
 import "time"
 
+const (
+	RegistryResourcePrefix      = "kubescape-registry-scan"
+	RegistryAuthFieldInSecret   = "registriesAuth"
+	RegistryCommandBody         = "request-body.json"
+	RegistryCronjobTemplateName = "cronjobTemplate"
+	RegistryRequestVolumeName   = "request-body-volume"
+)
+
 type RegistryJobParams struct {
 	Name            string `json:"name,omitempty"`
 	ID              string `json:"id,omitempty"`
@@ -35,12 +43,23 @@ type Repository struct {
 	RepositoryName string `json:"repositoryName"`
 }
 
-type RegistryProvider int
+type RegistryProvider string
 
 const (
-	Quay RegistryProvider = iota
-	Harbor
+	AWS    RegistryProvider = "aws"
+	Azure  RegistryProvider = "azure"
+	Google RegistryProvider = "google"
+	Harbor RegistryProvider = "harbor"
+	Quay   RegistryProvider = "quay"
 )
+
+type ContainerImageRegistry interface {
+	MaskSecret()
+	ExtractSecret() interface{}
+	FillSecret(interface{}) error
+	GetBase() *BaseContainerImageRegistry
+	Validate() error
+}
 
 type BaseContainerImageRegistry struct {
 	PortalBase    `json:",inline" bson:"inline"`
@@ -49,7 +68,7 @@ type BaseContainerImageRegistry struct {
 	Repositories  []string         `json:"repositories" bson:"repositories"`
 	LastScan      *time.Time       `json:"lastScan,omitempty" bson:"lastScan,omitempty"`
 	ScanFrequency string           `json:"scanFrequency,omitempty" bson:"scanFrequency,omitempty"`
-	ResourceHash  string           `json:"resourceHash,omitempty" bson:"resourceHash,omitempty"`
+	ResourceName  string           `json:"resourceName,omitempty" bson:"resourceName,omitempty"`
 	AuthID        string           `json:"authID,omitempty" bson:"authID"`
 }
 
@@ -65,4 +84,25 @@ type HarborImageRegistry struct {
 	InstanceURL                string `json:"instanceURL"`
 	Username                   string `json:"username"`
 	Password                   string `json:"password"`
+}
+
+type AzureImageRegistry struct {
+	BaseContainerImageRegistry `json:",inline"`
+	LoginServer                string `json:"loginServer"`
+	Username                   string `json:"username"`
+	AccessToken                string `json:"accessToken"`
+}
+
+type AWSImageRegistry struct {
+	BaseContainerImageRegistry `json:",inline"`
+	Registry                   string `json:"registry"`
+	RegistryRegion             string `json:"registryRegion"`
+	AccessKeyID                string `json:"accessKeyID,omitempty"`
+	SecretAccessKey            string `json:"secretAccessKey,omitempty"`
+	RoleARN                    string `json:"roleARN,omitempty"`
+}
+
+type GoogleImageRegistry struct {
+	BaseContainerImageRegistry `json:",inline"`
+	RegistryURI                string `json:"registryURI"`
 }
