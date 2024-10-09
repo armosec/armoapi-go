@@ -56,24 +56,6 @@ const (
 	ScanTypeRepositories ScanType = "repository"
 )
 
-type NotificationsConfig struct {
-	//Map of unsubscribed user id to notification config identifier
-	UnsubscribedUsers  map[string][]NotificationConfigIdentifier `json:"unsubscribedUsers,omitempty" bson:"unsubscribedUsers,omitempty"`
-	LatestWeeklyReport *WeeklyReport                             `json:"latestWeeklyReport,omitempty" bson:"latestWeeklyReport,omitempty"`
-	LatestPushReports  map[string]*PushReport                    `json:"latestPushReports,omitempty" bson:"latestPushReports,omitempty"`
-	AlertChannels      map[ChannelProvider][]AlertChannel        `json:"alertChannels,omitempty" bson:"alertChannels,omitempty"`
-
-	// workflows is enabled only once, when user is identified as true for workflows feature flag.
-	WorkflowsEnabled bool `json:"workflowsEnabled,omitempty" bson:"workflowsEnabled,omitempty"`
-
-	// workflowsConverted is enabled only once, when user is identified as true for workflows feature flag and conversion from alert channels to workflows is done successfully.
-	WorkflowsConverted bool `json:"workflowsConverted,omitempty" bson:"workflowsConverted,omitempty"`
-}
-
-func (nc *NotificationsConfig) GetWorkflowsActive() bool {
-	return nc.WorkflowsEnabled && nc.WorkflowsConverted
-}
-
 type NotificationConfigIdentifier struct {
 	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
 }
