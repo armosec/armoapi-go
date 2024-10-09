@@ -13,6 +13,7 @@ const (
 	LowestHelmVersionSupportedRegistryScan        = "v1.7.14"
 	RegistryInfoArgKey                            = "registryInfo-v1"
 	RegistryScanSecretName                        = "kubescape-registry-scan" //nolint:gosec
+	RegistrySecretNameArgKey                      = "registry-secret"
 
 	// vulnerability scan
 	LowestHelmVersionSupportedVulnerabilityScan = "v1.7.17"

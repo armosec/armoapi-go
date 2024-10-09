@@ -41,6 +41,8 @@ const (
 	TypeCalculateSBOM NotificationPolicyType = "calculateSBOM"
 	// Trigger a registry scan
 	TypeScanRegistry NotificationPolicyType = "scanRegistry"
+	// Trigger a v2 registry scan
+	TypeScanRegistryV2 NotificationPolicyType = "scanRegistryV2"
 	// Create a CronJob that runs registry scans
 	TypeSetRegistryScanCronJob NotificationPolicyType = "setRegistryScanCronJob"
 	// Update a CronJob that runs registry scans
