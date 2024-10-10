@@ -76,22 +76,22 @@ type BaseContainerImageRegistry struct {
 type QuayImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	ContainerRegistryName      string `json:"containerRegistryName"`
-	RobotAccountName           string `json:"RobotAccountName"`
-	RobotAccountToken          string `json:"RobotAccountToken"`
+	RobotAccountName           string `json:"robotAccountName"`
+	RobotAccountToken          string `json:"robotAccountToken,omitempty"`
 }
 
 type HarborImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	InstanceURL                string `json:"instanceURL"`
 	Username                   string `json:"username"`
-	Password                   string `json:"password"`
+	Password                   string `json:"password,omitempty"`
 }
 
 type AzureImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	LoginServer                string `json:"loginServer"`
 	Username                   string `json:"username"`
-	AccessToken                string `json:"accessToken"`
+	AccessToken                string `json:"accessToken,omitempty"`
 }
 
 type AWSImageRegistry struct {
