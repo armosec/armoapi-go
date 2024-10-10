@@ -58,6 +58,7 @@ type ContainerImageRegistry interface {
 	ExtractSecret() interface{}
 	FillSecret(interface{}) error
 	GetBase() *BaseContainerImageRegistry
+	SetBase(*BaseContainerImageRegistry)
 	Validate() error
 }
 

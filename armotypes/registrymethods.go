@@ -70,6 +70,10 @@ func (aws *AWSImageRegistry) GetBase() *BaseContainerImageRegistry {
 	return &aws.BaseContainerImageRegistry
 }
 
+func (aws *AWSImageRegistry) SetBase(base *BaseContainerImageRegistry) {
+	aws.BaseContainerImageRegistry = *base
+}
+
 func (aws *AWSImageRegistry) Validate() error {
 	if err := aws.GetBase().ValidateBase(); err != nil {
 		return err
@@ -114,6 +118,10 @@ func (azure *AzureImageRegistry) GetBase() *BaseContainerImageRegistry {
 	return &azure.BaseContainerImageRegistry
 }
 
+func (azure *AzureImageRegistry) SetBase(base *BaseContainerImageRegistry) {
+	azure.BaseContainerImageRegistry = *base
+}
+
 func (azure *AzureImageRegistry) Validate() error {
 	if err := azure.GetBase().ValidateBase(); err != nil {
 		return err
@@ -154,6 +162,10 @@ func (google *GoogleImageRegistry) GetBase() *BaseContainerImageRegistry {
 	return &google.BaseContainerImageRegistry
 }
 
+func (google *GoogleImageRegistry) SetBase(base *BaseContainerImageRegistry) {
+	google.BaseContainerImageRegistry = *base
+}
+
 func (google *GoogleImageRegistry) Validate() error {
 	if err := google.GetBase().ValidateBase(); err != nil {
 		return err
@@ -189,6 +201,10 @@ func (harbor *HarborImageRegistry) FillSecret(value interface{}) error {
 
 func (harbor *HarborImageRegistry) GetBase() *BaseContainerImageRegistry {
 	return &harbor.BaseContainerImageRegistry
+}
+
+func (harbor *HarborImageRegistry) SetBase(base *BaseContainerImageRegistry) {
+	harbor.BaseContainerImageRegistry = *base
 }
 
 func (harbor *HarborImageRegistry) Validate() error {
@@ -232,6 +248,10 @@ func (quay *QuayImageRegistry) FillSecret(value interface{}) error {
 
 func (quay *QuayImageRegistry) GetBase() *BaseContainerImageRegistry {
 	return &quay.BaseContainerImageRegistry
+}
+
+func (quay *QuayImageRegistry) SetBase(base *BaseContainerImageRegistry) {
+	quay.BaseContainerImageRegistry = *base
 }
 
 func (quay *QuayImageRegistry) Validate() error {
