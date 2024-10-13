@@ -16,10 +16,12 @@ package packages_versions
 
 import (
 	"fmt"
-	"github.com/anchore/syft/syft/pkg"
 
-	"github.com/anchore/grype/grype/version"
 	"sort"
+
+	"github.com/anchore/grype/grype/pkg"
+	"github.com/anchore/grype/grype/version"
+	syftPkg "github.com/anchore/syft/syft/pkg"
 )
 
 type Version struct {
@@ -55,8 +57,9 @@ func NewVersion(raw string, format version.Format) (*Version, error) {
 }
 
 func NewVersionFromPkgType(versionStr, pkgTypeStr string) (*Version, error) {
-	pkgTyp := pkg.Type(pkgTypeStr)
-	ver, err := NewVersion(versionStr, version.FormatFromPkgType(pkgTyp))
+	ver, err := NewVersion(versionStr, version.FormatFromPkg(pkg.Package{
+		Type: syftPkg.Type(pkgTypeStr),
+	}))
 	if err != nil {
 		return nil, err
 	}
@@ -111,27 +114,27 @@ func (v *Version) populate() error {
 }
 
 // Compare compares this version with another version, based on the specified package type.
-func (v *Version) Compare(pkgType pkg.Type, other *Version) (int, error) {
+func (v *Version) Compare(pkgType syftPkg.Type, other *Version) (int, error) {
 	var compRes int
 	var err error
 	switch pkgType {
-	case pkg.ApkPkg:
+	case syftPkg.ApkPkg:
 		compRes, err = v.rich.apkVer.Compare(other)
-	case pkg.DebPkg:
+	case syftPkg.DebPkg:
 		compRes, err = v.rich.debVer.Compare(other)
-	case pkg.JavaPkg:
+	case syftPkg.JavaPkg:
 		compRes, err = v.rich.mavenVer.Compare(other)
-	case pkg.RpmPkg:
+	case syftPkg.RpmPkg:
 		compRes, err = v.rich.rpmVer.Compare(other)
-	case pkg.PythonPkg:
+	case syftPkg.PythonPkg:
 		compRes, err = v.rich.pep440version.Compare(other)
-	case pkg.GoModulePkg:
+	case syftPkg.GoModulePkg:
 		compRes, err = v.rich.golangVersion.Compare(other)
-	case pkg.KbPkg:
+	case syftPkg.KbPkg:
 		compRes, err = v.rich.kbVer.Compare(other)
-	case pkg.PortagePkg:
+	case syftPkg.PortagePkg:
 		compRes, err = v.rich.portVer.Compare(other)
-	case pkg.GemPkg:
+	case syftPkg.GemPkg:
 		compRes, err = v.rich.semVer.Compare(other)
 	default:
 		return -1, fmt.Errorf("unsupported package type: %v", pkgType)
@@ -156,7 +159,7 @@ func SortVersions(pkgTypeStr string, versionStrings []string) ([]string, error) 
 		}
 		versions[i] = ver
 	}
-	pkgType := pkg.Type(pkgTypeStr)
+	pkgType := syftPkg.Type(pkgTypeStr)
 	// Sort the Version instances.
 	sort.Slice(versions, func(i, j int) bool {
 		compRes, err := versions[i].Compare(pkgType, versions[j])
