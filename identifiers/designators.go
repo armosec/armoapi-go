@@ -90,6 +90,7 @@ const (
 	AttributeComponent            = "component"
 	AttributeSeverityScore        = "severityScore"
 	AttributeSeverity             = "severity"
+	AttributeStatus               = "status"
 	AttributeCVEID                = "cveID"
 	AttributeCVEName              = "cveName"
 	AttributeControlID            = "controlID"
@@ -159,7 +160,7 @@ const (
 const (
 	AttributeCloudAccountID   = "accountID"
 	AttributeCloudAccountName = "accountName"
-	AttributeFramework   = "framework"
+	AttributeFramework        = "framework"
 	AttributeCloudScanID      = "scanID"
 	AttributeCloudTaskID      = "taskID"
 	AttributeCloudFindingType = "findingType"
