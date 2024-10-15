@@ -35,7 +35,11 @@ const (
 	CloudCheckStatusManual  = "MANUAL"
 	CloudCheckStatusPass    = "PASS"
 	CloudCheckStatusSkipped = "SKIPPED"
+
+	CloudAutomatedCheckType = "AUTOMATED"
+	CloudManualCheckType    = CloudCheckStatusFail
 )
+
 var CloudCheckStatusToInt = map[string]int{
 	CloudCheckStatusEmpty:   -1,
 	CloudCheckStatusFail:    10,
