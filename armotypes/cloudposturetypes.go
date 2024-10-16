@@ -7,7 +7,7 @@ var CloudSeverityToInt = map[string]int{
 	"medium":   300,
 	"low":      200,
 	"info":     100,
-	"none":  0,
+	"none":     0,
 }
 
 var CloudIntToSeverity = map[int]string{
