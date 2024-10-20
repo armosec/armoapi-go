@@ -53,6 +53,20 @@ const (
 	Quay   RegistryProvider = "quay"
 )
 
+type RegistryStatus string
+
+const (
+	Empty   RegistryStatus = ""
+	Created RegistryStatus = "Created"
+	Updated RegistryStatus = "Updated"
+	Error   RegistryStatus = "Error"
+
+	// Scan statuses
+	Failed     RegistryStatus = "Failed"
+	InProgress RegistryStatus = "In progress"
+	Completed  RegistryStatus = "Completed"
+)
+
 type ContainerImageRegistry interface {
 	MaskSecret()
 	ExtractSecret() interface{}
@@ -71,6 +85,8 @@ type BaseContainerImageRegistry struct {
 	ScanFrequency string           `json:"scanFrequency,omitempty" bson:"scanFrequency,omitempty"`
 	ResourceName  string           `json:"resourceName,omitempty" bson:"resourceName,omitempty"`
 	AuthID        string           `json:"authID,omitempty" bson:"authID"`
+	Status        RegistryStatus   `json:"status,omitempty" bson:"status"`
+	StatusMessage string           `json:"statusMessage,omitempty" bson:"statusMessage"`
 }
 
 type QuayImageRegistry struct {
