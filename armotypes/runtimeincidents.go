@@ -18,6 +18,9 @@ type Process struct {
 	Hardlink   string    `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
 	Uid        *uint32   `json:"uid,omitempty" bson:"uid,omitempty"`
 	Gid        *uint32   `json:"gid,omitempty" bson:"gid,omitempty"`
+	UserName   string    `json:"userName,omitempty" bson:"userName,omitempty"`
+	GroupName  string    `json:"groupName,omitempty" bson:"groupName,omitempty"`
+	StartTime  time.Time `json:"startTime,omitempty" bson:"startTime,omitempty"`
 	UpperLayer *bool     `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
 	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
@@ -31,6 +34,36 @@ const (
 	AlertTypeMalware
 	AlertTypeAdmission
 )
+
+type StackFrame struct {
+	// Frame ID
+	FrameID string `json:"frameId,omitempty" bson:"frameId,omitempty"`
+	// Function name
+	Function string `json:"function,omitempty" bson:"function,omitempty"`
+	// File name
+	File string `json:"file,omitempty" bson:"file,omitempty"`
+	// Line number
+	Line *int `json:"line,omitempty" bson:"line,omitempty"`
+	// Address
+	Address string `json:"address,omitempty" bson:"address,omitempty"`
+	// Arguments
+	Arguments []string `json:"arguments,omitempty" bson:"arguments,omitempty"`
+	// User/Kernel space
+	UserSpace bool `json:"userSpace,omitempty" bson:"userSpace,omitempty"`
+	// Native/Source code
+	NativeCode *bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
+}
+
+type Trace struct {
+	// Trace ID
+	TraceID string `json:"traceId,omitempty" bson:"traceId,omitempty"`
+	// Stack trace
+	Stack []StackFrame `json:"stack,omitempty" bson:"stack,omitempty"`
+	// Package name
+	Package string `json:"package,omitempty" bson:"package,omitempty"`
+	// Language
+	Language string `json:"language,omitempty" bson:"language,omitempty"`
+}
 
 type BaseRuntimeAlert struct {
 	// AlertName is either RuleName or MalwareName
@@ -57,6 +90,8 @@ type BaseRuntimeAlert struct {
 	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
 	// Nanoseconds of the alert
 	Nanoseconds uint64 `json:"nanoseconds,omitempty" bson:"nanoseconds,omitempty"`
+	// Trace of the alert
+	Trace Trace `json:"trace,omitempty" bson:"trace,omitempty"`
 }
 
 type RuleAlert struct {
