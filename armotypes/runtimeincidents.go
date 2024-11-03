@@ -51,7 +51,7 @@ type StackFrame struct {
 	// User/Kernel space
 	UserSpace bool `json:"userSpace,omitempty" bson:"userSpace,omitempty"`
 	// Native/Source code
-	NativeCode bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
+	NativeCode *bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
 }
 
 type Trace struct {
