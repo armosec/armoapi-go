@@ -29,6 +29,14 @@ type Process struct {
 
 type Provider string
 
+// Cloud providers (The Provider suffix is added to avoid conflicts with other Provider types :( ).
+const (
+	AWSProvider          Provider = "aws"
+	GCPProvider          Provider = "gcp"
+	AzureProvider        Provider = "azure"
+	DigitalOceanProvider Provider = "digitalocean"
+)
+
 type CloudMetadata struct {
 	Provider     Provider `json:"provider,omitempty" bson:"provider,omitempty"`
 	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
