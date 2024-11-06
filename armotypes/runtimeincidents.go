@@ -27,18 +27,9 @@ type Process struct {
 	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
 }
 
-type Provider string
-
-// Cloud providers (The Provider suffix is added to avoid conflicts with other Provider types :( ).
-const (
-	AWSProvider          Provider = "aws"
-	GCPProvider          Provider = "gcp"
-	AzureProvider        Provider = "azure"
-	DigitalOceanProvider Provider = "digitalocean"
-)
-
 type CloudMetadata struct {
-	Provider     Provider `json:"provider,omitempty" bson:"provider,omitempty"`
+	// Provider is the cloud provider name (e.g. aws, gcp, azure).
+	Provider     string `json:"provider,omitempty" bson:"provider,omitempty"`
 	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
 	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
 	Region       string   `json:"region,omitempty" bson:"region,omitempty"`
