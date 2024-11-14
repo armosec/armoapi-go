@@ -35,10 +35,6 @@ const (
 	CloudCheckStatusManual  = "MANUAL"
 	CloudCheckStatusPass    = "PASS"
 	CloudCheckStatusSkipped = "SKIPPED"
-
-	CloudAutomatedCheckType = "AUTOMATED"
-	CloudManualCheckType    = CloudCheckStatusManual
-	CloudManualAndAutomated = CloudAutomatedCheckType + "/" + CloudManualCheckType
 )
 
 var CloudCheckStatusToInt = map[string]int{
@@ -55,6 +51,25 @@ var CloudIntToCheckStatus = map[int]string{
 	20: CloudCheckStatusManual,
 	30: CloudCheckStatusPass,
 	40: CloudCheckStatusSkipped,
+}
+
+// cloud check types
+const (
+	CloudAutomatedCheckType = "AUTOMATED"
+	CloudManualCheckType    = CloudCheckStatusManual
+	CloudManualAndAutomated = CloudAutomatedCheckType + "/" + CloudManualCheckType
+)
+
+var CloudCheckTypeToInt = map[string]int{
+	CloudAutomatedCheckType: 10,
+	CloudManualCheckType:    20,
+	CloudManualAndAutomated: 30,
+}
+
+var CloudIntToCheckType = map[int]string{
+	10: CloudAutomatedCheckType,
+	20: CloudManualCheckType,
+	30: CloudManualAndAutomated,
 }
 
 // cloud posture scans statuses
