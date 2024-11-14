@@ -55,18 +55,21 @@ var CloudIntToCheckStatus = map[int]string{
 
 // cloud check types
 const (
+	CloudEmptyCheckType     = "EMPTY"
 	CloudAutomatedCheckType = "AUTOMATED"
 	CloudManualCheckType    = CloudCheckStatusManual
 	CloudManualAndAutomated = CloudAutomatedCheckType + "/" + CloudManualCheckType
 )
 
 var CloudCheckTypeToInt = map[string]int{
+	CloudEmptyCheckType:     -1,
 	CloudAutomatedCheckType: 10,
 	CloudManualCheckType:    20,
 	CloudManualAndAutomated: 30,
 }
 
 var CloudIntToCheckType = map[int]string{
+	-1: CloudEmptyCheckType,
 	10: CloudAutomatedCheckType,
 	20: CloudManualCheckType,
 	30: CloudManualAndAutomated,
