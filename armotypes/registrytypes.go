@@ -53,18 +53,20 @@ const (
 	Quay   RegistryProvider = "quay"
 )
 
-type RegistryStatus string
+type RegistryManageStatus string
+type RegistryScanStatus string
 
 const (
-	Empty   RegistryStatus = ""
-	Created RegistryStatus = "Created"
-	Updated RegistryStatus = "Updated"
-	Error   RegistryStatus = "Error"
+	Empty   RegistryManageStatus = ""
+	Created RegistryManageStatus = "Created"
+	Updated RegistryManageStatus = "Updated"
+	Error   RegistryManageStatus = "Error"
 
 	// Scan statuses
-	Failed     RegistryStatus = "Failed"
-	InProgress RegistryStatus = "In progress"
-	Completed  RegistryStatus = "Completed"
+	Idle       RegistryScanStatus = "Idle"
+	Failed     RegistryScanStatus = "Failed"
+	InProgress RegistryScanStatus = "In progress"
+	Completed  RegistryScanStatus = "Completed"
 )
 
 type ContainerImageRegistry interface {
@@ -77,16 +79,18 @@ type ContainerImageRegistry interface {
 }
 
 type BaseContainerImageRegistry struct {
-	PortalBase    `json:",inline" bson:"inline"`
-	Provider      RegistryProvider `json:"provider" bson:"provider"`
-	ClusterName   string           `json:"clusterName" bson:"clusterName"`
-	Repositories  []string         `json:"repositories" bson:"repositories"`
-	LastScan      *time.Time       `json:"lastScan,omitempty" bson:"lastScan,omitempty"`
-	ScanFrequency string           `json:"scanFrequency,omitempty" bson:"scanFrequency,omitempty"`
-	ResourceName  string           `json:"resourceName,omitempty" bson:"resourceName,omitempty"`
-	AuthID        string           `json:"authID,omitempty" bson:"authID"`
-	Status        RegistryStatus   `json:"status,omitempty" bson:"status"`
-	StatusMessage string           `json:"statusMessage,omitempty" bson:"statusMessage"`
+	PortalBase          `json:",inline" bson:"inline"`
+	Provider            RegistryProvider     `json:"provider" bson:"provider"`
+	ClusterName         string               `json:"clusterName" bson:"clusterName"`
+	Repositories        []string             `json:"repositories" bson:"repositories"`
+	LastScan            *time.Time           `json:"lastScan,omitempty" bson:"lastScan,omitempty"`
+	ScanFrequency       string               `json:"scanFrequency,omitempty" bson:"scanFrequency,omitempty"`
+	ResourceName        string               `json:"resourceName,omitempty" bson:"resourceName,omitempty"`
+	AuthID              string               `json:"authID,omitempty" bson:"authID"`
+	ManageStatus        RegistryManageStatus `json:"manageStatus,omitempty" bson:"manageStatus"`
+	ManageStatusMessage string               `json:"manageStatusMessage,omitempty" bson:"manageStatusMessage"`
+	ScanStatus          RegistryScanStatus   `json:"scanStatus,omitempty" bson:"scanStatus"`
+	ScanStatusMessage   string               `json:"scanStatusMessage,omitempty" bson:"scanStatusMessage"`
 }
 
 type QuayImageRegistry struct {
@@ -122,4 +126,9 @@ type AWSImageRegistry struct {
 type GoogleImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	RegistryURI                string `json:"registryURI"`
+}
+
+type CheckRegistryResp struct {
+	Repositories []string `json:"repositories,omitempty"`
+	ErrorMessage string   `json:"errorMessage,omitempty"`
 }
