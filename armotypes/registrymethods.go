@@ -5,12 +5,12 @@ import (
 	"errors"
 )
 
-var RegistryTypeMap = map[RegistryProvider]ContainerImageRegistry{
-	AWS:    new(AWSImageRegistry),
-	Azure:  new(AzureImageRegistry),
-	Google: new(GoogleImageRegistry),
-	Harbor: new(HarborImageRegistry),
-	Quay:   new(QuayImageRegistry),
+var RegistryTypeMap = map[RegistryProvider]func() ContainerImageRegistry{
+	AWS:    func() ContainerImageRegistry { return new(AWSImageRegistry) },
+	Azure:  func() ContainerImageRegistry { return new(AzureImageRegistry) },
+	Google: func() ContainerImageRegistry { return new(GoogleImageRegistry) },
+	Harbor: func() ContainerImageRegistry { return new(HarborImageRegistry) },
+	Quay:   func() ContainerImageRegistry { return new(QuayImageRegistry) },
 }
 
 func UnmarshalRegistry(payload []byte) (ContainerImageRegistry, error) {
@@ -21,7 +21,7 @@ func UnmarshalRegistry(payload []byte) (ContainerImageRegistry, error) {
 		return nil, err
 	}
 
-	registry := RegistryTypeMap[RegistryProvider(providerHolder.Provider)]
+	registry := RegistryTypeMap[RegistryProvider(providerHolder.Provider)]()
 	if err := json.Unmarshal(payload, &registry); err != nil {
 		return nil, err
 	}
@@ -31,9 +31,6 @@ func UnmarshalRegistry(payload []byte) (ContainerImageRegistry, error) {
 func (base *BaseContainerImageRegistry) ValidateBase() error {
 	if base.ClusterName == "" {
 		return errors.New("clusterName is empty")
-	}
-	if len(base.Repositories) == 0 {
-		return errors.New("repositories is empty")
 	}
 	return nil
 }
