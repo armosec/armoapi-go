@@ -51,6 +51,7 @@ const (
 	Google RegistryProvider = "google"
 	Harbor RegistryProvider = "harbor"
 	Quay   RegistryProvider = "quay"
+	Nexus  RegistryProvider = "nexus"
 )
 
 type RegistryManageStatus string
@@ -76,6 +77,7 @@ type ContainerImageRegistry interface {
 	GetBase() *BaseContainerImageRegistry
 	SetBase(*BaseContainerImageRegistry)
 	Validate() error
+	GetDisplayName() string
 }
 
 type BaseContainerImageRegistry struct {
@@ -85,6 +87,7 @@ type BaseContainerImageRegistry struct {
 	Repositories        []string             `json:"repositories" bson:"repositories"`
 	LastScan            *time.Time           `json:"lastScan,omitempty" bson:"lastScan,omitempty"`
 	ScanFrequency       string               `json:"scanFrequency,omitempty" bson:"scanFrequency,omitempty"`
+	NextScan            *time.Time           `json:"nextScan,omitempty" bson:"nextScan,omitempty"`
 	ResourceName        string               `json:"resourceName,omitempty" bson:"resourceName,omitempty"`
 	AuthID              string               `json:"authID,omitempty" bson:"authID"`
 	ManageStatus        RegistryManageStatus `json:"manageStatus,omitempty" bson:"manageStatus"`
@@ -126,6 +129,13 @@ type AWSImageRegistry struct {
 type GoogleImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	RegistryURI                string `json:"registryURI"`
+}
+
+type NexusImageRegistry struct {
+	BaseContainerImageRegistry `json:",inline"`
+	RegistryURL                string `json:"registryURL"`
+	Username                   string `json:"username"`
+	Password                   string `json:"password,omitempty"`
 }
 
 type CheckRegistryResp struct {

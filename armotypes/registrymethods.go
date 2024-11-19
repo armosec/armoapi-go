@@ -11,6 +11,7 @@ var RegistryTypeMap = map[RegistryProvider]func() ContainerImageRegistry{
 	Google: func() ContainerImageRegistry { return new(GoogleImageRegistry) },
 	Harbor: func() ContainerImageRegistry { return new(HarborImageRegistry) },
 	Quay:   func() ContainerImageRegistry { return new(QuayImageRegistry) },
+	Nexus:  func() ContainerImageRegistry { return new(NexusImageRegistry) },
 }
 
 func UnmarshalRegistry(payload []byte) (ContainerImageRegistry, error) {
@@ -33,6 +34,13 @@ func (base *BaseContainerImageRegistry) ValidateBase() error {
 		return errors.New("clusterName is empty")
 	}
 	return nil
+}
+
+func (b *BaseContainerImageRegistry) GetBase() *BaseContainerImageRegistry {
+	return b
+}
+func (b *BaseContainerImageRegistry) SetBase(base *BaseContainerImageRegistry) {
+	*b = *base
 }
 
 func (aws *AWSImageRegistry) MaskSecret() {
@@ -63,14 +71,6 @@ func (aws *AWSImageRegistry) FillSecret(value interface{}) error {
 	return nil
 }
 
-func (aws *AWSImageRegistry) GetBase() *BaseContainerImageRegistry {
-	return &aws.BaseContainerImageRegistry
-}
-
-func (aws *AWSImageRegistry) SetBase(base *BaseContainerImageRegistry) {
-	aws.BaseContainerImageRegistry = *base
-}
-
 func (aws *AWSImageRegistry) Validate() error {
 	if err := aws.GetBase().ValidateBase(); err != nil {
 		return err
@@ -86,6 +86,10 @@ func (aws *AWSImageRegistry) Validate() error {
 		return errors.New("missing authentication data")
 	}
 	return nil
+}
+
+func (aws *AWSImageRegistry) GetDisplayName() string {
+	return aws.Registry
 }
 
 func (azure *AzureImageRegistry) MaskSecret() {
@@ -111,14 +115,6 @@ func (azure *AzureImageRegistry) FillSecret(value interface{}) error {
 	return nil
 }
 
-func (azure *AzureImageRegistry) GetBase() *BaseContainerImageRegistry {
-	return &azure.BaseContainerImageRegistry
-}
-
-func (azure *AzureImageRegistry) SetBase(base *BaseContainerImageRegistry) {
-	azure.BaseContainerImageRegistry = *base
-}
-
 func (azure *AzureImageRegistry) Validate() error {
 	if err := azure.GetBase().ValidateBase(); err != nil {
 		return err
@@ -134,6 +130,10 @@ func (azure *AzureImageRegistry) Validate() error {
 		return errors.New("accessToken is empty")
 	}
 	return nil
+}
+
+func (azure *AzureImageRegistry) GetDisplayName() string {
+	return azure.LoginServer
 }
 
 func (google *GoogleImageRegistry) MaskSecret() {
@@ -155,14 +155,6 @@ func (google *GoogleImageRegistry) FillSecret(value interface{}) error {
 	return nil
 }
 
-func (google *GoogleImageRegistry) GetBase() *BaseContainerImageRegistry {
-	return &google.BaseContainerImageRegistry
-}
-
-func (google *GoogleImageRegistry) SetBase(base *BaseContainerImageRegistry) {
-	google.BaseContainerImageRegistry = *base
-}
-
 func (google *GoogleImageRegistry) Validate() error {
 	if err := google.GetBase().ValidateBase(); err != nil {
 		return err
@@ -171,6 +163,10 @@ func (google *GoogleImageRegistry) Validate() error {
 		return errors.New("registryURI is empty")
 	}
 	return nil
+}
+
+func (google *GoogleImageRegistry) GetDisplayName() string {
+	return google.RegistryURI
 }
 
 func (harbor *HarborImageRegistry) MaskSecret() {
@@ -196,14 +192,6 @@ func (harbor *HarborImageRegistry) FillSecret(value interface{}) error {
 	return nil
 }
 
-func (harbor *HarborImageRegistry) GetBase() *BaseContainerImageRegistry {
-	return &harbor.BaseContainerImageRegistry
-}
-
-func (harbor *HarborImageRegistry) SetBase(base *BaseContainerImageRegistry) {
-	harbor.BaseContainerImageRegistry = *base
-}
-
 func (harbor *HarborImageRegistry) Validate() error {
 	if err := harbor.GetBase().ValidateBase(); err != nil {
 		return err
@@ -220,15 +208,25 @@ func (harbor *HarborImageRegistry) Validate() error {
 	return nil
 }
 
+func (harbor *HarborImageRegistry) GetDisplayName() string {
+	return harbor.InstanceURL
+}
+
+const (
+	containerRegistryName = "containerRegistryName"
+	robotAccountName      = "robotAccountName"
+	robotAccountToken     = "robotAccountToken"
+)
+
 func (quay *QuayImageRegistry) MaskSecret() {
 	quay.RobotAccountToken = ""
 }
 
 func (quay *QuayImageRegistry) ExtractSecret() interface{} {
 	return map[string]string{
-		"containerRegistryName": quay.ContainerRegistryName,
-		"robotAccountName":      quay.RobotAccountName,
-		"robotAccountToken":     quay.RobotAccountToken,
+		containerRegistryName: quay.ContainerRegistryName,
+		robotAccountName:      quay.RobotAccountName,
+		robotAccountToken:     quay.RobotAccountToken,
 	}
 }
 
@@ -237,31 +235,73 @@ func (quay *QuayImageRegistry) FillSecret(value interface{}) error {
 	if err != nil {
 		return err
 	}
-	quay.ContainerRegistryName = secretMap["containerRegistryName"]
-	quay.RobotAccountName = secretMap["robotAccountName"]
-	quay.RobotAccountToken = secretMap["robotAccountToken"]
+	quay.ContainerRegistryName = secretMap[containerRegistryName]
+	quay.RobotAccountName = secretMap[robotAccountName]
+	quay.RobotAccountToken = secretMap[robotAccountToken]
 	return nil
-}
-
-func (quay *QuayImageRegistry) GetBase() *BaseContainerImageRegistry {
-	return &quay.BaseContainerImageRegistry
-}
-
-func (quay *QuayImageRegistry) SetBase(base *BaseContainerImageRegistry) {
-	quay.BaseContainerImageRegistry = *base
 }
 
 func (quay *QuayImageRegistry) Validate() error {
 	if err := quay.GetBase().ValidateBase(); err != nil {
 		return err
 	}
+	if quay.ContainerRegistryName == "" {
+		return errors.New("container registry name is empty")
+	}
 	if quay.RobotAccountName == "" {
-		return errors.New("robotAccountName is empty")
+		return errors.New("robot account name is empty")
 	}
 	if quay.RobotAccountToken == "" {
-		return errors.New("robotAccountToken is empty")
+		return errors.New("robot account token is empty")
 	}
 	return nil
+}
+
+func (quay *QuayImageRegistry) GetDisplayName() string {
+	return quay.ContainerRegistryName
+}
+
+func (nexus *NexusImageRegistry) MaskSecret() {
+	nexus.Password = ""
+}
+
+func (nexus *NexusImageRegistry) ExtractSecret() interface{} {
+	return map[string]string{
+		"registryURL": nexus.RegistryURL,
+		"username":    nexus.Username,
+		"password":    nexus.Password,
+	}
+}
+
+func (nexus *NexusImageRegistry) FillSecret(value interface{}) error {
+	secretMap, err := decodeSecretMapFromInterface(value)
+	if err != nil {
+		return err
+	}
+	nexus.RegistryURL = secretMap["registryURL"]
+	nexus.Username = secretMap["username"]
+	nexus.Password = secretMap["password"]
+	return nil
+}
+
+func (nexus *NexusImageRegistry) Validate() error {
+	if err := nexus.GetBase().ValidateBase(); err != nil {
+		return err
+	}
+	if nexus.RegistryURL == "" {
+		return errors.New("registry url is empty")
+	}
+	if nexus.Username == "" {
+		return errors.New("username is empty")
+	}
+	if nexus.Password == "" {
+		return errors.New("password is empty")
+	}
+	return nil
+}
+
+func (nexus *NexusImageRegistry) GetDisplayName() string {
+	return nexus.RegistryURL
 }
 
 func decodeSecretMapFromInterface(value interface{}) (map[string]string, error) {
