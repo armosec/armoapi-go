@@ -59,7 +59,7 @@ func (aws *AWSImageRegistry) ExtractSecret() interface{} {
 }
 
 func (aws *AWSImageRegistry) FillSecret(value interface{}) error {
-	secretMap, err := decodeSecretMapFromInterface(value)
+	secretMap, err := decodeSecretFromInterface[map[string]string](value)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (azure *AzureImageRegistry) ExtractSecret() interface{} {
 }
 
 func (azure *AzureImageRegistry) FillSecret(value interface{}) error {
-	secretMap, err := decodeSecretMapFromInterface(value)
+	secretMap, err := decodeSecretFromInterface[map[string]string](value)
 	if err != nil {
 		return err
 	}
@@ -141,17 +141,19 @@ func (google *GoogleImageRegistry) MaskSecret() {
 }
 
 func (google *GoogleImageRegistry) ExtractSecret() interface{} {
-	return map[string]string{
+	return map[string]interface{}{
 		"registryURI": google.RegistryURI,
+		"key":         google.Key,
 	}
 }
 
 func (google *GoogleImageRegistry) FillSecret(value interface{}) error {
-	secretMap, err := decodeSecretMapFromInterface(value)
+	secretMap, err := decodeSecretFromInterface[map[string]interface{}](value)
 	if err != nil {
 		return err
 	}
-	google.RegistryURI = secretMap["registryURI"]
+	google.RegistryURI = secretMap["registryURI"].(string)
+	google.Key = secretMap["key"].(map[string]interface{})
 	return nil
 }
 
@@ -185,7 +187,7 @@ func (harbor *HarborImageRegistry) ExtractSecret() interface{} {
 }
 
 func (harbor *HarborImageRegistry) FillSecret(value interface{}) error {
-	secretMap, err := decodeSecretMapFromInterface(value)
+	secretMap, err := decodeSecretFromInterface[map[string]string](value)
 	if err != nil {
 		return err
 	}
@@ -234,7 +236,7 @@ func (quay *QuayImageRegistry) ExtractSecret() interface{} {
 }
 
 func (quay *QuayImageRegistry) FillSecret(value interface{}) error {
-	secretMap, err := decodeSecretMapFromInterface(value)
+	secretMap, err := decodeSecretFromInterface[map[string]string](value)
 	if err != nil {
 		return err
 	}
@@ -277,7 +279,7 @@ func (nexus *NexusImageRegistry) ExtractSecret() interface{} {
 }
 
 func (nexus *NexusImageRegistry) FillSecret(value interface{}) error {
-	secretMap, err := decodeSecretMapFromInterface(value)
+	secretMap, err := decodeSecretFromInterface[map[string]string](value)
 	if err != nil {
 		return err
 	}
@@ -307,8 +309,8 @@ func (nexus *NexusImageRegistry) GetDisplayName() string {
 	return nexus.RegistryURL
 }
 
-func decodeSecretMapFromInterface(value interface{}) (map[string]string, error) {
-	var res map[string]string
+func decodeSecretFromInterface[T any](value interface{}) (T, error) {
+	var res T
 	if value == nil {
 		return res, errors.New("got an empty value")
 	}
