@@ -137,7 +137,7 @@ func (azure *AzureImageRegistry) GetDisplayName() string {
 }
 
 func (google *GoogleImageRegistry) MaskSecret() {
-
+	google.Key = nil
 }
 
 func (google *GoogleImageRegistry) ExtractSecret() interface{} {
@@ -161,6 +161,9 @@ func (google *GoogleImageRegistry) Validate() error {
 	}
 	if google.RegistryURI == "" {
 		return errors.New("registryURI is empty")
+	}
+	if len(google.Key) == 0 {
+		return errors.New("json key is empty")
 	}
 	return nil
 }
