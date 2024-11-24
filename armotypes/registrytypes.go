@@ -64,7 +64,6 @@ const (
 	Error   RegistryManageStatus = "Error"
 
 	// Scan statuses
-	Idle       RegistryScanStatus = "Idle"
 	Failed     RegistryScanStatus = "Failed"
 	InProgress RegistryScanStatus = "In progress"
 	Completed  RegistryScanStatus = "Completed"
@@ -128,7 +127,8 @@ type AWSImageRegistry struct {
 
 type GoogleImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
-	RegistryURI                string `json:"registryURI"`
+	RegistryURI                string                 `json:"registryURI"`
+	Key                        map[string]interface{} `json:"key,omitempty"`
 }
 
 type NexusImageRegistry struct {
