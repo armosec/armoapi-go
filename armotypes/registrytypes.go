@@ -65,7 +65,7 @@ const (
 
 	// Scan statuses
 	Failed     RegistryScanStatus = "Failed"
-	InProgress RegistryScanStatus = "In progress"
+	InProgress RegistryScanStatus = "In Progress"
 	Completed  RegistryScanStatus = "Completed"
 )
 
