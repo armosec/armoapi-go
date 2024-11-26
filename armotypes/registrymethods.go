@@ -88,6 +88,20 @@ func (aws *AWSImageRegistry) Validate() error {
 	return nil
 }
 
+type AWSConnectionMethod int
+
+const (
+	CloudIAMRole = iota
+	Credentials
+)
+
+func (aws *AWSImageRegistry) GetConnectionMethod() AWSConnectionMethod {
+	if aws.RoleARN != "" {
+		return CloudIAMRole
+	}
+	return Credentials
+}
+
 func (aws *AWSImageRegistry) GetDisplayName() string {
 	return aws.Registry
 }
