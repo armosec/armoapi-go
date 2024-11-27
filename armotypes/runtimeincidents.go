@@ -30,14 +30,14 @@ type Process struct {
 type CloudMetadata struct {
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
 	Provider     string `json:"provider,omitempty" bson:"provider,omitempty"`
-	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
-	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
-	Region       string   `json:"region,omitempty" bson:"region,omitempty"`
-	Zone         string   `json:"zone,omitempty" bson:"zone,omitempty"`
-	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
-	PublicIP     string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
-	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
-	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
+	InstanceID   string `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
+	InstanceType string `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
+	Region       string `json:"region,omitempty" bson:"region,omitempty"`
+	Zone         string `json:"zone,omitempty" bson:"zone,omitempty"`
+	PrivateIP    string `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
+	PublicIP     string `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
+	Hostname     string `json:"hostname,omitempty" bson:"hostname,omitempty"`
+	AccountID    string `json:"account_id,omitempty" bson:"account_id,omitempty"`
 }
 
 type AlertType int
@@ -134,6 +134,7 @@ type RuntimeAlertK8sDetails struct {
 	ClusterName       string            `json:"clusterName" bson:"clusterName"`
 	ContainerName     string            `json:"containerName,omitempty" bson:"containerName,omitempty"`
 	HostNetwork       *bool             `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
+	OldImage          string            `json:"oldImage,omitempty" bson:"oldImage,omitempty"`
 	Image             string            `json:"image,omitempty" bson:"image,omitempty"`
 	ImageDigest       string            `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
 	Namespace         string            `json:"namespace,omitempty" bson:"namespace,omitempty"`
