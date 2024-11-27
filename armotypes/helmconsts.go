@@ -1,10 +1,6 @@
 package armotypes
 
 const (
-	// In-cluster namespaces
-	ArmoSystemNamespace = "armo-system" // deprecated, kept for backward compatibility
-	KubescapeNamespace  = "kubescape"
-
 	ArmoKollectorContainerName = "armo-collector" // deprecated, kept for backward compatibility
 	KollectorContainerName     = "kollector"
 
@@ -38,7 +34,3 @@ const (
 	CronJobTemplateLabelValueVulnScan     = "vuln-scan"
 	CronJobTemplateLabelValueRegistryScan = "registry-scan"
 )
-
-func GetInClusterSupportedNamespaces() []string {
-	return []string{KubescapeNamespace, ArmoSystemNamespace}
-}
