@@ -71,6 +71,8 @@ const (
 	AttributeWorkloadHash         = "workloadHash"
 	AttributeIsIncomplete         = "isIncomplete"
 	AttributeSensor               = "sensor"
+	AttributeRegistryID           = "registryID"
+	AttributeRegistryScanID       = "registryScanID"
 	AttributePath                 = "path"
 	AttributeResourceID           = "resourceID"
 	AttributeContainerScanId      = "containerScanId"
