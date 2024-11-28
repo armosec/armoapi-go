@@ -3,6 +3,8 @@ package armotypes
 import (
 	"encoding/json"
 	"errors"
+	"net/url"
+	"strings"
 )
 
 var RegistryTypeMap = map[RegistryProvider]func() ContainerImageRegistry{
@@ -119,10 +121,10 @@ func (azure *AzureImageRegistry) Validate() error {
 	if err := azure.GetBase().ValidateBase(); err != nil {
 		return err
 	}
-
 	if azure.LoginServer == "" {
 		return errors.New("loginServer is empty")
 	}
+	azure.LoginServer = cleanRegistryURL(azure.LoginServer)
 	if azure.Username == "" {
 		return errors.New("username is empty")
 	}
@@ -144,6 +146,7 @@ func (google *GoogleImageRegistry) ExtractSecret() interface{} {
 	return map[string]interface{}{
 		"registryURI": google.RegistryURI,
 		"key":         google.Key,
+		"projectID":   google.ProjectID,
 	}
 }
 
@@ -154,6 +157,7 @@ func (google *GoogleImageRegistry) FillSecret(value interface{}) error {
 	}
 	google.RegistryURI = secretMap["registryURI"].(string)
 	google.Key = secretMap["key"].(map[string]interface{})
+	google.ProjectID = secretMap["projectID"].(string)
 	return nil
 }
 
@@ -164,8 +168,14 @@ func (google *GoogleImageRegistry) Validate() error {
 	if google.RegistryURI == "" {
 		return errors.New("registryURI is empty")
 	}
+	google.RegistryURI = cleanRegistryURL(google.RegistryURI)
 	if len(google.Key) == 0 {
 		return errors.New("json key is empty")
+	}
+	if projectID, ok := google.Key["project_id"]; !ok {
+		return errors.New("missing project_id")
+	} else {
+		google.ProjectID = projectID.(string)
 	}
 	return nil
 }
@@ -204,6 +214,7 @@ func (harbor *HarborImageRegistry) Validate() error {
 	if harbor.InstanceURL == "" {
 		return errors.New("instanceURL is empty")
 	}
+	harbor.InstanceURL = cleanRegistryURL(harbor.InstanceURL)
 	if harbor.Username == "" {
 		return errors.New("username is empty")
 	}
@@ -253,6 +264,7 @@ func (quay *QuayImageRegistry) Validate() error {
 	if quay.ContainerRegistryName == "" {
 		return errors.New("container registry name is empty")
 	}
+	quay.ContainerRegistryName = cleanRegistryURL(quay.ContainerRegistryName)
 	if quay.RobotAccountName == "" {
 		return errors.New("robot account name is empty")
 	}
@@ -296,6 +308,7 @@ func (nexus *NexusImageRegistry) Validate() error {
 	if nexus.RegistryURL == "" {
 		return errors.New("registry url is empty")
 	}
+	nexus.RegistryURL = cleanRegistryURL(nexus.RegistryURL)
 	if nexus.Username == "" {
 		return errors.New("username is empty")
 	}
@@ -320,4 +333,15 @@ func decodeSecretFromInterface[T any](value interface{}) (T, error) {
 	}
 	err = json.Unmarshal(updatedJson, &res)
 	return res, err
+}
+
+func cleanRegistryURL(input string) string {
+	parsedURL, err := url.Parse(input)
+	if err != nil || parsedURL.Host == "" {
+		parsedURL = &url.URL{Host: input}
+	}
+
+	host := strings.TrimPrefix(parsedURL.Hostname(), "www.")
+
+	return host
 }

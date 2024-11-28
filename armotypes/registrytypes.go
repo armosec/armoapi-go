@@ -138,6 +138,7 @@ type AWSImageRegistry struct {
 type GoogleImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	RegistryURI                string                 `json:"registryURI"`
+	ProjectID                  string                 `json:"projectID"`
 	Key                        map[string]interface{} `json:"key,omitempty"`
 }
 
