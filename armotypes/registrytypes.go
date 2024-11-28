@@ -95,6 +95,16 @@ type BaseContainerImageRegistry struct {
 	ScanStatusMessage   string               `json:"scanStatusMessage,omitempty" bson:"scanStatusMessage"`
 }
 
+const RegistryScanStatusPath = "registrystatuses"
+const RegistryScanStatusKind = "RegistryStatus"
+
+type ContainerImageRegistryScanStatusUpdate struct {
+	GUID              string             `json:"guid"`
+	ScanStatus        RegistryScanStatus `json:"scanStatus"`
+	ScanStatusMessage string             `json:"scanStatusMessage,omitempty"`
+	ScanTime          time.Time          `json:"scanTime"`
+}
+
 type QuayImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	ContainerRegistryName      string `json:"containerRegistryName"`
