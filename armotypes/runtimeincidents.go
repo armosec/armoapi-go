@@ -29,15 +29,16 @@ type Process struct {
 
 type CloudMetadata struct {
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
-	Provider     string `json:"provider,omitempty" bson:"provider,omitempty"`
-	InstanceID   string `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
-	InstanceType string `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
-	Region       string `json:"region,omitempty" bson:"region,omitempty"`
-	Zone         string `json:"zone,omitempty" bson:"zone,omitempty"`
-	PrivateIP    string `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
-	PublicIP     string `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
-	Hostname     string `json:"hostname,omitempty" bson:"hostname,omitempty"`
-	AccountID    string `json:"account_id,omitempty" bson:"account_id,omitempty"`
+	Provider     string   `json:"provider,omitempty" bson:"provider,omitempty"`
+	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
+	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
+	Region       string   `json:"region,omitempty" bson:"region,omitempty"`
+	Zone         string   `json:"zone,omitempty" bson:"zone,omitempty"`
+	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
+	PublicIP     string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
+	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
+	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
+	Services     []string `json:"services,omitempty" bson:"services,omitempty"`
 }
 
 type AlertType int
