@@ -91,7 +91,7 @@ func (aws *AWSImageRegistry) Validate() error {
 }
 
 func (aws *AWSImageRegistry) GetDisplayName() string {
-	return aws.Registry
+	return aws.RegistryRegion
 }
 
 func (azure *AzureImageRegistry) MaskSecret() {
