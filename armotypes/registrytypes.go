@@ -95,8 +95,8 @@ type BaseContainerImageRegistry struct {
 	ScanStatusMessage   string               `json:"scanStatusMessage,omitempty" bson:"scanStatusMessage"`
 }
 
-const RegistryScanStatusPath = "registrystatuses"
-const RegistryScanStatusKind = "RegistryStatus"
+const RegistryScanStatusesKindPath = "registrystatuses"
+const RegistryScanStatusesKind = "RegistryStatuses"
 
 type ContainerImageRegistryScanStatusUpdate struct {
 	GUID              string             `json:"guid"`
