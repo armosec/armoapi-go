@@ -88,6 +88,6 @@ const (
 )
 
 type IntegrationsConnectionStatus struct {
-	Provider ChannelProvider             `json:"provider"`
+	Provider string                      `json:"provider"`
 	Status   IntegrationConnectionStatus `json:"status"`
 }
