@@ -52,7 +52,7 @@ func (aws *AWSImageRegistry) MaskSecret() {
 
 func (aws *AWSImageRegistry) ExtractSecret() interface{} {
 	return map[string]string{
-		"registry":        aws.Registry,
+		"registryURI":     aws.RegistryURI,
 		"registryRegion":  aws.RegistryRegion,
 		"accessKeyID":     aws.AccessKeyID,
 		"secretAccessKey": aws.SecretAccessKey,
@@ -65,7 +65,7 @@ func (aws *AWSImageRegistry) FillSecret(value interface{}) error {
 	if err != nil {
 		return err
 	}
-	aws.Registry = secretMap["registry"]
+	aws.RegistryURI = secretMap["registryURI"]
 	aws.RegistryRegion = secretMap["registryRegion"]
 	aws.AccessKeyID = secretMap["accessKeyID"]
 	aws.SecretAccessKey = secretMap["secretAccessKey"]
@@ -78,20 +78,35 @@ func (aws *AWSImageRegistry) Validate() error {
 		return err
 	}
 
-	if aws.Registry == "" {
-		return errors.New("registry is empty")
-	}
-	if aws.RegistryRegion == "" {
-		return errors.New("registryRegion is empty")
+	if aws.RegistryURI == "" {
+		return errors.New("registry uri is empty")
 	}
 	if (aws.AccessKeyID == "" || aws.SecretAccessKey == "") && aws.RoleARN == "" {
 		return errors.New("missing authentication data")
 	}
+	aws.RegistryURI = cleanRegistryURL(aws.RegistryURI)
+	if region, err := extractRegionFromAWSRegistryURI(aws.RegistryURI); err != nil {
+		return err
+	} else {
+		aws.RegistryRegion = region
+	}
 	return nil
 }
 
+func extractRegionFromAWSRegistryURI(uri string) (string, error) {
+	if !strings.Contains(uri, ".dkr.ecr.") || !strings.Contains(uri, ".amazonaws.com") {
+		return "", errors.New("invalid AWS ECR registry URI format")
+	}
+	parts := strings.Split(uri, ".")
+	if len(parts) < 5 {
+		return "", errors.New("unexpected URI structure")
+	}
+	region := parts[3]
+	return region, nil
+}
+
 func (aws *AWSImageRegistry) GetDisplayName() string {
-	return aws.RegistryRegion
+	return aws.RegistryURI
 }
 
 func (azure *AzureImageRegistry) MaskSecret() {
