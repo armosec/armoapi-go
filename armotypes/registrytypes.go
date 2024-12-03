@@ -128,7 +128,7 @@ type AzureImageRegistry struct {
 
 type AWSImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
-	Registry                   string `json:"registry"`
+	RegistryURI                string `json:"registryURI"`
 	RegistryRegion             string `json:"registryRegion"`
 	AccessKeyID                string `json:"accessKeyID,omitempty"`
 	SecretAccessKey            string `json:"secretAccessKey,omitempty"`
