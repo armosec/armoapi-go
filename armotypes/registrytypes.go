@@ -85,7 +85,7 @@ type BaseContainerImageRegistry struct {
 	ClusterName         string               `json:"clusterName" bson:"clusterName"`
 	Repositories        []string             `json:"repositories" bson:"repositories"`
 	LastScan            *time.Time           `json:"lastScan,omitempty" bson:"lastScan,omitempty"`
-	ScanFrequency       string               `json:"scanFrequency,omitempty" bson:"scanFrequency,omitempty"`
+	ScanFrequency       string               `json:"scanFrequency,omitempty" bson:"scanFrequency"`
 	NextScan            *time.Time           `json:"nextScan,omitempty" bson:"nextScan,omitempty"`
 	ResourceName        string               `json:"resourceName,omitempty" bson:"resourceName,omitempty"`
 	AuthID              string               `json:"authID,omitempty" bson:"authID"`
