@@ -63,7 +63,7 @@ type StackFrame struct {
 	// Arguments
 	Arguments []string `json:"arguments,omitempty" bson:"arguments,omitempty"`
 	// User/Kernel space
-	UserSpace bool `json:"userSpace,omitempty" bson:"userSpace,omitempty"`
+	UserSpace bool `json:"userSpace" bson:"userSpace"`
 	// Native/Source code
 	NativeCode *bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
 }
