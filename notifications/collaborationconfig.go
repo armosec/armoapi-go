@@ -63,6 +63,9 @@ type CollaborationConfig struct {
 	// Example: jira
 	Provider ChannelProvider `json:"provider,omitempty" bson:"provider,omitempty"`
 
+	// Integration ID for supporting multiple integrations to jira
+	IntegrationID string `json:"IntegrationID,omitempty" bson:"integrationID,omitempty"`
+
 	// Host name for private hosting
 	// Example: http://example.com
 	HostName string `json:"hostName,omitempty" bson:"hostName,omitempty"`
