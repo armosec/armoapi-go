@@ -3,6 +3,7 @@ package armotypes
 import (
 	"time"
 
+	"github.com/armosec/armoapi-go/armotypes/cdr"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
@@ -47,6 +48,7 @@ const (
 	AlertTypeRule AlertType = iota
 	AlertTypeMalware
 	AlertTypeAdmission
+	AlertTypeCdr
 )
 
 type StackFrame struct {
@@ -155,6 +157,7 @@ type RuntimeAlert struct {
 	MalwareAlert           `json:",inline" bson:"inline"`
 	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
+	cdr.CdrAlert           `json:",inline" bson:"inline"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
