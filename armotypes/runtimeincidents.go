@@ -157,7 +157,7 @@ type RuntimeAlert struct {
 	MalwareAlert           `json:",inline" bson:"inline"`
 	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
-	cdr.CdrAlert           `json:",inline" bson:"inline"`
+	cdr.CdrAlert           `json:"cdrevent" bson:"cdrevent"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
