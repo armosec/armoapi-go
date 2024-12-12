@@ -2,12 +2,13 @@ package apis
 
 // WebsocketScanCommand api
 const (
-	VulnerabilityScanCommandVersion string = "v1"
-	ContainerScanCommandPath        string = "scanImage"
-	RegistryScanCommandPath         string = "scanRegistryImage"
-	SBOMCalculationCommandPath      string = "generateSBOM"
-	DBCommandPath                   string = "DBCommand"
-	ServerReady                     string = "ready"
+	VulnerabilityScanCommandVersion   string = "v1"
+	ApplicationProfileScanCommandPath string = "scanApplicationProfile"
+	ContainerScanCommandPath          string = "scanImage"
+	RegistryScanCommandPath           string = "scanRegistryImage"
+	SBOMCalculationCommandPath        string = "generateSBOM"
+	DBCommandPath                     string = "DBCommand"
+	ServerReady                       string = "ready"
 )
 
 // Supported NotificationTypes
@@ -37,6 +38,8 @@ const (
 	TypeDeleteVulnScanCronJob NotificationPolicyType = "deleteVulnScanCronJob"
 	// Trigger an image scan
 	TypeScanImages NotificationPolicyType = "scan"
+	// Trigger an Application Profile scan
+	TypeScanApplicationProfile NotificationPolicyType = "scanApplicationProfile"
 	// Trigger a relevancy image scan
 	TypeCalculateSBOM NotificationPolicyType = "calculateSBOM"
 	// Trigger a registry scan
