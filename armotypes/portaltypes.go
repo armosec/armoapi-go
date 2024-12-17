@@ -90,6 +90,7 @@ type InstallationData struct {
 	ClusterProvider                           string                                    `json:"clusterProvider,omitempty" bson:"clusterProvider,omitempty"`                                                     // cluster provider (aws/azure/gcp)
 	IncludeNamespaces                         []string                                  `json:"includeNamespaces,omitempty" bson:"includeNamespaces,omitempty"`                                                 // perform scanning only on specific namespaces
 	ExcludeNamespaces                         []string                                  `json:"excludeNamespaces,omitempty" bson:"excludeNamespaces,omitempty"`                                                 // fully ignore namespaces
+	DefaultFrameworks                         []string                                  `json:"defaultFrameworks,omitempty" bson:"defaultFrameworks,omitempty"`                                                 // fully ignore namespaces
 }
 
 // hold information of a single subscription.
