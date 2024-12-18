@@ -27,6 +27,7 @@ const (
 
 var RiskFactorMapping = map[string]RiskFactor{
 	"C-0256": RiskFactorExternalFacing,
+	"C-0266": RiskFactorExternalFacing,
 	"C-0046": RiskFactorPrivileged,
 	"C-0057": RiskFactorPrivileged,
 	"C-0255": RiskFactorSecretAccess,
