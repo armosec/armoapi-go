@@ -73,6 +73,7 @@ const (
 	AttributeSensor               = "sensor"
 	AttributeRegistryID           = "registryID"
 	AttributeRegistryScanID       = "registryScanID"
+	AttributeRegistryScanImagesCount = "registryScanImagesCount"
 	AttributePath                 = "path"
 	AttributeResourceID           = "resourceID"
 	AttributeContainerScanId      = "containerScanId"
