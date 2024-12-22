@@ -1,9 +1,10 @@
 package armotypes
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetControlIDsByRiskFactors(t *testing.T) {
@@ -15,7 +16,7 @@ func TestGetControlIDsByRiskFactors(t *testing.T) {
 		{
 			name:     "Single Risk Factor",
 			input:    "External facing",
-			expected: []string{"C-0256"},
+			expected: []string{"C-0256", "C-0266"},
 		},
 		{
 			name:     "Multiple Risk Factors",

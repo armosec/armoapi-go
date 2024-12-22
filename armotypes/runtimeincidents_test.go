@@ -18,11 +18,7 @@ func TestAdmissionAlert(t *testing.T) {
 		Resource:         schema.GroupVersionResource{},
 		Subresource:      "test-subresource",
 		Operation:        admission.Create,
-		Options:          nil,
 		DryRun:           false,
-		Object:           nil,
-		OldObject:        nil,
-		UserInfo:         nil,
 	}
 
 	assert.Equal(t, "test-namespace", alert.RequestNamespace)

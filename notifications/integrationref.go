@@ -32,6 +32,7 @@ type IntegrationReference struct {
 
 // EntityIdentifiers is a struct that holds the identifiers of an entity (hard typed designators)
 type EntityType string
+type CreatedBy string
 
 const (
 	EntityTypePostureResource       EntityType = "postureResource"
@@ -43,6 +44,9 @@ const (
 	EntityTypeControl               EntityType = "control"
 	EntityTypeSecurityRiskResource  EntityType = "securityRiskResource"
 	EntityTypeSecurityRisk          EntityType = "securityRisk"
+
+	CreatedByUser CreatedBy = "user"
+	CreatedByUNS  CreatedBy = "uns"
 )
 
 type EntitiesIdentifiers []EntityIdentifiers
@@ -85,6 +89,8 @@ type EntityIdentifiers struct {
 	SecurityRiskCategory string `json:"securityRiskCategory,omitempty" bson:"securityRiskCategory,omitempty"`
 	SecurityRiskName     string `json:"securityRiskName,omitempty" bson:"securityRiskName,omitempty"`
 	SmartRemediation     bool   `json:"smartRemediation,omitempty" bson:"smartRemediation,omitempty"`
+
+	CreatedBy CreatedBy `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
 
 func NewClusterResourceIdentifiers(resource armotypes.PostureResourceSummary) EntityIdentifiers {

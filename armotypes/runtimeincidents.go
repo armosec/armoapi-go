@@ -3,6 +3,7 @@ package armotypes
 import (
 	"time"
 
+	"github.com/armosec/armoapi-go/armotypes/cdr"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
@@ -18,10 +19,27 @@ type Process struct {
 	Hardlink   string    `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
 	Uid        *uint32   `json:"uid,omitempty" bson:"uid,omitempty"`
 	Gid        *uint32   `json:"gid,omitempty" bson:"gid,omitempty"`
+	UserName   string    `json:"userName,omitempty" bson:"userName,omitempty"`
+	GroupName  string    `json:"groupName,omitempty" bson:"groupName,omitempty"`
+	StartTime  time.Time `json:"startTime,omitempty" bson:"startTime,omitempty"`
 	UpperLayer *bool     `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
 	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
 	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
+}
+
+type CloudMetadata struct {
+	// Provider is the cloud provider name (e.g. aws, gcp, azure).
+	Provider     string   `json:"provider,omitempty" bson:"provider,omitempty"`
+	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
+	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
+	Region       string   `json:"region,omitempty" bson:"region,omitempty"`
+	Zone         string   `json:"zone,omitempty" bson:"zone,omitempty"`
+	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
+	PublicIP     string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
+	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
+	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
+	Services     []string `json:"services,omitempty" bson:"services,omitempty"`
 }
 
 type AlertType int
@@ -30,7 +48,38 @@ const (
 	AlertTypeRule AlertType = iota
 	AlertTypeMalware
 	AlertTypeAdmission
+	AlertTypeCdr
 )
+
+type StackFrame struct {
+	// Frame ID
+	FrameID string `json:"frameId,omitempty" bson:"frameId,omitempty"`
+	// Function name
+	Function string `json:"function,omitempty" bson:"function,omitempty"`
+	// File name
+	File string `json:"file,omitempty" bson:"file,omitempty"`
+	// Line number
+	Line *int `json:"line,omitempty" bson:"line,omitempty"`
+	// Address
+	Address string `json:"address,omitempty" bson:"address,omitempty"`
+	// Arguments
+	Arguments []string `json:"arguments,omitempty" bson:"arguments,omitempty"`
+	// User/Kernel space
+	UserSpace bool `json:"userSpace" bson:"userSpace"`
+	// Native/Source code
+	NativeCode *bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
+}
+
+type Trace struct {
+	// Trace ID
+	TraceID string `json:"traceId,omitempty" bson:"traceId,omitempty"`
+	// Stack trace
+	Stack []StackFrame `json:"stack,omitempty" bson:"stack,omitempty"`
+	// Package name
+	Package string `json:"package,omitempty" bson:"package,omitempty"`
+	// Language
+	Language string `json:"language,omitempty" bson:"language,omitempty"`
+}
 
 type BaseRuntimeAlert struct {
 	// AlertName is either RuleName or MalwareName
@@ -57,6 +106,8 @@ type BaseRuntimeAlert struct {
 	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
 	// Nanoseconds of the alert
 	Nanoseconds uint64 `json:"nanoseconds,omitempty" bson:"nanoseconds,omitempty"`
+	// Trace of the alert
+	Trace Trace `json:"trace,omitempty" bson:"trace,omitempty"`
 }
 
 type RuleAlert struct {
@@ -86,6 +137,7 @@ type RuntimeAlertK8sDetails struct {
 	ClusterName       string            `json:"clusterName" bson:"clusterName"`
 	ContainerName     string            `json:"containerName,omitempty" bson:"containerName,omitempty"`
 	HostNetwork       *bool             `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
+	OldImage          string            `json:"oldImage,omitempty" bson:"oldImage,omitempty"`
 	Image             string            `json:"image,omitempty" bson:"image,omitempty"`
 	ImageDigest       string            `json:"imageDigest,omitempty" bson:"imageDigest,omitempty"`
 	Namespace         string            `json:"namespace,omitempty" bson:"namespace,omitempty"`
@@ -105,6 +157,7 @@ type RuntimeAlert struct {
 	MalwareAlert           `json:",inline" bson:"inline"`
 	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
+	cdr.CdrAlert           `json:"cdrevent" bson:"cdrevent"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
