@@ -6,6 +6,7 @@ import (
 
 	"github.com/armosec/armoapi-go/armotypes"
 	"github.com/armosec/armoapi-go/identifiers"
+	cloudposture "github.com/armosec/armosec-infra/cloudPosture"
 )
 
 type ReferenceType string //type of the reference (e.g cve-ticket, slack-message etc)
@@ -17,6 +18,7 @@ const (
 	ReferenceTypeImageTicket             ReferenceType = "ticket:image"
 	ReferenceTypeVulnerabilityTicket     ReferenceType = "ticket:vulnerability"
 	ReferenceTypeSecurityIssueTicket     ReferenceType = "ticket:securityIssue"
+	ReferenceTypeCloudRuleTicket         ReferenceType = "ticket:cloud:rule"
 )
 
 // Referance to external integration (e.g link to jira ticket)
@@ -44,6 +46,9 @@ const (
 	EntityTypeControl               EntityType = "control"
 	EntityTypeSecurityRiskResource  EntityType = "securityRiskResource"
 	EntityTypeSecurityRisk          EntityType = "securityRisk"
+	EntityTypeCloudResource         EntityType = "cloudResource"
+	EntityTypeCloudRule             EntityType = "cloudRule"
+	EntityTypeCloudControl          EntityType = "cloudControl"
 
 	CreatedByUser CreatedBy = "user"
 	CreatedByUNS  CreatedBy = "uns"
@@ -89,6 +94,11 @@ type EntityIdentifiers struct {
 	SecurityRiskCategory string `json:"securityRiskCategory,omitempty" bson:"securityRiskCategory,omitempty"`
 	SecurityRiskName     string `json:"securityRiskName,omitempty" bson:"securityRiskName,omitempty"`
 	SmartRemediation     bool   `json:"smartRemediation,omitempty" bson:"smartRemediation,omitempty"`
+
+	RuleHash         string `json:"ruleHash,omitempty" bson:"ruleHash,omitempty"`
+	CloudAccountGUID string `json:"cloudAccountGUID,omitempty" bson:"cloudAccountGUID,omitempty"`
+
+	CloudControlHash string `json:"cloudControlHash,omitempty" bson:"cloudControlHash,omitempty"`
 
 	CreatedBy CreatedBy `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
@@ -154,6 +164,17 @@ func NewSecurityRiskResourceIdentifiers(issue armotypes.SecurityIssue) EntityIde
 	}
 }
 
+// cloud posture
+func NewCloudResourceIdentifiers(resource cloudposture.CloudPostureResourceSummaryWrapper) EntityIdentifiers {
+	return EntityIdentifiers{
+		Type:             EntityTypeCloudResource,
+		Name:             resource.Name,
+		ResourceHash:     resource.ResourceHash,
+		ResourceID:       resource.ResourceID,
+		CloudAccountGUID: resource.CloudAccountGUID,
+	}
+}
+
 func (e *EntityIdentifiers) Validate() error {
 	if e.Type == "" {
 		return fmt.Errorf("entity type is required")
@@ -194,6 +215,14 @@ func (e *EntityIdentifiers) Validate() error {
 	case EntityTypeSecurityRisk:
 		if e.SecurityRiskID == "" {
 			return fmt.Errorf("security risk id, category and name are required for %s", e.Type)
+		}
+	case EntityTypeCloudResource:
+		if e.Name == "" || e.ResourceHash == "" || e.ResourceID == "" || e.CloudAccountGUID == "" {
+			return fmt.Errorf("name, resource hash, resource id and cloud account guid are required for %s", e.Type)
+		}
+	case EntityTypeCloudRule:
+		if e.RuleHash == "" || e.CloudControlHash == "" || e.Severity == "" {
+			return fmt.Errorf("rule hash, cloud control hash and severity are required for %s", e.Type)
 		}
 	default:
 		return fmt.Errorf("entity type %s is not supported", e.Type)
@@ -270,6 +299,14 @@ func (e *EntityIdentifiers) ToMap() map[string]string {
 
 	if e.SecurityRiskName != "" {
 		entityMap[identifiers.AttributeSecurityRiskName] = e.SecurityRiskName
+	}
+
+	if e.RuleHash != "" {
+		entityMap["ruleHash"] = e.RuleHash
+	}
+
+	if e.CloudAccountGUID != "" {
+		entityMap["cloudAccountGUID"] = e.CloudAccountGUID
 	}
 
 	return entityMap
