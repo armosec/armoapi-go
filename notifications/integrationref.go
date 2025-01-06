@@ -6,7 +6,6 @@ import (
 
 	"github.com/armosec/armoapi-go/armotypes"
 	"github.com/armosec/armoapi-go/identifiers"
-	cloudposture "github.com/armosec/armosec-infra/cloudPosture"
 )
 
 type ReferenceType string //type of the reference (e.g cve-ticket, slack-message etc)
@@ -161,17 +160,6 @@ func NewSecurityRiskResourceIdentifiers(issue armotypes.SecurityIssue) EntityIde
 		Namespace:    issue.Namespace,
 		Kind:         issue.Kind,
 		Name:         issue.ResourceName,
-	}
-}
-
-// cloud posture
-func NewCloudResourceIdentifiers(resource cloudposture.CloudPostureResourceSummaryWrapper) EntityIdentifiers {
-	return EntityIdentifiers{
-		Type:             EntityTypeCloudResource,
-		Name:             resource.Name,
-		ResourceHash:     resource.ResourceHash,
-		ResourceID:       resource.ResourceID,
-		CloudAccountGUID: resource.CloudAccountGUID,
 	}
 }
 
