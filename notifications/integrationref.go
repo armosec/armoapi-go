@@ -205,8 +205,8 @@ func (e *EntityIdentifiers) Validate() error {
 			return fmt.Errorf("security risk id, category and name are required for %s", e.Type)
 		}
 	case EntityTypeCloudResource:
-		if e.Name == "" || e.ResourceHash == "" || e.ResourceID == "" || e.CloudAccountGUID == "" {
-			return fmt.Errorf("name, resource hash, resource id and cloud account guid are required for %s", e.Type)
+		if e.ResourceHash == "" || e.ResourceID == "" || e.CloudAccountGUID == "" {
+			return fmt.Errorf("resource hash, resource id and cloud account guid are required for %s", e.Type)
 		}
 	case EntityTypeCloudRule:
 		if e.RuleHash == "" || e.CloudControlHash == "" || e.Severity == "" {
@@ -290,11 +290,11 @@ func (e *EntityIdentifiers) ToMap() map[string]string {
 	}
 
 	if e.RuleHash != "" {
-		entityMap["ruleHash"] = e.RuleHash
+		entityMap[identifiers.AttributeCloudRuleHash] = e.RuleHash
 	}
 
 	if e.CloudAccountGUID != "" {
-		entityMap["cloudAccountGUID"] = e.CloudAccountGUID
+		entityMap[identifiers.AttributeCloudAccountGUID] = e.CloudAccountGUID
 	}
 
 	return entityMap
