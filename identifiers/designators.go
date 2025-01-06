@@ -161,7 +161,7 @@ const (
 
 // CSPM related attributes
 const (
-	AttributeCloudAccountGUID = "accountGUID"
+	AttributeCloudAccountGUID = "cloudAccountGUID"
 	AttributeCloudAccountID   = "accountID"
 	AttributeCloudAccountName = "accountName"
 	AttributeFramework        = "framework"
