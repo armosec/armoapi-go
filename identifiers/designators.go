@@ -168,6 +168,11 @@ const (
 	AttributeCloudScanID      = "scanID"
 	AttributeCloudTaskID      = "taskID"
 	AttributeCloudFindingType = "findingType"
+
+	AttributeCloudRuleHash      = "ruleHash"    // cloud compliance rule hash
+	AttributeCloudControlHash   = "controlHash" // cloud compliance control hash
+	AttributeCloudFrameworkName = "frameworkName"
+	AttributeCloudResourceHash  = "resourceHash"
 )
 
 type mapString2String map[string]string
