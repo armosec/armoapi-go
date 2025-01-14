@@ -49,6 +49,7 @@ const (
 	AlertTypeMalware
 	AlertTypeAdmission
 	AlertTypeCdr
+	AlertTypeHttpRule
 )
 
 type StackFrame struct {
@@ -119,6 +120,23 @@ type MalwareAlert struct {
 	MalwareDescription string `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
 }
 
+type HttpRuleAlert struct {
+	Request struct {
+		Method string            `json:"method,omitempty" bson:"method,omitempty"` // e.g., "GET"
+		URL    string            `json:"url,omitempty" bson:"url,omitempty"`       // e.g., "/index.html"
+		Header map[string]string `json:"header,omitempty" bson:"header,omitempty"` // e.g., "Content-Type" -> ["application/json"]
+		Body   string            `json:"body,omitempty" bson:"body,omitempty"`     // e.g., "<html>...</html>"
+		Proto  string            `json:"proto,omitempty" bson:"proto,omitempty"`   // e.g., "HTTP/1.1"
+	} `json:"request,omitempty" bson:"request,omitempty"`
+
+	Response struct {
+		StatusCode int               `json:"statusCode,omitempty" bson:"statusCode,omitempty"` // e.g., 200
+		Header     map[string]string `json:"header,omitempty" bson:"header,omitempty"`         // e.g., "Content-Type" -> ["application/json"]
+		Body       string            `json:"body,omitempty" bson:"body,omitempty"`             // e.g., "<html>...</html>"
+		Proto      string            `json:"proto,omitempty" bson:"proto,omitempty"`           // e.g., "HTTP/1.1"
+	} `json:"response,omitempty" bson:"response,omitempty"`
+}
+
 type AdmissionAlert struct {
 	Kind             schema.GroupVersionKind     `json:"kind,omitempty" bson:"kind,omitempty"`
 	RequestNamespace string                      `json:"requestNamespace,omitempty" bson:"requestNamespace,omitempty"`
@@ -158,6 +176,7 @@ type RuntimeAlert struct {
 	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
 	cdr.CdrAlert           `json:"cdrevent" bson:"cdrevent"`
+	HttpRuleAlert          `json:",inline" bson:"inline"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
