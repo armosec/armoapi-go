@@ -122,11 +122,12 @@ type MalwareAlert struct {
 
 type HttpRuleAlert struct {
 	Request struct {
-		Method string            `json:"method,omitempty" bson:"method,omitempty"` // e.g., "GET"
-		URL    string            `json:"url,omitempty" bson:"url,omitempty"`       // e.g., "/index.html"
-		Header map[string]string `json:"header,omitempty" bson:"header,omitempty"` // e.g., "Content-Type" -> ["application/json"]
-		Body   string            `json:"body,omitempty" bson:"body,omitempty"`     // e.g., "<html>...</html>"
-		Proto  string            `json:"proto,omitempty" bson:"proto,omitempty"`   // e.g., "HTTP/1.1"
+		Method  string            `json:"method,omitempty" bson:"method,omitempty"`   // e.g., "GET"
+		URL     string            `json:"url,omitempty" bson:"url,omitempty"`         // e.g., "/index.html"
+		Header  map[string]string `json:"header,omitempty" bson:"header,omitempty"`   // e.g., "Content-Type" -> ["application/json"]
+		Body    string            `json:"body,omitempty" bson:"body,omitempty"`       // e.g., "<html>...</html>"
+		Proto   string            `json:"proto,omitempty" bson:"proto,omitempty"`     // e.g., "HTTP/1.1"
+		Payload string            `json:"payload,omitempty" bson:"payload,omitempty"` // e.g., "'OR 1=1"'"
 	} `json:"request,omitempty" bson:"request,omitempty"`
 
 	Response struct {
