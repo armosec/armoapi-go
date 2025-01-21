@@ -136,6 +136,8 @@ type HttpRuleAlert struct {
 		Body       string            `json:"body,omitempty" bson:"body,omitempty"`             // e.g., "<html>...</html>"
 		Proto      string            `json:"proto,omitempty" bson:"proto,omitempty"`           // e.g., "HTTP/1.1"
 	} `json:"response,omitempty" bson:"response,omitempty"`
+
+	AttackerIp string `json:"attackerIp,omitempty" bson:"attackerIp,omitempty"`
 }
 
 type AdmissionAlert struct {
