@@ -99,3 +99,12 @@ const (
 	ScanInProgressScore = 2
 	ScanSuccessScore    = 3
 )
+
+type CSPMExceptionPolicy struct {
+	BaseExceptionPolicy `json:",inline"`
+	Name                string   `json:"name"`     // rule name
+	Controls            []string `json:"controls"` // affected controls
+	Severity            string   `json:"severity"`
+	SeverityScore       int      `json:"severityScore"`
+	RuleHash            string   `json:"ruleHash"`
+}
