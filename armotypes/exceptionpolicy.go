@@ -12,6 +12,9 @@ const (
 
 	// RuntimeIncidentPolicy - policy for runtime incidents
 	RuntimeIncidentExceptionPolicyType PolicyType = "runtimeIncidentExceptionPolicy"
+
+	// CSPM - policy for CSPM
+	CSPMExceptionPolicyType PolicyType = "cspmExceptionPolicy"
 )
 
 type BaseExceptionPolicy struct {

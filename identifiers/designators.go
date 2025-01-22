@@ -104,6 +104,7 @@ const (
 	AttributeProjectID               = "projectId"    // Jira project ID
 	AttributeIssueTypeID             = "issueTypeId"  // Jira issue type ID
 	AttributeWorkflowGUID            = "workflowGUID" // workflow GUID
+	AttributeAccount                 = "account"
 )
 
 // Repository scan related attributes
