@@ -36,6 +36,8 @@ type CloudMetadata struct {
 type EventData struct {
 	// AWSCloudTrail cloudtrail event
 	AWSCloudTrail *CloudTrailEvent `json:"awsCloudTrail,omitempty"`
+	// Target resource
+	TargetResource string `json:"targetResource,omitempty"`
 	// Add more cloud event data here
 }
 
