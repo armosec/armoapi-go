@@ -189,6 +189,27 @@ type CustomerState struct {
 	GettingStarted       *GettingStartedChecklist `json:"gettingStarted,omitempty" bson:"gettingStarted,omitempty"`
 	NodeUsage            *NodeUsage               `json:"nodeUsage,omitempty" bson:"nodeUsage,omitempty"`
 	AttackChainsLastScan string                   `json:"attackChainsLastScan,omitempty" bson:"attackChainsLastScan,omitempty"`
+	FeatureFlags         *map[string]bool         `json:"enabledFeatureFlags,omitempty" bson:"enabledFeatureFlags,omitempty"`
+}
+
+func (cs *CustomerState) IsFeatureEnabled(key string) bool {
+	if cs.FeatureFlags == nil {
+		return false
+	}
+
+	if val, ok := (*cs.FeatureFlags)[key]; ok {
+		return val
+	}
+
+	return false
+}
+
+func (cs *CustomerState) SetFeatureEnabled(key string, val bool) {
+	if cs.FeatureFlags == nil {
+		cs.FeatureFlags = &map[string]bool{}
+	}
+
+	(*cs.FeatureFlags)[key] = val
 }
 
 type User struct {
