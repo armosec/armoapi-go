@@ -137,7 +137,8 @@ type HttpRuleAlert struct {
 		Proto      string            `json:"proto,omitempty" bson:"proto,omitempty"`           // e.g., "HTTP/1.1"
 	} `json:"response,omitempty" bson:"response,omitempty"`
 
-	AttackerIp string `json:"attackerIp,omitempty" bson:"attackerIp,omitempty"`
+	SourcePodInfo RuntimeAlertK8sDetails `json:"sourcePodInfo,omitempty" bson:"podInfo,omitempty"`
+	AttackerIp    string                 `json:"attackerIp,omitempty" bson:"attackerIp,omitempty"`
 }
 
 type AdmissionAlert struct {
