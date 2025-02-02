@@ -209,8 +209,8 @@ func (e *EntityIdentifiers) Validate() error {
 			return fmt.Errorf("resource hash, resource id and cloud account guid are required for %s", e.Type)
 		}
 	case EntityTypeCloudRule:
-		if e.RuleHash == "" || e.CloudControlHash == "" || e.Severity == "" {
-			return fmt.Errorf("rule hash, cloud control hash and severity are required for %s", e.Type)
+		if e.RuleHash == "" {
+			return fmt.Errorf("rule hash is required for %s", e.Type)
 		}
 	default:
 		return fmt.Errorf("entity type %s is not supported", e.Type)
