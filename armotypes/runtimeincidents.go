@@ -10,23 +10,15 @@ import (
 	"k8s.io/apiserver/pkg/authentication/user"
 )
 
-type Process struct {
-	PID        uint32    `json:"pid,omitempty" bson:"pid,omitempty"`
-	Cmdline    string    `json:"cmdline,omitempty" bson:"cmdline,omitempty"`
-	Comm       string    `json:"comm,omitempty" bson:"comm,omitempty"`
-	PPID       uint32    `json:"ppid,omitempty" bson:"ppid,omitempty"`
-	Pcomm      string    `json:"pcomm,omitempty" bson:"pcomm,omitempty"`
-	Hardlink   string    `json:"hardlink,omitempty" bson:"hardlink,omitempty"`
-	Uid        *uint32   `json:"uid,omitempty" bson:"uid,omitempty"`
-	Gid        *uint32   `json:"gid,omitempty" bson:"gid,omitempty"`
-	UserName   string    `json:"userName,omitempty" bson:"userName,omitempty"`
-	GroupName  string    `json:"groupName,omitempty" bson:"groupName,omitempty"`
-	StartTime  time.Time `json:"startTime,omitempty" bson:"startTime,omitempty"`
-	UpperLayer *bool     `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
-	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
-	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
-	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
-}
+type AlertType int
+
+const (
+	AlertTypeRule AlertType = iota
+	AlertTypeMalware
+	AlertTypeAdmission
+	AlertTypeCdr
+	AlertTypeHttpRule
+)
 
 type CloudMetadata struct {
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
@@ -42,16 +34,6 @@ type CloudMetadata struct {
 	Services     []string `json:"services,omitempty" bson:"services,omitempty"`
 }
 
-type AlertType int
-
-const (
-	AlertTypeRule AlertType = iota
-	AlertTypeMalware
-	AlertTypeAdmission
-	AlertTypeCdr
-	AlertTypeHttpRule
-)
-
 type StackFrame struct {
 	// Frame ID
 	FrameID string `json:"frameId,omitempty" bson:"frameId,omitempty"`
@@ -66,7 +48,7 @@ type StackFrame struct {
 	// Arguments
 	Arguments []string `json:"arguments,omitempty" bson:"arguments,omitempty"`
 	// User/Kernel space
-	UserSpace bool `json:"userSpace" bson:"userSpace"`
+	UserSpace bool `json:"userSpace,omitempty" bson:"userSpace,omitempty"`
 	// Native/Source code
 	NativeCode *bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
 }
@@ -126,7 +108,13 @@ type RuleAlert struct {
 }
 
 type MalwareAlert struct {
-	MalwareDescription string `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
+	MalwareFile        File        `json:"malwareFile,omitempty" bson:"malwareFile,omitempty"`
+	Aliases            []string    `json:"aliases,omitempty" bson:"aliases,omitempty"`
+	Family             string      `json:"family,omitempty" bson:"family,omitempty"`
+	Action             string      `json:"action,omitempty" bson:"action,omitempty"`
+	DetectionMethod    string      `json:"detectionMethod,omitempty" bson:"detectionMethod,omitempty"`
+	MalwareDescription string      `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
+	ProcessTree        ProcessTree `json:"processTree,omitempty" bson:"processTree,omitempty"`
 }
 
 type HttpRuleAlert struct {
@@ -165,7 +153,7 @@ type AdmissionAlert struct {
 }
 
 type RuntimeAlertK8sDetails struct {
-	ClusterName       string            `json:"clusterName" bson:"clusterName"`
+	ClusterName       string            `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
 	ContainerName     string            `json:"containerName,omitempty" bson:"containerName,omitempty"`
 	HostNetwork       *bool             `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
 	OldImage          string            `json:"oldImage,omitempty" bson:"oldImage,omitempty"`
@@ -177,9 +165,9 @@ type RuntimeAlertK8sDetails struct {
 	PodName           string            `json:"podName,omitempty" bson:"podName,omitempty"`
 	PodNamespace      string            `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
 	PodLabels         map[string]string `json:"podLabels,omitempty" bson:"podLabels,omitempty"`
-	WorkloadName      string            `json:"workloadName" bson:"workloadName"`
+	WorkloadName      string            `json:"workloadName,omitempty" bson:"workloadName,omitempty"`
 	WorkloadNamespace string            `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
-	WorkloadKind      string            `json:"workloadKind" bson:"workloadKind"`
+	WorkloadKind      string            `json:"workloadKind,omitempty" bson:"workloadKind,omitempty"`
 }
 
 type RuntimeAlert struct {
@@ -188,7 +176,7 @@ type RuntimeAlert struct {
 	MalwareAlert           `json:",inline" bson:"inline"`
 	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
-	cdr.CdrAlert           `json:"cdrevent" bson:"cdrevent"`
+	cdr.CdrAlert           `json:"cdrevent,omitempty" bson:"cdrevent"`
 	HttpRuleAlert          `json:",inline" bson:"inline"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Rule ID
@@ -200,8 +188,8 @@ type RuntimeAlert struct {
 
 type ProcessTree struct {
 	ProcessTree Process `json:"processTree" bson:"processTree"`
-	UniqueID    uint32  `json:"uniqueID" bson:"uniqueID"`
-	ContainerID string  `json:"containerID" bson:"containerID"`
+	UniqueID    uint32  `json:"uniqueID,omitempty" bson:"uniqueID,omitempty"`
+	ContainerID string  `json:"containerID,omitempty" bson:"containerID,omitempty"`
 }
 
 type KDRMonitoredEntitiesCounters struct {
