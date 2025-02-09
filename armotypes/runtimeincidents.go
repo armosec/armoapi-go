@@ -51,13 +51,8 @@ type StackFrame struct {
 	UserSpace bool `json:"userSpace,omitempty" bson:"userSpace,omitempty"`
 	// Native/Source code
 	NativeCode *bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
-}
-
-type StackAnomalyDetails struct {
-	// FromIndex is the index of the first frame in the stack trace that is considered anomalous.
-	FromIndex int `json:"fromIndex,omitempty" bson:"fromIndex,omitempty"`
-	// ToIndex is the index of the last frame in the stack trace that is considered anomalous.
-	ToIndex int `json:"toIndex,omitempty" bson:"toIndex,omitempty"`
+	// Anomaly flag
+	Anomaly bool `json:"anomaly,omitempty" bson:"anomaly,omitempty"`
 }
 
 type Trace struct {
@@ -69,8 +64,6 @@ type Trace struct {
 	Package string `json:"package,omitempty" bson:"package,omitempty"`
 	// Language
 	Language string `json:"language,omitempty" bson:"language,omitempty"`
-	// Anomaly details
-	AnomalyDetails *StackAnomalyDetails `json:"anomalyDetails,omitempty" bson:"anomalyDetails,omitempty"`
 }
 
 type BaseRuntimeAlert struct {
