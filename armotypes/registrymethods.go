@@ -3,6 +3,7 @@ package armotypes
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"strings"
 )
@@ -357,6 +358,9 @@ func cleanRegistryURL(input string) string {
 	}
 
 	host := strings.TrimPrefix(parsedURL.Hostname(), "www.")
+	if parsedURL.Port() == "" {
+		return host
+	}
 
-	return host
+	return fmt.Sprintf("%s:%s", host, parsedURL.Port())
 }
