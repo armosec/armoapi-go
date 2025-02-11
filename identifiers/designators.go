@@ -170,10 +170,11 @@ const (
 	AttributeCloudTaskID      = "taskID"
 	AttributeCloudFindingType = "findingType"
 
-	AttributeCloudRuleHash      = "ruleHash"    // cloud compliance rule hash
-	AttributeCloudControlHash   = "controlHash" // cloud compliance control hash
-	AttributeCloudFrameworkName = "frameworkName"
-	AttributeCloudResourceHash  = "resourceHash"
+	AttributeCloudRuleHash       = "ruleHash"       // cloud compliance rule hash
+	AttributeSecondCloudRuleHash = "secondRuleHash" // cloud compliance rule hash for second ruleHash filter(AND in the same innerFilter)
+	AttributeCloudControlHash    = "controlHash"    // cloud compliance control hash
+	AttributeCloudFrameworkName  = "frameworkName"
+	AttributeCloudResourceHash   = "resourceHash"
 )
 
 type mapString2String map[string]string
