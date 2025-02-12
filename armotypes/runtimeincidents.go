@@ -101,13 +101,11 @@ type RuleAlert struct {
 }
 
 type MalwareAlert struct {
-	MalwareFile        File        `json:"malwareFile,omitempty" bson:"malwareFile,omitempty"`
-	Aliases            []string    `json:"aliases,omitempty" bson:"aliases,omitempty"`
-	Family             string      `json:"family,omitempty" bson:"family,omitempty"`
-	Action             string      `json:"action,omitempty" bson:"action,omitempty"`
-	DetectionMethod    string      `json:"detectionMethod,omitempty" bson:"detectionMethod,omitempty"`
-	MalwareDescription string      `json:"malwareDescription,omitempty" bson:"malwareDescription,omitempty"`
-	ProcessTree        ProcessTree `json:"processTree,omitempty" bson:"processTree,omitempty"`
+	MalwareFile     File             `json:"malwareFile,omitempty" bson:"malwareFile,omitempty"`
+	Action          string           `json:"action,omitempty" bson:"action,omitempty"`
+	DetectionMethod string           `json:"detectionMethod,omitempty" bson:"detectionMethod,omitempty"`
+	ProcessTree     ProcessTree      `json:"processTree,omitempty" bson:"processTree,omitempty"`
+	Signature       MalwareSignature `json:"signature,omitempty" bson:"signature,omitempty"`
 }
 
 type HttpRuleAlert struct {
