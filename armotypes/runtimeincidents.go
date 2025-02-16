@@ -162,8 +162,8 @@ type RuntimeAlertK8sDetails struct {
 }
 
 type NetworkScanAlert struct {
-	Dns string `json:"dns,omitempty" bson:"dns,omitempty"`
-	Ip  string `json:"ip,omitempty" bson:"ip,omitempty"`
+	Domain string `json:"domain,omitempty" bson:"domain,omitempty"`
+	Ip     string `json:"ip,omitempty" bson:"ip,omitempty"`
 }
 
 type RuntimeAlert struct {
