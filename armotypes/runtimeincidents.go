@@ -161,6 +161,11 @@ type RuntimeAlertK8sDetails struct {
 	WorkloadKind      string            `json:"workloadKind,omitempty" bson:"workloadKind,omitempty"`
 }
 
+type NetworkScanAlert struct {
+	Dns string `json:"dns,omitempty" bson:"dns,omitempty"`
+	Ip  string `json:"ip,omitempty" bson:"ip,omitempty"`
+}
+
 type RuntimeAlert struct {
 	BaseRuntimeAlert       `json:",inline" bson:"inline"`
 	RuleAlert              `json:",inline" bson:"inline"`
@@ -169,6 +174,7 @@ type RuntimeAlert struct {
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
 	cdr.CdrAlert           `json:"cdrevent,omitempty" bson:"cdrevent"`
 	HttpRuleAlert          `json:",inline" bson:"inline"`
+	NetworkScanAlert       `json:"networkscan,inline" bson:"networkscan"`
 	AlertType              AlertType `json:"alertType" bson:"alertType"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
