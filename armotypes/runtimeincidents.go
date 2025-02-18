@@ -18,6 +18,7 @@ const (
 	AlertTypeAdmission
 	AlertTypeCdr
 	AlertTypeHttpRule
+	AlertTypeNetworkScan
 )
 
 type CloudMetadata struct {
