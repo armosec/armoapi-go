@@ -32,8 +32,11 @@ type KubernetesObject struct {
 
 	Labels map[string]string `json:"labels"`
 
-	// used for network policies
+	// pod selector labels of network policies
 	PodSelectorLabels map[string]string `json:"podSelectorLabels"`
+
+	// pod spec labels of workloads
+	PodSpecLabels map[string]string `json:"podSpecLabels"`
 }
 
 type Resource struct {
