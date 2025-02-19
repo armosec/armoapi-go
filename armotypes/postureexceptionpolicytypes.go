@@ -2,8 +2,9 @@ package armotypes
 
 import (
 	"encoding/json"
-	"github.com/armosec/armoapi-go/identifiers"
 	"time"
+
+	"github.com/armosec/armoapi-go/identifiers"
 )
 
 type PostureExceptionPolicyActions string
@@ -38,6 +39,7 @@ type PostureExceptionPolicy struct {
 
 type PosturePolicy struct {
 	FrameworkName string `json:"frameworkName" bson:"frameworkName"`
+	// deprecated - use ControlID instead
 	ControlName   string `json:"controlName,omitempty" bson:"controlName,omitempty"`
 	ControlID     string `json:"controlID,omitempty" bson:"controlID,omitempty"`
 	RuleName      string `json:"ruleName,omitempty" bson:"ruleName,omitempty"`
