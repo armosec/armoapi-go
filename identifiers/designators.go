@@ -105,6 +105,9 @@ const (
 	AttributeIssueTypeID             = "issueTypeId"  // Jira issue type ID
 	AttributeWorkflowGUID            = "workflowGUID" // workflow GUID
 	AttributeAccount                 = "account"
+	AttribueCloudProvider            = "cloudProvider"
+	AttributeService                 = "service"
+	AttributeRegion                  = "region"
 )
 
 // Repository scan related attributes
