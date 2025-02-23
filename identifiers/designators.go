@@ -108,6 +108,7 @@ const (
 	AttribueCloudProvider            = "cloudProvider"
 	AttributeService                 = "service"
 	AttributeRegion                  = "region"
+	AttribueCloudAccountID           = "cloudAccountID"
 )
 
 // Repository scan related attributes
