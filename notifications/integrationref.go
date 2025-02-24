@@ -29,6 +29,7 @@ type IntegrationReference struct {
 	Owner                *EntityIdentifiers  `json:"owner,omitempty" bson:"owner,omitempty"`                   //owner identifiers of this reference (e.g resourceHash, wlid)
 	RelatedObjects       EntitiesIdentifiers `json:"relatedObjects,omitempty" bson:"relatedObjects,omitempty"` //related entities identifiers of this reference (e.g cves, controls)
 	CreationTime         time.Time           `json:"creationTime" bson:"creationTime"`                         //creation time of the reference
+	CreatedBy            CreatedBy           `json:"createdBy,omitempty" bson:"createdBy,omitempty"`           //created by user or uns
 }
 
 // EntityIdentifiers is a struct that holds the identifiers of an entity (hard typed designators)
