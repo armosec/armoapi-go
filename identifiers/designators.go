@@ -108,6 +108,7 @@ const (
 	AttribueCloudProvider            = "cloudProvider"
 	AttributeService                 = "service"
 	AttributeRegion                  = "region"
+	AttributeImageHash               = "imageHash"
 )
 
 // Repository scan related attributes
