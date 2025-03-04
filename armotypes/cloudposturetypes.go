@@ -34,8 +34,8 @@ const (
 	CloudCheckStatusFail     = "FAIL"
 	CloudCheckStatusManual   = "MANUAL"
 	CloudCheckStatusPass     = "PASS"
-	CloudCheckStatusSkipped  = "SKIPPED"
-	CloudCheckStatusAccepted = "ACCEPTED"
+	CloudCheckStatusSkipped  = "SKIP"
+	CloudCheckStatusAccepted = "ACCEPT"
 )
 
 var CloudCheckStatusToInt = map[string]int{
