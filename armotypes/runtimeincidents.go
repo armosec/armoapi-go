@@ -199,6 +199,11 @@ type KDRMonitoredEntitiesCounters struct {
 	ContainersCount int `json:"containersCount"`
 }
 
+type KDRMonitoredClusters struct {
+	MonitoredClusters    []string `json:"monitored,omitempty"`
+	NotMonitoredClusters []string `json:"notMonitored,omitempty"`
+}
+
 type RuntimeIncidentExceptionPolicy struct {
 	BaseExceptionPolicy `json:",inline"`
 	Name                string `json:"name"`
