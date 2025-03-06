@@ -109,6 +109,7 @@ const (
 	AttributeService                 = "service"
 	AttributeRegion                  = "region"
 	AttributeImageHash               = "imageHash"
+	AttributeImageTag                = "imageTag"
 )
 
 // Repository scan related attributes
