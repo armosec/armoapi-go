@@ -22,6 +22,7 @@ const (
 // NetworkPoliciesWorkload is used store information about workloads
 // in the customer's clusters related to the NetworkPolicies feature
 type NetworkPoliciesWorkload struct {
+	ResourceHash               string                   `json:"resourceHash"`
 	Name                       string                   `json:"name"`
 	Kind                       string                   `json:"kind"`
 	CustomerGUID               string                   `json:"customerGUID"`
