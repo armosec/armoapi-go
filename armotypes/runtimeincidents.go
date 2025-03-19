@@ -211,3 +211,22 @@ type RuntimeIncidentExceptionPolicy struct {
 	Severity            string `json:"severity"`
 	SeverityScore       int    `json:"severityScore"`
 }
+
+// FindProcessByPID searches for a process by PID in the process tree
+func (pt *ProcessTree) FindProcessByPID(pid uint32) *Process {
+	return findProcessRecursive(&pt.ProcessTree, pid)
+}
+
+// findProcessRecursive recursively searches for a process by PID
+func findProcessRecursive(proc *Process, pid uint32) *Process {
+	if proc.PID == pid {
+		return proc
+	}
+
+	for _, child := range proc.Children {
+		if found := findProcessRecursive(&child, pid); found != nil {
+			return found
+		}
+	}
+	return nil
+}
