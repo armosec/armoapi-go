@@ -21,6 +21,11 @@ func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersio
 
 }
 
+func CalcContainerHashFNV(customerGUID, cluster, podName, containerName, namespace string) string {
+	strLower := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s/%s", customerGUID, cluster, podName, containerName, namespace))
+	return CalcHashFNV(strLower)
+}
+
 func GenerateExceptionUID() (string, error) {
 	newUUID, err := uuid.NewUUID()
 	if err != nil {

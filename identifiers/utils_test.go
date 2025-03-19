@@ -1,6 +1,8 @@
 package identifiers
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCalcHashFNV(t *testing.T) {
 	type args struct {
@@ -67,5 +69,45 @@ func TestConvertResourceIDToResourceHashFNV(t *testing.T) {
 		if actual != test.expectedHash {
 			t.Errorf("ConvertResourceIDToResourceHashFNV(%s) = %s; want %s", test.resourceID, actual, test.expectedHash)
 		}
+	}
+}
+
+func TestCalcContainerHashFNV(t *testing.T) {
+	tests := []struct {
+		name          string
+		customerGUID  string
+		cluster       string
+		podName       string
+		containerName string
+		namespace     string
+		wantHash      string // Expected hash value
+	}{
+		{
+			name:          "Test case 1",
+			customerGUID:  "customer123",
+			cluster:       "clusterA",
+			podName:       "podX",
+			containerName: "containerY",
+			namespace:     "namespaceZ",
+			wantHash:      "8445573203380894384",
+		},
+		{
+			name:          "Test case 2 - Different input",
+			customerGUID:  "cust456",
+			cluster:       "clusB",
+			podName:       "podY",
+			containerName: "contZ",
+			namespace:     "nsX",
+			wantHash:      "5926078173930249943",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := CalcContainerHashFNV(tt.customerGUID, tt.cluster, tt.podName, tt.containerName, tt.namespace)
+			if got != tt.wantHash {
+				t.Errorf("CalcContainerHashFNV() = %v, want %v", got, tt.wantHash)
+			}
+		})
 	}
 }
