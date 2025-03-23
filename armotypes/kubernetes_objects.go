@@ -33,10 +33,19 @@ type KubernetesObject struct {
 	Labels map[string]string `json:"labels"`
 
 	// pod selector labels of network policies
-	PodSelectorLabels map[string]string `json:"podSelectorLabels"`
+	NetworkPolicyPodSelectorLabels map[string]string `json:"podSelectorLabels,omitempty"`
 
 	// pod spec labels of workloads
-	PodSpecLabels map[string]string `json:"podSpecLabels"`
+	PodSpecLabels map[string]string `json:"podSpecLabels,omitempty"`
+
+	// pod selector labels of services
+	ServicePodSelectorLabels map[string]string `json:"servicePodSelectorLabels,omitempty"`
+
+	// roleRef of RoleBinding
+	RoleRef *RoleBindingRoleRef `json:"roleRef,omitempty"`
+
+	// subjects of RoleBinding
+	Subject []RoleBindingSubject `json:"subject,omitempty"`
 }
 
 type Resource struct {
@@ -46,4 +55,18 @@ type Resource struct {
 	Namespace        string `json:"namespace,omitempty" bson:"namespace,omitempty"`
 	Kind             string `json:"kind,omitempty" bson:"kind,omitempty"`
 	Name             string `json:"name,omitempty" bson:"name,omitempty"`
+}
+
+type RoleBindingSubject struct {
+	APIVersion string `json:"apiVersion,omitempty"`
+	Kind       string `json:"kind,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Namespace  string `json:"namespace,omitempty"`
+}
+
+type RoleBindingRoleRef struct {
+	APIVersion string `json:"apiVersion,omitempty"`
+	Kind       string `json:"kind,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Namespace  string `json:"namespace,omitempty"`
 }
