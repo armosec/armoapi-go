@@ -1,6 +1,7 @@
 package armotypes
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/armosec/armoapi-go/armotypes/cdr"
@@ -182,8 +183,9 @@ type RuntimeAlert struct {
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 	// Hostname is the name of the node agent pod
-	HostName string `json:"hostName" bson:"hostName"`
-	Message  string `json:"message" bson:"message"`
+	HostName string          `json:"hostName" bson:"hostName"`
+	Message  string          `json:"message" bson:"message"`
+	Fields   json.RawMessage `json:"fields,omitempty" bson:"fields,omitempty"`
 }
 
 type ProcessTree struct {
