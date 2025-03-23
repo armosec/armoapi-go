@@ -121,10 +121,11 @@ type HttpRuleAlert struct {
 	} `json:"request,omitempty" bson:"request,omitempty"`
 
 	Response struct {
-		StatusCode int               `json:"statusCode,omitempty" bson:"statusCode,omitempty"` // e.g., 200
-		Header     map[string]string `json:"header,omitempty" bson:"header,omitempty"`         // e.g., "Content-Type" -> ["application/json"]
-		Body       string            `json:"body,omitempty" bson:"body,omitempty"`             // e.g., "<html>...</html>"
-		Proto      string            `json:"proto,omitempty" bson:"proto,omitempty"`           // e.g., "HTTP/1.1"
+		StatusCode   int               `json:"statusCode,omitempty" bson:"statusCode,omitempty"`     // e.g., 200
+		Header       map[string]string `json:"header,omitempty" bson:"header,omitempty"`             // e.g., "Content-Type" -> ["application/json"]
+		Body         string            `json:"body,omitempty" bson:"body,omitempty"`                 // e.g., "<html>...</html>"
+		Proto        string            `json:"proto,omitempty" bson:"proto,omitempty"`               // e.g., "HTTP/1.1"
+		FullResponse string            `json:"fullResponse,omitempty" bson:"fullResponse,omitempty"` // e.g., "{...}"
 	} `json:"response,omitempty" bson:"response,omitempty"`
 
 	SourcePodInfo RuntimeAlertK8sDetails `json:"sourcePodInfo,omitempty" bson:"podInfo,omitempty"`
