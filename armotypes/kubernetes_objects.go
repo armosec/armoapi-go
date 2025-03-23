@@ -42,10 +42,10 @@ type KubernetesObject struct {
 	ServicePodSelectorLabels map[string]string `json:"servicePodSelectorLabels,omitempty"`
 
 	// roleRef of RoleBinding
-	RoleRef *RoleBindingRoleRef `json:"roleRef,omitempty"`
+	RoleBindingRoleRef *RoleBindingRoleRef `json:"roleRef,omitempty"`
 
 	// subjects of RoleBinding
-	Subject []RoleBindingSubject `json:"subject,omitempty"`
+	RoleBindingSubjects []RoleBindingSubject `json:"subjects,omitempty"`
 }
 
 type Resource struct {
