@@ -49,10 +49,11 @@ type CollaborationConfigOption struct {
 type ChannelProvider string
 
 const (
-	CollaborationTypeJira  ChannelProvider = "jira"
-	CollaborationTypeSlack ChannelProvider = "slack"
-	CollaborationTypeTeams ChannelProvider = "teams"
-	CollaborationTypeEmail ChannelProvider = "email"
+	CollaborationTypeJira    ChannelProvider = "jira"
+	CollaborationTypeSlack   ChannelProvider = "slack"
+	CollaborationTypeTeams   ChannelProvider = "teams"
+	CollaborationTypeEmail   ChannelProvider = "email"
+	CollaborationTypeWebhook ChannelProvider = "webhook"
 )
 
 // swagger:model CollaborationConfig
