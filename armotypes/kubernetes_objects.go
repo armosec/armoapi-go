@@ -34,6 +34,10 @@ type KubernetesObject struct {
 
 	// pod selector labels of network policies
 	NetworkPolicyPodSelectorLabels map[string]string `json:"podSelectorLabels,omitempty"`
+	// indicates if the network policy has egress rules
+	HasEgressRules *bool `json:"hasEgressRules,omitempty"`
+	// indicates if the network policy has ingress rules
+	HasIngressRules *bool `json:"hasIngressRules,omitempty"`
 
 	// pod spec labels of workloads
 	PodSpecLabels map[string]string `json:"podSpecLabels,omitempty"`
