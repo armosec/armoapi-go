@@ -1,6 +1,13 @@
 package armotypes
 
-import "time"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
+)
+
+const sep = "␟"
 
 type File struct {
 	Path       string         `json:"path,omitempty" bson:"path,omitempty"`
@@ -9,6 +16,33 @@ type File struct {
 	Timestamps FileTimestamps `json:"timestamps,omitempty" bson:"timestamps,omitempty"`
 	Ownership  FileOwnership  `json:"ownership,omitempty" bson:"ownership,omitempty"`
 	Attributes FileAttributes `json:"attributes,omitempty" bson:"attributes,omitempty"`
+}
+
+type CommPID struct {
+	Comm string `json:"comm,omitempty" bson:"comm,omitempty"`
+	PID  uint32 `json:"pid,omitempty" bson:"pid,omitempty"`
+}
+
+// MarshalText implements encoding.TextMarshaler
+func (c CommPID) MarshalText() ([]byte, error) {
+	s := fmt.Sprintf("%s%s%d", c.Comm, sep, c.PID)
+	return []byte(s), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler
+func (c *CommPID) UnmarshalText(text []byte) error {
+	parts := strings.Split(string(text), sep)
+	if len(parts) != 2 {
+		return fmt.Errorf("invalid CommPID representation: %q", text)
+	}
+	var err error
+	c.Comm = parts[0]
+	u64, err := strconv.ParseUint(parts[1], 10, 32)
+	if err != nil {
+		return fmt.Errorf("invalid PID value %q: %w", parts[1], err)
+	}
+	c.PID = uint32(u64)
+	return nil
 }
 
 type Process struct {
@@ -26,7 +60,24 @@ type Process struct {
 	UpperLayer *bool     `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
 	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
-	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
+	// Deprecated: Use ChildrenMap instead
+	Children    []Process            `json:"children,omitempty" bson:"children,omitempty"`
+	ChildrenMap map[CommPID]*Process `json:"childrenMap,omitempty" bson:"childrenMap,omitempty"`
+}
+
+// MigrateToMap migrates the Children slice to ChildrenMap to accommodate for older versions of the Process struct
+func (p *Process) MigrateToMap() {
+	if p.ChildrenMap == nil {
+		p.ChildrenMap = make(map[CommPID]*Process)
+	}
+	if len(p.Children) > 0 {
+		for i := range p.Children {
+			p.Children[i].MigrateToMap()
+			commPID := CommPID{Comm: p.Children[i].Comm, PID: p.Children[i].PID}
+			p.ChildrenMap[commPID] = &p.Children[i]
+		}
+		p.Children = nil
+	}
 }
 
 type FileHashes struct {

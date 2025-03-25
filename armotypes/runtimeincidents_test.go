@@ -59,10 +59,10 @@ func TestFindProcessRecursive(t *testing.T) {
 		PID:     1,
 		Comm:    "p1",
 		Cmdline: "init",
-		Children: []Process{
-			{PID: 2, Comm: "p2", Cmdline: "bash"},
-			{PID: 3, Comm: "p3", Cmdline: "nginx",
-				Children: []Process{{PID: 4, Comm: "p4", Cmdline: "worker"}}},
+		ChildrenMap: map[CommPID]*Process{
+			{Comm: "p2", PID: 2}: {PID: 2, Comm: "p2", Cmdline: "bash"},
+			{Comm: "p3", PID: 3}: {PID: 3, Comm: "p3", Cmdline: "nginx",
+				ChildrenMap: map[CommPID]*Process{{Comm: "p4", PID: 4}: {PID: 4, Comm: "p4", Cmdline: "worker"}}},
 		},
 	}
 
