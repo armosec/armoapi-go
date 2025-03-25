@@ -1,6 +1,10 @@
 package notifications
 
-import "github.com/armosec/armoapi-go/identifiers"
+import (
+	"time"
+
+	"github.com/armosec/armoapi-go/identifiers"
+)
 
 type RuntimeIncidentPushNotification struct {
 	NewRuntimeIncident NewRuntimeIncident
@@ -15,6 +19,7 @@ type NewRuntimeIncident struct {
 	Resource            identifiers.PortalDesignator `json:"resource"` // Pod, Node, Workload, Namespace, Cluster, etc.
 	Link                string                       `json:"link"`
 	Response            *RuntimeIncidentResponse     `json:"response,omitempty"`
+	ReportTime          time.Time                    `json:"reportTime"`
 }
 
 type RuntimeIncidentResponse struct {
