@@ -22,6 +22,14 @@ const (
 	AlertTypeNetworkScan
 )
 
+type AlertSourcePlatform int
+
+const (
+	AlertSourcePlatformK8s AlertSourcePlatform = iota
+	AlertSourcePlatformEC2
+	AlertSourcePlatformCloud
+)
+
 type CloudMetadata struct {
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
 	Provider     string   `json:"provider,omitempty" bson:"provider,omitempty"`
@@ -186,6 +194,18 @@ type RuntimeAlert struct {
 	HostName string          `json:"hostName" bson:"hostName"`
 	Message  string          `json:"message" bson:"message"`
 	Fields   json.RawMessage `json:"fields,omitempty" bson:"fields,omitempty"`
+}
+
+func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
+	if ra.AlertType == AlertTypeCdr {
+		return AlertSourcePlatformCloud
+	}
+
+	if ra.PodName != "" {
+		return AlertSourcePlatformK8s
+	}
+
+	return AlertSourcePlatformEC2
 }
 
 type ProcessTree struct {
