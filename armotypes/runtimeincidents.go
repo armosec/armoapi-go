@@ -187,7 +187,8 @@ type RuntimeAlert struct {
 	cdr.CdrAlert           `json:"cdrevent,omitempty" bson:"cdrevent"`
 	HttpRuleAlert          `json:",inline" bson:"inline"`
 	NetworkScanAlert       `json:"networkscan,inline" bson:"networkscan"`
-	AlertType              AlertType `json:"alertType" bson:"alertType"`
+	AlertType              AlertType           `json:"alertType" bson:"alertType"`
+	AlertSourcePlatform    AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 	// Hostname is the name of the node agent pod
