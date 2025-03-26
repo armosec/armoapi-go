@@ -25,7 +25,8 @@ const (
 type AlertSourcePlatform int
 
 const (
-	AlertSourcePlatformK8s AlertSourcePlatform = iota
+	AlertSourcePlatformUnknown AlertSourcePlatform = iota
+	AlertSourcePlatformK8s
 	AlertSourcePlatformEC2
 	AlertSourcePlatformCloud
 )
