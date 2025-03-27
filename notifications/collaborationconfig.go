@@ -44,6 +44,8 @@ type CollaborationConfigOption struct {
 
 	// Icon for the option encoded in base64. Optional
 	IconBase64 string `json:"iconBase64,omitempty" bson:"iconBase64,omitempty"`
+
+	Headers map[string]string `json:"headers,omitempty" bson:"headers,omitempty"`
 }
 
 type ChannelProvider string
