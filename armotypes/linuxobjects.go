@@ -11,6 +11,11 @@ type File struct {
 	Attributes FileAttributes `json:"attributes,omitempty" bson:"attributes,omitempty"`
 }
 
+type CommPID struct {
+	Comm string `json:"comm,omitempty" bson:"comm,omitempty"`
+	PID  uint32 `json:"pid,omitempty" bson:"pid,omitempty"`
+}
+
 type Process struct {
 	PID        uint32    `json:"pid,omitempty" bson:"pid,omitempty"`
 	Cmdline    string    `json:"cmdline,omitempty" bson:"cmdline,omitempty"`
@@ -26,7 +31,24 @@ type Process struct {
 	UpperLayer *bool     `json:"upperLayer,omitempty" bson:"upperLayer,omitempty"`
 	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
-	Children   []Process `json:"children,omitempty" bson:"children,omitempty"`
+	// Deprecated: Use ChildrenMap instead
+	Children    []Process            `json:"children,omitempty" bson:"children,omitempty"`
+	ChildrenMap map[CommPID]*Process `json:"childrenMap,omitempty" bson:"childrenMap,omitempty"`
+}
+
+// MigrateToMap migrates the Children slice to ChildrenMap to accommodate for older versions of the Process struct
+func (p *Process) MigrateToMap() {
+	if p.ChildrenMap == nil {
+		p.ChildrenMap = make(map[CommPID]*Process)
+	}
+	if len(p.Children) > 0 {
+		for i := range p.Children {
+			p.Children[i].MigrateToMap()
+			commPID := CommPID{Comm: p.Children[i].Comm, PID: p.Children[i].PID}
+			p.ChildrenMap[commPID] = &p.Children[i]
+		}
+		p.Children = nil
+	}
 }
 
 type FileHashes struct {
