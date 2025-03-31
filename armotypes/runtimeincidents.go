@@ -248,8 +248,8 @@ func findProcessRecursive(proc *Process, pid uint32) *Process {
 		return proc
 	}
 
-	for _, child := range proc.Children {
-		if found := findProcessRecursive(&child, pid); found != nil {
+	for _, child := range proc.ChildrenMap {
+		if found := findProcessRecursive(child, pid); found != nil {
 			return found
 		}
 	}
