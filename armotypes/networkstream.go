@@ -4,11 +4,18 @@ import (
 	"time"
 )
 
-type NetworkTrafficEventProtocol string
+type NetworkStreamEventProtocol string
 
 const (
-	NetworkTrafficEventProtocolTCP NetworkTrafficEventProtocol = "TCP"
-	NetworkTrafficEventProtocolUDP NetworkTrafficEventProtocol = "UDP"
+	NetworkStreamEventProtocolTCP NetworkStreamEventProtocol = "TCP"
+	NetworkStreamEventProtocolUDP NetworkStreamEventProtocol = "UDP"
+)
+
+type NetworkStreamEntityKind string
+
+const (
+	NetworkStreamEntityKindContainer NetworkStreamEntityKind = "container" // container
+	// more types can be added here
 )
 
 type EndpointKind string
@@ -19,14 +26,26 @@ const (
 	EndpointKindRaw     EndpointKind = "raw"
 )
 
-// NetworkTrafficEvents represents a collection of network traffic events for a specific pod/container
-type NetworkTrafficEvents struct {
-	// ContainerID to NetworkTrafficEventContainer
-	Containers map[string]NetworkTrafficEventContainer `json:"containers,omitempty"`
+// NetworkStream represents a collection of network traffic events for a specific pod/container
+type NetworkStream struct {
+	// <identifier> to <network stream entity>
+	Entities map[string]NetworkStreamEntity `json:"entities,omitempty"`
 }
 
-// NetworkTrafficEventContainer represents an aggregation of network connections from/to a specific source
-type NetworkTrafficEventContainer struct {
+// NetworkStreamEntity represents an aggregation of network connections from/to a specific source
+type NetworkStreamEntity struct {
+	// entity kind
+	Kind NetworkStreamEntityKind `json:"kind,omitempty"`
+	// entity details
+	NetworkStreamEntityContainer `json:",inline"`
+	// inbound network events
+	Inbound map[string]NetworkStreamEvent `json:"inbound,omitempty"`
+	// outbound network events
+	Outbound map[string]NetworkStreamEvent `json:"outbound,omitempty"`
+}
+
+// NetworkStreamEntityContainer represents a container generating network events
+type NetworkStreamEntityContainer struct {
 	// ContainerName is the name of the container generating these network events
 	ContainerName string `json:"containerName,omitempty"`
 	// ContainerID is the unique identifier for the container
@@ -39,28 +58,24 @@ type NetworkTrafficEventContainer struct {
 	WorkloadName string `json:"workloadName,omitempty"`
 	// WorkloadKind is the type of the parent workload (e.g., Deployment, StatefulSet)
 	WorkloadKind string `json:"workloadKind,omitempty"`
-	// inbound network traffic events
-	Inbound map[string]NetworkTrafficEvent `json:"inbound,omitempty"`
-	// outbound network traffic events
-	Outbound map[string]NetworkTrafficEvent `json:"outbound,omitempty"`
 }
 
-// NetworkTrafficEvent represents an aggregation of network connections from/to a specific source
-type NetworkTrafficEvent struct {
-	Timestamp time.Time                   `json:"timestamp,omitempty"`
-	IPAddress string                      `json:"ipAddress,omitempty"`
-	DNSName   string                      `json:"dnsName,omitempty"`
-	Port      int32                       `json:"port,omitempty"`
-	Protocol  NetworkTrafficEventProtocol `json:"protocol,omitempty"`
+// NetworkStreamEvent represents an aggregation of network connections from/to a specific source
+type NetworkStreamEvent struct {
+	Timestamp time.Time                  `json:"timestamp,omitempty"`
+	IPAddress string                     `json:"ipAddress,omitempty"`
+	DNSName   string                     `json:"dnsName,omitempty"`
+	Port      int32                      `json:"port,omitempty"`
+	Protocol  NetworkStreamEventProtocol `json:"protocol,omitempty"`
 	// endpoint kind (pod, service, raw)
 	Kind EndpointKind `json:"kind,omitempty"`
 	// endpoint details in case of pod
-	NetworkTrafficEventEndpointPodDetails `json:",inline"`
+	NetworkStreamEventEndpointPodDetails `json:",inline"`
 	// endpoint details in case of service
-	NetworkTrafficEventEndpointServiceDetails `json:",inline"`
+	NetworkStreamEventEndpointServiceDetails `json:",inline"`
 }
 
-func (e *NetworkTrafficEvent) String() string {
+func (e *NetworkStreamEvent) String() string {
 	switch e.Kind {
 	case EndpointKindPod:
 		return "p/" + e.PodName + "/" + e.PodNamespace + "/" + string(e.IPAddress) + "/" + string(e.Port) + "/" + string(e.Protocol)
@@ -73,7 +88,7 @@ func (e *NetworkTrafficEvent) String() string {
 	}
 }
 
-type NetworkTrafficEventEndpointPodDetails struct {
+type NetworkStreamEventEndpointPodDetails struct {
 	// PodName is the name of the pod
 	PodName string `json:"podName,omitempty"`
 	// PodNamespace is the namespace of the pod
@@ -86,7 +101,7 @@ type NetworkTrafficEventEndpointPodDetails struct {
 	WorkloadKind string `json:"workloadKind,omitempty"`
 }
 
-type NetworkTrafficEventEndpointServiceDetails struct {
+type NetworkStreamEventEndpointServiceDetails struct {
 	ServiceName      string `json:"serviceName,omitempty"`
 	ServiceNamespace string `json:"serviceNamespace,omitempty"`
 }
