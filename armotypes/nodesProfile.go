@@ -9,7 +9,10 @@ type NodeProfile struct {
 	NodeAgentRunning bool `json:"nodeAgentRunning"`
 
 	RuntimeDetectionEnabled bool `json:"runtimeDetectionEnabled"`
+
+	CloudMetadata *CloudMetadata `json:"cloudMetadata,omitempty"`
 }
+
 type NodeSpec struct {
 	AllocatedCPU *int `json:"allocatedCPU,omitempty"`
 }
