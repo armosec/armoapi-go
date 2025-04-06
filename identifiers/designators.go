@@ -169,6 +169,8 @@ const (
 const (
 	AttributeCloudAccountGUID = "cloudAccountGUID"
 	AttributeCloudAccountID   = "accountID"
+	AttributeSubscriptionID   = "subscriptionID"
+	AttributeTenantID         = "tenantID"
 	AttributeCloudAccountName = "accountName"
 	AttributeFramework        = "framework"
 	AttributeCloudScanID      = "scanID"
