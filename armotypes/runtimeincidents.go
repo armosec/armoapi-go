@@ -248,17 +248,13 @@ func findProcessRecursive(proc *Process, pid uint32) *Process {
 		return proc
 	}
 
+	proc.MigrateToMap()
+
 	for _, child := range proc.ChildrenMap {
 		if found := findProcessRecursive(child, pid); found != nil {
 			return found
 		}
 	}
 
-	// Children is deprecated, but used for backward compatibility
-	for _, child := range proc.Children {
-		if found := findProcessRecursive(&child, pid); found != nil {
-			return found
-		}
-	}
 	return nil
 }
