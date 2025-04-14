@@ -9,6 +9,7 @@ type NetworkStreamEventProtocol string
 const (
 	NetworkStreamEventProtocolTCP NetworkStreamEventProtocol = "TCP"
 	NetworkStreamEventProtocolUDP NetworkStreamEventProtocol = "UDP"
+	NetworkStreamEventProtocolDNS NetworkStreamEventProtocol = "DNS"
 )
 
 type NetworkStreamEntityKind string
