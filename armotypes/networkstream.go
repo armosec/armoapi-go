@@ -64,11 +64,12 @@ type NetworkStreamEntityContainer struct {
 
 // NetworkStreamEvent represents an aggregation of network connections from/to a specific source
 type NetworkStreamEvent struct {
-	Timestamp time.Time                  `json:"timestamp,omitempty"`
-	IPAddress string                     `json:"ipAddress,omitempty"`
-	DNSName   string                     `json:"dnsName,omitempty"`
-	Port      int32                      `json:"port,omitempty"`
-	Protocol  NetworkStreamEventProtocol `json:"protocol,omitempty"`
+	Timestamp   time.Time                  `json:"timestamp,omitempty"`
+	IPAddress   string                     `json:"ipAddress,omitempty"`
+	DNSName     string                     `json:"dnsName,omitempty"`
+	Port        int32                      `json:"port,omitempty"`
+	Protocol    NetworkStreamEventProtocol `json:"protocol,omitempty"`
+	ProcessTree *ProcessTree               `json:"processTree,omitempty"`
 	// endpoint kind (pod, service, raw)
 	Kind EndpointKind `json:"kind,omitempty"`
 	// endpoint details in case of pod
