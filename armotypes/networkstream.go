@@ -7,8 +7,9 @@ import (
 type NetworkStreamEventProtocol string
 
 const (
-	NetworkStreamEventProtocolTCP NetworkStreamEventProtocol = "TCP"
-	NetworkStreamEventProtocolUDP NetworkStreamEventProtocol = "UDP"
+	NetworkStreamEventProtocolTCP  NetworkStreamEventProtocol = "TCP"
+	NetworkStreamEventProtocolUDP  NetworkStreamEventProtocol = "UDP"
+	NetworkStreamEventProtocolICMP NetworkStreamEventProtocol = "DNS"
 )
 
 type NetworkStreamEntityKind string
