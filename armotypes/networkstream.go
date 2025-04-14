@@ -69,7 +69,7 @@ type NetworkStreamEvent struct {
 	DNSName     string                     `json:"dnsName,omitempty"`
 	Port        int32                      `json:"port,omitempty"`
 	Protocol    NetworkStreamEventProtocol `json:"protocol,omitempty"`
-	ProcessTree ProcessTree                `json:"processTree,omitempty"`
+	ProcessTree *ProcessTree               `json:"processTree,omitempty"`
 	// endpoint kind (pod, service, raw)
 	Kind EndpointKind `json:"kind,omitempty"`
 	// endpoint details in case of pod
