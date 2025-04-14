@@ -16,6 +16,7 @@ type NetworkStreamEntityKind string
 
 const (
 	NetworkStreamEntityKindContainer NetworkStreamEntityKind = "container" // container
+	NetworkStreamEntityKindHost      NetworkStreamEntityKind = "host"      // host
 	// more types can be added here
 )
 
