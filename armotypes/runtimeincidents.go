@@ -250,7 +250,7 @@ func findProcessRecursive(proc *Process, pid uint32) *Process {
 
 	proc.MigrateToMap()
 
-	for _, child := range proc.ChildrenMap {
+	for _, child := range proc.ChildrenMap.Values() {
 		if found := findProcessRecursive(child, pid); found != nil {
 			return found
 		}

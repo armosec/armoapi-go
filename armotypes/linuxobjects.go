@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/goradd/maps"
 )
 
 const sep = "␟"
@@ -61,20 +63,18 @@ type Process struct {
 	Cwd        string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	Path       string    `json:"path,omitempty" bson:"path,omitempty"`
 	// Deprecated: Use ChildrenMap instead
-	Children    []Process            `json:"children,omitempty" bson:"children,omitempty"`
-	ChildrenMap map[CommPID]*Process `json:"childrenMap,omitempty" bson:"childrenMap,omitempty"`
+	Children    []Process                       `json:"children,omitempty" bson:"children,omitempty"`
+	ChildrenMap maps.SafeMap[CommPID, *Process] `json:"childrenMap,omitempty" bson:"childrenMap,omitempty"`
 }
 
 // MigrateToMap migrates the Children slice to ChildrenMap to accommodate for older versions of the Process struct
 func (p *Process) MigrateToMap() {
-	if p.ChildrenMap == nil {
-		p.ChildrenMap = make(map[CommPID]*Process)
-	}
+
 	if len(p.Children) > 0 {
 		for i := range p.Children {
 			p.Children[i].MigrateToMap()
 			commPID := CommPID{Comm: p.Children[i].Comm, PID: p.Children[i].PID}
-			p.ChildrenMap[commPID] = &p.Children[i]
+			p.ChildrenMap.Set(commPID, &p.Children[i])
 		}
 		p.Children = nil
 	}
