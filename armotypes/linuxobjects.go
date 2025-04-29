@@ -65,6 +65,40 @@ type Process struct {
 	ChildrenMap map[CommPID]*Process `json:"childrenMap,omitempty" bson:"childrenMap,omitempty"`
 }
 
+// DeepCopy creates a deep copy of the Process struct.
+func (p *Process) DeepCopy() *Process {
+	if p == nil {
+		return nil
+	}
+
+	p.MigrateToMap()
+	newProcess := &Process{
+		PID:        p.PID,
+		Cmdline:    p.Cmdline,
+		Comm:       p.Comm,
+		PPID:       p.PPID,
+		Pcomm:      p.Pcomm,
+		Hardlink:   p.Hardlink,
+		Uid:        p.Uid,
+		Gid:        p.Gid,
+		UserName:   p.UserName,
+		GroupName:  p.GroupName,
+		StartTime:  p.StartTime,
+		UpperLayer: p.UpperLayer,
+		Cwd:        p.Cwd,
+		Path:       p.Path,
+		// Initialize ChildrenMap
+		ChildrenMap: make(map[CommPID]*Process),
+	}
+
+	// Deep copy ChildrenMap
+	for k, child := range p.ChildrenMap {
+		newProcess.ChildrenMap[k] = child.DeepCopy()
+	}
+
+	return newProcess
+}
+
 // MigrateToMap migrates the Children slice to ChildrenMap to accommodate for older versions of the Process struct
 func (p *Process) MigrateToMap() {
 	if p.ChildrenMap == nil {
