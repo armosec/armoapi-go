@@ -44,9 +44,9 @@ var CloudCheckStatusToInt = map[string]int{
 	CloudCheckStatusFail:       10,
 	CloudCheckStatusManual:     20,
 	CloudCheckStatusPass:       30,
+	CloudCheckStatusIrrelevant: 35,
 	CloudCheckStatusSkipped:    40,
 	CloudCheckStatusAccepted:   50,
-	CloudCheckStatusIrrelevant: 60,
 }
 
 var CloudIntToCheckStatus = map[int]string{
@@ -54,9 +54,9 @@ var CloudIntToCheckStatus = map[int]string{
 	10: CloudCheckStatusFail,
 	20: CloudCheckStatusManual,
 	30: CloudCheckStatusPass,
+	35: CloudCheckStatusIrrelevant,
 	40: CloudCheckStatusSkipped,
 	50: CloudCheckStatusAccepted,
-	60: CloudCheckStatusIrrelevant,
 }
 
 // cloud check types
