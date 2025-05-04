@@ -30,21 +30,23 @@ const (
 
 // cloud check statuses
 const (
-	CloudCheckStatusEmpty    = "EMPTY"
-	CloudCheckStatusFail     = "FAIL"
-	CloudCheckStatusManual   = "MANUAL"
-	CloudCheckStatusPass     = "PASS"
-	CloudCheckStatusSkipped  = "SKIP"
-	CloudCheckStatusAccepted = "ACCEPT"
+	CloudCheckStatusEmpty      = "EMPTY"
+	CloudCheckStatusFail       = "FAIL"
+	CloudCheckStatusManual     = "MANUAL"
+	CloudCheckStatusPass       = "PASS"
+	CloudCheckStatusSkipped    = "SKIP"
+	CloudCheckStatusAccepted   = "ACCEPT"
+	CloudCheckStatusIrrelevant = "IRRELEVANT"
 )
 
 var CloudCheckStatusToInt = map[string]int{
-	CloudCheckStatusEmpty:    -1,
-	CloudCheckStatusFail:     10,
-	CloudCheckStatusManual:   20,
-	CloudCheckStatusPass:     30,
-	CloudCheckStatusSkipped:  40,
-	CloudCheckStatusAccepted: 50,
+	CloudCheckStatusEmpty:      -1,
+	CloudCheckStatusFail:       10,
+	CloudCheckStatusManual:     20,
+	CloudCheckStatusPass:       30,
+	CloudCheckStatusIrrelevant: 35,
+	CloudCheckStatusSkipped:    40,
+	CloudCheckStatusAccepted:   50,
 }
 
 var CloudIntToCheckStatus = map[int]string{
@@ -52,6 +54,7 @@ var CloudIntToCheckStatus = map[int]string{
 	10: CloudCheckStatusFail,
 	20: CloudCheckStatusManual,
 	30: CloudCheckStatusPass,
+	35: CloudCheckStatusIrrelevant,
 	40: CloudCheckStatusSkipped,
 	50: CloudCheckStatusAccepted,
 }
