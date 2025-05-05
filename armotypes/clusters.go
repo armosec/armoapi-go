@@ -1,7 +1,5 @@
 package armotypes
 
-import "time"
-
 type ClusterInfo struct {
 	Cluster        string       `json:"cluster"`
 	NodeCount      int          `json:"nodeCount"`
@@ -9,7 +7,6 @@ type ClusterInfo struct {
 	CloudProvider  string       `json:"cloudProvider"`
 	HelmVersion    string       `json:"helmVersion"`
 	ClusterVersion string       `json:"clusterVersion"`
-	LastReportTime *time.Time   `json:"lastReportTime"`
 	IsConnected    bool         `json:"isConnected"`
 	Capabilities   []Capability `json:"capabilities,omitempty"`
 }
