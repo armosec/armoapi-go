@@ -104,6 +104,8 @@ type BaseRuntimeAlert struct {
 	Nanoseconds uint64 `json:"nanoseconds,omitempty" bson:"nanoseconds,omitempty"`
 	// Trace of the alert
 	Trace Trace `json:"trace,omitempty" bson:"trace,omitempty"`
+	// Unique ID of the alert
+	UniqueID string `json:"uniqueID,omitempty" bson:"uniqueID,omitempty"`
 }
 
 type RuleAlert struct {
