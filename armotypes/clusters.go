@@ -9,7 +9,7 @@ type ClusterInfo struct {
 	CloudProvider  string       `json:"cloudProvider"`
 	HelmVersion    string       `json:"helmVersion"`
 	ClusterVersion string       `json:"clusterVersion"`
-	LastReportTime *time.Time   `json:"lastReportTime"`
+	LastReportTime *time.Time   `json:"lastReportTime,omitempty"`
 	IsConnected    bool         `json:"isConnected"`
 	Capabilities   []Capability `json:"capabilities,omitempty"`
 	Status         string       `json:"status,omitempty"`
