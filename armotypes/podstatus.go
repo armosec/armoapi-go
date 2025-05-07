@@ -44,6 +44,19 @@ type PodContainer struct {
 	RestartCount        int       `json:"restartCount"`
 }
 
+type PodInfo struct {
+	App             string    `json:"app"`
+	Name            string    `json:"name"`
+	Namespace       string    `json:"namespace"`
+	NodeName        string    `json:"nodeName"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+	CreationTime    time.Time `json:"creationTimestamp"`
+	Phase           string    `json:"phase"`
+	CurrentState    string    `json:"currentState"`
+	LateStateReason string    `json:"lateStateReason"`
+	RestartCount    int       `json:"restartCount"`
+}
+
 func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
 	var monitoredContainers []PodContainer
 	if ps.IsKDRMonitored {
