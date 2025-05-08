@@ -15,4 +15,5 @@ type SynchronizerClient struct {
 	FirstConnected      time.Time `json:"firstConnected"`
 	GitVersion          string    `json:"gitVersion"`
 	CloudProvider       string    `json:"cloudProvider"`
+	ClusterStatus       string    `json:"clusterStatus"`
 }
