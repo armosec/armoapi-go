@@ -62,6 +62,8 @@ type CdrAlert struct {
 	MitreTactic string `json:"mitreTactic,omitempty"`
 	// MitreTechnique is the MITRE ATT&CK technique
 	MitreTechnique string `json:"mitreTechnique,omitempty"`
+	// UniqueID is the unique identifier of the alert
+	UniqueID string `json:"uniqueID,omitempty"`
 }
 
 type CdrAlertBatch struct {
