@@ -53,7 +53,7 @@ type PodInfo struct {
 	CreationTime    time.Time `json:"creationTimestamp"`
 	Phase           string    `json:"phase"`
 	CurrentState    string    `json:"currentState"`
-	LateStateReason string    `json:"lateStateReason"`
+	LastStateReason string    `json:"lastStateReason"`
 	RestartCount    int       `json:"restartCount"`
 }
 
