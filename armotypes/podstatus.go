@@ -31,6 +31,7 @@ type PodStatus struct {
 	HasApplicableRuleBindings  bool           `json:"hasApplicableRuleBindings"`
 	HasRelevancyCalculating    bool           `json:"hasRelevancyCalculating"`
 	IsKDRMonitored             bool           `json:"isKDRMonitored"`
+	ContainerImages            []string       `json:"containerImages,omitempty"`
 }
 
 type PodContainer struct {
@@ -55,6 +56,7 @@ type PodInfo struct {
 	CurrentState    string    `json:"currentState"`
 	LastStateReason string    `json:"lastStateReason"`
 	RestartCount    int       `json:"restartCount"`
+	ContainerImages []string  `json:"containerImages,omitempty"`
 }
 
 func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
