@@ -120,6 +120,8 @@ type BaseRuntimeAlert struct {
 	Trace Trace `json:"trace,omitempty" bson:"trace,omitempty"`
 	// Unique ID of the alert
 	UniqueID string `json:"uniqueID,omitempty" bson:"uniqueID,omitempty"`
+	// Profile metadata
+	ProfileMetadata *ProfileMetadata `json:"profileMetadata,omitempty" bson:"profileMetadata,omitempty"`
 }
 
 type RuleAlert struct {
@@ -208,8 +210,6 @@ type RuntimeAlert struct {
 	AlertSourcePlatform    AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
-	// Profile metadata
-	ProfileMetadata *ProfileMetadata `json:"profileMetadata,omitempty" bson:"profileMetadata,omitempty"`
 	// Hostname is the name of the node agent pod
 	HostName string          `json:"hostName" bson:"hostName"`
 	Message  string          `json:"message" bson:"message"`
