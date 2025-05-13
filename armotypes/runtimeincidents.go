@@ -31,6 +31,20 @@ const (
 	AlertSourcePlatformCloud
 )
 
+type ProfileType int
+
+const (
+	ApplicationProfile ProfileType = iota
+	NetworkProfile
+)
+
+type ProfileMetadata struct {
+	Status     string      `json:"status,omitempty" bson:"status,omitempty"`
+	Completion string      `json:"completion,omitempty" bson:"completion,omitempty"`
+	Name       string      `json:"name,omitempty" bson:"name,omitempty"`
+	Type       ProfileType `json:"type,omitempty" bson:"type,omitempty"`
+}
+
 type CloudMetadata struct {
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
 	Provider     string   `json:"provider,omitempty" bson:"provider,omitempty"`
@@ -194,6 +208,8 @@ type RuntimeAlert struct {
 	AlertSourcePlatform    AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
+	// Profile metadata
+	ProfileMetadata *ProfileMetadata `json:"profileMetadata,omitempty" bson:"profileMetadata,omitempty"`
 	// Hostname is the name of the node agent pod
 	HostName string          `json:"hostName" bson:"hostName"`
 	Message  string          `json:"message" bson:"message"`
