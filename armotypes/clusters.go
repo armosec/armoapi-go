@@ -11,7 +11,7 @@ type ClusterInfo struct {
 	ClusterVersion string       `json:"clusterVersion"`
 	LastReportTime *time.Time   `json:"lastReportTime,omitempty"`
 	LastKeepAlive  *time.Time   `json:"lastKeepAlive,omitempty"`
-	CreateAt       *time.Time   `json:"createAt,omitempty"`
+	CreatedAt      *time.Time   `json:"createdAt,omitempty"`
 	IsConnected    bool         `json:"isConnected"`
 	Capabilities   []Capability `json:"capabilities,omitempty"`
 	Status         string       `json:"status,omitempty"`
