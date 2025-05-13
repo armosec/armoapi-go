@@ -39,10 +39,11 @@ const (
 )
 
 type ProfileMetadata struct {
-	Status     string      `json:"status,omitempty" bson:"status,omitempty"`
-	Completion string      `json:"completion,omitempty" bson:"completion,omitempty"`
-	Name       string      `json:"name,omitempty" bson:"name,omitempty"`
-	Type       ProfileType `json:"type,omitempty" bson:"type,omitempty"`
+	Status             string      `json:"status,omitempty" bson:"status,omitempty"`
+	Completion         string      `json:"completion,omitempty" bson:"completion,omitempty"`
+	Name               string      `json:"name,omitempty" bson:"name,omitempty"`
+	Type               ProfileType `json:"type,omitempty" bson:"type,omitempty"`
+	IsProfileDependent bool        `json:"isProfileDependent,omitempty" bson:"isProfileDependent,omitempty"`
 }
 
 type CloudMetadata struct {
