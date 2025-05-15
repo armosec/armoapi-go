@@ -80,6 +80,7 @@ type NotificationParams struct {
 	CVSS           *float32 `json:"cvss,omitempty" bson:"cvss,omitempty"`                     // CVSS (Common Vulnerability Scoring System)
 	InUse          *bool    `json:"inUse,omitempty" bson:"inUse,omitempty"`                   // In Use (CISA IU)
 	Fixable        *bool    `json:"fixable,omitempty" bson:"fixable,omitempty"`               // Fixable (CISA FX)
+	RiskFactors    []string `json:"riskFactors,omitempty" bson:"riskFactors,omitempty"`       // Risk Factors
 
 	// security risks params
 	SecurityRiskIDs []string `json:"securityRiskIDs,omitempty" bson:"securityRiskIDs,omitempty"` // Security Risk ID
