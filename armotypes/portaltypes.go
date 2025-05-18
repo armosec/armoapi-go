@@ -93,6 +93,10 @@ type InstallationData struct {
 	DefaultFrameworks                         []string                                  `json:"defaultFrameworks,omitempty" bson:"defaultFrameworks,omitempty"`                                                 // fully ignore namespaces
 }
 
+type NodeAgentConfig struct {
+	MaxSniffingTime string `json:"maxSniffingTime"`
+}
+
 // hold information of a single subscription.
 type Subscription struct {
 
