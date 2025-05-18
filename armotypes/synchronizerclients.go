@@ -16,4 +16,5 @@ type SynchronizerClient struct {
 	GitVersion          string    `json:"gitVersion"`
 	CloudProvider       string    `json:"cloudProvider"`
 	ClusterStatus       string    `json:"clusterStatus"`
+	LearningTime        string    `json:"learningTime"`
 }
