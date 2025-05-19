@@ -94,7 +94,7 @@ type InstallationData struct {
 }
 
 type NodeAgentConfig struct {
-	MaxSniffingTime string `json:"maxSniffingTime"`
+	MaxSniffingTime string `json:"maxSniffingTimePerContainer"`
 }
 
 // hold information of a single subscription.
