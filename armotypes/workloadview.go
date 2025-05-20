@@ -12,7 +12,7 @@ type WorkloadViews struct {
 	Namespace         string     `json:"namespace"`
 	CreationTimestamp *time.Time `json:"creationTimestamp,omitempty"`
 	CompletionStatus  string     `json:"completionStatus,omitempty"`
-	Status            string     `json:"Status,omitempty"`
+	Status            string     `json:"status,omitempty"`
 	LearningPeriod    string     `json:"learningPeriod,omitempty"`
 	RiskFactors       []string   `json:"riskFactors,omitempty"`
 }
