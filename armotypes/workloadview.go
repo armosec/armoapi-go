@@ -11,7 +11,7 @@ type WorkloadViews struct {
 	Provider          string     `json:"provider"`
 	Namespace         string     `json:"namespace"`
 	CreationTimestamp *time.Time `json:"creationTimestamp,omitempty"`
-	CompletionStatus  string     `json:"CompletionStatus,omitempty"`
+	CompletionStatus  string     `json:"completionStatus,omitempty"`
 	Status            string     `json:"Status,omitempty"`
 	LearningPeriod    string     `json:"learningPeriod,omitempty"`
 	RiskFactors       []string   `json:"riskFactors,omitempty"`
