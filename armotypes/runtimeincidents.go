@@ -50,6 +50,7 @@ type ProfileMetadata struct {
 	Status            string            `json:"status,omitempty" bson:"status,omitempty"`
 	Completion        string            `json:"completion,omitempty" bson:"completion,omitempty"`
 	Name              string            `json:"name,omitempty" bson:"name,omitempty"`
+	FailOnProfile     bool              `json:"failOnProfile,omitempty" bson:"failOnProfile,omitempty"`
 	Type              ProfileType       `json:"type,omitempty" bson:"type,omitempty"`
 	ProfileDependency ProfileDependency `json:"profileDependency,omitempty" bson:"profileDependency,omitempty"`
 }
