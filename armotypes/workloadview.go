@@ -10,7 +10,7 @@ type WorkloadViews struct {
 	Region            string     `json:"region"`
 	Provider          string     `json:"provider"`
 	Namespace         string     `json:"namespace"`
-	CreationTimestamp *time.Time `json:"CreationTimestamp,omitempty"`
+	CreationTimestamp *time.Time `json:"creationTimestamp,omitempty"`
 	CompletionStatus  string     `json:"CompletionStatus,omitempty"`
 	Status            string     `json:"Status,omitempty"`
 	LearningPeriod    string     `json:"learningPeriod,omitempty"`
