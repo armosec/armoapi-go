@@ -85,6 +85,8 @@ type NotificationParams struct {
 	// security risks params
 	SecurityRiskIDs []string `json:"securityRiskIDs,omitempty" bson:"securityRiskIDs,omitempty"` // Security Risk ID
 
+	// cluster status params
+	ClusterStatus []string `json:"clusterStatus,omitempty" bson:"clusterStatus,omitempty"` // Cluster Status
 }
 
 type AlertConfig struct {
