@@ -53,6 +53,7 @@ type ProfileMetadata struct {
 	FailOnProfile     bool              `json:"failOnProfile,omitempty" bson:"failOnProfile,omitempty"`
 	Type              ProfileType       `json:"type,omitempty" bson:"type,omitempty"`
 	ProfileDependency ProfileDependency `json:"profileDependency,omitempty" bson:"profileDependency,omitempty"`
+	Error             error            `json:"error,omitempty" bson:"error,omitempty"`
 }
 
 type CloudMetadata struct {
