@@ -31,6 +31,31 @@ const (
 	AlertSourcePlatformCloud
 )
 
+type ProfileType int
+
+const (
+	ApplicationProfile ProfileType = iota
+	NetworkProfile
+)
+
+type ProfileDependency int
+
+const (
+	Required ProfileDependency = iota
+	Optional
+	NotRequired
+)
+
+type ProfileMetadata struct {
+	Status            string            `json:"status,omitempty" bson:"status,omitempty"`
+	Completion        string            `json:"completion,omitempty" bson:"completion,omitempty"`
+	Name              string            `json:"name,omitempty" bson:"name,omitempty"`
+	FailOnProfile     bool              `json:"failOnProfile,omitempty" bson:"failOnProfile,omitempty"`
+	Type              ProfileType       `json:"type,omitempty" bson:"type,omitempty"`
+	ProfileDependency ProfileDependency `json:"profileDependency,omitempty" bson:"profileDependency,omitempty"`
+	Error             error            `json:"error,omitempty" bson:"error,omitempty"`
+}
+
 type CloudMetadata struct {
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
 	Provider     string   `json:"provider,omitempty" bson:"provider,omitempty"`
@@ -106,6 +131,8 @@ type BaseRuntimeAlert struct {
 	Trace Trace `json:"trace,omitempty" bson:"trace,omitempty"`
 	// Unique ID of the alert
 	UniqueID string `json:"uniqueID,omitempty" bson:"uniqueID,omitempty"`
+	// Profile metadata
+	ProfileMetadata *ProfileMetadata `json:"profileMetadata,omitempty" bson:"profileMetadata,omitempty"`
 }
 
 type RuleAlert struct {
