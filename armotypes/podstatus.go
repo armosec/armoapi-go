@@ -46,17 +46,18 @@ type PodContainer struct {
 }
 
 type PodInfo struct {
-	App             string    `json:"app"`
-	Name            string    `json:"name"`
-	Namespace       string    `json:"namespace"`
-	NodeName        string    `json:"nodeName"`
-	UpdatedAt       time.Time `json:"updatedAt"`
-	CreationTime    time.Time `json:"creationTimestamp"`
-	Phase           string    `json:"phase"`
-	CurrentState    string    `json:"currentState"`
-	LastStateReason string    `json:"lastStateReason"`
-	RestartCount    int       `json:"restartCount"`
-	ContainerImages []string  `json:"containerImages,omitempty"`
+	App                 string    `json:"app"`
+	Name                string    `json:"name"`
+	Namespace           string    `json:"namespace"`
+	NodeName            string    `json:"nodeName"`
+	UpdatedAt           time.Time `json:"updatedAt"`
+	CreationTime        time.Time `json:"creationTimestamp"`
+	Phase               string    `json:"phase"`
+	CurrentState        string    `json:"currentState"`
+	LastStateReason     string    `json:"lastStateReason"`
+	LastStateFinishedAt time.Time `json:"lastStateFinishedAt"`
+	RestartCount        int       `json:"restartCount"`
+	ContainerImages     []string  `json:"containerImages,omitempty"`
 }
 
 func (ps *PodStatus) GetMonitoredContainers() []PodContainer {
