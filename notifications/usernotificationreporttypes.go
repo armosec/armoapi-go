@@ -113,7 +113,7 @@ const (
 	NotificationTypeContainerPush       NotificationType = "containerScanPush"   //container scan
 	NotificationTypeSecurityRiskPush    NotificationType = "securityRiskPush"    //security risk
 	NotificationTypeRuntimeIncidentPush NotificationType = "runtimeIncidentPush" // runtime incident (kdr)
-
+	NotificationTypeClusterStatusPush   NotificationType = "clusterStatusPush"   // cluster status
 	NotificationTypeComplianceDrift     NotificationType = NotificationTypePush + ":complianceDrift"
 	NotificationTypeNewClusterAdmin     NotificationType = NotificationTypePush + ":newClusterAdmin"
 	NotificationTypeNewVulnerability    NotificationType = NotificationTypeContainerPush + ":newVulnerability"
