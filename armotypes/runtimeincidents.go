@@ -50,10 +50,10 @@ type ProfileMetadata struct {
 	Status            string            `json:"status,omitempty" bson:"status,omitempty"`
 	Completion        string            `json:"completion,omitempty" bson:"completion,omitempty"`
 	Name              string            `json:"name,omitempty" bson:"name,omitempty"`
-	FailOnProfile     bool              `json:"failOnProfile,omitempty" bson:"failOnProfile,omitempty"`
-	Type              ProfileType       `json:"type,omitempty" bson:"type,omitempty"`
+	FailOnProfile     bool              `json:"failOnProfile" bson:"failOnProfile"`
+	Type              ProfileType       `json:"type" bson:"type"`
 	ProfileDependency ProfileDependency `json:"profileDependency,omitempty" bson:"profileDependency,omitempty"`
-	Error             error            `json:"error,omitempty" bson:"error,omitempty"`
+	Error             error             `json:"error,omitempty" bson:"error,omitempty"`
 }
 
 type CloudMetadata struct {
