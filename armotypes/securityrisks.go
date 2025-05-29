@@ -146,6 +146,11 @@ type SecurityIssuesSeverities struct {
 	TotalResources           int                           `json:"totalResources"`
 }
 
+type SecurityRisksSmartRemediationTotals struct {
+	TotalResources int `json:"totalResources"`
+	TotalRisks     int `json:"totalRisks"`
+}
+
 func NewSecurityIssuesCategories() SecurityIssuesCategories {
 	return SecurityIssuesCategories{
 		CategoryResourceCounters: map[string]int{},
