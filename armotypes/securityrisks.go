@@ -146,9 +146,9 @@ type SecurityIssuesSeverities struct {
 	TotalResources           int                           `json:"totalResources"`
 }
 
-type SecurityRisksSmartRemediationTotals struct {
-	TotalResources int `json:"totalResources"`
-	TotalRisks     int `json:"totalRisks"`
+type SecurityIssuesRisksTotals struct {
+	TotalSecurityIssues int `json:"totalSecurityIssues,omitempty"`
+	TotalRisks          int `json:"totalRisks,omitempty"`
 }
 
 func NewSecurityIssuesCategories() SecurityIssuesCategories {
