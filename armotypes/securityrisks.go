@@ -125,9 +125,7 @@ type SecurityIssuesSummary struct {
 	AffectedResourcesChange int `json:"affectedResourcesChange"`
 
 	// if True, control supports smart remediation
-	// swagger:ignore
-	SupportsSmartRemediation bool `json:"supportsSmartRemediation"` // DEPRECATED
-	SmartRemediation         bool `json:"smartRemediation"`
+	SmartRemediation bool `json:"smartRemediation"`
 
 	Tickets []Ticket `json:"tickets,omitempty"`
 }
