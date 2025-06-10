@@ -18,7 +18,7 @@ type KubernetesObject struct {
 	OwnerReferenceName string `json:"ownerReferenceName"`
 	OwnerReferenceKind string `json:"ownerReferenceKind"`
 
-	// related only to kubescape DRDs.
+	// related only to kubescape CRDs.
 	RelatedName            string `json:"relatedName"`
 	RelatedKind            string `json:"relatedKind"`
 	RelatedAPIGroup        string `json:"relatedAPIGroup"`
@@ -49,6 +49,13 @@ type KubernetesObject struct {
 
 	// additional properties of the resource
 	AdditionalProps map[string]string `json:"additionalProps,omitempty"`
+
+	// containers (names) of the resource
+	Containers []string `json:"containers,omitempty"`
+	// init containers (names) of the resource
+	InitContainers []string `json:"initContainers,omitempty"`
+	// ephemeral containers (names) of the resource
+	EphemeralContainers []string `json:"ephemeralContainers,omitempty"`
 }
 
 type Resource struct {
