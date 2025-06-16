@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/armotypes/cdr"
+	"github.com/armosec/armoapi-go/armotypes/common"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
@@ -133,6 +134,8 @@ type BaseRuntimeAlert struct {
 	UniqueID string `json:"uniqueID,omitempty" bson:"uniqueID,omitempty"`
 	// Profile metadata
 	ProfileMetadata *ProfileMetadata `json:"profileMetadata,omitempty" bson:"profileMetadata,omitempty"`
+	// Identifiers of the alert
+	Identifiers *common.Identifiers `json:"identifiers,omitempty" bson:"identifiers,omitempty"`
 }
 
 type RuleAlert struct {
