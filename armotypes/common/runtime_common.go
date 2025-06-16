@@ -34,6 +34,7 @@ type CloudAPIEntity struct {
 }
 
 type Identifiers struct {
+	Process  *ProcessEntity  `json:"process,omitempty" bson:"process,omitempty"`
 	File     *FileEntity     `json:"file,omitempty" bson:"file,omitempty"`
 	Network  *NetworkEntity  `json:"network,omitempty" bson:"network,omitempty"`
 	Http     *HttpEntity     `json:"http,omitempty" bson:"http,omitempty"`
