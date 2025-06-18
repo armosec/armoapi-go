@@ -17,6 +17,12 @@ const (
 	CSPMExceptionPolicyType PolicyType = "cspmExceptionPolicy"
 )
 
+type AdvancedScopeEntity struct {
+	Entity   string `json:"entity" bson:"entity"`
+	Operator string `json:"condition" bson:"operator"`
+	Values   string `json:"values" bson:"values"`
+}
+
 type BaseExceptionPolicy struct {
 	PortalBase `json:",inline" bson:"inline"`
 	PolicyType PolicyType `json:"policyType,omitempty" bson:"policyType,omitempty"`
@@ -28,4 +34,5 @@ type BaseExceptionPolicy struct {
 	ExpirationDate *time.Time                     `json:"expirationDate,omitempty" bson:"expirationDate,omitempty"`
 	CreatedBy      string                         `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 	Resources      []identifiers.PortalDesignator `json:"resources,omitempty" bson:"resources,omitempty"`
+	AdvancedScopes []AdvancedScopeEntity          `json:"advancedScopes,omitempty" bson:"advancedScopes,omitempty"`
 }
