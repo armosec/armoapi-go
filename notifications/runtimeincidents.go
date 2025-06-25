@@ -20,7 +20,7 @@ type NewRuntimeIncident struct {
 	Link                string                       `json:"link"`
 	Response            *RuntimeIncidentResponse     `json:"response,omitempty"`
 	ReportTime          time.Time                    `json:"reportTime"`
-	PolicyGUIDToName    map[string]string            `json:"policyGUIDToName"`
+	PolicyGUIDToName    map[string]string            `json:"policyGUIDToName,omitempty"`
 }
 
 type RuntimeIncidentResponse struct {
