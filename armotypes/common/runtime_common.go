@@ -41,7 +41,7 @@ type Identifiers struct {
 	Dns      *DnsEntity      `json:"dns,omitempty" bson:"dns,omitempty"`
 	Network  *NetworkEntity  `json:"network,omitempty" bson:"network,omitempty"`
 	Http     *HttpEntity     `json:"http,omitempty" bson:"http,omitempty"`
-	CloudAPI *CloudAPIEntity `json:"cloudAPI,omitempty" bson:"cloudAPI,omitempty"`
+	CloudAPI *CloudAPIEntity `json:"cloud,omitempty" bson:"cloud,omitempty"`
 }
 
 func (identifiers *Identifiers) Flatten() map[string]string {
@@ -72,10 +72,10 @@ func (identifiers *Identifiers) Flatten() map[string]string {
 
 	}
 	if identifiers.CloudAPI != nil {
-		identifiers_map["cloudAPI.service"] = identifiers.CloudAPI.Service
-		identifiers_map["cloudAPI.apiCall"] = identifiers.CloudAPI.APIcall
-		identifiers_map["cloudAPI.resource"] = identifiers.CloudAPI.Resource
-		identifiers_map["cloudAPI.user"] = identifiers.CloudAPI.User
+		identifiers_map["cloud.service"] = identifiers.CloudAPI.Service
+		identifiers_map["cloud.apiCall"] = identifiers.CloudAPI.APIcall
+		identifiers_map["cloud.resource"] = identifiers.CloudAPI.Resource
+		identifiers_map["cloud.user"] = identifiers.CloudAPI.User
 	}
 	return identifiers_map
 }
