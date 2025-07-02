@@ -1,5 +1,7 @@
 package cdr
 
+import "github.com/armosec/armoapi-go/armotypes/common"
+
 type CustomerDetails struct {
 	// CustomerGUID is the unique identifier of the customer account
 	CustomerGUID string `json:"customerGUID"`
@@ -38,6 +40,8 @@ type EventData struct {
 	AWSCloudTrail *CloudTrailEvent `json:"awsCloudTrail,omitempty"`
 	// Target resource
 	TargetResource string `json:"targetResource,omitempty"`
+	// Identifiers of the alert
+	Identifiers *common.Identifiers `json:"identifiers,omitempty"`
 	// Add more cloud event data here
 }
 
