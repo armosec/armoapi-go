@@ -13,9 +13,11 @@ type NetworkConnection struct {
 }
 
 type AggregatedNetworkConnection struct {
-	DNSName     string   `json:"dnsName"`
-	Direction   string   `json:"direction"`
-	Port        int32    `json:"port"`
-	Protocol    string   `json:"protocol"`
-	IPAddresses []string `json:"ipAddresses"`
+	DNSName                   string   `json:"dnsName"`
+	Direction                 string   `json:"direction"`
+	Port                      int32    `json:"port"`
+	Protocol                  string   `json:"protocol"`
+	EndpointWorkloadName      *string  `json:"endpointWorkloadName,omitempty"`
+	EndpointWorkloadNamespace *string  `json:"endpointWorkloadNamespace,omitempty"`
+	IPAddresses               []string `json:"ipAddresses"`
 }
