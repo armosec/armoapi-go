@@ -78,6 +78,7 @@ const (
 	AttributeResourceID              = "resourceID"
 	AttributeContainerScanId         = "containerScanId"
 	AttributeSyncKind                = "syncKind"
+	AttributeSBOMToolName            = "sbomToolName"
 	AttributeSBOMToolVersion         = "sbomToolVersion"
 	AttributeSecurityRiskID          = "securityRiskID"
 	AttributeSecurityRiskCategory    = "securityRiskCategory"
@@ -105,11 +106,14 @@ const (
 	AttributeIssueTypeID             = "issueTypeId"  // Jira issue type ID
 	AttributeWorkflowGUID            = "workflowGUID" // workflow GUID
 	AttributeAccount                 = "account"
-	AttribueCloudProvider            = "cloudProvider"
+	AttributeCloudProvider           = "cloudProvider"
 	AttributeService                 = "service"
 	AttributeRegion                  = "region"
 	AttributeImageHash               = "imageHash"
 	AttributeImageTag                = "imageTag"
+	AttributeVolumeScanId            = "volumeScanId"
+	AttributeVolumeId                = "volumeId"
+	AttributeInstanceId              = "instanceId"
 )
 
 // Repository scan related attributes
