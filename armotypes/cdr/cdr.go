@@ -75,6 +75,8 @@ type CdrAlertBatch struct {
 	CustomerGUID string `json:"customerGUID,omitempty"`
 	// CloudAccountID is the unique identifier of the cloud account
 	CloudAccountID string `json:"cloudAccountID,omitempty"`
+	// OrgID is the unique identifier of the organization
+	OrgID string `json:"orgID,omitempty"`
 	// Provider is the cloud provider
 	Provider CloudProvider `json:"provider,omitempty"`
 	// RuleFailures is the list of rule failures
