@@ -5,5 +5,5 @@ type VolumeInfo interface {
 	GetAccountId() string
 	GetInstanceId() string
 	GetVolumeId() string
-	GetVolumeScanId() string
+	GetVolumeScanID() string
 }
