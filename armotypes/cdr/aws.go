@@ -2,6 +2,11 @@ package cdr
 
 import "time"
 
+const (
+	CdrEventAccountIDJsonPath = "cdrevent.eventData.awsCloudTrail.userIdentity.accountId"
+	CdrEventOrgIDJsonPath     = "cdrevent.eventData.awsCloudTrail.userIdentity.orgId"
+)
+
 type CloudTrailEvent struct {
 	EventVersion        string                 `json:"eventVersion"`
 	UserIdentity        UserIdentity           `json:"userIdentity"`
