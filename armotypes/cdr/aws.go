@@ -35,6 +35,7 @@ type UserIdentity struct {
 	PrincipalID    string          `json:"principalId"`
 	ARN            string          `json:"arn,omitempty"`
 	AccountID      string          `json:"accountId"`
+	OrgID          string          `json:"orgId,omitempty"`
 	AccessKeyID    string          `json:"accessKeyId,omitempty"`
 	UserName       string          `json:"userName,omitempty"`
 	InvokedBy      string          `json:"invokedBy,omitempty"`
