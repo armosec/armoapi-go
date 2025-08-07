@@ -68,6 +68,7 @@ type CloudMetadata struct {
 	PublicIP     string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
 	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
 	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
+	OrgID        string   `json:"org_id,omitempty" bson:"org_id,omitempty"`
 	Services     []string `json:"services,omitempty" bson:"services,omitempty"`
 }
 
