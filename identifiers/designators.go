@@ -114,6 +114,8 @@ const (
 	AttributeVolumeScanId            = "volumeScanId"
 	AttributeVolumeId                = "volumeId"
 	AttributeInstanceId              = "instanceId"
+	AttributeInstanceHash            = "instanceHash"
+	AttributeInstanceScanId          = "instanceScanId"
 )
 
 // Repository scan related attributes
