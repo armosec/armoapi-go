@@ -2,7 +2,8 @@ package armotypes
 
 type RuntimeRules struct {
 	// Identifiers for future rules
-	CustomerGUID   string        `json:"customerGUID,omitempty" bson:"customerGUID,omitempty"`
+	PortalBase     `json:",inline" bson:",inline"`
+	CustomerGUID   string        `json:"customerGUID"`
 	HostIdentifier string        `json:"hostIdentifier,omitempty" bson:"hostIdentifier,omitempty"`
 	Rules          []RuntimeRule `json:"rules" bson:"rules"`
 }
