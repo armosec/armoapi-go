@@ -3,7 +3,7 @@ package armotypes
 type RuntimeRules struct {
 	// Identifiers for future rules
 	PortalBase     `json:",inline" bson:",inline"`
-	CustomerGUID   string        `json:"customerGUID"`
+	CustomerGUID   string        `json:"customerGUID" bson:"customerGUID"`
 	HostIdentifier string        `json:"hostIdentifier,omitempty" bson:"hostIdentifier,omitempty"`
 	Rules          []RuntimeRule `json:"rules" bson:"rules"`
 }
