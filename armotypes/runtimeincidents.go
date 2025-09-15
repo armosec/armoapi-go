@@ -106,7 +106,7 @@ type Trace struct {
 
 type BaseRuntimeAlert struct {
 	// AlertName is either RuleName or MalwareName
-	AlertName string `json:"alertName,omitempty" bson:"name,omitempty"`
+	AlertName string `json:"alertName,omitempty" bson:"alertName,omitempty"`
 	// Arguments of specific alerts (e.g. for unexpected files: open file flags; for unexpected process: return code)
 	Arguments map[string]interface{} `json:"arguments,omitempty" bson:"arguments,omitempty"`
 	// Infected process id
