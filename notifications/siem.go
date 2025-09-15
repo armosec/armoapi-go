@@ -14,6 +14,13 @@ const (
 	SIEMProviderMicrosoftSentinel SIEMProvider = "microsoftSentinel"
 )
 
+type TestMessageStatus string
+
+const (
+	TestMessageStatusSuccess TestMessageStatus = "successful"
+	TestMessageStatusFailure TestMessageStatus = "failed"
+)
+
 type SumoLogicConfig struct {
 	HTTPSourceAddress string `json:"httpSourceAddress" bson:"httpSourceAddress"`
 }
@@ -36,6 +43,7 @@ type SIEMIntegration struct {
 	Provider             string                 `json:"provider" bson:"provider"`
 	Configuration        map[string]interface{} `json:"configuration" bson:"configuration"`
 	IsEnabled            bool                   `json:"isEnabled" bson:"isEnabled"`
+	TestMessageStatus    TestMessageStatus      `json:"testMessageStatus" bson:"testMessageStatus"`
 }
 
 func (s *SIEMIntegration) GetProvider() string {
@@ -46,6 +54,13 @@ func (s *SIEMIntegration) GetCustomerGUID() string {
 	return s.CustomerGUID
 }
 
+func (s *SIEMIntegration) GetTestMessageStatus() TestMessageStatus {
+	return s.TestMessageStatus
+}
+
+func (s *SIEMIntegration) SetTestMessageStatus(status TestMessageStatus) {
+	s.TestMessageStatus = status
+}
 
 func (s *SIEMIntegration) GetSumoLogicConfig() (*SumoLogicConfig, error) {
 	if s.Provider != string(SIEMProviderSumo) {
