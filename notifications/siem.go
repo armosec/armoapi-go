@@ -12,6 +12,7 @@ const (
 	SIEMProviderSplunk            SIEMProvider = "splunk"
 	SIEMProviderSumo              SIEMProvider = "sumoLogic"
 	SIEMProviderMicrosoftSentinel SIEMProvider = "microsoftSentinel"
+	SIEMProviderWebhook           SIEMProvider = "webhook"
 )
 
 type TestMessageStatus string
@@ -40,13 +41,52 @@ type SIEMIntegration struct {
 	armotypes.PortalBase `json:",inline" bson:"inline"`
 	Name                 string                 `json:"name" bson:"name"`
 	CustomerGUID         string                 `json:"customerGUID" bson:"customerGUID"`
-	Provider             string                 `json:"provider" bson:"provider"`
+	Provider             SIEMProvider           `json:"provider" bson:"provider"`
 	Configuration        map[string]interface{} `json:"configuration" bson:"configuration"`
 	IsEnabled            bool                   `json:"isEnabled" bson:"isEnabled"`
 	TestMessageStatus    TestMessageStatus      `json:"testMessageStatus" bson:"testMessageStatus"`
 }
 
-func (s *SIEMIntegration) GetProvider() string {
+type WebhookConfig struct {
+	WebhookURL string `json:"webhookURL"`
+}
+
+type SumoLogicRequest struct {
+	GUID              string            `json:"guid"`
+	Name              string            `json:"name"`
+	HttpSourceAddress string            `json:"httpSourceAddress"`
+	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+}
+
+type SplunkRequest struct {
+	GUID              string            `json:"guid"`
+	Name              string            `json:"name"`
+	URL               string            `json:"url"`
+	Port              string            `json:"port"`
+	Token             string            `json:"token"`
+	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+}
+
+type MicrosoftSentinelRequest struct {
+	GUID              string            `json:"guid"`
+	Name              string            `json:"name"`
+	WorkSpaceID       string            `json:"workSpaceID"`
+	PrimaryKey        string            `json:"primaryKey"`
+	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+}
+
+type WebhookRequest struct {
+	GUID              string            `json:"guid"`
+	Name              string            `json:"name"`
+	WebhookURL        string            `json:"webhookURL"`
+	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+}
+
+type DeleteRequest struct {
+	GUID string `json:"guid"`
+}
+
+func (s *SIEMIntegration) GetProvider() SIEMProvider {
 	return s.Provider
 }
 
@@ -62,8 +102,16 @@ func (s *SIEMIntegration) SetTestMessageStatus(status TestMessageStatus) {
 	s.TestMessageStatus = status
 }
 
+func (s *SIEMIntegration) GetWebhookConfig() (*WebhookConfig, error) {
+	if s.Provider != SIEMProviderWebhook {
+		return nil, fmt.Errorf("invalid provider for Webhook config: %s", s.Provider)
+	}
+	config := &WebhookConfig{}
+	return config, nil
+}
+
 func (s *SIEMIntegration) GetSumoLogicConfig() (*SumoLogicConfig, error) {
-	if s.Provider != string(SIEMProviderSumo) {
+	if s.Provider != SIEMProviderSumo {
 		return nil, fmt.Errorf("invalid provider for SumoLogic config: %s", s.Provider)
 	}
 	config := &SumoLogicConfig{}
@@ -74,7 +122,7 @@ func (s *SIEMIntegration) GetSumoLogicConfig() (*SumoLogicConfig, error) {
 }
 
 func (s *SIEMIntegration) GetSplunkConfig() (*SplunkConfig, error) {
-	if s.Provider != string(SIEMProviderSplunk) {
+	if s.Provider != SIEMProviderSplunk {
 		return nil, fmt.Errorf("invalid provider for Splunk config: %s", s.Provider)
 	}
 	config := &SplunkConfig{}
@@ -91,7 +139,7 @@ func (s *SIEMIntegration) GetSplunkConfig() (*SplunkConfig, error) {
 }
 
 func (s *SIEMIntegration) GetMicrosoftSentinelConfig() (*MicrosoftSentinelConfig, error) {
-	if s.Provider != string(SIEMProviderMicrosoftSentinel) {
+	if s.Provider != SIEMProviderMicrosoftSentinel {
 		return nil, fmt.Errorf("invalid provider for Microsoft Sentinel config: %s", s.Provider)
 	}
 	config := &MicrosoftSentinelConfig{}
@@ -108,7 +156,7 @@ func (s *SIEMIntegration) SetSumoLogicConfig(config *SumoLogicConfig) {
 	if config == nil {
 		return
 	}
-	s.Provider = string(SIEMProviderSumo)
+	s.Provider = SIEMProviderSumo
 	s.Configuration = map[string]interface{}{
 		"httpSourceAddress": config.HTTPSourceAddress,
 	}
@@ -118,7 +166,7 @@ func (s *SIEMIntegration) SetSplunkConfig(config *SplunkConfig) {
 	if config == nil {
 		return
 	}
-	s.Provider = string(SIEMProviderSplunk)
+	s.Provider = SIEMProviderSplunk
 	s.Configuration = map[string]interface{}{
 		"url":   config.URL,
 		"port":  config.Port,
@@ -130,12 +178,23 @@ func (s *SIEMIntegration) SetMicrosoftSentinelConfig(config *MicrosoftSentinelCo
 	if config == nil {
 		return
 	}
-	s.Provider = string(SIEMProviderMicrosoftSentinel)
+	s.Provider = SIEMProviderMicrosoftSentinel
 	s.Configuration = map[string]interface{}{
 		"workSpaceID": config.WorkSpaceID,
 		"primaryKey":  config.PrimaryKey,
 	}
 }
+
+func (s *SIEMIntegration) SetWebhookConfig(config *WebhookConfig) {
+	if config == nil {
+		return
+	}
+	s.Provider = SIEMProviderWebhook
+	s.Configuration = map[string]interface{}{
+		"webhookURL": config.WebhookURL,
+	}
+}
+
 func (s *SIEMIntegration) GetName() string {
 	return s.Name
 }
@@ -150,4 +209,53 @@ func (s *SIEMIntegration) GetGUID() string {
 
 func (s *SIEMIntegration) SetGUID(guid string) {
 	s.GUID = guid
+}
+
+func (h *SIEMIntegration) ValidateSumoLogicRequest(request *SumoLogicRequest) error {
+	if request.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if request.HttpSourceAddress == "" {
+		return fmt.Errorf("httpSourceAddress is required")
+	}
+	return nil
+}
+
+func (h *SIEMIntegration) ValidateSplunkRequest(request *SplunkRequest) error {
+	if request.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if request.URL == "" {
+		return fmt.Errorf("url is required")
+	}
+	if request.Port == "" {
+		return fmt.Errorf("port is required")
+	}
+	if request.Token == "" {
+		return fmt.Errorf("token is required")
+	}
+	return nil
+}
+
+func (h *SIEMIntegration) ValidateMicrosoftSentinelRequest(request *MicrosoftSentinelRequest) error {
+	if request.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if request.WorkSpaceID == "" {
+		return fmt.Errorf("workSpaceID is required")
+	}
+	if request.PrimaryKey == "" {
+		return fmt.Errorf("primaryKey is required")
+	}
+	return nil
+}
+
+func (h *SIEMIntegration) ValidateWebhookRequest(request *WebhookRequest) error {
+	if request.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if request.WebhookURL == "" {
+		return fmt.Errorf("webhookURL is required")
+	}
+	return nil
 }
