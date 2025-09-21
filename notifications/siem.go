@@ -58,6 +58,16 @@ type SumoLogicRequest struct {
 	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
 }
 
+func (r *SumoLogicRequest) Validate() error {
+	if r.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if r.HttpSourceAddress == "" {
+		return fmt.Errorf("httpSourceAddress is required")
+	}
+	return nil
+}
+
 type SplunkRequest struct {
 	GUID              string            `json:"guid"`
 	Name              string            `json:"name"`
@@ -65,6 +75,22 @@ type SplunkRequest struct {
 	Port              string            `json:"port"`
 	Token             string            `json:"token"`
 	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+}
+
+func (r *SplunkRequest) Validate() error {
+	if r.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if r.URL == "" {
+		return fmt.Errorf("url is required")
+	}
+	if r.Port == "" {
+		return fmt.Errorf("port is required")
+	}
+	if r.Token == "" {
+		return fmt.Errorf("token is required")
+	}
+	return nil
 }
 
 type MicrosoftSentinelRequest struct {
@@ -75,11 +101,34 @@ type MicrosoftSentinelRequest struct {
 	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
 }
 
+func (r *MicrosoftSentinelRequest) Validate() error {
+	if r.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if r.WorkSpaceID == "" {
+		return fmt.Errorf("workSpaceID is required")
+	}
+	if r.PrimaryKey == "" {
+		return fmt.Errorf("primaryKey is required")
+	}
+	return nil
+}
+
 type WebhookRequest struct {
 	GUID              string            `json:"guid"`
 	Name              string            `json:"name"`
 	WebhookURL        string            `json:"webhookURL"`
 	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+}
+
+func (r *WebhookRequest) Validate() error {
+	if r.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if r.WebhookURL == "" {
+		return fmt.Errorf("webhookURL is required")
+	}
+	return nil
 }
 
 type DeleteRequest struct {
@@ -209,53 +258,4 @@ func (s *SIEMIntegration) GetGUID() string {
 
 func (s *SIEMIntegration) SetGUID(guid string) {
 	s.GUID = guid
-}
-
-func (h *SIEMIntegration) ValidateSumoLogicRequest(request *SumoLogicRequest) error {
-	if request.Name == "" {
-		return fmt.Errorf("name is required")
-	}
-	if request.HttpSourceAddress == "" {
-		return fmt.Errorf("httpSourceAddress is required")
-	}
-	return nil
-}
-
-func (h *SIEMIntegration) ValidateSplunkRequest(request *SplunkRequest) error {
-	if request.Name == "" {
-		return fmt.Errorf("name is required")
-	}
-	if request.URL == "" {
-		return fmt.Errorf("url is required")
-	}
-	if request.Port == "" {
-		return fmt.Errorf("port is required")
-	}
-	if request.Token == "" {
-		return fmt.Errorf("token is required")
-	}
-	return nil
-}
-
-func (h *SIEMIntegration) ValidateMicrosoftSentinelRequest(request *MicrosoftSentinelRequest) error {
-	if request.Name == "" {
-		return fmt.Errorf("name is required")
-	}
-	if request.WorkSpaceID == "" {
-		return fmt.Errorf("workSpaceID is required")
-	}
-	if request.PrimaryKey == "" {
-		return fmt.Errorf("primaryKey is required")
-	}
-	return nil
-}
-
-func (h *SIEMIntegration) ValidateWebhookRequest(request *WebhookRequest) error {
-	if request.Name == "" {
-		return fmt.Errorf("name is required")
-	}
-	if request.WebhookURL == "" {
-		return fmt.Errorf("webhookURL is required")
-	}
-	return nil
 }
