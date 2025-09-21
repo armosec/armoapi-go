@@ -57,9 +57,10 @@ func NewVersion(raw string, format version.Format) (*Version, error) {
 }
 
 func NewVersionFromPkgType(versionStr, pkgTypeStr string) (*Version, error) {
-	ver, err := NewVersion(versionStr, version.FormatFromPkg(pkg.Package{
+	p := pkg.Package{
 		Type: syftPkg.Type(pkgTypeStr),
-	}))
+	}
+	ver, err := NewVersion(versionStr, pkg.VersionFormat(p))
 	if err != nil {
 		return nil, err
 	}
