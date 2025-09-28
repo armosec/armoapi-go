@@ -39,12 +39,12 @@ type MicrosoftSentinelConfig struct {
 
 type SIEMIntegration struct {
 	armotypes.PortalBase `json:",inline" bson:"inline"`
-	Name                 string                 `json:"name" bson:"name"`
-	CustomerGUID         string                 `json:"customerGUID" bson:"customerGUID"`
 	Provider             SIEMProvider           `json:"provider" bson:"provider"`
 	Configuration        map[string]interface{} `json:"configuration" bson:"configuration"`
 	IsEnabled            bool                   `json:"isEnabled" bson:"isEnabled"`
 	TestMessageStatus    TestMessageStatus      `json:"testMessageStatus" bson:"testMessageStatus"`
+	UpdatedBy            string                 `json:"updatedBy,omitempty" bson:"updatedBy,omitempty"`
+	CreationTime         string                 `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 }
 
 type WebhookConfig struct {
@@ -137,10 +137,6 @@ type DeleteRequest struct {
 
 func (s *SIEMIntegration) GetProvider() SIEMProvider {
 	return s.Provider
-}
-
-func (s *SIEMIntegration) GetCustomerGUID() string {
-	return s.CustomerGUID
 }
 
 func (s *SIEMIntegration) GetTestMessageStatus() TestMessageStatus {
