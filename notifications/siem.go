@@ -18,12 +18,20 @@ const (
 type TestMessageStatus string
 
 const (
-	TestMessageStatusSuccess TestMessageStatus = "successful"
-	TestMessageStatusFailure TestMessageStatus = "failed"
+	TestMessageStatusSuccess TestMessageStatus = "success"
+	TestMessageStatusFailure TestMessageStatus = "failure"
+	TestMessageStatusPending TestMessageStatus = "pending"
 )
 
 type SumoLogicConfig struct {
-	HTTPSourceAddress string `json:"httpSourceAddress" bson:"httpSourceAddress"`
+	HttpSourceAddress string `json:"httpSourceAddress" bson:"httpSourceAddress"`
+}
+
+func (c *SumoLogicConfig) Validate() error {
+	if c.HttpSourceAddress == "" {
+		return fmt.Errorf("httpSourceAddress is required")
+	}
+	return nil
 }
 
 type SplunkConfig struct {
@@ -32,9 +40,43 @@ type SplunkConfig struct {
 	Token string `json:"token" bson:"token"`
 }
 
+func (c *SplunkConfig) Validate() error {
+	if c.URL == "" {
+		return fmt.Errorf("url is required")
+	}
+	if c.Port == "" {
+		return fmt.Errorf("port is required")
+	}
+	if c.Token == "" {
+		return fmt.Errorf("token is required")
+	}
+	return nil
+}
+
 type MicrosoftSentinelConfig struct {
 	WorkSpaceID string `json:"workSpaceID" bson:"workSpaceID"`
 	PrimaryKey  string `json:"primaryKey" bson:"primaryKey"`
+}
+
+func (c *MicrosoftSentinelConfig) Validate() error {
+	if c.WorkSpaceID == "" {
+		return fmt.Errorf("workSpaceID is required")
+	}
+	if c.PrimaryKey == "" {
+		return fmt.Errorf("primaryKey is required")
+	}
+	return nil
+}
+
+type WebhookConfig struct {
+	WebhookURL string `json:"webhookURL"`
+}
+
+func (c *WebhookConfig) Validate() error {
+	if c.WebhookURL == "" {
+		return fmt.Errorf("webhookURL is required")
+	}
+	return nil
 }
 
 type SIEMIntegration struct {
@@ -47,92 +89,71 @@ type SIEMIntegration struct {
 	CreationTime         string                 `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 }
 
-type WebhookConfig struct {
-	WebhookURL string `json:"webhookURL"`
-}
-
 type SumoLogicRequest struct {
-	GUID              string            `json:"guid"`
-	Name              string            `json:"name"`
-	HttpSourceAddress string            `json:"httpSourceAddress"`
-	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+	GUID          string           `json:"guid"`
+	Name          string           `json:"name"`
+	IsEnabled     bool             `json:"isEnabled"`
+	Configuration *SumoLogicConfig `json:"configuration"`
 }
 
 func (r *SumoLogicRequest) Validate() error {
 	if r.Name == "" {
 		return fmt.Errorf("name is required")
 	}
-	if r.HttpSourceAddress == "" {
-		return fmt.Errorf("httpSourceAddress is required")
-	}
-	return nil
+	return r.Configuration.Validate()
 }
 
 type SplunkRequest struct {
-	GUID              string            `json:"guid"`
-	Name              string            `json:"name"`
-	URL               string            `json:"url"`
-	Port              string            `json:"port"`
-	Token             string            `json:"token"`
-	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+	GUID          string       `json:"guid"`
+	Name          string       `json:"name"`
+	IsEnabled     bool         `json:"isEnabled"`
+	Configuration SplunkConfig `json:"configuration"`
 }
 
 func (r *SplunkRequest) Validate() error {
 	if r.Name == "" {
 		return fmt.Errorf("name is required")
 	}
-	if r.URL == "" {
-		return fmt.Errorf("url is required")
-	}
-	if r.Port == "" {
-		return fmt.Errorf("port is required")
-	}
-	if r.Token == "" {
-		return fmt.Errorf("token is required")
-	}
-	return nil
+	return r.Configuration.Validate()
 }
 
 type MicrosoftSentinelRequest struct {
-	GUID              string            `json:"guid"`
-	Name              string            `json:"name"`
-	WorkSpaceID       string            `json:"workSpaceID"`
-	PrimaryKey        string            `json:"primaryKey"`
-	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+	GUID          string                  `json:"guid"`
+	Name          string                  `json:"name"`
+	IsEnabled     bool                    `json:"isEnabled"`
+	Configuration MicrosoftSentinelConfig `json:"configuration"`
 }
 
 func (r *MicrosoftSentinelRequest) Validate() error {
 	if r.Name == "" {
 		return fmt.Errorf("name is required")
 	}
-	if r.WorkSpaceID == "" {
-		return fmt.Errorf("workSpaceID is required")
-	}
-	if r.PrimaryKey == "" {
-		return fmt.Errorf("primaryKey is required")
-	}
-	return nil
+	return r.Configuration.Validate()
 }
 
 type WebhookRequest struct {
-	GUID              string            `json:"guid"`
-	Name              string            `json:"name"`
-	WebhookURL        string            `json:"webhookURL"`
-	TestMessageStatus TestMessageStatus `json:"testMessageStatus"`
+	GUID          string        `json:"guid"`
+	Name          string        `json:"name"`
+	IsEnabled     bool          `json:"isEnabled"`
+	Configuration WebhookConfig `json:"configuration"`
 }
 
 func (r *WebhookRequest) Validate() error {
 	if r.Name == "" {
 		return fmt.Errorf("name is required")
 	}
-	if r.WebhookURL == "" {
-		return fmt.Errorf("webhookURL is required")
-	}
-	return nil
+	return r.Configuration.Validate()
 }
 
-type DeleteRequest struct {
+type SiemIntegrationDeleteRequest struct {
 	GUID string `json:"guid"`
+}
+
+func (s *SiemIntegrationDeleteRequest) Validate() error {
+	if s.GUID == "" {
+		return fmt.Errorf("guid is required")
+	}
+	return nil
 }
 
 func (s *SIEMIntegration) GetProvider() SIEMProvider {
@@ -161,7 +182,7 @@ func (s *SIEMIntegration) GetSumoLogicConfig() (*SumoLogicConfig, error) {
 	}
 	config := &SumoLogicConfig{}
 	if httpSourceAddress, ok := s.Configuration["httpSourceAddress"].(string); ok {
-		config.HTTPSourceAddress = httpSourceAddress
+		config.HttpSourceAddress = httpSourceAddress
 	}
 	return config, nil
 }
@@ -203,7 +224,7 @@ func (s *SIEMIntegration) SetSumoLogicConfig(config *SumoLogicConfig) {
 	}
 	s.Provider = SIEMProviderSumo
 	s.Configuration = map[string]interface{}{
-		"httpSourceAddress": config.HTTPSourceAddress,
+		"httpSourceAddress": config.HttpSourceAddress,
 	}
 }
 
