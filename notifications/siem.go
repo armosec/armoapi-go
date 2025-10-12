@@ -18,10 +18,14 @@ const (
 type TestMessageStatus string
 
 const (
-	TestMessageStatusSuccess TestMessageStatus = "success"
-	TestMessageStatusFailure TestMessageStatus = "failure"
-	TestMessageStatusPending TestMessageStatus = "pending"
+	TestMessageStatusSuccess TestMessageStatus = "successful"
+	TestMessageStatusFailure TestMessageStatus = "failed"
 )
+
+// SIEMConfig defines the interface for SIEM provider configurations
+type SIEMConfig interface {
+	Validate() error
+}
 
 type SumoLogicConfig struct {
 	HttpSourceAddress string `json:"httpSourceAddress" bson:"httpSourceAddress"`
@@ -69,7 +73,8 @@ func (c *MicrosoftSentinelConfig) Validate() error {
 }
 
 type WebhookConfig struct {
-	WebhookURL string `json:"webhookURL"`
+	WebhookURL string             `json:"webhookURL"`
+	Headers    *map[string]string `json:"headers,omitempty"`
 }
 
 func (c *WebhookConfig) Validate() error {
