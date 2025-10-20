@@ -9,17 +9,21 @@ type RuntimeRules struct {
 }
 
 type RuntimeRule struct {
-	Enabled                 bool              `json:"enabled" yaml:"enabled" bson:"enabled"`
-	ID                      string            `json:"id" yaml:"id" bson:"id"`
-	Name                    string            `json:"name" yaml:"name" bson:"name"`
-	Description             string            `json:"description" yaml:"description" bson:"description"`
-	Expressions             RuleExpressions   `json:"expressions" yaml:"expressions" bson:"expressions"`
-	ProfileDependency       ProfileDependency `json:"profile_dependency" yaml:"profile_dependency" bson:"profile_dependency"`
-	Severity                int               `json:"severity" yaml:"severity" bson:"severity"`
-	SupportPolicy           bool              `json:"support_policy" yaml:"support_policy" bson:"support_policy"`
-	Tags                    []string          `json:"tags" yaml:"tags" bson:"tags"`
-	State                   map[string]any    `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
-	AgentVersionRequirement string            `json:"agent_version_requirement" yaml:"agent_version_requirement" bson:"agent_version_requirement"`
+	Enabled                 bool                  `json:"enabled" yaml:"enabled" bson:"enabled"`
+	ID                      string                `json:"id" yaml:"id" bson:"id"`
+	Name                    string                `json:"name" yaml:"name" bson:"name"`
+	Description             string                `json:"description" yaml:"description" bson:"description"`
+	Expressions             RuleExpressions       `json:"expressions" yaml:"expressions" bson:"expressions"`
+	ProfileDependency       ProfileDependency     `json:"profile_dependency" yaml:"profile_dependency" bson:"profile_dependency"`
+	Severity                SecurityIssueSeverity `json:"severity" bson:"severity"`
+	SeverityScore           int                   `json:"severityScore" bson:"severityScore"`
+	SupportPolicy           bool                  `json:"support_policy" yaml:"support_policy" bson:"support_policy"`
+	Tags                    []string              `json:"tags" yaml:"tags" bson:"tags"`
+	State                   map[string]any        `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
+	AgentVersionRequirement string                `json:"agent_version_requirement" yaml:"agent_version_requirement" bson:"agent_version_requirement"`
+	IsTriggerAlert          bool                  `json:"isTriggerAlert" yaml:"isTriggerAlert" bson:"isTriggerAlert"`
+	MitreTactic             string                `json:"mitreTactic" bson:"mitreTactic"`
+	Category                string                `json:"category" bson:"category"`
 }
 
 type RuleExpressions struct {
