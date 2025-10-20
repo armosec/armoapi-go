@@ -32,11 +32,26 @@ type RuntimeRule struct {
 
 type RuleExpressions struct {
 	Message        string           `json:"message" yaml:"message" bson:"message"`
-	UniqueID       string           `json:"unique_id" yaml:"unique_id" bson:"unique_id"`
-	RuleExpression []RuleExpression `json:"rule_expression" yaml:"rule_expression" bson:"rule_expression"`
+	UniqueID       string           `json:"uniqueID" yaml:"uniqueID" bson:"uniqueID"`
+	RuleExpression []RuleExpression `json:"ruleExpression" yaml:"ruleExpression" bson:"ruleExpression"`
 }
 
 type RuleExpression struct {
-	EventType  string `json:"event_type" yaml:"event_type" bson:"event_type"` // TODO: change to enum
-	Expression string `json:"expression" yaml:"expression" bson:"expression"`
+	EventType  EventType `json:"eventType" yaml:"eventType" bson:"eventType"`
+	Expression string    `json:"expression" yaml:"expression" bson:"expression"`
 }
+
+type EventType string
+
+const (
+	EventTypeExec         EventType = "exec"
+	EventTypeOpen         EventType = "open"
+	EventTypeCapabilities EventType = "capabilities"
+	EventTypeDNS          EventType = "dns"
+	EventTypeNetwork      EventType = "network"
+	EventTypeSyscall      EventType = "syscall"
+	EventTypeSymlink      EventType = "symlink"
+	EventTypeHardlink     EventType = "hardlink"
+	EventTypeSSH          EventType = "ssh"
+	EventTypeHTTP         EventType = "http"
+)
