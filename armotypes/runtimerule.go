@@ -12,18 +12,22 @@ type RuntimeRule struct {
 	Enabled                 bool                  `json:"enabled" yaml:"enabled" bson:"enabled"`
 	ID                      string                `json:"id" yaml:"id" bson:"id"`
 	Name                    string                `json:"name" yaml:"name" bson:"name"`
+	EventType               string                `json:"eventType" bson:"eventType"`
 	Description             string                `json:"description" yaml:"description" bson:"description"`
+	ViolationMessage        string                `json:"violationMessage" bson:"violationMessage"`
 	Expressions             RuleExpressions       `json:"expressions" yaml:"expressions" bson:"expressions"`
-	ProfileDependency       ProfileDependency     `json:"profile_dependency" yaml:"profile_dependency" bson:"profile_dependency"`
+	ProfileDependency       ProfileDependency     `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
 	Severity                SecurityIssueSeverity `json:"severity" bson:"severity"`
 	SeverityScore           int                   `json:"severityScore" bson:"severityScore"`
-	SupportPolicy           bool                  `json:"support_policy" yaml:"support_policy" bson:"support_policy"`
+	SupportPolicy           bool                  `json:"supportPolicy" yaml:"supportPolicy" bson:"supportPolicy"`
 	Tags                    []string              `json:"tags" yaml:"tags" bson:"tags"`
 	State                   map[string]any        `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
-	AgentVersionRequirement string                `json:"agent_version_requirement" yaml:"agent_version_requirement" bson:"agent_version_requirement"`
+	AgentVersionRequirement string                `json:"agentVersionRequirement" yaml:"agentVersionRequirement" bson:"agentVersionRequirement"`
 	IsTriggerAlert          bool                  `json:"isTriggerAlert" yaml:"isTriggerAlert" bson:"isTriggerAlert"`
 	MitreTactic             string                `json:"mitreTactic" bson:"mitreTactic"`
+	MitreTechnique          string                `json:"mitreTechnique" bson:"mitreTechnique"`
 	Category                string                `json:"category" bson:"category"`
+	IncidentTypeId          string                `json:"incidentTypeId" bson:"incidentTypeId"`
 }
 
 type RuleExpressions struct {
