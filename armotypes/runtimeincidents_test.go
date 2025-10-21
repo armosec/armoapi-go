@@ -54,6 +54,124 @@ func TestAdmissionAlertJSON(t *testing.T) {
 	assert.Equal(t, alert, alert2)
 }
 
+func TestIncidentStatusChangeValidate(t *testing.T) {
+	tests := []struct {
+		name        string
+		change      IncidentStatusChange
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name: "valid change",
+			change: IncidentStatusChange{
+				IncidentGUID: "incident-123",
+				Status:       "Open",
+				CustomerGUID: "customer-456",
+				ClusterName:  "prod-cluster",
+			},
+			expectError: false,
+		},
+		{
+			name: "valid transition",
+			change: IncidentStatusChange{
+				IncidentGUID:   "incident-123",
+				Status:         "Investigating",
+				PreviousStatus: "Open",
+				CustomerGUID:   "customer-456",
+				ClusterName:    "prod-cluster",
+			},
+			expectError: false,
+		},
+		{
+			name: "missing incidentGUID",
+			change: IncidentStatusChange{
+				Status:       "Open",
+				CustomerGUID: "customer-456",
+				ClusterName:  "prod-cluster",
+			},
+			expectError: true,
+			errorMsg:    "incidentGUID is required",
+		},
+		{
+			name: "missing status",
+			change: IncidentStatusChange{
+				IncidentGUID: "incident-123",
+				CustomerGUID: "customer-456",
+				ClusterName:  "prod-cluster",
+			},
+			expectError: true,
+			errorMsg:    "status is required",
+		},
+		{
+			name: "missing customerGUID",
+			change: IncidentStatusChange{
+				IncidentGUID: "incident-123",
+				Status:       "Open",
+				ClusterName:  "prod-cluster",
+			},
+			expectError: true,
+			errorMsg:    "customerGUID is required",
+		},
+		{
+			name: "missing clusterName",
+			change: IncidentStatusChange{
+				IncidentGUID: "incident-123",
+				Status:       "Open",
+				CustomerGUID: "customer-456",
+			},
+			expectError: true,
+			errorMsg:    "clusterName is required",
+		},
+		{
+			name: "invalid status",
+			change: IncidentStatusChange{
+				IncidentGUID: "incident-123",
+				Status:       "InvalidStatus",
+				CustomerGUID: "customer-456",
+				ClusterName:  "prod-cluster",
+			},
+			expectError: true,
+			errorMsg:    "invalid status",
+		},
+		{
+			name: "invalid previousStatus",
+			change: IncidentStatusChange{
+				IncidentGUID:   "incident-123",
+				Status:         "Open",
+				PreviousStatus: "InvalidPrevStatus",
+				CustomerGUID:   "customer-456",
+				ClusterName:    "prod-cluster",
+			},
+			expectError: true,
+			errorMsg:    "invalid previous_status",
+		},
+		{
+			name: "no-op change (Status == PreviousStatus)",
+			change: IncidentStatusChange{
+				IncidentGUID:   "incident-123",
+				Status:         "Open",
+				PreviousStatus: "Open",
+				CustomerGUID:   "customer-456",
+				ClusterName:    "prod-cluster",
+			},
+			expectError: true,
+			errorMsg:    "status and previousStatus are the same",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.change.Validate()
+			if tt.expectError {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.errorMsg)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestFindProcessRecursive(t *testing.T) {
 	tree := Process{
 		PID:     1,

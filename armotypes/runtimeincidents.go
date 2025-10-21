@@ -282,37 +282,40 @@ type RuntimeIncidentsOvertime struct {
 }
 
 type IncidentStatusChange struct {
-    IncidentGUID   string `json:"incidentGUID"`
-    Status         string `json:"status"`
-    PreviousStatus string `json:"previousStatus,omitempty"`
-    ChangedBy      string `json:"changedBy,omitempty"`
-    CustomerGUID   string `json:"customerGUID"`
-    ClusterName    string `json:"clusterName"`
+	IncidentGUID   string `json:"incidentGUID"`
+	Status         string `json:"status"`
+	PreviousStatus string `json:"previousStatus,omitempty"`
+	ChangedBy      string `json:"changedBy,omitempty"`
+	CustomerGUID   string `json:"customerGUID"`
+	ClusterName    string `json:"clusterName"`
 }
 
 func (c *IncidentStatusChange) Validate() error {
-    if c.IncidentGUID == "" {
-        return fmt.Errorf("incidentGUID is required")
-    }
-    if c.Status == "" {
-        return fmt.Errorf("status is required")
-    }
-    if c.CustomerGUID == "" {
-        return fmt.Errorf("customerGUID is required")
-    }
-    if c.ClusterName == "" {
-        return fmt.Errorf("clusterName is required")
-    }
-    
-    validStatuses := []string{"Open", "Investigating", "Resolved", "Dismissed"}
-    if !slices.Contains(validStatuses, c.Status) {
-        return fmt.Errorf("invalid status '%s', must be one of: %v", c.Status, validStatuses)
-    }
-    if c.PreviousStatus != "" && !slices.Contains(validStatuses, c.PreviousStatus) {
-        return fmt.Errorf("invalid previous_status '%s', must be one of: %v", c.PreviousStatus, validStatuses)
-    }
-    
-    return nil
+	if c.IncidentGUID == "" {
+		return fmt.Errorf("incidentGUID is required")
+	}
+	if c.Status == "" {
+		return fmt.Errorf("status is required")
+	}
+	if c.CustomerGUID == "" {
+		return fmt.Errorf("customerGUID is required")
+	}
+	if c.ClusterName == "" {
+		return fmt.Errorf("clusterName is required")
+	}
+
+	validStatuses := []string{"Open", "Investigating", "Resolved", "Dismissed"}
+	if !slices.Contains(validStatuses, c.Status) {
+		return fmt.Errorf("invalid status '%s', must be one of: %v", c.Status, validStatuses)
+	}
+	if c.PreviousStatus != "" && !slices.Contains(validStatuses, c.PreviousStatus) {
+		return fmt.Errorf("invalid previous_status '%s', must be one of: %v", c.PreviousStatus, validStatuses)
+	}
+	if c.Status == c.PreviousStatus && c.PreviousStatus != "" {
+		return fmt.Errorf("status and previousStatus are the same (%s) - no change to record", c.Status)
+	}
+
+	return nil
 }
 
 // FindProcessByPID searches for a process by PID in the process tree
