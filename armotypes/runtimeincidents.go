@@ -270,6 +270,15 @@ type RuntimeIncidentExceptionPolicy struct {
 	SeverityScore       int    `json:"severityScore"`
 }
 
+type RuntimeIncidentsOvertime struct {
+	Date           string           `json:"date"`
+	CountsByStatus map[string]int64 `json:"countsByStatus,omitempty"`
+	// Legacy fields for backward compatibility - will be removed after FE will be in production
+	Count          int64 `json:"count,omitempty"`
+	NewCount       int64 `json:"newCount,omitempty"`
+	DismissedCount int64 `json:"dismissedCount,omitempty"`
+}
+
 // FindProcessByPID searches for a process by PID in the process tree
 func (pt *ProcessTree) FindProcessByPID(pid uint32) *Process {
 	return findProcessRecursive(&pt.ProcessTree, pid)
