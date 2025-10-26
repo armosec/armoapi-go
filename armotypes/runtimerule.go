@@ -12,7 +12,6 @@ type RuntimeRule struct {
 	Enabled                 bool                  `json:"enabled" yaml:"enabled" bson:"enabled"`
 	ID                      string                `json:"id" yaml:"id" bson:"id"`
 	Name                    string                `json:"name" yaml:"name" bson:"name"`
-	EventType               string                `json:"eventType" bson:"eventType"`
 	Description             string                `json:"description" yaml:"description" bson:"description"`
 	ViolationMessage        string                `json:"violationMessage" bson:"violationMessage"`
 	Expressions             RuleExpressions       `json:"expressions" yaml:"expressions" bson:"expressions"`
