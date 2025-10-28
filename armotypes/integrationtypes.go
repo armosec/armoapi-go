@@ -1,5 +1,7 @@
 package armotypes
 
+import "time"
+
 type TicketManager string
 
 const (
@@ -20,4 +22,13 @@ type Ticket struct {
 	ErrorCode      int                 `json:"errorCode,omitempty"`      //error code if any (e.g. http status code like 401)
 	ProviderData   map[string]string   `json:"providerData,omitempty"`   //provider specific data
 	CreatedBy      string              `json:"createdBy,omitempty"`      //user that created the ticket
+
+	// metadata for the ticket
+	CustomerGUID string     `json:"customerGUID,omitempty"`
+	IssueID      string     `json:"issueID,omitempty"`
+	SiteID       string     `json:"siteID,omitempty"`
+	Timestamp    *time.Time `json:"timestamp,omitempty"`
+	ProjectID    string     `json:"projectID,omitempty"`
+	IssueTypeID  string     `json:"issueTypeID,omitempty"`
+	Provider     string     `json:"provider,omitempty"`
 }
