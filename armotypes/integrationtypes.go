@@ -25,10 +25,5 @@ type Ticket struct {
 
 	// metadata for the ticket
 	CustomerGUID string     `json:"customerGUID,omitempty"`
-	IssueID      string     `json:"issueID,omitempty"`
-	SiteID       string     `json:"siteID,omitempty"`
 	Timestamp    *time.Time `json:"timestamp,omitempty"`
-	ProjectID    string     `json:"projectID,omitempty"`
-	IssueTypeID  string     `json:"issueTypeID,omitempty"`
-	Provider     string     `json:"provider,omitempty"`
 }
