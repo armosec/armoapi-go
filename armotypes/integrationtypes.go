@@ -5,7 +5,8 @@ import "time"
 type TicketManager string
 
 const (
-	TicketManagerJira TicketManager = "jira"
+	TicketManagerJira   TicketManager = "jira"
+	TicketManagerLinear TicketManager = "linear"
 )
 
 type Ticket struct {
