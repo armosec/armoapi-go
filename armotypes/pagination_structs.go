@@ -141,6 +141,9 @@ type V2ListRequest struct {
 	//internal flag to indicate if the request is validated (avoid fixing pagination twice in the same request)
 	// swagger:ignore
 	FixedPageNum bool `json:"_fixedPageNum"`
+
+	// Ticket manager to use for the request - for example, to get tickets from Jira or Linear
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
 }
 
 type Cursor struct {
@@ -170,6 +173,9 @@ type UniqueValuesRequestV2 struct {
 	Since          *time.Time `json:"since,omitempty"`
 	Until          *time.Time `json:"until,omitempty"`
 	TimestampField string     `json:"-"`
+
+	// Ticket manager to use for the request - for example, to get tickets from Jira or Linear
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
 }
 
 // UniqueCardinalityResponseV2 holds response data of cardinality request
