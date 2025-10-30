@@ -13,7 +13,6 @@ type RuntimeRule struct {
 	ID                      string                `json:"id" yaml:"id" bson:"id"`
 	Name                    string                `json:"name" yaml:"name" bson:"name"`
 	Description             string                `json:"description" yaml:"description" bson:"description"`
-	ViolationMessage        string                `json:"violationMessage" bson:"violationMessage"`
 	Expressions             RuleExpressions       `json:"expressions" yaml:"expressions" bson:"expressions"`
 	ProfileDependency       ProfileDependency     `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
 	Severity                SecurityIssueSeverity `json:"severity" bson:"severity"`
