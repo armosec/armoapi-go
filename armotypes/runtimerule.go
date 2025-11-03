@@ -1,31 +1,78 @@
 package armotypes
 
-type RuntimeRules struct {
-	// Identifiers for future rules
-	PortalBase     `json:",inline" bson:",inline"`
-	CustomerGUID   string        `json:"customerGUID" bson:"customerGUID"`
-	HostIdentifier string        `json:"hostIdentifier,omitempty" bson:"hostIdentifier,omitempty"`
-	Rules          []RuntimeRule `json:"rules" bson:"rules"`
+// copied from kubescape/node-agent/pkg/ruleengine/v1/rule.go
+const (
+	RuleSeverityNone        = 0
+	RuleSeverityLow         = 1
+	RuleSeverityMed         = 5
+	RuleSeverityHigh        = 8
+	RuleSeverityCritical    = 10
+	RuleSeveritySystemIssue = 1000
+)
+
+func RuleSeverityFromString(severity string) int {
+	switch severity {
+	case "None":
+		return RuleSeverityNone
+	case "Low":
+		return RuleSeverityLow
+	case "Medium":
+		return RuleSeverityMed
+	case "High":
+		return RuleSeverityHigh
+	case "Critical":
+		return RuleSeverityCritical
+	case "System Issue":
+		return RuleSeveritySystemIssue
+	default:
+		return RuleSeverityNone
+	}
+}
+
+func RuleSeverityToString(severity int) string {
+	switch severity {
+	case RuleSeverityNone:
+		return "None"
+	case RuleSeverityLow:
+		return "Low"
+	case RuleSeverityMed:
+		return "Medium"
+	case RuleSeverityHigh:
+		return "High"
+	case RuleSeverityCritical:
+		return "Critical"
+	case RuleSeveritySystemIssue:
+		return "System Issue"
+	default:
+		if severity < RuleSeverityMed {
+			return "Low"
+		} else if severity < RuleSeverityHigh {
+			return "Medium"
+		} else if severity < RuleSeverityCritical {
+			return "High"
+		}
+		return "Unknown"
+	}
 }
 
 type RuntimeRule struct {
-	Enabled                 bool                  `json:"enabled" yaml:"enabled" bson:"enabled"`
-	ID                      string                `json:"id" yaml:"id" bson:"id"`
-	Name                    string                `json:"name" yaml:"name" bson:"name"`
-	Description             string                `json:"description" yaml:"description" bson:"description"`
-	Expressions             RuleExpressions       `json:"expressions" yaml:"expressions" bson:"expressions"`
-	ProfileDependency       ProfileDependency     `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
-	Severity                SecurityIssueSeverity `json:"severity" bson:"severity"`
-	SeverityScore           int                   `json:"severityScore" bson:"severityScore"`
-	SupportPolicy           bool                  `json:"supportPolicy" yaml:"supportPolicy" bson:"supportPolicy"`
-	Tags                    []string              `json:"tags" yaml:"tags" bson:"tags"`
-	State                   map[string]any        `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
-	AgentVersionRequirement string                `json:"agentVersionRequirement" yaml:"agentVersionRequirement" bson:"agentVersionRequirement"`
-	IsTriggerAlert          bool                  `json:"isTriggerAlert" yaml:"isTriggerAlert" bson:"isTriggerAlert"`
-	MitreTactic             string                `json:"mitreTactic" bson:"mitreTactic"`
-	MitreTechnique          string                `json:"mitreTechnique" bson:"mitreTechnique"`
-	Category                string                `json:"category" bson:"category"`
-	IncidentTypeId          string                `json:"incidentTypeId" bson:"incidentTypeId"`
+	Enabled                 bool              `json:"enabled" yaml:"enabled" bson:"enabled"`
+	ID                      string            `json:"id" yaml:"id" bson:"id"`
+	Name                    string            `json:"name" yaml:"name" bson:"name"`
+	Description             string            `json:"description" yaml:"description" bson:"description"`
+	Expressions             RuleExpressions   `json:"expressions" yaml:"expressions" bson:"expressions"`
+	ProfileDependency       ProfileDependency `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
+	Severity                int               `json:"severity" bson:"severity"`
+	SeverityString          string            `json:"severityString" bson:"severityString"`
+	SupportPolicy           bool              `json:"supportPolicy" yaml:"supportPolicy" bson:"supportPolicy"`
+	Tags                    []string          `json:"tags" yaml:"tags" bson:"tags"`
+	State                   map[string]any    `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
+	AgentVersionRequirement string            `json:"agentVersionRequirement" yaml:"agentVersionRequirement" bson:"agentVersionRequirement"`
+	IsTriggerAlert          bool              `json:"isTriggerAlert" yaml:"isTriggerAlert" bson:"isTriggerAlert"`
+	MitreTactic             string            `json:"mitreTactic" bson:"mitreTactic"`
+	MitreTechnique          string            `json:"mitreTechnique" bson:"mitreTechnique"`
+	Category                string            `json:"category" bson:"category"`
+	IncidentTypeId          string            `json:"incidentTypeId" bson:"incidentTypeId"`
 }
 
 type RuleExpressions struct {
