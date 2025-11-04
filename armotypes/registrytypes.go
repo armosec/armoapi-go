@@ -52,6 +52,7 @@ const (
 	Harbor RegistryProvider = "harbor"
 	Quay   RegistryProvider = "quay"
 	Nexus  RegistryProvider = "nexus"
+	Gitlab RegistryProvider = "gitlab"
 )
 
 type RegistryManageStatus string
@@ -143,6 +144,13 @@ type GoogleImageRegistry struct {
 }
 
 type NexusImageRegistry struct {
+	BaseContainerImageRegistry `json:",inline"`
+	RegistryURL                string `json:"registryURL"`
+	Username                   string `json:"username"`
+	Password                   string `json:"password,omitempty"`
+}
+
+type GitlabImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
 	RegistryURL                string `json:"registryURL"`
 	Username                   string `json:"username"`
