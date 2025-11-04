@@ -15,6 +15,7 @@ var RegistryTypeMap = map[RegistryProvider]func() ContainerImageRegistry{
 	Harbor: func() ContainerImageRegistry { return new(HarborImageRegistry) },
 	Quay:   func() ContainerImageRegistry { return new(QuayImageRegistry) },
 	Nexus:  func() ContainerImageRegistry { return new(NexusImageRegistry) },
+	Gitlab: func() ContainerImageRegistry { return new(GitlabImageRegistry) },
 }
 
 func UnmarshalRegistry(payload []byte) (ContainerImageRegistry, error) {
@@ -336,6 +337,50 @@ func (nexus *NexusImageRegistry) Validate() error {
 
 func (nexus *NexusImageRegistry) GetDisplayName() string {
 	return nexus.RegistryURL
+}
+
+func (gitlab *GitlabImageRegistry) MaskSecret() {
+	gitlab.Password = ""
+}
+
+func (gitlab *GitlabImageRegistry) ExtractSecret() interface{} {
+	return map[string]string{
+		"registryURL": gitlab.RegistryURL,
+		"username":    gitlab.Username,
+		"password":    gitlab.Password,
+	}
+}
+
+func (gitlab *GitlabImageRegistry) FillSecret(value interface{}) error {
+	secretMap, err := decodeSecretFromInterface[map[string]string](value)
+	if err != nil {
+		return err
+	}
+	gitlab.RegistryURL = secretMap["registryURL"]
+	gitlab.Username = secretMap["username"]
+	gitlab.Password = secretMap["password"]
+	return nil
+}
+
+func (gitlab *GitlabImageRegistry) Validate() error {
+	if err := gitlab.GetBase().ValidateBase(); err != nil {
+		return err
+	}
+	if gitlab.RegistryURL == "" {
+		return errors.New("registry url is empty")
+	}
+	gitlab.RegistryURL = cleanRegistryURL(gitlab.RegistryURL)
+	if gitlab.Username == "" {
+		return errors.New("username is empty")
+	}
+	if gitlab.Password == "" {
+		return errors.New("password is empty")
+	}
+	return nil
+}
+
+func (gitlab *GitlabImageRegistry) GetDisplayName() string {
+	return gitlab.RegistryURL
 }
 
 func decodeSecretFromInterface[T any](value interface{}) (T, error) {
