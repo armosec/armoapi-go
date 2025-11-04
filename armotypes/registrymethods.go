@@ -340,14 +340,13 @@ func (nexus *NexusImageRegistry) GetDisplayName() string {
 }
 
 func (gitlab *GitlabImageRegistry) MaskSecret() {
-	gitlab.Password = ""
+	gitlab.AccessToken = ""
 }
 
 func (gitlab *GitlabImageRegistry) ExtractSecret() interface{} {
 	return map[string]string{
-		"registryURL": gitlab.RegistryURL,
 		"username":    gitlab.Username,
-		"password":    gitlab.Password,
+		"accessToken": gitlab.AccessToken,
 	}
 }
 
@@ -356,9 +355,8 @@ func (gitlab *GitlabImageRegistry) FillSecret(value interface{}) error {
 	if err != nil {
 		return err
 	}
-	gitlab.RegistryURL = secretMap["registryURL"]
 	gitlab.Username = secretMap["username"]
-	gitlab.Password = secretMap["password"]
+	gitlab.AccessToken = secretMap["accessToken"]
 	return nil
 }
 
@@ -366,21 +364,17 @@ func (gitlab *GitlabImageRegistry) Validate() error {
 	if err := gitlab.GetBase().ValidateBase(); err != nil {
 		return err
 	}
-	if gitlab.RegistryURL == "" {
-		return errors.New("registry url is empty")
-	}
-	gitlab.RegistryURL = cleanRegistryURL(gitlab.RegistryURL)
 	if gitlab.Username == "" {
 		return errors.New("username is empty")
 	}
-	if gitlab.Password == "" {
-		return errors.New("password is empty")
+	if gitlab.AccessToken == "" {
+		return errors.New("access token is empty")
 	}
 	return nil
 }
 
 func (gitlab *GitlabImageRegistry) GetDisplayName() string {
-	return gitlab.RegistryURL
+	return gitlab.Username
 }
 
 func decodeSecretFromInterface[T any](value interface{}) (T, error) {
