@@ -345,6 +345,7 @@ func (gitlab *GitlabImageRegistry) MaskSecret() {
 
 func (gitlab *GitlabImageRegistry) ExtractSecret() interface{} {
 	return map[string]string{
+		"registryURL": gitlab.RegistryURL,
 		"username":    gitlab.Username,
 		"accessToken": gitlab.AccessToken,
 	}
@@ -355,6 +356,7 @@ func (gitlab *GitlabImageRegistry) FillSecret(value interface{}) error {
 	if err != nil {
 		return err
 	}
+	gitlab.RegistryURL = secretMap["registryURL"]
 	gitlab.Username = secretMap["username"]
 	gitlab.AccessToken = secretMap["accessToken"]
 	return nil
@@ -364,6 +366,10 @@ func (gitlab *GitlabImageRegistry) Validate() error {
 	if err := gitlab.GetBase().ValidateBase(); err != nil {
 		return err
 	}
+	if gitlab.RegistryURL == "" {
+		return errors.New("registry url is empty")
+	}
+	gitlab.RegistryURL = cleanRegistryURL(gitlab.RegistryURL)
 	if gitlab.Username == "" {
 		return errors.New("username is empty")
 	}
@@ -374,7 +380,7 @@ func (gitlab *GitlabImageRegistry) Validate() error {
 }
 
 func (gitlab *GitlabImageRegistry) GetDisplayName() string {
-	return gitlab.Username
+	return gitlab.RegistryURL
 }
 
 func decodeSecretFromInterface[T any](value interface{}) (T, error) {
