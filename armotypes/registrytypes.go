@@ -152,6 +152,7 @@ type NexusImageRegistry struct {
 
 type GitlabImageRegistry struct {
 	BaseContainerImageRegistry `json:",inline"`
+	RegistryURL                string `json:"registryURL"`
 	Username                   string `json:"username"`
 	AccessToken                string `json:"accessToken,omitempty"`
 }
