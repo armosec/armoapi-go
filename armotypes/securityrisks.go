@@ -127,7 +127,8 @@ type SecurityIssuesSummary struct {
 	// if True, control supports smart remediation
 	SmartRemediation bool `json:"smartRemediation"`
 
-	Tickets []Ticket `json:"tickets,omitempty"`
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
+	Tickets       []Ticket      `json:"tickets,omitempty"`
 }
 
 type SecurityIssuesCategories struct {
@@ -206,7 +207,8 @@ type SecurityIssue struct {
 	ExceptionApplied    bool   `json:"exceptionApplied"`
 	ExceptionPolicyGUID string `json:"exceptionPolicyGUID"`
 
-	Tickets []Ticket `json:"tickets,omitempty"`
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
+	Tickets       []Ticket      `json:"tickets,omitempty"`
 }
 
 func (si *SecurityIssue) GetClusterName() string {
