@@ -140,7 +140,8 @@ type PostureClusterSummary struct {
 	PrefixName string `json:"clusterPrefixName"`
 
 	//tickets opened for in this cluster
-	Tickets []Ticket `json:"tickets,omitempty"`
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
+	Tickets       []Ticket      `json:"tickets,omitempty"`
 }
 
 type PostureFrameworkSubsectionSummary struct {
@@ -212,7 +213,8 @@ type PostureControlSummary struct {
 	SmartRemediation               bool                         `json:"smartRemediation"`
 	FixByNetworkPolicy             bool                         `json:"fixByNetworkPolicy"`
 	//tickets opened for this control
-	Tickets []Ticket `json:"tickets,omitempty"`
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
+	Tickets       []Ticket      `json:"tickets,omitempty"`
 }
 
 //---------/api/v1/posture/resources
@@ -304,7 +306,8 @@ type PostureResourceSummary struct {
 	SmartRemediation bool `json:"smartRemediation"`
 
 	//tickets opened for this resource
-	Tickets []Ticket `json:"tickets,omitempty"`
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
+	Tickets       []Ticket      `json:"tickets,omitempty"`
 }
 
 type PostureAttributesList struct {

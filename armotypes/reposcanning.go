@@ -64,5 +64,6 @@ type RepoEntitySummary struct {
 	DeleteStatus RecordStatus `json:"deletionStatus,omitempty"`
 
 	//tickets opened for in this entity (repository or repository file)
-	Tickets []Ticket `json:"tickets,omitempty"`
+	TicketManager TicketManager `json:"ticketManager,omitempty"`
+	Tickets       []Ticket      `json:"tickets,omitempty"`
 }
