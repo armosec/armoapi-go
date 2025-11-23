@@ -17,6 +17,8 @@ const (
 	RiskFactorSecretAccess   RiskFactor = "Secret access"
 	RiskFactorDataAccess     RiskFactor = "Data access"
 	RiskFactorHostAccess     RiskFactor = "Host access"
+	RiskFactorAILLMClient   RiskFactor = "AI/LLM client"
+	RiskFactorAILLMServer   RiskFactor = "AI/LLM service"
 
 	//scan types
 	ClusterPosture           ScanType = "cluster"
@@ -36,6 +38,8 @@ var RiskFactorMapping = map[string]RiskFactor{
 	"C-0041": RiskFactorHostAccess,
 	"C-0044": RiskFactorHostAccess,
 	"C-0048": RiskFactorHostAccess,
+	"C-AILLMClient": RiskFactorAILLMClient,
+	"C-AILLMServer": RiskFactorAILLMServer,
 }
 
 // GetRiskFactors returns a list of unique risk factors for given control IDs.
