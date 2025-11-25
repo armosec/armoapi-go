@@ -77,7 +77,7 @@ type RuntimeRule struct {
 
 type RuleExpressions struct {
 	Message        string           `json:"message" yaml:"message" bson:"message"`
-	UniqueID       string           `json:"uniqueID" yaml:"uniqueID" bson:"uniqueID"`
+	UniqueID       string           `json:"uniqueId" yaml:"uniqueId" bson:"uniqueId"`
 	RuleExpression []RuleExpression `json:"ruleExpression" yaml:"ruleExpression" bson:"ruleExpression"`
 }
 
