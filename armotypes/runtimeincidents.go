@@ -201,10 +201,12 @@ type RuntimeAlertK8sDetails struct {
 	ContainerID       string            `json:"containerID,omitempty" bson:"containerID,omitempty"`
 	PodName           string            `json:"podName,omitempty" bson:"podName,omitempty"`
 	PodNamespace      string            `json:"podNamespace,omitempty" bson:"podNamespace,omitempty"`
+	PodUID            string            `json:"podUID,omitempty" bson:"podUID,omitempty"`
 	PodLabels         map[string]string `json:"podLabels,omitempty" bson:"podLabels,omitempty"`
 	WorkloadName      string            `json:"workloadName,omitempty" bson:"workloadName,omitempty"`
 	WorkloadNamespace string            `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
 	WorkloadKind      string            `json:"workloadKind,omitempty" bson:"workloadKind,omitempty"`
+	WorkloadUID       string            `json:"workloadUID,omitempty" bson:"workloadUID,omitempty"`
 }
 
 type NetworkScanAlert struct {
