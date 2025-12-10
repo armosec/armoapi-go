@@ -89,6 +89,7 @@ type SIEMIntegration struct {
 	Provider             SIEMProvider           `json:"provider" bson:"provider"`
 	Configuration        map[string]interface{} `json:"configuration" bson:"configuration"`
 	IsEnabled            bool                   `json:"isEnabled" bson:"isEnabled"`
+	Events               []string               `json:"events,omitempty" bson:"events,omitempty"`
 	TestMessageStatus    TestMessageStatus      `json:"testMessageStatus" bson:"testMessageStatus"`
 	UpdatedBy            string                 `json:"updatedBy,omitempty" bson:"updatedBy,omitempty"`
 	CreationTime         string                 `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
@@ -163,6 +164,14 @@ func (s *SiemIntegrationDeleteRequest) Validate() error {
 
 func (s *SIEMIntegration) GetProvider() SIEMProvider {
 	return s.Provider
+}
+
+func (s *SIEMIntegration) GetEvents() []string {
+	return s.Events
+}
+
+func (s *SIEMIntegration) SetEvents(events []string) {
+	s.Events = events
 }
 
 func (s *SIEMIntegration) GetTestMessageStatus() TestMessageStatus {
