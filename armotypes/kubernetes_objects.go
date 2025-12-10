@@ -80,3 +80,26 @@ type RoleBindingRoleRef struct {
 	Name       string `json:"name,omitempty"`
 	Namespace  string `json:"namespace,omitempty"`
 }
+
+type KubernetesStorageResourceObject struct {
+	KubernetesObject
+
+	// Storage-specific fields
+	ResourceSize             int
+	RelatedContainerProfiles map[string]string
+}
+
+type TimeSeriesContainerProfileObject struct {
+	CustomerGUID            string    `json:"customerGUID"`
+	Cluster                 string    `json:"cluster"`
+	Namespace               string    `json:"namespace"`
+	Name                    string    `json:"name"`
+	SeriesID                string    `json:"seriesID"`
+	TSSuffix                string    `json:"tsSuffix"`
+	ReportTimestamp         time.Time `json:"reportTimestamp"`
+	Status                  string    `json:"status"`
+	Completion              string    `json:"completion"`
+	PreviousReportTimestamp time.Time `json:"previousReportTimestamp"`
+	ResourceObjectRef       string    `json:"resourceObjectRef"`
+	HasData                 bool      `json:"hasData"`
+}
