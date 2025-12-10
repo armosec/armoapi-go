@@ -100,6 +100,7 @@ type SumoLogicRequest struct {
 	Name          string           `json:"name"`
 	IsEnabled     bool             `json:"isEnabled"`
 	Configuration *SumoLogicConfig `json:"configuration"`
+	Events        []string         `json:"events,omitempty"`
 }
 
 func (r *SumoLogicRequest) Validate() error {
@@ -114,6 +115,7 @@ type SplunkRequest struct {
 	Name          string       `json:"name"`
 	IsEnabled     bool         `json:"isEnabled"`
 	Configuration SplunkConfig `json:"configuration"`
+	Events        []string     `json:"events,omitempty"`
 }
 
 func (r *SplunkRequest) Validate() error {
@@ -128,6 +130,7 @@ type MicrosoftSentinelRequest struct {
 	Name          string                  `json:"name"`
 	IsEnabled     bool                    `json:"isEnabled"`
 	Configuration MicrosoftSentinelConfig `json:"configuration"`
+	Events        []string                `json:"events,omitempty"`
 }
 
 func (r *MicrosoftSentinelRequest) Validate() error {
@@ -142,6 +145,7 @@ type WebhookRequest struct {
 	Name          string        `json:"name"`
 	IsEnabled     bool          `json:"isEnabled"`
 	Configuration WebhookConfig `json:"configuration"`
+	Events        []string      `json:"events,omitempty"`
 }
 
 func (r *WebhookRequest) Validate() error {
