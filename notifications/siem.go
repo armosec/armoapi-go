@@ -89,6 +89,7 @@ type SIEMIntegration struct {
 	Provider             SIEMProvider           `json:"provider" bson:"provider"`
 	Configuration        map[string]interface{} `json:"configuration" bson:"configuration"`
 	IsEnabled            bool                   `json:"isEnabled" bson:"isEnabled"`
+	Events               []string               `json:"events,omitempty" bson:"events,omitempty"`
 	TestMessageStatus    TestMessageStatus      `json:"testMessageStatus" bson:"testMessageStatus"`
 	UpdatedBy            string                 `json:"updatedBy,omitempty" bson:"updatedBy,omitempty"`
 	CreationTime         string                 `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
@@ -99,6 +100,7 @@ type SumoLogicRequest struct {
 	Name          string           `json:"name"`
 	IsEnabled     bool             `json:"isEnabled"`
 	Configuration *SumoLogicConfig `json:"configuration"`
+	Events        []string         `json:"events,omitempty"`
 }
 
 func (r *SumoLogicRequest) Validate() error {
@@ -113,6 +115,7 @@ type SplunkRequest struct {
 	Name          string       `json:"name"`
 	IsEnabled     bool         `json:"isEnabled"`
 	Configuration SplunkConfig `json:"configuration"`
+	Events        []string     `json:"events,omitempty"`
 }
 
 func (r *SplunkRequest) Validate() error {
@@ -127,6 +130,7 @@ type MicrosoftSentinelRequest struct {
 	Name          string                  `json:"name"`
 	IsEnabled     bool                    `json:"isEnabled"`
 	Configuration MicrosoftSentinelConfig `json:"configuration"`
+	Events        []string                `json:"events,omitempty"`
 }
 
 func (r *MicrosoftSentinelRequest) Validate() error {
@@ -141,6 +145,7 @@ type WebhookRequest struct {
 	Name          string        `json:"name"`
 	IsEnabled     bool          `json:"isEnabled"`
 	Configuration WebhookConfig `json:"configuration"`
+	Events        []string      `json:"events,omitempty"`
 }
 
 func (r *WebhookRequest) Validate() error {
@@ -163,6 +168,14 @@ func (s *SiemIntegrationDeleteRequest) Validate() error {
 
 func (s *SIEMIntegration) GetProvider() SIEMProvider {
 	return s.Provider
+}
+
+func (s *SIEMIntegration) GetEvents() []string {
+	return s.Events
+}
+
+func (s *SIEMIntegration) SetEvents(events []string) {
+	s.Events = events
 }
 
 func (s *SIEMIntegration) GetTestMessageStatus() TestMessageStatus {
