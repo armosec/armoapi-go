@@ -90,16 +90,16 @@ type KubernetesStorageResourceObject struct {
 }
 
 type TimeSeriesContainerProfileObject struct {
-	CustomerGUID            string    `json:"customerGUID"`
-	Cluster                 string    `json:"cluster"`
-	Namespace               string    `json:"namespace"`
-	Name                    string    `json:"name"`
-	SeriesID                string    `json:"seriesID"`
-	TSSuffix                string    `json:"tsSuffix"`
-	ReportTimestamp         time.Time `json:"reportTimestamp"`
-	Status                  string    `json:"status"`
-	Completion              string    `json:"completion"`
-	PreviousReportTimestamp time.Time `json:"previousReportTimestamp"`
-	ResourceObjectRef       string    `json:"resourceObjectRef"`
-	HasData                 bool      `json:"hasData"`
+	CustomerGUID            string `json:"customerGUID"`
+	Cluster                 string `json:"cluster"`
+	Namespace               string `json:"namespace"`
+	Name                    string `json:"name"`
+	SeriesID                string `json:"seriesID"`
+	TSSuffix                string `json:"tsSuffix"`
+	ReportTimestamp         string `json:"reportTimestamp"`
+	Status                  string `json:"status"`
+	Completion              string `json:"completion"`
+	PreviousReportTimestamp string `json:"previousReportTimestamp"`
+	ResourceObjectRef       string `json:"resourceObjectRef"`
+	HasData                 bool   `json:"hasData"`
 }
