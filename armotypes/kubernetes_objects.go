@@ -6,6 +6,15 @@ import (
 	"github.com/armosec/armoapi-go/identifiers"
 )
 
+type ProfileKind string
+
+const (
+	ContainerProfileKind    ProfileKind = "ContainerProfile"
+	TSContainerProfileKind  ProfileKind = "TSContainerProfile"
+	ApplicationProfileKind  ProfileKind = "ApplicationProfile"
+	NetworkNeighborhoodKind ProfileKind = "NetworkNeighborhood"
+)
+
 // KubernetesObject represents a single Kubernetes object, either native or kubescape CRD
 type KubernetesObject struct {
 	Designators       identifiers.PortalDesignator `json:"designators"`
