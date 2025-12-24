@@ -95,6 +95,14 @@ type RoleBindingRoleRef struct {
 	Namespace  string `json:"namespace,omitempty"`
 }
 
+type KubernetesStorageResourceObject struct {
+	KubernetesObject
+
+	// Storage-specific fields
+	ResourceSize             int
+	RelatedContainerProfiles map[string]string
+}
+
 type TimeSeriesContainerProfileObject struct {
 	CustomerGUID            string `json:"customerGUID"`
 	Cluster                 string `json:"cluster"`
