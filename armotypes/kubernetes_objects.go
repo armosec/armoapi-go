@@ -39,7 +39,8 @@ type KubernetesObject struct {
 
 	NetworkPolicyStatus NetworkPolicyStatus `json:"networkPolicyStatus"`
 
-	Labels map[string]string `json:"labels"`
+	Labels      map[string]string `json:"labels"`
+	Annotations map[string]string `json:"annotations"`
 
 	// pod selector labels of network policies
 	NetworkPolicyPodSelectorLabels map[string]string `json:"podSelectorLabels,omitempty"`
