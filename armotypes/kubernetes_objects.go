@@ -66,6 +66,10 @@ type KubernetesObject struct {
 	InitContainers []string `json:"initContainers,omitempty"`
 	// ephemeral containers (names) of the resource
 	EphemeralContainers []string `json:"ephemeralContainers,omitempty"`
+
+	// Storage-specific fields
+	ResourceSize             int
+	RelatedContainerProfiles map[string]string
 }
 
 type Resource struct {
@@ -89,14 +93,6 @@ type RoleBindingRoleRef struct {
 	Kind       string `json:"kind,omitempty"`
 	Name       string `json:"name,omitempty"`
 	Namespace  string `json:"namespace,omitempty"`
-}
-
-type KubernetesStorageResourceObject struct {
-	KubernetesObject
-
-	// Storage-specific fields
-	ResourceSize             int
-	RelatedContainerProfiles map[string]string
 }
 
 type TimeSeriesContainerProfileObject struct {
