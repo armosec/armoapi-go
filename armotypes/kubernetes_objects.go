@@ -39,7 +39,8 @@ type KubernetesObject struct {
 
 	NetworkPolicyStatus NetworkPolicyStatus `json:"networkPolicyStatus"`
 
-	Labels map[string]string `json:"labels"`
+	Labels      map[string]string `json:"labels"`
+	Annotations map[string]string `json:"annotations"`
 
 	// pod selector labels of network policies
 	NetworkPolicyPodSelectorLabels map[string]string `json:"podSelectorLabels,omitempty"`
@@ -65,6 +66,10 @@ type KubernetesObject struct {
 	InitContainers []string `json:"initContainers,omitempty"`
 	// ephemeral containers (names) of the resource
 	EphemeralContainers []string `json:"ephemeralContainers,omitempty"`
+
+	// Storage-specific fields
+	ResourceSize             int
+	RelatedContainerProfiles map[string]string
 }
 
 type Resource struct {
