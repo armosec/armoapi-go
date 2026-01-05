@@ -17,8 +17,9 @@ const (
 	RiskFactorSecretAccess   RiskFactor = "Secret access"
 	RiskFactorDataAccess     RiskFactor = "Data access"
 	RiskFactorHostAccess     RiskFactor = "Host access"
-	RiskFactorAILLMClient   RiskFactor = "AI/LLM client"
-	RiskFactorAILLMServer   RiskFactor = "AI/LLM service"
+	RiskFactorAILLMClient    RiskFactor = "AI/LLM client"
+	RiskFactorAILLMServer    RiskFactor = "AI/LLM service"
+	RiskFactorInternetFacing RiskFactor = "Internet facing"
 
 	//scan types
 	ClusterPosture           ScanType = "cluster"
@@ -28,16 +29,16 @@ const (
 )
 
 var RiskFactorMapping = map[string]RiskFactor{
-	"C-0256": RiskFactorExternalFacing,
-	"C-0266": RiskFactorExternalFacing,
-	"C-0046": RiskFactorPrivileged,
-	"C-0057": RiskFactorPrivileged,
-	"C-0255": RiskFactorSecretAccess,
-	"C-0257": RiskFactorDataAccess,
-	"C-0038": RiskFactorHostAccess,
-	"C-0041": RiskFactorHostAccess,
-	"C-0044": RiskFactorHostAccess,
-	"C-0048": RiskFactorHostAccess,
+	"C-0256":        RiskFactorExternalFacing,
+	"C-0266":        RiskFactorExternalFacing,
+	"C-0046":        RiskFactorPrivileged,
+	"C-0057":        RiskFactorPrivileged,
+	"C-0255":        RiskFactorSecretAccess,
+	"C-0257":        RiskFactorDataAccess,
+	"C-0038":        RiskFactorHostAccess,
+	"C-0041":        RiskFactorHostAccess,
+	"C-0044":        RiskFactorHostAccess,
+	"C-0048":        RiskFactorHostAccess,
 	"C-AILLMClient": RiskFactorAILLMClient,
 	"C-AILLMServer": RiskFactorAILLMServer,
 }
