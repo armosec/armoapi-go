@@ -173,6 +173,12 @@ type HttpRuleAlert struct {
 
 	SourcePodInfo RuntimeAlertK8sDetails `json:"sourcePodInfo,omitempty" bson:"podInfo,omitempty"`
 	AttackerIp    string                 `json:"attackerIp,omitempty" bson:"attackerIp,omitempty"`
+
+	// Enrichment fields for the layer 7 alert
+	PastActivityCount *int    `json:"pastActivityCount,omitempty" bson:"pastActivityCount,omitempty"`
+	Country           string  `json:"country,omitempty" bson:"country,omitempty"`
+	City              string  `json:"city,omitempty" bson:"city,omitempty"`
+	Explain           string  `json:"explain,omitempty" bson:"explain,omitempty"`
 }
 
 type AdmissionAlert struct {
