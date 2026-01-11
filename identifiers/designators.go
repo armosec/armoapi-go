@@ -114,6 +114,7 @@ const (
 	AttributeVolumeScanId            = "volumeScanId"
 	AttributeVolumeId                = "volumeId"
 	AttributeInstanceId              = "instanceId"
+	AttributeHostType                = "hostType"
 	AttributeInstanceHash            = "instanceHash"
 	AttributeInstanceScanId          = "instanceScanId"
 )
