@@ -58,18 +58,21 @@ type ProfileMetadata struct {
 }
 
 type CloudMetadata struct {
-	// Provider is the cloud provider name (e.g. aws, gcp, azure).
-	Provider     string   `json:"provider,omitempty" bson:"provider,omitempty"`
+	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
+	HostType     string   `json:"host_type,omitempty" bson:"host_type,omitempty"`
+	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
 	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
 	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
-	Region       string   `json:"region,omitempty" bson:"region,omitempty"`
-	Zone         string   `json:"zone,omitempty" bson:"zone,omitempty"`
-	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
-	PublicIP     string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
-	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
-	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
 	OrgID        string   `json:"org_id,omitempty" bson:"org_id,omitempty"`
-	Services     []string `json:"services,omitempty" bson:"services,omitempty"`
+	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"` // deprecated: use PrivateIPs
+	PrivateIPs   []string `json:"private_ips,omitempty" bson:"private_ips,omitempty"`
+	// Provider is the cloud provider name (e.g. aws, gcp, azure).
+	Provider  string   `json:"provider,omitempty" bson:"provider,omitempty"`
+	PublicIP  string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"` // deprecated: use PublicIPs
+	PublicIPs []string `json:"public_ips,omitempty" bson:"public_ips,omitempty"`
+	Region    string   `json:"region,omitempty" bson:"region,omitempty"`
+	Services  []string `json:"services,omitempty" bson:"services,omitempty"`
+	Zone      string   `json:"zone,omitempty" bson:"zone,omitempty"`
 }
 
 type StackFrame struct {
@@ -175,10 +178,10 @@ type HttpRuleAlert struct {
 	AttackerIp    string                 `json:"attackerIp,omitempty" bson:"attackerIp,omitempty"`
 
 	// Enrichment fields for the layer 7 alert
-	PastActivityCount *int    `json:"pastActivityCount,omitempty" bson:"pastActivityCount,omitempty"`
-	Country           string  `json:"country,omitempty" bson:"country,omitempty"`
-	City              string  `json:"city,omitempty" bson:"city,omitempty"`
-	Explain           string  `json:"explain,omitempty" bson:"explain,omitempty"`
+	PastActivityCount *int   `json:"pastActivityCount,omitempty" bson:"pastActivityCount,omitempty"`
+	Country           string `json:"country,omitempty" bson:"country,omitempty"`
+	City              string `json:"city,omitempty" bson:"city,omitempty"`
+	Explain           string `json:"explain,omitempty" bson:"explain,omitempty"`
 }
 
 type AdmissionAlert struct {
