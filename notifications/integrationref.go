@@ -18,6 +18,7 @@ const (
 	ReferenceTypeVulnerabilityTicket     ReferenceType = "ticket:vulnerability"
 	ReferenceTypeSecurityIssueTicket     ReferenceType = "ticket:securityIssue"
 	ReferenceTypeCloudRuleTicket         ReferenceType = "ticket:cloud:rule"
+	ReferenceTypeIncidentTicket          ReferenceType = "ticket:incident"
 )
 
 // Referance to external integration (e.g link to jira ticket)
@@ -49,6 +50,7 @@ const (
 	EntityTypeCloudResource         EntityType = "cloudResource"
 	EntityTypeCloudRule             EntityType = "cloudRule"
 	EntityTypeCloudControl          EntityType = "cloudControl"
+	EntityTypeIncident              EntityType = "incident"
 
 	CreatedByUser CreatedBy = "user"
 	CreatedByUNS  CreatedBy = "uns"
@@ -99,6 +101,8 @@ type EntityIdentifiers struct {
 	CloudAccountGUID string `json:"cloudAccountGUID,omitempty" bson:"cloudAccountGUID,omitempty"`
 
 	CloudControlHash string `json:"cloudControlHash,omitempty" bson:"cloudControlHash,omitempty"`
+
+	IncidentGUID string `json:"incidentGUID,omitempty" bson:"incidentGUID,omitempty"`
 
 	CreatedBy CreatedBy `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
@@ -164,6 +168,14 @@ func NewSecurityRiskResourceIdentifiers(issue armotypes.SecurityIssue) EntityIde
 	}
 }
 
+// NewIncidentIdentifiers creates EntityIdentifiers for an incident
+func NewIncidentIdentifiers(incidentGUID string) EntityIdentifiers {
+	return EntityIdentifiers{
+		Type:         EntityTypeIncident,
+		IncidentGUID: incidentGUID,
+	}
+}
+
 func (e *EntityIdentifiers) Validate() error {
 	if e.Type == "" {
 		return fmt.Errorf("entity type is required")
@@ -212,6 +224,10 @@ func (e *EntityIdentifiers) Validate() error {
 	case EntityTypeCloudRule:
 		if e.RuleHash == "" {
 			return fmt.Errorf("rule hash is required for %s", e.Type)
+		}
+	case EntityTypeIncident:
+		if e.IncidentGUID == "" {
+			return fmt.Errorf("incident GUID is required for %s", e.Type)
 		}
 	default:
 		return fmt.Errorf("entity type %s is not supported", e.Type)
@@ -296,6 +312,10 @@ func (e *EntityIdentifiers) ToMap() map[string]string {
 
 	if e.CloudAccountGUID != "" {
 		entityMap[identifiers.AttributeCloudAccountGUID] = e.CloudAccountGUID
+	}
+
+	if e.IncidentGUID != "" {
+		entityMap[identifiers.AttributeIncidentGUID] = e.IncidentGUID
 	}
 
 	return entityMap
