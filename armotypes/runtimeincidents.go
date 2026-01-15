@@ -2,6 +2,8 @@ package armotypes
 
 import (
 	"encoding/json"
+	"fmt"
+	"slices"
 	"time"
 
 	"github.com/armosec/armoapi-go/armotypes/cdr"
@@ -279,6 +281,52 @@ type RuntimeIncidentExceptionPolicy struct {
 	IncidentTypeId      string `json:"incidentTypeId"`
 	Severity            string `json:"severity"`
 	SeverityScore       int    `json:"severityScore"`
+}
+
+type RuntimeIncidentsOvertime struct {
+	Date           string           `json:"date"`
+	CountsByStatus map[string]int64 `json:"countsByStatus,omitempty"`
+	// Legacy fields for backward compatibility - will be removed after FE will be in production
+	Count          int64 `json:"count,omitempty"`
+	NewCount       int64 `json:"newCount,omitempty"`
+	DismissedCount int64 `json:"dismissedCount,omitempty"`
+}
+
+type IncidentStatusChange struct {
+	IncidentGUID   string `json:"incidentGUID"`
+	Status         string `json:"status"`
+	PreviousStatus string `json:"previousStatus,omitempty"`
+	ChangedBy      string `json:"changedBy,omitempty"`
+	CustomerGUID   string `json:"customerGUID"`
+	ClusterName    string `json:"clusterName"`
+}
+
+func (c *IncidentStatusChange) Validate() error {
+	if c.IncidentGUID == "" {
+		return fmt.Errorf("incidentGUID is required")
+	}
+	if c.Status == "" {
+		return fmt.Errorf("status is required")
+	}
+	if c.CustomerGUID == "" {
+		return fmt.Errorf("customerGUID is required")
+	}
+	if c.ClusterName == "" {
+		return fmt.Errorf("clusterName is required")
+	}
+
+	validStatuses := []string{"Open", "Investigating", "Resolved", "Dismissed"}
+	if !slices.Contains(validStatuses, c.Status) {
+		return fmt.Errorf("invalid status '%s', must be one of: %v", c.Status, validStatuses)
+	}
+	if c.PreviousStatus != "" && !slices.Contains(validStatuses, c.PreviousStatus) {
+		return fmt.Errorf("invalid previous_status '%s', must be one of: %v", c.PreviousStatus, validStatuses)
+	}
+	if c.Status == c.PreviousStatus && c.PreviousStatus != "" {
+		return fmt.Errorf("status and previousStatus are the same (%s) - no change to record", c.Status)
+	}
+
+	return nil
 }
 
 // FindProcessByPID searches for a process by PID in the process tree
