@@ -236,6 +236,8 @@ type RuntimeAlert struct {
 	AlertSourcePlatform    AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
+	// IsTriggerAlert indicates if this alert is a trigger alert
+	IsTriggerAlert bool `json:"isTriggerAlert,omitempty" bson:"isTriggerAlert,omitempty"`
 	// Hostname is the name of the node agent pod
 	HostName string          `json:"hostName" bson:"hostName"`
 	Message  string          `json:"message" bson:"message"`
