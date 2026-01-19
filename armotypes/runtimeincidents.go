@@ -58,18 +58,49 @@ type ProfileMetadata struct {
 	Error             string            `json:"errorMessage,omitempty" bson:"errorMessage,omitempty"`
 }
 
+type HostType string
+
+const (
+	HostTypeAci        HostType = "aci"
+	HostTypeAks        HostType = "aks"
+	HostTypeAutopilot  HostType = "autopilot"
+	HostTypeAzureVm    HostType = "azurevm"
+	HostTypeCloudRun   HostType = "cloudrun"
+	HostTypeDoks       HostType = "doks"
+	HostTypeDroplet    HostType = "droplet"
+	HostTypeEc2        HostType = "ec2"
+	HostTypeEcsEc2     HostType = "ecs-ec2"
+	HostTypeEcsFargate HostType = "ecs-fargate"
+	HostTypeEksEc2     HostType = "eks-ec2"
+	HostTypeEksFargate HostType = "eks-fargate"
+	HostTypeGce        HostType = "gce"
+	HostTypeGke        HostType = "gke"
+	HostTypeKubernetes HostType = "kubernetes"
+	HostTypeOther      HostType = "other"
+)
+
+type Provider string
+
+const (
+	ProviderAws          Provider = "aws"
+	ProviderAzure        Provider = "azure"
+	ProviderDigitalOcean Provider = "digitalocean"
+	ProviderGcp          Provider = "gcp"
+	ProviderOther        Provider = "other"
+)
+
 type CloudMetadata struct {
 	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
-	HostType     string   `json:"host_type,omitempty" bson:"host_type,omitempty"`
+	HostType     HostType `json:"host_type,omitempty" bson:"host_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
 	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
-	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"`
+	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"` // m5.large, ...
 	OrgID        string   `json:"org_id,omitempty" bson:"org_id,omitempty"`
-	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"` // deprecated: use PrivateIPs
+	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
 	PrivateIPs   []string `json:"private_ips,omitempty" bson:"private_ips,omitempty"`
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
-	Provider  string   `json:"provider,omitempty" bson:"provider,omitempty"`
-	PublicIP  string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"` // deprecated: use PublicIPs
+	Provider  Provider `json:"provider,omitempty" bson:"provider,omitempty"`
+	PublicIP  string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
 	PublicIPs []string `json:"public_ips,omitempty" bson:"public_ips,omitempty"`
 	Region    string   `json:"region,omitempty" bson:"region,omitempty"`
 	Services  []string `json:"services,omitempty" bson:"services,omitempty"`
