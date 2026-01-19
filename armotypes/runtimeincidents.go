@@ -2,6 +2,7 @@ package armotypes
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/armosec/armoapi-go/armotypes/cdr"
@@ -254,6 +255,33 @@ func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
 	}
 
 	return AlertSourcePlatformEC2
+}
+
+func (ra *RuntimeAlert) Validate() error {
+	if ra.RuleID == "" {
+		return fmt.Errorf("ruleID is required")
+	}
+
+	switch ra.AlertSourcePlatform {
+	case AlertSourcePlatformK8s:
+		requiredFields := map[string]string{
+			"WorkloadNamespace": ra.WorkloadNamespace,
+			"WorkloadKind":      ra.WorkloadKind,
+			"WorkloadName":      ra.WorkloadName,
+			"PodNamespace":      ra.PodNamespace,
+			"PodName":           ra.PodName,
+			"ContainerName":     ra.ContainerName,
+		}
+		for fieldName, fieldValue := range requiredFields {
+			if fieldValue == "" {
+				return fmt.Errorf("%s is required", fieldName)
+			}
+		}
+	case AlertSourcePlatformEC2, AlertSourcePlatformCloud, AlertSourcePlatformUnknown:
+		return nil
+	}
+
+	return nil
 }
 
 type ProcessTree struct {
