@@ -118,6 +118,7 @@ const (
 	AttributeInstanceHash            = "instanceHash"
 	AttributeInstanceScanId          = "instanceScanId"
 	AttributeIncidentGUID            = "incidentGUID"
+	AttributeHostName                = "hostName"
 )
 
 // Repository scan related attributes
