@@ -82,11 +82,22 @@ const (
 type Provider string
 
 const (
+	ProviderAlibaba      Provider = "alibaba"
 	ProviderAws          Provider = "aws"
 	ProviderAzure        Provider = "azure"
 	ProviderDigitalOcean Provider = "digitalocean"
+	ProviderEquinixMetal Provider = "equinixmetal" // formerly Packet
+	ProviderExoscale     Provider = "exoscale"
 	ProviderGcp          Provider = "gcp"
+	ProviderHetzner      Provider = "hetzner"
+	ProviderIBM          Provider = "ibm"
+	ProviderLinode       Provider = "linode"
+	ProviderOpenStack    Provider = "openstack"
+	ProviderOracle       Provider = "oracle"
 	ProviderOther        Provider = "other"
+	ProviderScaleway     Provider = "scaleway"
+	ProviderVMware       Provider = "vmware"
+	ProviderVultr        Provider = "vultr"
 )
 
 type CloudMetadata struct {
