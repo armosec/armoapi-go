@@ -264,19 +264,19 @@ type RuntimeAlertK8sDetails struct {
 
 type RuntimeAlertECSDetails struct {
 	ClusterARN        string `json:"clusterArn,omitempty" bson:"clusterArn,omitempty"`
-	ClusterName       string `json:"ecsClusterName,omitempty" bson:"ecsClusterName,omitempty"`
-	ServiceName       string `json:"serviceName,omitempty" bson:"serviceName,omitempty"`
+	ECSClusterName    string `json:"ecsClusterName,omitempty" bson:"ecsClusterName,omitempty"`
+	ServiceName        string `json:"serviceName,omitempty" bson:"serviceName,omitempty"`
 	TaskARN           string `json:"taskArn,omitempty" bson:"taskArn,omitempty"`
 	TaskFamily        string `json:"taskFamily,omitempty" bson:"taskFamily,omitempty"`
 	TaskDefinitionARN string `json:"taskDefinitionArn,omitempty" bson:"taskDefinitionArn,omitempty"`
-	ContainerName     string `json:"ecsContainerName,omitempty" bson:"ecsContainerName,omitempty"`
+	ECSContainerName  string `json:"ecsContainerName,omitempty" bson:"ecsContainerName,omitempty"`
 	ContainerARN      string `json:"containerArn,omitempty" bson:"containerArn,omitempty"`
-	ContainerID       string `json:"ecsContainerID,omitempty" bson:"ecsContainerID,omitempty"`
+	ECSContainerID    string `json:"ecsContainerID,omitempty" bson:"ecsContainerID,omitempty"`
 	ContainerInstance string `json:"containerInstance,omitempty" bson:"containerInstance,omitempty"` // EC2 instance ID (EC2 launch type only)
 	LaunchType        string `json:"launchType,omitempty" bson:"launchType,omitempty"`               // EC2 or FARGATE
 	AvailabilityZone  string `json:"availabilityZone,omitempty" bson:"availabilityZone,omitempty"`
-	Image             string `json:"ecsImage,omitempty" bson:"ecsImage,omitempty"`
-	ImageDigest       string `json:"ecsImageDigest,omitempty" bson:"ecsImageDigest,omitempty"`
+	ECSImage          string `json:"ecsImage,omitempty" bson:"ecsImage,omitempty"`
+	ECSImageDigest    string `json:"ecsImageDigest,omitempty" bson:"ecsImageDigest,omitempty"`
 }
 
 type NetworkScanAlert struct {
