@@ -31,6 +31,7 @@ const (
 	AlertSourcePlatformK8s
 	AlertSourcePlatformEC2
 	AlertSourcePlatformCloud
+	AlertSourcePlatformECS
 )
 
 type ProfileType int
@@ -261,6 +262,21 @@ type RuntimeAlertK8sDetails struct {
 	WorkloadUID       string            `json:"workloadUID,omitempty" bson:"workloadUID,omitempty"`
 }
 
+type RuntimeAlertECSDetails struct {
+	ClusterARN        string `json:"clusterArn,omitempty" bson:"clusterArn,omitempty"`
+	ClusterName       string `json:"ecsClusterName,omitempty" bson:"ecsClusterName,omitempty"`
+	ServiceName       string `json:"serviceName,omitempty" bson:"serviceName,omitempty"`
+	TaskARN           string `json:"taskArn,omitempty" bson:"taskArn,omitempty"`
+	TaskFamily        string `json:"taskFamily,omitempty" bson:"taskFamily,omitempty"`
+	TaskDefinitionARN string `json:"taskDefinitionArn,omitempty" bson:"taskDefinitionArn,omitempty"`
+	ContainerName     string `json:"ecsContainerName,omitempty" bson:"ecsContainerName,omitempty"`
+	ContainerARN      string `json:"containerArn,omitempty" bson:"containerArn,omitempty"`
+	ContainerID       string `json:"ecsContainerID,omitempty" bson:"ecsContainerID,omitempty"`
+	LaunchType        string `json:"launchType,omitempty" bson:"launchType,omitempty"` // EC2 or FARGATE
+	Image             string `json:"ecsImage,omitempty" bson:"ecsImage,omitempty"`
+	ImageDigest       string `json:"ecsImageDigest,omitempty" bson:"ecsImageDigest,omitempty"`
+}
+
 type NetworkScanAlert struct {
 	Domain    string   `json:"domain,omitempty" bson:"domain,omitempty"`
 	Addresses []string `json:"addresses,omitempty" bson:"addresses,omitempty"`
@@ -272,6 +288,7 @@ type RuntimeAlert struct {
 	MalwareAlert           `json:",inline" bson:"inline"`
 	AdmissionAlert         `json:",inline" bson:"inline"`
 	RuntimeAlertK8sDetails `json:",inline" bson:"inline"`
+	RuntimeAlertECSDetails `json:",inline" bson:"inline"`
 	cdr.CdrAlert           `json:"cdrevent,omitempty" bson:"cdrevent"`
 	HttpRuleAlert          `json:",inline" bson:"inline"`
 	NetworkScanAlert       `json:"networkscan,inline" bson:"networkscan"`
@@ -296,6 +313,10 @@ func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
 		return AlertSourcePlatformK8s
 	}
 
+	if ra.TaskARN != "" || ra.ClusterARN != "" {
+		return AlertSourcePlatformECS
+	}
+
 	return AlertSourcePlatformEC2
 }
 
@@ -312,14 +333,14 @@ func (ra *RuntimeAlert) Validate() error {
 			"WorkloadName":      ra.WorkloadName,
 			"PodNamespace":      ra.PodNamespace,
 			"PodName":           ra.PodName,
-			"ContainerName":     ra.ContainerName,
+			"ContainerName":     ra.RuntimeAlertK8sDetails.ContainerName,
 		}
 		for fieldName, fieldValue := range requiredFields {
 			if fieldValue == "" {
 				return fmt.Errorf("%s is required", fieldName)
 			}
 		}
-	case AlertSourcePlatformEC2, AlertSourcePlatformCloud, AlertSourcePlatformUnknown:
+	case AlertSourcePlatformEC2, AlertSourcePlatformCloud, AlertSourcePlatformUnknown, AlertSourcePlatformECS:
 		return nil
 	}
 
