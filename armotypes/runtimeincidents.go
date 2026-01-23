@@ -272,7 +272,9 @@ type RuntimeAlertECSDetails struct {
 	ContainerName     string `json:"ecsContainerName,omitempty" bson:"ecsContainerName,omitempty"`
 	ContainerARN      string `json:"containerArn,omitempty" bson:"containerArn,omitempty"`
 	ContainerID       string `json:"ecsContainerID,omitempty" bson:"ecsContainerID,omitempty"`
-	LaunchType        string `json:"launchType,omitempty" bson:"launchType,omitempty"` // EC2 or FARGATE
+	ContainerInstance string `json:"containerInstance,omitempty" bson:"containerInstance,omitempty"` // EC2 instance ID (EC2 launch type only)
+	LaunchType        string `json:"launchType,omitempty" bson:"launchType,omitempty"`               // EC2 or FARGATE
+	AvailabilityZone  string `json:"availabilityZone,omitempty" bson:"availabilityZone,omitempty"`
 	Image             string `json:"ecsImage,omitempty" bson:"ecsImage,omitempty"`
 	ImageDigest       string `json:"ecsImageDigest,omitempty" bson:"ecsImageDigest,omitempty"`
 }
