@@ -29,7 +29,7 @@ type AlertSourcePlatform int
 const (
 	AlertSourcePlatformUnknown AlertSourcePlatform = iota
 	AlertSourcePlatformK8s
-	AlertSourcePlatformEC2
+	AlertSourcePlatformHost
 	AlertSourcePlatformCloud
 	AlertSourcePlatformECS
 )
@@ -265,7 +265,7 @@ type RuntimeAlertK8sDetails struct {
 type RuntimeAlertECSDetails struct {
 	ClusterARN        string `json:"clusterArn,omitempty" bson:"clusterArn,omitempty"`
 	ECSClusterName    string `json:"ecsClusterName,omitempty" bson:"ecsClusterName,omitempty"`
-	ServiceName        string `json:"serviceName,omitempty" bson:"serviceName,omitempty"`
+	ServiceName       string `json:"serviceName,omitempty" bson:"serviceName,omitempty"`
 	TaskARN           string `json:"taskArn,omitempty" bson:"taskArn,omitempty"`
 	TaskFamily        string `json:"taskFamily,omitempty" bson:"taskFamily,omitempty"`
 	TaskDefinitionARN string `json:"taskDefinitionArn,omitempty" bson:"taskDefinitionArn,omitempty"`
@@ -319,7 +319,7 @@ func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
 		return AlertSourcePlatformECS
 	}
 
-	return AlertSourcePlatformEC2
+	return AlertSourcePlatformHost
 }
 
 func (ra *RuntimeAlert) Validate() error {
@@ -342,7 +342,7 @@ func (ra *RuntimeAlert) Validate() error {
 				return fmt.Errorf("%s is required", fieldName)
 			}
 		}
-	case AlertSourcePlatformEC2, AlertSourcePlatformCloud, AlertSourcePlatformUnknown, AlertSourcePlatformECS:
+	case AlertSourcePlatformHost, AlertSourcePlatformCloud, AlertSourcePlatformUnknown, AlertSourcePlatformECS:
 		return nil
 	}
 

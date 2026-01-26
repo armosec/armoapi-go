@@ -11,7 +11,7 @@ func TestRuntimeAlertValidateRequiredFieldsByPlatform(t *testing.T) {
 		{
 			name: "ruleID required for ec2",
 			alert: RuntimeAlert{
-				AlertSourcePlatform: AlertSourcePlatformEC2,
+				AlertSourcePlatform: AlertSourcePlatformHost,
 			},
 			wantErr: true,
 		},
