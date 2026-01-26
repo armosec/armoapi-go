@@ -29,7 +29,7 @@ type AlertSourcePlatform int
 const (
 	AlertSourcePlatformUnknown AlertSourcePlatform = iota
 	AlertSourcePlatformK8s
-	AlertSourcePlatformEC2
+	AlertSourcePlatformHost
 	AlertSourcePlatformCloud
 )
 
@@ -296,7 +296,7 @@ func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
 		return AlertSourcePlatformK8s
 	}
 
-	return AlertSourcePlatformEC2
+	return AlertSourcePlatformHost
 }
 
 func (ra *RuntimeAlert) Validate() error {
@@ -319,7 +319,7 @@ func (ra *RuntimeAlert) Validate() error {
 				return fmt.Errorf("%s is required", fieldName)
 			}
 		}
-	case AlertSourcePlatformEC2, AlertSourcePlatformCloud, AlertSourcePlatformUnknown:
+	case AlertSourcePlatformHost, AlertSourcePlatformCloud, AlertSourcePlatformUnknown:
 		return nil
 	}
 
