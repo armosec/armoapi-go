@@ -111,12 +111,13 @@ type CloudMetadata struct {
 	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
 	PrivateIPs   []string `json:"private_ips,omitempty" bson:"private_ips,omitempty"`
 	// Provider is the cloud provider name (e.g. aws, gcp, azure).
-	Provider  Provider `json:"provider,omitempty" bson:"provider,omitempty"`
-	PublicIP  string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
-	PublicIPs []string `json:"public_ips,omitempty" bson:"public_ips,omitempty"`
-	Region    string   `json:"region,omitempty" bson:"region,omitempty"`
-	Services  []string `json:"services,omitempty" bson:"services,omitempty"`
-	Zone      string   `json:"zone,omitempty" bson:"zone,omitempty"`
+	Provider      Provider `json:"provider,omitempty" bson:"provider,omitempty"`
+	PublicIP      string   `json:"public_ip,omitempty" bson:"public_ip,omitempty"`
+	PublicIPs     []string `json:"public_ips,omitempty" bson:"public_ips,omitempty"`
+	Region        string   `json:"region,omitempty" bson:"region,omitempty"`
+	ResourceGroup string   `json:"resource_group,omitempty" bson:"resource_group,omitempty"` // Azure Resource Group
+	Services      []string `json:"services,omitempty" bson:"services,omitempty"`
+	Zone          string   `json:"zone,omitempty" bson:"zone,omitempty"`
 }
 
 type StackFrame struct {
