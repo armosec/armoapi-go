@@ -15,6 +15,15 @@ func CalcHashFNV(id string) string {
 	return fmt.Sprintf("%v", hasher.Sum64())
 }
 
+// CalcAwsResourceHashFNV calculates the hash (FNV) of the AWS resource ARN
+// customerGUID is the customer GUID
+// resourceArn is the AWS resource ARN
+// returns the hash (FNV) of the AWS resource ARN
+func CalcAwsResourceHashFNV(customerGUID, resourceArn string) string {
+	strLower := strings.ToLower(fmt.Sprintf("%s/%s", customerGUID, resourceArn))
+	return CalcHashFNV(strLower)
+}
+
 func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion string) string {
 	strLower := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s/%s/%s", customerGUID, cluster, kind, name, namespace, apiVersion))
 	return CalcHashFNV(strLower)
