@@ -245,6 +245,7 @@ type AdmissionAlert struct {
 
 type RuntimeAlertK8sDetails struct {
 	ClusterName       string            `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
+	ClusterUID        string            `json:"clusterUID,omitempty" bson:"clusterUID,omitempty"`
 	ContainerName     string            `json:"containerName,omitempty" bson:"containerName,omitempty"`
 	HostNetwork       *bool             `json:"hostNetwork,omitempty" bson:"hostNetwork,omitempty"`
 	OldImage          string            `json:"oldImage,omitempty" bson:"oldImage,omitempty"`
