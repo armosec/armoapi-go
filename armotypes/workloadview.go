@@ -16,4 +16,5 @@ type WorkloadViews struct {
 	LearningPeriod     string     `json:"learningPeriod,omitempty"`
 	RiskFactors        []string   `json:"riskFactors,omitempty"`
 	LearningPercentage *int       `json:"learningPercentage,omitempty"`
+	HostName           string     `json:"hostName,omitempty"`
 }
