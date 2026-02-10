@@ -4,7 +4,8 @@ import "time"
 
 type WorkloadViews struct {
 	WorkloadName       string     `json:"workloadName"`
-	Kind               string     `json:"kind"`
+	Kind               string     `json:"kind"` // will be deprecated in the future after type is introduced
+	Type               string     `json:"type"`
 	Cluster            string     `json:"cluster"`
 	AccountID          string     `json:"accountId"`
 	Region             string     `json:"region"`
