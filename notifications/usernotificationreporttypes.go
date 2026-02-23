@@ -77,10 +77,12 @@ type NotificationParams struct {
 	// vulnerability params
 	KnownExploited *bool    `json:"knownExploited,omitempty" bson:"knownExploited,omitempty"` // Known Exploited (CISA KEV)
 	HighLikelihood *bool    `json:"highLikelihood,omitempty" bson:"highLikelihood,omitempty"` // High Likelihood (EPSS ≥ 10%)
-	CVSS           *float32 `json:"cvss,omitempty" bson:"cvss,omitempty"`                     // CVSS (Common Vulnerability Scoring System)
-	InUse          *bool    `json:"inUse,omitempty" bson:"inUse,omitempty"`                   // In Use (CISA IU)
-	Fixable        *bool    `json:"fixable,omitempty" bson:"fixable,omitempty"`               // Fixable (CISA FX)
-	RiskFactors    []string `json:"riskFactors,omitempty" bson:"riskFactors,omitempty"`       // Risk Factors
+	CVSS              *float32 `json:"cvss,omitempty" bson:"cvss,omitempty"`                           // CVSS (Common Vulnerability Scoring System) min threshold (≥)
+	CVSSMax           *float32 `json:"cvssMax,omitempty" bson:"cvssMax,omitempty"`                     // CVSS max threshold (≤)
+	InUse             *bool    `json:"inUse,omitempty" bson:"inUse,omitempty"`                         // In Use (CISA IU)
+	Fixable           *bool    `json:"fixable,omitempty" bson:"fixable,omitempty"`                     // Fixable (CISA FX)
+	NoExploitability  *bool    `json:"noExploitability,omitempty" bson:"noExploitability,omitempty"`   // No exploit intelligence
+	RiskFactors       []string `json:"riskFactors,omitempty" bson:"riskFactors,omitempty"`             // Risk Factors
 
 	// security risks params
 	SecurityRiskIDs []string `json:"securityRiskIDs,omitempty" bson:"securityRiskIDs,omitempty"` // Security Risk ID
