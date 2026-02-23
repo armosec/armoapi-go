@@ -20,6 +20,7 @@ const (
 	RiskFactorAILLMClient    RiskFactor = "AI/LLM client"
 	RiskFactorAILLMServer    RiskFactor = "AI/LLM service"
 	RiskFactorInternetFacing RiskFactor = "Internet facing"
+	RiskFactorNone           RiskFactor = "None"
 
 	//scan types
 	ClusterPosture           ScanType = "cluster"
