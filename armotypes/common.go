@@ -20,7 +20,10 @@ const (
 	RiskFactorAILLMClient    RiskFactor = "AI/LLM client"
 	RiskFactorAILLMServer    RiskFactor = "AI/LLM service"
 	RiskFactorInternetFacing RiskFactor = "Internet facing"
-	RiskFactorNone           RiskFactor = "None"
+	// RiskFactorNone is a filter sentinel representing "no risk factors".
+	// It is NOT a mappable risk factor and has no entry in RiskFactorMapping.
+	// Do not pass it to GetControlIDsByRiskFactors (it will return an empty slice).
+	RiskFactorNone RiskFactor = "None"
 
 	//scan types
 	ClusterPosture           ScanType = "cluster"
