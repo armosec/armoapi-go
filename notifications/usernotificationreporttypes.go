@@ -75,10 +75,10 @@ type LinearTicketIdentifiers struct {
 }
 
 type AlertChannel struct {
-	ChannelType             ChannelProvider                 `json:"channelType,omitempty" bson:"channelType,omitempty"`
-	Scope                   []AlertScope                    `json:"scope,omitempty" bson:"scope,omitempty"`
-	CollaborationConfigGUID string                          `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
-	Alerts                  []AlertConfig                   `json:"notifications,omitempty" bson:"notifications,omitempty"`
+	ChannelType             ChannelProvider           `json:"channelType,omitempty" bson:"channelType,omitempty"`
+	Scope                   []AlertScope              `json:"scope,omitempty" bson:"scope,omitempty"`
+	CollaborationConfigGUID string                    `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
+	Alerts                  []AlertConfig             `json:"notifications,omitempty" bson:"notifications,omitempty"`
 	JiraTicketIdentifiers   []JiraTicketIdentifiers   `json:"jiraTicketIdentifiers,omitempty" bson:"jiraTicketIdentifiers,omitempty"`
 	LinearTicketIdentifiers []LinearTicketIdentifiers `json:"linearTicketIdentifiers,omitempty" bson:"linearTicketIdentifiers,omitempty"`
 }
