@@ -59,11 +59,28 @@ const (
 type NotificationConfigIdentifier struct {
 	NotificationType NotificationType `json:"notificationType,omitempty" bson:"notificationType,omitempty"`
 }
+type JiraTicketIdentifiers struct {
+	CollaborationGUID string                 `json:"collaborationGUID,omitempty" bson:"collaborationGUID,omitempty"`
+	SiteID            string                 `json:"siteId,omitempty" bson:"siteId,omitempty"`
+	ProjectID         string                 `json:"projectId,omitempty" bson:"projectId,omitempty"`
+	IssueTypeID       string                 `json:"issueTypeId,omitempty" bson:"issueTypeId,omitempty"`
+	Fields            map[string]interface{} `json:"fields,omitempty" bson:"fields,omitempty"`
+}
+
+type LinearTicketIdentifiers struct {
+	WorkspaceID string                 `json:"workspaceId,omitempty" bson:"workspaceId,omitempty"`
+	TeamID      string                 `json:"teamId,omitempty" bson:"teamId,omitempty"`
+	AssigneeID  string                 `json:"assigneeId,omitempty" bson:"assigneeId,omitempty"`
+	Fields      map[string]interface{} `json:"fields,omitempty" bson:"fields,omitempty"`
+}
+
 type AlertChannel struct {
-	ChannelType             ChannelProvider `json:"channelType,omitempty" bson:"channelType,omitempty"`
-	Scope                   []AlertScope    `json:"scope,omitempty" bson:"scope,omitempty"`
-	CollaborationConfigGUID string          `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
-	Alerts                  []AlertConfig   `json:"notifications,omitempty" bson:"notifications,omitempty"`
+	ChannelType             ChannelProvider           `json:"channelType,omitempty" bson:"channelType,omitempty"`
+	Scope                   []AlertScope              `json:"scope,omitempty" bson:"scope,omitempty"`
+	CollaborationConfigGUID string                    `json:"collaborationConfigId,omitempty" bson:"collaborationConfigId,omitempty"`
+	Alerts                  []AlertConfig             `json:"notifications,omitempty" bson:"notifications,omitempty"`
+	JiraTicketIdentifiers   []JiraTicketIdentifiers   `json:"jiraTicketIdentifiers,omitempty" bson:"jiraTicketIdentifiers,omitempty"`
+	LinearTicketIdentifiers []LinearTicketIdentifiers `json:"linearTicketIdentifiers,omitempty" bson:"linearTicketIdentifiers,omitempty"`
 }
 
 type NotificationParams struct {
