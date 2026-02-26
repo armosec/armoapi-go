@@ -27,11 +27,12 @@ const (
 type AlertSourcePlatform int
 
 const (
-	AlertSourcePlatformUnknown AlertSourcePlatform = iota
-	AlertSourcePlatformK8s
-	AlertSourcePlatformHost
-	AlertSourcePlatformCloud
-	AlertSourcePlatformECS
+	AlertSourcePlatformUnknown     AlertSourcePlatform = iota
+	AlertSourcePlatformK8sAgent                        // node-agent running on Kubernetes (user facing: "Kubernetes Node Agent")
+	AlertSourcePlatformHostAgent                       // host-agent (user facing: "Linux Host Agent")
+	AlertSourcePlatformCloud                           // CDR alerts from cloud sources (e.g. CloudTrail, Cloud Audit Logs) (user facing: "Cloud Log Agent")
+	AlertSourcePlatformECSAgent                        // ecs-agent running on EC2 (user facing: "ECS Node Agent")
+	AlertSourcePlatformPtraceAgent                     // ptrace-agent running on fargate or other environments without eBPF (user facing: "Linux Ptrace Agent")
 )
 
 type ProfileType int
@@ -309,19 +310,26 @@ type RuntimeAlert struct {
 }
 
 func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
+	if ra.AlertSourcePlatform != AlertSourcePlatformUnknown {
+		return ra.AlertSourcePlatform
+	}
+
 	if ra.AlertType == AlertTypeCdr {
 		return AlertSourcePlatformCloud
 	}
 
 	if ra.PodName != "" {
-		return AlertSourcePlatformK8s
+		return AlertSourcePlatformK8sAgent
 	}
 
 	if ra.TaskARN != "" || ra.ClusterARN != "" {
-		return AlertSourcePlatformECS
+		if ra.LaunchType == "FARGATE" {
+			return AlertSourcePlatformPtraceAgent
+		}
+		return AlertSourcePlatformECSAgent
 	}
 
-	return AlertSourcePlatformHost
+	return AlertSourcePlatformHostAgent
 }
 
 func (ra *RuntimeAlert) Validate() error {
@@ -330,7 +338,7 @@ func (ra *RuntimeAlert) Validate() error {
 	}
 
 	switch ra.AlertSourcePlatform {
-	case AlertSourcePlatformK8s:
+	case AlertSourcePlatformK8sAgent:
 		requiredFields := map[string]string{
 			"WorkloadNamespace": ra.WorkloadNamespace,
 			"WorkloadKind":      ra.WorkloadKind,
@@ -344,7 +352,7 @@ func (ra *RuntimeAlert) Validate() error {
 				return fmt.Errorf("%s is required", fieldName)
 			}
 		}
-	case AlertSourcePlatformHost, AlertSourcePlatformCloud, AlertSourcePlatformUnknown, AlertSourcePlatformECS:
+	default:
 		return nil
 	}
 
