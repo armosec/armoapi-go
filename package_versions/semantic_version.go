@@ -37,6 +37,9 @@ func newSemanticVersion(raw string) (*semanticVersion, error) {
 	}, nil
 }
 
+// Compare checks semVer population rather than Format, because multiple formats
+// populate rich.semVer (SemanticFormat, GemFormat, and the UnknownFormat fallback).
+// The nil check is the real safety guard — Format alone would be too restrictive.
 func (v *semanticVersion) Compare(other *Version) (int, error) {
 	if other.rich.semVer == nil {
 		return -1, fmt.Errorf("given Version has no semantic version populated")
