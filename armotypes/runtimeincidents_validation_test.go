@@ -20,9 +20,8 @@ func TestGetAlertSourcePlatform(t *testing.T) {
 					Timestamp: now,
 				},
 				RuntimeAlertECSDetails: RuntimeAlertECSDetails{
-					TaskARN:    "arn:aws:ecs:us-east-1:123456789:task/my-cluster/12345678",
-					ClusterARN: "arn:aws:ecs:us-east-1:123456789:cluster/my-cluster",
-					LaunchType: "FARGATE",
+					ECSClusterName: "my-cluster",
+					LaunchType:     "FARGATE",
 				},
 			},
 			expected: AlertSourcePlatformPtraceAgent,
@@ -34,34 +33,32 @@ func TestGetAlertSourcePlatform(t *testing.T) {
 					Timestamp: now,
 				},
 				RuntimeAlertECSDetails: RuntimeAlertECSDetails{
-					TaskARN:    "arn:aws:ecs:us-east-1:123456789:task/my-cluster/12345678",
-					ClusterARN: "arn:aws:ecs:us-east-1:123456789:cluster/my-cluster",
-					LaunchType: "EC2",
+					ECSClusterName: "my-cluster",
+					LaunchType:     "EC2",
 				},
 			},
 			expected: AlertSourcePlatformECSAgent,
 		},
 		{
-			name: "TaskARN without LaunchType returns ECSAgent (backward compatibility)",
+			name: "TaskFamily without LaunchType returns ECSAgent",
 			alert: RuntimeAlert{
 				BaseRuntimeAlert: BaseRuntimeAlert{
 					Timestamp: now,
 				},
 				RuntimeAlertECSDetails: RuntimeAlertECSDetails{
-					TaskARN:    "arn:aws:ecs:us-east-1:123456789:task/my-cluster/12345678",
-					ClusterARN: "arn:aws:ecs:us-east-1:123456789:cluster/my-cluster",
+					TaskFamily: "my-task-family",
 				},
 			},
 			expected: AlertSourcePlatformECSAgent,
 		},
 		{
-			name: "ClusterARN without LaunchType returns ECSAgent (backward compatibility)",
+			name: "ECSClusterName only returns ECSAgent",
 			alert: RuntimeAlert{
 				BaseRuntimeAlert: BaseRuntimeAlert{
 					Timestamp: now,
 				},
 				RuntimeAlertECSDetails: RuntimeAlertECSDetails{
-					ClusterARN: "arn:aws:ecs:us-east-1:123456789:cluster/my-cluster",
+					ECSClusterName: "my-cluster",
 				},
 			},
 			expected: AlertSourcePlatformECSAgent,
