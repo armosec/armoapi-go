@@ -318,15 +318,17 @@ func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
 		return AlertSourcePlatformCloud
 	}
 
-	if ra.PodName != "" {
-		return AlertSourcePlatformK8sAgent
-	}
-
-	if ra.TaskARN != "" || ra.ClusterARN != "" {
+	// Check ECS before PodName: ECS alerts often have K8s-style fields (e.g. PodName) filled for
+	// backend compatibility, so we must use ECS-specific fields first to avoid misclassifying as K8s.
+	if ra.TaskFamily != "" || ra.ServiceName != "" || ra.ECSClusterName != "" {
 		if ra.LaunchType == "FARGATE" {
 			return AlertSourcePlatformPtraceAgent
 		}
 		return AlertSourcePlatformECSAgent
+	}
+
+	if ra.PodName != "" {
+		return AlertSourcePlatformK8sAgent
 	}
 
 	return AlertSourcePlatformHostAgent
