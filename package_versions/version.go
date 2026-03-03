@@ -110,6 +110,13 @@ func (v *Version) populate() error {
 		return nil
 	}
 
+	// fallback to semver for unrecognized formats (e.g. binary, npm)
+	ver, err := newSemanticVersion(v.Raw)
+	if err == nil {
+		v.rich.semVer = ver
+		return nil
+	}
+
 	return fmt.Errorf("no rich version populated (format=%s)", v.Format)
 }
 
@@ -137,7 +144,11 @@ func (v *Version) Compare(pkgType syftPkg.Type, other *Version) (int, error) {
 	case syftPkg.GemPkg:
 		compRes, err = v.rich.semVer.Compare(other)
 	default:
-		return -1, fmt.Errorf("unsupported package type: %v", pkgType)
+		if v.rich.semVer != nil {
+			compRes, err = v.rich.semVer.Compare(other)
+		} else {
+			return -1, fmt.Errorf("unsupported package type: %v", pkgType)
+		}
 	}
 
 	if err != nil {

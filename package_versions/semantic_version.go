@@ -16,7 +16,6 @@ package packages_versions
 
 import (
 	"fmt"
-	"github.com/anchore/grype/grype/version"
 	"strings"
 
 	hashiVer "github.com/hashicorp/go-version"
@@ -39,9 +38,6 @@ func newSemanticVersion(raw string) (*semanticVersion, error) {
 }
 
 func (v *semanticVersion) Compare(other *Version) (int, error) {
-	if other.Format != version.SemanticFormat {
-		return -1, fmt.Errorf("unable to compare semantic version to given format: %s", other.Format)
-	}
 	if other.rich.semVer == nil {
 		return -1, fmt.Errorf("given empty semanticVersion object")
 	}
