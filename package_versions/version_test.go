@@ -16,7 +16,8 @@ func TestNewVersion(t *testing.T) {
 		wantError bool
 	}{
 		{"Valid Semantic Version", "1.0.0", version.SemanticFormat, false},
-		{"Invalid Format", "1.0.0", version.ParseFormat("unknown"), true},
+		{"Unknown Format with valid semver", "1.0.0", version.ParseFormat("unknown"), false},
+		{"Unknown Format with invalid semver", "not-a-version", version.ParseFormat("unknown"), true},
 	}
 
 	for _, tt := range tests {
@@ -39,7 +40,8 @@ func TestNewVersionFromPkgType(t *testing.T) {
 		wantError  bool
 	}{
 		{"Valid Java Package", "1.0.0", string(pkg.JavaPkg), false},
-		{"Invalid Package Type", "1.0.0", "invalid", true},
+		{"Unknown Package Type with valid semver", "1.0.0", "invalid", false},
+		{"Unknown Package Type with invalid semver", "not-a-version", "invalid", true},
 		{"Valid Python Package", "1.0.0", string(pkg.PythonPkg), false},
 		{"Valid Golang Package", "v1.2.3", string(pkg.GoModulePkg), false},
 		{"Invalid Version for Golang", "1.2ee", string(pkg.GoModulePkg), true},
@@ -115,9 +117,16 @@ func TestSortVersions(t *testing.T) {
 			wantError:   false,
 		},
 		{
-			name:        "Invalid Package Type",
+			name:        "Unknown Package Type with valid semver",
 			pkgType:     "unknown",
-			versionStrs: []string{"1.0.0", "1.0.1"},
+			versionStrs: []string{"1.0.1", "1.0.0"},
+			want:        []string{"1.0.0", "1.0.1"},
+			wantError:   false,
+		},
+		{
+			name:        "Unknown Package Type with invalid semver",
+			pkgType:     "unknown",
+			versionStrs: []string{"not-a-version", "also-not"},
 			wantError:   true,
 		},
 		{
