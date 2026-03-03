@@ -39,7 +39,7 @@ func newSemanticVersion(raw string) (*semanticVersion, error) {
 
 func (v *semanticVersion) Compare(other *Version) (int, error) {
 	if other.rich.semVer == nil {
-		return -1, fmt.Errorf("given empty semanticVersion object")
+		return -1, fmt.Errorf("given Version has no semantic version populated")
 	}
 
 	return other.rich.semVer.verObj.Compare(v.verObj), nil

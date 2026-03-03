@@ -110,14 +110,14 @@ func (v *Version) populate() error {
 		return nil
 	}
 
-	// fallback to semver for unrecognized formats (e.g. binary, npm)
-	ver, err := newSemanticVersion(v.Raw)
-	if err == nil {
+	// fallback to semantic version parsing when version.Format is unrecognized
+	ver, semverErr := newSemanticVersion(v.Raw)
+	if semverErr == nil {
 		v.rich.semVer = ver
 		return nil
 	}
 
-	return fmt.Errorf("no rich version populated (format=%s)", v.Format)
+	return fmt.Errorf("no rich version populated (format=%s): semver fallback failed: %w", v.Format, semverErr)
 }
 
 // Compare compares this version with another version, based on the specified package type.
