@@ -144,7 +144,8 @@ const (
 	NotificationTypeSecurityRiskNew    NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
 	NotificationTypeRuntimeIncidentNew NotificationType = NotificationTypeRuntimeIncidentPush + ":newRuntimeIncident"
 
-	NotificationTypeVulnScanFailurePush NotificationType = "vulnScanFailurePush" // vulnerability scan failure
+	NotificationTypeVulnScanFailurePush NotificationType = "vulnScanFailurePush"                            // vulnerability scan failure
+	NotificationTypeVulnScanFailureNew  NotificationType = NotificationTypeVulnScanFailurePush + ":newVulnScanFailure" // new scan failure event
 )
 
 var notificationTypes = []NotificationType{
