@@ -106,6 +106,9 @@ type NotificationParams struct {
 
 	// cluster status params
 	ClusterStatus []string `json:"clusterStatus,omitempty" bson:"clusterStatus,omitempty"` // Cluster Status
+
+	// system health — vulnerability scan failure
+	VulnerabilityScanFailure *bool `json:"vulnerabilityScanFailure,omitempty" bson:"vulnerabilityScanFailure,omitempty"`
 }
 
 type AlertConfig struct {
@@ -140,6 +143,9 @@ const (
 
 	NotificationTypeSecurityRiskNew    NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
 	NotificationTypeRuntimeIncidentNew NotificationType = NotificationTypeRuntimeIncidentPush + ":newRuntimeIncident"
+
+	NotificationTypeVulnScanFailurePush NotificationType = "vulnScanFailurePush"                            // vulnerability scan failure
+	NotificationTypeVulnScanFailureNew  NotificationType = NotificationTypeVulnScanFailurePush + ":newVulnScanFailure" // new scan failure event
 )
 
 var notificationTypes = []NotificationType{
@@ -149,6 +155,7 @@ var notificationTypes = []NotificationType{
 	NotificationTypeNewClusterAdmin,
 	NotificationTypeNewVulnerability,
 	NotificationTypeVulnerabilityNewFix,
+	NotificationTypeVulnScanFailurePush,
 }
 
 type PushReport struct {
