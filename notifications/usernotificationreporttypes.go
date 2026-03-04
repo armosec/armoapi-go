@@ -155,6 +155,7 @@ var notificationTypes = []NotificationType{
 	NotificationTypeNewClusterAdmin,
 	NotificationTypeNewVulnerability,
 	NotificationTypeVulnerabilityNewFix,
+	NotificationTypeVulnScanFailurePush,
 }
 
 type PushReport struct {
