@@ -164,6 +164,28 @@ func TestRuntimeAlertValidateRequiredFieldsByPlatform(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "k8sAgent host container with empty workload fields passes",
+			alert: RuntimeAlert{
+				AlertSourcePlatform: AlertSourcePlatformK8sAgent,
+				RuleID:              "R0010",
+				RuntimeAlertK8sDetails: RuntimeAlertK8sDetails{
+					ContainerID: HostContainerID,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "k8sAgent non-host with empty workload fields fails",
+			alert: RuntimeAlert{
+				AlertSourcePlatform: AlertSourcePlatformK8sAgent,
+				RuleID:              "R0010",
+				RuntimeAlertK8sDetails: RuntimeAlertK8sDetails{
+					ContainerID: "8e4d0abaf22b889cd9165e51551eb35da278bd6fa68acfd3779ba2a30187f13f",
+				},
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
