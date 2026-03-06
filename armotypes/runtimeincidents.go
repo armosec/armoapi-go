@@ -334,6 +334,8 @@ func (ra *RuntimeAlert) GetAlertSourcePlatform() AlertSourcePlatform {
 	return AlertSourcePlatformHostAgent
 }
 
+const HostContainerID = "host"
+
 func (ra *RuntimeAlert) Validate() error {
 	if ra.RuleID == "" {
 		return fmt.Errorf("ruleID is required")
@@ -351,7 +353,9 @@ func (ra *RuntimeAlert) Validate() error {
 		}
 		for fieldName, fieldValue := range requiredFields {
 			if fieldValue == "" {
-				return fmt.Errorf("%s is required", fieldName)
+				if ra.ContainerID != HostContainerID {
+					return fmt.Errorf("%s is required", fieldName)
+				}
 			}
 		}
 	default:
