@@ -27,7 +27,13 @@ func CalcAwsResourceHashFNV(customerGUID, resourceArn string) string {
 func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion string) string {
 	strLower := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s/%s/%s", customerGUID, cluster, kind, name, namespace, apiVersion))
 	return CalcHashFNV(strLower)
+}
 
+// CalcStorageResourceHashFNV calculates the hash (FNV) for storage resources with platform identification.
+func CalcStorageResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion, hostType, awsAccountID, region, hostID string) string {
+	strLower := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s/%s/%s/%s/%s/%s/%s",
+		customerGUID, cluster, kind, name, namespace, apiVersion, hostType, awsAccountID, region, hostID))
+	return CalcHashFNV(strLower)
 }
 
 func CalcContainerHashFNV(customerGUID, cluster, podName, containerName, namespace string) string {
