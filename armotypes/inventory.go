@@ -18,4 +18,8 @@ type Inventory struct {
 	RiskFactors        []string   `json:"riskFactors,omitempty"`
 	LearningPercentage *int       `json:"learningPercentage,omitempty"`
 	HostName           string     `json:"hostName,omitempty"`
+	AccountName        string     `json:"accountName,omitempty"`
+	InstanceID         string     `json:"instanceId,omitempty"`
+	HostIPs            []string   `json:"hostIPs,omitempty"`
+	Tags               []string   `json:"tags,omitempty"`
 }
