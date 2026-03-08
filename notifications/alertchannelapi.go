@@ -14,4 +14,7 @@ type AlertChannelAPI struct {
 	// Scope selected clusters/namespaces
 	// Example cluster123, [nspace1, nspace2]
 	Scope []EnrichedScope `json:"scope"`
+
+	JiraTicketIdentifiers   []JiraTicketIdentifiers   `json:"jiraTicketIdentifiers,omitempty"`
+	LinearTicketIdentifiers []LinearTicketIdentifiers `json:"linearTicketIdentifiers,omitempty"`
 }
