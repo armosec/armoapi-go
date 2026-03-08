@@ -6,15 +6,6 @@ import (
 	"github.com/armosec/armoapi-go/identifiers"
 )
 
-type ProfileKind string
-
-const (
-	ContainerProfileKind    ProfileKind = "ContainerProfile"
-	TSContainerProfileKind  ProfileKind = "TSContainerProfile"
-	ApplicationProfileKind  ProfileKind = "ApplicationProfile"
-	NetworkNeighborhoodKind ProfileKind = "NetworkNeighborhood"
-)
-
 // KubernetesObject represents a single Kubernetes object, either native or kubescape CRD
 type KubernetesObject struct {
 	Designators       identifiers.PortalDesignator `json:"designators"`
@@ -93,19 +84,4 @@ type RoleBindingRoleRef struct {
 	Kind       string `json:"kind,omitempty"`
 	Name       string `json:"name,omitempty"`
 	Namespace  string `json:"namespace,omitempty"`
-}
-
-type TimeSeriesContainerProfileObject struct {
-	CustomerGUID            string `json:"customerGUID"`
-	Cluster                 string `json:"cluster"`
-	Namespace               string `json:"namespace"`
-	Name                    string `json:"name"`
-	SeriesID                string `json:"seriesID"`
-	TSSuffix                string `json:"tsSuffix"`
-	ReportTimestamp         string `json:"reportTimestamp"`
-	Status                  string `json:"status"`
-	Completion              string `json:"completion"`
-	PreviousReportTimestamp string `json:"previousReportTimestamp"`
-	ResourceObjectRef       string `json:"resourceObjectRef"`
-	HasData                 bool   `json:"hasData"`
 }
