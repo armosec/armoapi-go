@@ -346,7 +346,6 @@ func (ra *RuntimeAlert) Validate() error {
 		requiredFields := map[string]string{
 			"WorkloadNamespace": ra.WorkloadNamespace,
 			"WorkloadKind":      ra.WorkloadKind,
-			"WorkloadName":      ra.WorkloadName,
 			"PodNamespace":      ra.PodNamespace,
 			"PodName":           ra.PodName,
 			"ContainerName":     ra.RuntimeAlertK8sDetails.ContainerName,
