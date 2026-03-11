@@ -186,6 +186,8 @@ type BaseRuntimeAlert struct {
 	ProfileMetadata *ProfileMetadata `json:"profileMetadata,omitempty" bson:"profileMetadata,omitempty"`
 	// Identifiers of the alert
 	Identifiers *common.Identifiers `json:"identifiers,omitempty" bson:"identifiers,omitempty"`
+	// Version of the agent that generated the alert
+	AgentVersion string `json:"agentVersion,omitempty" bson:"agentVersion,omitempty"`
 }
 
 type RuleAlert struct {
