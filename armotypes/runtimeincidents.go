@@ -104,10 +104,12 @@ const (
 
 type CloudMetadata struct {
 	AccountID    string   `json:"account_id,omitempty" bson:"account_id,omitempty"`
+	ClusterName  string   `json:"cluster_name,omitempty" bson:"cluster_name,omitempty"`
 	HostType     HostType `json:"host_type,omitempty" bson:"host_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty" bson:"hostname,omitempty"`
 	InstanceID   string   `json:"instance_id,omitempty" bson:"instance_id,omitempty"`
 	InstanceType string   `json:"instance_type,omitempty" bson:"instance_type,omitempty"` // m5.large, ...
+	MachineID    string   `json:"machine_id,omitempty" bson:"machine_id,omitempty"`
 	OrgID        string   `json:"org_id,omitempty" bson:"org_id,omitempty"`
 	PrivateIP    string   `json:"private_ip,omitempty" bson:"private_ip,omitempty"`
 	PrivateIPs   []string `json:"private_ips,omitempty" bson:"private_ips,omitempty"`
