@@ -57,7 +57,7 @@ type AgentsProfileObject struct {
 	ResourceObjectRef string    `json:"resourceObjectRef"`
 	ResourceVersion   string    `json:"resourceVersion,omitempty"`
 	Checksum          string    `json:"checksum"`
-	CreationTimestamp  time.Time `json:"creationTimestamp"`
+	CreationTimestamp time.Time `json:"creationTimestamp"`
 	SyncKind          string    `json:"syncKind,omitempty"`
 	APIVersion        string    `json:"apiVersion,omitempty"`
 
