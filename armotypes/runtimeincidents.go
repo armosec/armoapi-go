@@ -73,6 +73,8 @@ const (
 	HostTypeEc2        HostType = "ec2"
 	HostTypeEcsEc2     HostType = "ecs-ec2"
 	HostTypeEcsFargate HostType = "ecs-fargate"
+	HostTypeEcsService HostType = "ecs-service"
+	HostTypeEcsTask    HostType = "ecs-task"
 	HostTypeEksEc2     HostType = "eks-ec2"
 	HostTypeEksFargate HostType = "eks-fargate"
 	HostTypeGce        HostType = "gce"
