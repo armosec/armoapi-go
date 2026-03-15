@@ -81,6 +81,25 @@ const (
 	HostTypeOther      HostType = "other"
 )
 
+// IsClusterBasedHostType returns true for host types that use a cluster name
+// Standalone host types (EC2, GCE, Azure VM, Droplet, Cloud Run, etc.) use hostID instead.
+// An empty hostType is treated as cluster-based (defaults to Kubernetes).
+func IsClusterBasedHostType(hostType HostType) bool {
+	if hostType == "" {
+		return true
+	}
+	switch hostType {
+	case HostTypeKubernetes,
+		HostTypeEksEc2,
+		HostTypeEksFargate,
+		HostTypeEcsEc2,
+		HostTypeEcsFargate:
+		return true
+	default:
+		return false
+	}
+}
+
 type Provider string
 
 const (

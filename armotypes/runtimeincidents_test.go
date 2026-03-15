@@ -89,3 +89,36 @@ func TestFindProcessRecursive(t *testing.T) {
 		}
 	}
 }
+
+func TestIsClusterBasedHostType(t *testing.T) {
+	clusterBased := []HostType{
+		HostTypeKubernetes,
+		HostTypeEksEc2,
+		HostTypeEksFargate,
+		HostTypeEcsEc2,
+		HostTypeEcsFargate,
+	}
+	for _, ht := range clusterBased {
+		assert.True(t, IsClusterBasedHostType(ht), "expected %s to be cluster-based", ht)
+	}
+
+	standalone := []HostType{
+		HostTypeEc2,
+		HostTypeGce,
+		HostTypeAzureVm,
+		HostTypeDroplet,
+		HostTypeCloudRun,
+		HostTypeGke,
+		HostTypeAks,
+		HostTypeDoks,
+		HostTypeAutopilot,
+		HostTypeAci,
+		HostTypeOther,
+	}
+	for _, ht := range standalone {
+		assert.False(t, IsClusterBasedHostType(ht), "expected %s to be standalone", ht)
+	}
+
+	assert.True(t, IsClusterBasedHostType(""), "empty string should be treated as cluster-based (defaults to kubernetes)")
+	assert.False(t, IsClusterBasedHostType("unknown"), "unknown type should not be cluster-based")
+}
