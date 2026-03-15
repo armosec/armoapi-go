@@ -6,6 +6,8 @@ import "time"
 type ScanFailureCase int
 
 const (
+	// ScanFailureUnknown is the zero value; used when no specific case applies.
+	ScanFailureUnknown ScanFailureCase = 0
 	// ScanFailureCVE — have SBOM, can't match against vulnerability DBs.
 	ScanFailureCVE ScanFailureCase = 1
 	// ScanFailureSBOMGeneration — can't build SBOM from image.
@@ -24,7 +26,7 @@ func (f ScanFailureCase) String() string {
 	case ScanFailureSBOMGeneration:
 		return "SBOM generation failed"
 	case ScanFailureOOMKilled:
-		return "Scanner process OOM killed"
+		return "Scanner process OOM-killed"
 	case ScanFailureBackendPost:
 		return "Backend post failed"
 	default:
