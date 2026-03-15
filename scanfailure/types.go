@@ -37,8 +37,8 @@ func (f ScanFailureCase) String() string {
 // WorkloadIdentifier identifies a single Kubernetes workload affected by a scan failure.
 // A failed image may be used by multiple workloads, so the report carries a list of these.
 type WorkloadIdentifier struct {
-	ClusterName  string `json:"clusterName" bson:"clusterName"`
-	Namespace    string `json:"namespace" bson:"namespace"`
+	ClusterName   string `json:"clusterName" bson:"clusterName"`
+	Namespace     string `json:"namespace" bson:"namespace"`
 	WorkloadKind  string `json:"workloadKind" bson:"workloadKind"`
 	WorkloadName  string `json:"workloadName" bson:"workloadName"`
 	ContainerName string `json:"containerName,omitempty" bson:"containerName,omitempty"`
@@ -55,9 +55,8 @@ type ScanFailureReport struct {
 	FailureCase   ScanFailureCase      `json:"failureCase" bson:"failureCase"`
 	FailureReason string               `json:"failureReason" bson:"failureReason"`
 	Timestamp     time.Time            `json:"timestamp" bson:"timestamp"`
-	ImageHash     string               `json:"imageHash,omitempty" bson:"imageHash,omitempty"`
-	ContainerName string               `json:"containerName,omitempty" bson:"containerName,omitempty"`
-	JobID         string               `json:"jobID,omitempty" bson:"jobID,omitempty"`
+	ImageHash string `json:"imageHash,omitempty" bson:"imageHash,omitempty"`
+	JobID     string `json:"jobID,omitempty" bson:"jobID,omitempty"`
 
 	// Registry scan context (no workloads).
 	RegistryName   string `json:"registryName,omitempty" bson:"registryName,omitempty"`
