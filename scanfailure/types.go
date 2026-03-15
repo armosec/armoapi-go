@@ -55,8 +55,8 @@ type ScanFailureReport struct {
 	FailureCase   ScanFailureCase      `json:"failureCase" bson:"failureCase"`
 	FailureReason string               `json:"failureReason" bson:"failureReason"`
 	Timestamp     time.Time            `json:"timestamp" bson:"timestamp"`
-	ImageHash     string               `json:"imageHash,omitempty" bson:"imageHash,omitempty"`
-	JobID         string               `json:"jobID,omitempty" bson:"jobID,omitempty"`
+	ImageHash string `json:"imageHash,omitempty" bson:"imageHash,omitempty"`
+	JobID     string `json:"jobID,omitempty" bson:"jobID,omitempty"`
 
 	// Registry scan context (no workloads).
 	RegistryName   string `json:"registryName,omitempty" bson:"registryName,omitempty"`
