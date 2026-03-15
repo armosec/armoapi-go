@@ -34,28 +34,26 @@ func (f ScanFailureCase) String() string {
 	}
 }
 
-// WorkloadIdentifier identifies a single Kubernetes workload affected by a scan failure.
-// A failed image may be used by multiple workloads, so the report carries a list of these.
-type WorkloadIdentifier struct {
-	ClusterName  string `json:"clusterName" bson:"clusterName"`
-	Namespace    string `json:"namespace" bson:"namespace"`
-	WorkloadKind string `json:"workloadKind" bson:"workloadKind"`
-	WorkloadName string `json:"workloadName" bson:"workloadName"`
-}
-
 // ScanFailureReport is emitted by the scanner when a scan fails.
-// The scanner sends ONE report per failed image with all affected workloads listed.
-// Downstream services (event-ingester, UNS) fan out per workload for notifications.
-// For registry scans, Workloads is nil/empty and RegistryName is populated.
+// Each report covers a single workload-image pair (matching the container scan pattern).
+// For registry scans, workload fields are empty and RegistryName is populated.
 type ScanFailureReport struct {
-	CustomerGUID  string               `json:"customerGUID" bson:"customerGUID"`
-	Workloads     []WorkloadIdentifier `json:"workloads,omitempty" bson:"workloads,omitempty"`
-	ImageTag      string               `json:"imageTag" bson:"imageTag"`
-	FailureCase   ScanFailureCase      `json:"failureCase" bson:"failureCase"`
-	FailureReason string               `json:"failureReason" bson:"failureReason"`
-	Timestamp     time.Time            `json:"timestamp" bson:"timestamp"`
+	CustomerGUID  string          `json:"customerGUID" bson:"customerGUID"`
+	ImageTag      string          `json:"imageTag" bson:"imageTag"`
+	ImageHash     string          `json:"imageHash,omitempty" bson:"imageHash,omitempty"`
+	ContainerName string          `json:"containerName,omitempty" bson:"containerName,omitempty"`
+	FailureCase   ScanFailureCase `json:"failureCase" bson:"failureCase"`
+	FailureReason string          `json:"failureReason" bson:"failureReason"`
+	Timestamp     time.Time       `json:"timestamp" bson:"timestamp"`
+	JobID         string          `json:"jobID,omitempty" bson:"jobID,omitempty"`
 
-	// Registry scan context (no workloads).
+	// Workload context (single workload per report).
+	ClusterName  string `json:"clusterName,omitempty" bson:"clusterName,omitempty"`
+	Namespace    string `json:"namespace,omitempty" bson:"namespace,omitempty"`
+	WorkloadKind string `json:"workloadKind,omitempty" bson:"workloadKind,omitempty"`
+	WorkloadName string `json:"workloadName,omitempty" bson:"workloadName,omitempty"`
+
+	// Registry scan context (mutually exclusive with workload fields).
 	RegistryName   string `json:"registryName,omitempty" bson:"registryName,omitempty"`
 	IsRegistryScan bool   `json:"isRegistryScan,omitempty" bson:"isRegistryScan,omitempty"`
 }
