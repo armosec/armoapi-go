@@ -22,4 +22,5 @@ type Inventory struct {
 	InstanceID         string     `json:"instanceId,omitempty"`
 	HostIPs            []string   `json:"hostIPs,omitempty"`
 	Tags               []string   `json:"tags,omitempty"`
+	LaunchType         string     `json:"launchType,omitempty"`
 }
