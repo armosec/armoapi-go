@@ -102,6 +102,23 @@ func IsClusterBasedHostType(hostType HostType) bool {
 	}
 }
 
+// ValidateHostTypeIdentifiers checks that the required identifiers are present
+// based on the host type. Cluster-based types (Kubernetes, ECS) require a non-empty
+// cluster. Standalone host types require a non-empty hostID.
+// An empty hostType is treated as cluster-based (defaults to Kubernetes).
+func ValidateHostTypeIdentifiers(hostType HostType, cluster, hostID string) error {
+	if IsClusterBasedHostType(hostType) {
+		if cluster == "" {
+			return fmt.Errorf("cluster is required for host type %q", hostType)
+		}
+	} else {
+		if hostID == "" {
+			return fmt.Errorf("hostID is required for standalone host type %q", hostType)
+		}
+	}
+	return nil
+}
+
 type Provider string
 
 const (
