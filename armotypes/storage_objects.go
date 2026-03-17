@@ -1,6 +1,9 @@
 package armotypes
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type ProfileKind string
 
@@ -19,6 +22,42 @@ type ProfileScope struct {
 	AWSAccountID string   `json:"awsAccountID"`
 	Region       string   `json:"region"`
 	HostID       string   `json:"hostID"`
+}
+
+// ValidateProfileScope checks that all required identifiers are present for
+// the given host type. ECS types require cluster, awsAccountID, and region.
+// Kubernetes requires cluster and namespace. Standalone host types require hostID.
+// An empty HostType defaults to Kubernetes.
+func ValidateProfileScope(scope ProfileScope) error {
+	hostType := scope.HostType
+	if hostType == "" {
+		hostType = HostTypeKubernetes
+	}
+
+	switch hostType {
+	case HostTypeEcsEc2, HostTypeEcsFargate, HostTypeEksEc2, HostTypeEksFargate:
+		if scope.Cluster == "" {
+			return fmt.Errorf("cluster is required for %s profiles", hostType)
+		}
+		if scope.AWSAccountID == "" {
+			return fmt.Errorf("aws_account_id is required for %s profiles", hostType)
+		}
+		if scope.Region == "" {
+			return fmt.Errorf("region is required for %s profiles", hostType)
+		}
+	case HostTypeKubernetes:
+		if scope.Cluster == "" {
+			return fmt.Errorf("cluster is required for %s profiles", hostType)
+		}
+		if scope.Namespace == "" {
+			return fmt.Errorf("namespace is required for %s profiles", hostType)
+		}
+	default:
+		if scope.HostID == "" {
+			return fmt.Errorf("host_id is required for host type %q", hostType)
+		}
+	}
+	return nil
 }
 
 // ProfileIdentifier uniquely identifies a profile resource by combining
