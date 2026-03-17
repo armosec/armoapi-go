@@ -70,10 +70,13 @@ type ScanFailureReport struct {
 	ImageTag      string               `json:"imageTag" bson:"imageTag"`
 	FailureCase   ScanFailureCase      `json:"failureCase" bson:"failureCase"`
 	FailureReason string               `json:"failureReason" bson:"failureReason"`
-	Error         string               `json:"error,omitempty" bson:"error,omitempty"`
-	Timestamp     time.Time            `json:"timestamp" bson:"timestamp"`
-	ImageHash string `json:"imageHash,omitempty" bson:"imageHash,omitempty"`
-	JobID     string `json:"jobID,omitempty" bson:"jobID,omitempty"`
+	// Error holds the raw error string for R&D debugging. Not rendered in user-facing
+	// notifications (Slack/Teams templates use FailureReason only). Producers must avoid
+	// including secrets (tokens, credentials) — redact sensitive data before populating.
+	Error     string    `json:"error,omitempty" bson:"error,omitempty"`
+	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
+	ImageHash string    `json:"imageHash,omitempty" bson:"imageHash,omitempty"`
+	JobID     string    `json:"jobID,omitempty" bson:"jobID,omitempty"`
 
 	// Registry scan context (no workloads).
 	RegistryName   string `json:"registryName,omitempty" bson:"registryName,omitempty"`
