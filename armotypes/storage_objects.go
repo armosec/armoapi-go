@@ -114,10 +114,11 @@ type AgentsProfileObject struct {
 	CompletionStatus string `json:"completionStatus"`
 
 	// Storage
-	RelatedContainerProfiles map[string]string `json:"relatedContainerProfiles,omitempty"`
-	AdditionalProps          map[string]string `json:"additionalProps,omitempty"`
-	Containers               []string          `json:"containers,omitempty"`
-	InitContainers           []string          `json:"initContainers,omitempty"`
-	EphemeralContainers      []string          `json:"ephemeralContainers,omitempty"`
-	ResourceSize             int               `json:"resourceSize"`
+	RelatedContainerProfiles map[string]string      `json:"relatedContainerProfiles,omitempty"`
+	AdditionalProps          map[string]string      `json:"additionalProps,omitempty"`
+	ObjectMeta               map[string]interface{} `json:"objectMeta,omitempty"`
+	Containers               []string               `json:"containers,omitempty"`
+	InitContainers           []string               `json:"initContainers,omitempty"`
+	EphemeralContainers      []string               `json:"ephemeralContainers,omitempty"`
+	ResourceSize             int                    `json:"resourceSize"`
 }
