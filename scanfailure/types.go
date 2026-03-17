@@ -18,20 +18,21 @@ const (
 	ScanFailureBackendPost ScanFailureCase = 4
 )
 
-// Human-friendly failure reasons displayed in Slack/Teams notifications.
-// Scanners (kubevuln, node-agent) classify errors and pick the matching constant.
-// These are rendered directly as {{ .FailureReason }} in notification templates.
+// Failure reason codes sent by scanners (kubevuln, node-agent) in FailureReason.
+// These are short enum-like codes — the notification service (UNS) maps them to
+// human-friendly text at render time, so notification wording can be changed
+// without redeploying in-cluster scanners.
 const (
-	ReasonSBOMGenerationFailed = "Failed to generate software inventory (SBOM) for this image"
-	ReasonImageTooLarge        = "Image exceeds the maximum size limit for vulnerability scanning"
-	ReasonSBOMTooLarge         = "Generated software inventory (SBOM) exceeds the maximum size limit"
-	ReasonSBOMIncomplete       = "SBOM generation was incomplete — the scan may have timed out or the image exceeded size limits"
-	ReasonImageAuthFailed      = "Failed to authenticate when pulling the container image"
-	ReasonImageNotFound        = "Container image manifest not found in registry"
-	ReasonCVEMatchingFailed    = "Failed to match image components against vulnerability databases"
-	ReasonResultUploadFailed   = "Scan completed but results could not be uploaded to the platform"
-	ReasonSBOMStorageFailed    = "Failed to store the generated software inventory (SBOM)"
-	ReasonUnexpected           = "An unexpected error occurred during vulnerability scanning"
+	ReasonSBOMGenerationFailed = "sbom_generation_failed"
+	ReasonImageTooLarge        = "image_too_large"
+	ReasonSBOMTooLarge         = "sbom_too_large"
+	ReasonSBOMIncomplete       = "sbom_incomplete"
+	ReasonImageAuthFailed      = "image_auth_failed"
+	ReasonImageNotFound        = "image_not_found"
+	ReasonCVEMatchingFailed    = "cve_matching_failed"
+	ReasonResultUploadFailed   = "result_upload_failed"
+	ReasonSBOMStorageFailed    = "sbom_storage_failed"
+	ReasonUnexpected           = "unexpected_error"
 )
 
 // String returns a human-readable description of the failure case.
