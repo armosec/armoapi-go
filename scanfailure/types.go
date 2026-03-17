@@ -35,6 +35,29 @@ const (
 	ReasonUnexpected           = "unexpected_error"
 )
 
+// reasonFriendlyText maps reason codes to human-friendly text for notifications.
+var reasonFriendlyText = map[string]string{
+	ReasonSBOMGenerationFailed: "Failed to generate software inventory (SBOM) for this image",
+	ReasonImageTooLarge:        "Image exceeds the maximum size limit for vulnerability scanning",
+	ReasonSBOMTooLarge:         "Generated software inventory (SBOM) exceeds the maximum size limit",
+	ReasonSBOMIncomplete:       "SBOM generation was incomplete — the scan may have timed out or the image exceeded size limits",
+	ReasonImageAuthFailed:      "Failed to authenticate when pulling the container image",
+	ReasonImageNotFound:        "Container image manifest not found in registry",
+	ReasonCVEMatchingFailed:    "Failed to match image components against vulnerability databases",
+	ReasonResultUploadFailed:   "Scan completed but results could not be uploaded to the platform",
+	ReasonSBOMStorageFailed:    "Failed to store the generated software inventory (SBOM)",
+	ReasonUnexpected:           "An unexpected error occurred during vulnerability scanning",
+}
+
+// ReasonFriendlyText returns the human-friendly notification text for a reason code.
+// If the code is unknown, returns the code itself as a fallback.
+func ReasonFriendlyText(reasonCode string) string {
+	if text, ok := reasonFriendlyText[reasonCode]; ok {
+		return text
+	}
+	return reasonCode
+}
+
 // String returns a human-readable description of the failure case.
 func (f ScanFailureCase) String() string {
 	switch f {
