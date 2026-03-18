@@ -97,6 +97,8 @@ func TestIsClusterBasedHostType(t *testing.T) {
 		HostTypeEksFargate,
 		HostTypeEcsEc2,
 		HostTypeEcsFargate,
+		HostTypeEcsService,
+		HostTypeEcsTask,
 	}
 	for _, ht := range clusterBased {
 		assert.True(t, IsClusterBasedHostType(ht), "expected %s to be cluster-based", ht)

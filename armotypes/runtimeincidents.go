@@ -95,7 +95,9 @@ func IsClusterBasedHostType(hostType HostType) bool {
 		HostTypeEksEc2,
 		HostTypeEksFargate,
 		HostTypeEcsEc2,
-		HostTypeEcsFargate:
+		HostTypeEcsFargate,
+		HostTypeEcsService,
+		HostTypeEcsTask:
 		return true
 	default:
 		return false

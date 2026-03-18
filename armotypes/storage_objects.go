@@ -35,7 +35,7 @@ func ValidateProfileScope(scope ProfileScope) error {
 	}
 
 	switch hostType {
-	case HostTypeEcsEc2, HostTypeEcsFargate, HostTypeEksEc2, HostTypeEksFargate:
+	case HostTypeEcsEc2, HostTypeEcsFargate, HostTypeEcsService, HostTypeEcsTask, HostTypeEksEc2, HostTypeEksFargate:
 		if scope.Cluster == "" {
 			return fmt.Errorf("cluster is required for %s profiles", hostType)
 		}
