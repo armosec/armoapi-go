@@ -103,7 +103,6 @@ type AgentsProfileObject struct {
 	// Related resource info
 	RelatedName            string `json:"relatedName"`
 	RelatedKind            string `json:"relatedKind"`
-	RelatedResourceType    string `json:"relatedResourceType"`
 	RelatedAPIGroup        string `json:"relatedAPIGroup"`
 	RelatedNamespace       string `json:"relatedNamespace"`
 	RelatedAPIVersion      string `json:"relatedAPIVersion"`
