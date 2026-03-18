@@ -8,10 +8,10 @@ import (
 	"github.com/google/uuid"
 )
 
-// hashDelimiter is used to join components for hashing. NUL cannot appear in
-// Kubernetes identifiers (names, namespaces, apiVersion) or AWS values, so it
-// ensures unambiguous segmentation when apiVersion contains "/" (e.g., "apps/v1").
-const hashDelimiter = "\x00"
+// hashDelimiter is used to join components for hashing. ASCII Unit Separator (US)
+// cannot appear in Kubernetes identifiers or AWS values, ensuring unambiguous
+// segmentation when apiVersion contains "/" (e.g., "apps/v1").
+const hashDelimiter = "\x1F"
 
 // CalcHashFNV calculates the hash (FNV) of the string
 func CalcHashFNV(id string) string {
