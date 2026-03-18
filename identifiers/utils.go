@@ -8,6 +8,11 @@ import (
 	"github.com/google/uuid"
 )
 
+// hashDelimiter is used to join components for hashing. NUL cannot appear in
+// Kubernetes identifiers (names, namespaces, apiVersion) or AWS values, so it
+// ensures unambiguous segmentation when apiVersion contains "/" (e.g., "apps/v1").
+const hashDelimiter = "\x00"
+
 // CalcHashFNV calculates the hash (FNV) of the string
 func CalcHashFNV(id string) string {
 	hasher := fnv.New64a()
@@ -31,8 +36,8 @@ func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersio
 
 // CalcStorageResourceHashFNV calculates the hash (FNV) for storage resources with platform identification.
 func CalcStorageResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion, hostType, awsAccountID, region, hostID string) string {
-	strLower := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s/%s/%s/%s/%s/%s/%s",
-		customerGUID, cluster, kind, name, namespace, apiVersion, hostType, awsAccountID, region, hostID))
+	components := []string{customerGUID, cluster, kind, name, namespace, apiVersion, hostType, awsAccountID, region, hostID}
+	strLower := strings.ToLower(strings.Join(components, hashDelimiter))
 	return CalcHashFNV(strLower)
 }
 

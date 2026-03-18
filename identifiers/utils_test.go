@@ -72,6 +72,16 @@ func TestConvertResourceIDToResourceHashFNV(t *testing.T) {
 	}
 }
 
+func TestCalcStorageResourceHashFNV_NoCollisionWithSlashInAPIVersion(t *testing.T) {
+	// With "/" delimiter, these would collide: namespace="a", apiVersion="b/c", hostType="d"
+	// vs namespace="a/b", apiVersion="c", hostType="d" both produce "a/b/c/d"
+	hash1 := CalcStorageResourceHashFNV("cust", "cluster", "Deployment", "name", "a", "b/c", "d", "acct", "us-east-1", "host1")
+	hash2 := CalcStorageResourceHashFNV("cust", "cluster", "Deployment", "name", "a/b", "c", "d", "acct", "us-east-1", "host1")
+	if hash1 == hash2 {
+		t.Errorf("CalcStorageResourceHashFNV: inputs with slash in apiVersion must not collide; got same hash %s", hash1)
+	}
+}
+
 func TestCalcContainerHashFNV(t *testing.T) {
 	tests := []struct {
 		name          string
