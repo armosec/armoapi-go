@@ -83,6 +83,44 @@ const (
 	HostTypeOther      HostType = "other"
 )
 
+// IsClusterBasedHostType returns true for host types that use a cluster name
+// Standalone host types (EC2, GCE, Azure VM, Droplet, Cloud Run, etc.) use hostID instead.
+// An empty hostType is treated as cluster-based (defaults to Kubernetes).
+func IsClusterBasedHostType(hostType HostType) bool {
+	if hostType == "" {
+		return true
+	}
+	switch hostType {
+	case HostTypeKubernetes,
+		HostTypeEksEc2,
+		HostTypeEksFargate,
+		HostTypeEcsEc2,
+		HostTypeEcsFargate,
+		HostTypeEcsService,
+		HostTypeEcsTask:
+		return true
+	default:
+		return false
+	}
+}
+
+// ValidateHostTypeIdentifiers checks that the required identifiers are present
+// based on the host type. Cluster-based types (Kubernetes, ECS) require a non-empty
+// cluster. Standalone host types require a non-empty hostID.
+// An empty hostType is treated as cluster-based (defaults to Kubernetes).
+func ValidateHostTypeIdentifiers(hostType HostType, cluster, hostID string) error {
+	if IsClusterBasedHostType(hostType) {
+		if cluster == "" {
+			return fmt.Errorf("cluster is required for host type %q", hostType)
+		}
+	} else {
+		if hostID == "" {
+			return fmt.Errorf("hostID is required for standalone host type %q", hostType)
+		}
+	}
+	return nil
+}
+
 type Provider string
 
 const (

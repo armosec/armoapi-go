@@ -8,6 +8,11 @@ import (
 	"github.com/google/uuid"
 )
 
+// hashDelimiter is used to join components for hashing. ASCII Unit Separator (US)
+// cannot appear in Kubernetes identifiers or AWS values, ensuring unambiguous
+// segmentation when apiVersion contains "/" (e.g., "apps/v1").
+const hashDelimiter = "\x1F"
+
 // CalcHashFNV calculates the hash (FNV) of the string
 func CalcHashFNV(id string) string {
 	hasher := fnv.New64a()
@@ -27,7 +32,13 @@ func CalcAwsResourceHashFNV(customerGUID, resourceArn string) string {
 func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion string) string {
 	strLower := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s/%s/%s", customerGUID, cluster, kind, name, namespace, apiVersion))
 	return CalcHashFNV(strLower)
+}
 
+// CalcStorageResourceHashFNV calculates the hash (FNV) for storage resources with platform identification.
+func CalcStorageResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion, hostType, cloudAccountIdentifier, region, hostID string) string {
+	components := []string{customerGUID, cluster, kind, name, namespace, apiVersion, hostType, cloudAccountIdentifier, region, hostID}
+	strLower := strings.ToLower(strings.Join(components, hashDelimiter))
+	return CalcHashFNV(strLower)
 }
 
 func CalcContainerHashFNV(customerGUID, cluster, podName, containerName, namespace string) string {
