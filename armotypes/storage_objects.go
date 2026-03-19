@@ -14,18 +14,18 @@ const (
 	NetworkNeighborhoodKind ProfileKind = "NetworkNeighborhood"
 )
 
-// ProfileScope identifies the platform (hostType) and location (cluster, namespace, awsAccountID, region, hostID) of a storage resource.
+// ProfileScope identifies the platform (hostType) and location (cluster, namespace, cloudAccountIdentifier, region, hostID) of a storage resource.
 type ProfileScope struct {
-	HostType     HostType `json:"hostType"`
-	Cluster      string   `json:"cluster"`
-	Namespace    string   `json:"namespace"`
-	AWSAccountID string   `json:"awsAccountID"`
-	Region       string   `json:"region"`
-	HostID       string   `json:"hostID"`
+	HostType               HostType `json:"hostType"`
+	Cluster                string   `json:"cluster"`
+	Namespace              string   `json:"namespace"`
+	CloudAccountIdentifier string   `json:"cloudAccountIdentifier"`
+	Region                 string   `json:"region"`
+	HostID                 string   `json:"hostID"`
 }
 
 // ValidateProfileScope checks that all required identifiers are present for
-// the given host type. ECS types require cluster, awsAccountID, and region.
+// the given host type. ECS types require cluster, cloudAccountIdentifier, and region.
 // Kubernetes requires cluster and namespace. Standalone host types require hostID.
 // An empty HostType defaults to Kubernetes.
 func ValidateProfileScope(scope ProfileScope) error {
@@ -39,8 +39,8 @@ func ValidateProfileScope(scope ProfileScope) error {
 		if scope.Cluster == "" {
 			return fmt.Errorf("cluster is required for %s profiles", hostType)
 		}
-		if scope.AWSAccountID == "" {
-			return fmt.Errorf("aws_account_id is required for %s profiles", hostType)
+		if scope.CloudAccountIdentifier == "" {
+			return fmt.Errorf("cloud_account_identifier is required for %s profiles", hostType)
 		}
 		if scope.Region == "" {
 			return fmt.Errorf("region is required for %s profiles", hostType)
@@ -70,15 +70,16 @@ type ProfileIdentifier struct {
 type TimeSeriesContainerProfileObject struct {
 	CustomerGUID string `json:"customerGUID"`
 	ProfileScope
-	Name                    string `json:"name"`
-	SeriesID                string `json:"seriesID"`
-	TSSuffix                string `json:"tsSuffix"`
-	ReportTimestamp         string `json:"reportTimestamp"`
-	Status                  string `json:"status"`
-	Completion              string `json:"completion"`
-	PreviousReportTimestamp string `json:"previousReportTimestamp"`
-	ResourceObjectRef       string `json:"resourceObjectRef"`
-	HasData                 bool   `json:"hasData"`
+	Provider                Provider `json:"provider"`
+	Name                    string   `json:"name"`
+	SeriesID                string   `json:"seriesID"`
+	TSSuffix                string   `json:"tsSuffix"`
+	ReportTimestamp         string   `json:"reportTimestamp"`
+	Status                  string   `json:"status"`
+	Completion              string   `json:"completion"`
+	PreviousReportTimestamp string   `json:"previousReportTimestamp"`
+	ResourceObjectRef       string   `json:"resourceObjectRef"`
+	HasData                 bool     `json:"hasData"`
 }
 
 // AgentsProfileObject represents a platform-agnostic storage resource.
@@ -91,6 +92,7 @@ type AgentsProfileObject struct {
 
 	// Scope (platform + location)
 	ProfileScope
+	Provider Provider `json:"provider"`
 
 	// Resource metadata
 	ResourceObjectRef string    `json:"resourceObjectRef"`

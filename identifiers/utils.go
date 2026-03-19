@@ -35,8 +35,8 @@ func CalcResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersio
 }
 
 // CalcStorageResourceHashFNV calculates the hash (FNV) for storage resources with platform identification.
-func CalcStorageResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion, hostType, awsAccountID, region, hostID string) string {
-	components := []string{customerGUID, cluster, kind, name, namespace, apiVersion, hostType, awsAccountID, region, hostID}
+func CalcStorageResourceHashFNV(customerGUID, cluster, kind, name, namespace, apiVersion, hostType, cloudAccountIdentifier, region, hostID string) string {
+	components := []string{customerGUID, cluster, kind, name, namespace, apiVersion, hostType, cloudAccountIdentifier, region, hostID}
 	strLower := strings.ToLower(strings.Join(components, hashDelimiter))
 	return CalcHashFNV(strLower)
 }
