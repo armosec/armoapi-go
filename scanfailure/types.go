@@ -54,7 +54,8 @@ var reasonFriendlyText = map[string]string{
 }
 
 // ReasonFriendlyText returns the human-friendly notification text for a reason code.
-// If the code is empty or unknown, falls back to the unexpected error text.
+// Empty codes fall back to the unexpected error text.
+// Unknown non-empty codes are returned as-is (forward-compat for new scanner versions).
 func ReasonFriendlyText(reasonCode string) string {
 	if reasonCode == "" {
 		return reasonFriendlyText[ReasonUnexpected]
