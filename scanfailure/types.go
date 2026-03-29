@@ -32,6 +32,8 @@ const (
 	ReasonCVEMatchingFailed    = "cve_matching_failed"
 	ReasonResultUploadFailed   = "result_upload_failed"
 	ReasonSBOMStorageFailed    = "sbom_storage_failed"
+	ReasonScannerOOMKilled     = "scanner_oom_killed"
+	ReasonScanTimeout          = "scan_timeout"
 	ReasonUnexpected           = "unexpected_error"
 )
 
@@ -46,12 +48,18 @@ var reasonFriendlyText = map[string]string{
 	ReasonCVEMatchingFailed:    "Failed to match image components against vulnerability databases",
 	ReasonResultUploadFailed:   "Scan completed but results could not be uploaded to the platform",
 	ReasonSBOMStorageFailed:    "Failed to store the generated software inventory (SBOM)",
+	ReasonScannerOOMKilled:     "SBOM scanner was killed due to memory limits — consider increasing the scanner memory limit",
+	ReasonScanTimeout:          "Vulnerability scan timed out before completion",
 	ReasonUnexpected:           "An unexpected error occurred during vulnerability scanning",
 }
 
 // ReasonFriendlyText returns the human-friendly notification text for a reason code.
-// If the code is unknown, returns the code itself as a fallback.
+// Empty codes fall back to the unexpected error text.
+// Unknown non-empty codes are returned as-is (forward-compat for new scanner versions).
 func ReasonFriendlyText(reasonCode string) string {
+	if reasonCode == "" {
+		return reasonFriendlyText[ReasonUnexpected]
+	}
 	if text, ok := reasonFriendlyText[reasonCode]; ok {
 		return text
 	}
