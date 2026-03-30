@@ -23,4 +23,5 @@ type Inventory struct {
 	HostIPs            []string   `json:"hostIPs,omitempty"`
 	Tags               []string   `json:"tags,omitempty"`
 	LaunchType         string     `json:"launchType,omitempty"`
+	HostType           string     `json:"hostType,omitempty"`
 }
