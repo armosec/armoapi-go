@@ -38,6 +38,8 @@ func (vc *VersionConstraint) Matches(candidateVersion, pkgType string) (bool, er
 	pkg := syftPkg.Type(pkgType)
 
 	// Check lower bound (inclusive): candidate >= Start
+	// Note: Compare() uses inverted semantics (returns other.Compare(self)),
+	// so cmp > 0 means startVer > candidate, i.e. candidate < Start.
 	if vc.Start != "" {
 		startVer, err := NewVersionFromPkgType(vc.Start, pkgType)
 		if err != nil {
@@ -47,12 +49,13 @@ func (vc *VersionConstraint) Matches(candidateVersion, pkgType string) (bool, er
 		if err != nil {
 			return false, err
 		}
-		if cmp > 0 { // candidate < start
+		if cmp > 0 { // startVer > candidate → candidate below range
 			return false, nil
 		}
 	}
 
 	// Check upper bound (exclusive): candidate < End
+	// cmp <= 0 means endVer <= candidate, i.e. candidate >= End.
 	if vc.End != "" {
 		endVer, err := NewVersionFromPkgType(vc.End, pkgType)
 		if err != nil {
@@ -62,7 +65,7 @@ func (vc *VersionConstraint) Matches(candidateVersion, pkgType string) (bool, er
 		if err != nil {
 			return false, err
 		}
-		if cmp <= 0 { // candidate >= end (end is exclusive)
+		if cmp <= 0 { // endVer <= candidate → candidate at or above upper bound
 			return false, nil
 		}
 	}
