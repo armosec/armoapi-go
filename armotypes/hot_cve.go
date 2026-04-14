@@ -36,7 +36,7 @@ type HotCVEOnFinishedMessage struct {
 	Namespace    string   `json:"namespace"`
 	Kind         string   `json:"kind"`
 	WorkloadName string   `json:"workloadName"`
-	CVEId        string   `json:"cveId"`
+	CVEID        string   `json:"cveId"`
 	Severity     string   `json:"severity"`
 	Components   []string `json:"components"`
 }
