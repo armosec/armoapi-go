@@ -109,6 +109,9 @@ type NotificationParams struct {
 
 	// system health — scan failure
 	ScanFailure *bool `json:"scanFailure,omitempty" bson:"scanFailure,omitempty"`
+
+	// hot CVE notification
+	HotCVE *bool `json:"hotCVE,omitempty" bson:"hotCVE,omitempty"`
 }
 
 type AlertConfig struct {
