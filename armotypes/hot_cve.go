@@ -1,11 +1,8 @@
 package armotypes
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
-// HotCVEAffectedPackage defines a package affected by a hot CVE
+// HotCVEAffectedPackage defines a package affected by a hot CVE.
 type HotCVEAffectedPackage struct {
 	PackageName  string   `json:"packageName" bson:"packageName"`
 	PackageTypes []string `json:"packageTypes,omitempty" bson:"packageTypes,omitempty"`
@@ -15,53 +12,38 @@ type HotCVEAffectedPackage struct {
 	FixedVersion string   `json:"fixedVersion,omitempty" bson:"fixedVersion,omitempty"`
 }
 
-// HotCVE defines a hot CVE from the external JSON feed
+// HotCVE defines a hot CVE definition published via admin API.
 type HotCVE struct {
 	CVEID            string                  `json:"cveId" bson:"cveId"`
 	Title            string                  `json:"title" bson:"title"`
 	Description      string                  `json:"description,omitempty" bson:"description,omitempty"`
 	Severity         string                  `json:"severity" bson:"severity"`
 	SeverityScore    int                     `json:"severityScore" bson:"severityScore"`
-	IsRCE            bool                    `json:"isRce,omitempty" bson:"isRce,omitempty"`
 	References       []string                `json:"references,omitempty" bson:"references,omitempty"`
 	Status           string                  `json:"status" bson:"status"`
 	AffectedPackages []HotCVEAffectedPackage `json:"affectedPackages" bson:"affectedPackages"`
 }
 
-// HotCVEEndpointResponse is the JSON response from the external hot CVE endpoint
+// HotCVEEndpointResponse is the JSON response from the external hot CVE endpoint.
 type HotCVEEndpointResponse struct {
 	Version string   `json:"version"`
 	HotCVEs []HotCVE `json:"hotCves"`
 }
 
-// HotCVEOnFinishedMessage is the Pulsar message published for UNS after batch scan
+// HotCVEOnFinishedMessage is the Pulsar message published for UNS after hot CVE processing.
 type HotCVEOnFinishedMessage struct {
-	CustomerGUID string   `json:"customerGUID"`
-	ClusterName  string   `json:"clusterName"`
-	Namespace    string   `json:"namespace"`
-	Kind         string   `json:"kind"`
-	WorkloadName string   `json:"workloadName"`
-	CVEID        string   `json:"cveId"`
-	Severity     string   `json:"severity"`
-	Components   []string `json:"components"`
+	CustomerGUID string `json:"customerGUID"`
+	CVEID        string `json:"cveId"`
+	Severity     string `json:"severity"`
 }
 
-// validHotCVESeverities lists the accepted severity values for hot CVEs (lowercase for case-insensitive comparison).
-// Subset of containerscan.KnownSeverities — cannot import directly due to circular dependency.
-var validHotCVESeverities = map[string]bool{
-	"critical": true, "high": true, "medium": true, "low": true,
-}
-
-// Validate checks that the HotCVE has all required fields and valid values.
+// Validate checks that the HotCVE has all required fields.
 func (h *HotCVE) Validate() error {
 	if h.CVEID == "" {
 		return fmt.Errorf("cveId is required")
 	}
 	if h.Severity == "" {
 		return fmt.Errorf("severity is required")
-	}
-	if !validHotCVESeverities[strings.ToLower(h.Severity)] {
-		return fmt.Errorf("invalid severity %q: must be critical, high, medium, or low", h.Severity)
 	}
 	if len(h.AffectedPackages) == 0 {
 		return fmt.Errorf("affectedPackages is required and must not be empty")
@@ -82,7 +64,6 @@ func (p *HotCVEAffectedPackage) Validate() error {
 	if p.PackageName == "" {
 		return fmt.Errorf("packageName is required")
 	}
-	// At least one version constraint must be specified
 	if p.VersionStart == "" && p.VersionEnd == "" && len(p.VersionExact) == 0 {
 		return fmt.Errorf("at least one version constraint (versionStart, versionEnd, or versionExact) is required for package %q", p.PackageName)
 	}

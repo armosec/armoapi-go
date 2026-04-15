@@ -5,7 +5,7 @@
     "description": "Malicious code was discovered in xz-utils versions 5.6.0 and 5.6.1. The backdoor affects the sshd service via systemd.",
     "severity": "critical",
     "severityScore": 900,
-    "isRce": true,
+
     "references": [
       "https://nvd.nist.gov/vuln/detail/CVE-2024-3094",
       "https://www.openwall.com/lists/oss-security/2024/03/29/4"
@@ -48,7 +48,7 @@
     "description": "Critical remote code execution in Node.js http module.",
     "severity": "high",
     "severityScore": 750,
-    "isRce": true,
+
     "references": [
       "https://nvd.nist.gov/vuln/detail/CVE-2024-9999"
     ],

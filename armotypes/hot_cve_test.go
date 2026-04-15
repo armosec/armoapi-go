@@ -36,7 +36,6 @@ func TestHotCVE_Validate_FromJSON(t *testing.T) {
 	assert.Equal(t, "xz/liblzma backdoor", hotCVEs[0].Title)
 	assert.Equal(t, "critical", hotCVEs[0].Severity)
 	assert.Equal(t, 900, hotCVEs[0].SeverityScore)
-	assert.True(t, hotCVEs[0].IsRCE)
 	assert.Len(t, hotCVEs[0].AffectedPackages, 4)
 	assert.Equal(t, "xz-utils", hotCVEs[0].AffectedPackages[0].PackageName)
 	assert.Equal(t, []string{"deb"}, hotCVEs[0].AffectedPackages[0].PackageTypes)
@@ -98,23 +97,6 @@ func TestHotCVE_Validate(t *testing.T) {
 				AffectedPackages: []HotCVEAffectedPackage{validPkg},
 			},
 			wantErr: "severity is required",
-		},
-		{
-			name: "invalid severity",
-			cve: HotCVE{
-				CVEID:            "CVE-2024-3094",
-				Severity:         "urgent",
-				AffectedPackages: []HotCVEAffectedPackage{validPkg},
-			},
-			wantErr: "invalid severity",
-		},
-		{
-			name: "case insensitive severity",
-			cve: HotCVE{
-				CVEID:            "CVE-2024-3094",
-				Severity:         "Critical",
-				AffectedPackages: []HotCVEAffectedPackage{validPkg},
-			},
 		},
 		{
 			name: "empty affected packages",
