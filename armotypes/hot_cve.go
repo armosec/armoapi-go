@@ -46,8 +46,9 @@ type HotCVEOnFinishedMessage struct {
 	Components   []string `json:"components"`
 }
 
-// validSeverities lists the accepted severity values for hot CVEs.
-var validSeverities = map[string]bool{
+// validHotCVESeverities lists the accepted severity values for hot CVEs (lowercase for case-insensitive comparison).
+// Subset of containerscan.KnownSeverities — cannot import directly due to circular dependency.
+var validHotCVESeverities = map[string]bool{
 	"critical": true, "high": true, "medium": true, "low": true,
 }
 
@@ -59,7 +60,7 @@ func (h *HotCVE) Validate() error {
 	if h.Severity == "" {
 		return fmt.Errorf("severity is required")
 	}
-	if !validSeverities[strings.ToLower(h.Severity)] {
+	if !validHotCVESeverities[strings.ToLower(h.Severity)] {
 		return fmt.Errorf("invalid severity %q: must be critical, high, medium, or low", h.Severity)
 	}
 	if len(h.AffectedPackages) == 0 {

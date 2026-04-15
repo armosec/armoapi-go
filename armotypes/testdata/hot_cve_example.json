@@ -1,0 +1,66 @@
+[
+  {
+    "cveId": "CVE-2024-3094",
+    "title": "xz/liblzma backdoor",
+    "description": "Malicious code was discovered in xz-utils versions 5.6.0 and 5.6.1. The backdoor affects the sshd service via systemd.",
+    "severity": "critical",
+    "severityScore": 900,
+    "isRce": true,
+    "references": [
+      "https://nvd.nist.gov/vuln/detail/CVE-2024-3094",
+      "https://www.openwall.com/lists/oss-security/2024/03/29/4"
+    ],
+    "status": "active",
+    "affectedPackages": [
+      {
+        "packageName": "xz-utils",
+        "packageTypes": ["deb"],
+        "versionStart": "5.6.0",
+        "versionEnd": "5.6.2",
+        "fixedVersion": "5.6.2"
+      },
+      {
+        "packageName": "liblzma5",
+        "packageTypes": ["deb"],
+        "versionStart": "5.6.0",
+        "versionEnd": "5.6.2",
+        "fixedVersion": "5.6.2"
+      },
+      {
+        "packageName": "xz-libs",
+        "packageTypes": ["rpm"],
+        "versionStart": "5.6.0",
+        "versionEnd": "5.6.2",
+        "fixedVersion": "5.6.2"
+      },
+      {
+        "packageName": "xz",
+        "packageTypes": ["apk"],
+        "versionStart": "5.6.0",
+        "versionEnd": "5.6.2",
+        "fixedVersion": "5.6.2"
+      }
+    ]
+  },
+  {
+    "cveId": "CVE-2024-9999",
+    "title": "Example Node.js zero-day",
+    "description": "Critical remote code execution in Node.js http module.",
+    "severity": "high",
+    "severityScore": 750,
+    "isRce": true,
+    "references": [
+      "https://nvd.nist.gov/vuln/detail/CVE-2024-9999"
+    ],
+    "status": "active",
+    "affectedPackages": [
+      {
+        "packageName": "nodejs",
+        "packageTypes": ["npm"],
+        "versionStart": "18.0.0",
+        "versionEnd": "18.19.1",
+        "fixedVersion": "18.19.1"
+      }
+    ]
+  }
+]

@@ -1,10 +1,49 @@
 package armotypes
 
 import (
+	"encoding/json"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestHotCVE_Validate_FromJSON(t *testing.T) {
+	data, err := os.ReadFile("testdata/hot_cve_example.json")
+	require.NoError(t, err, "failed to read example JSON")
+
+	var hotCVEs []HotCVE
+	err = json.Unmarshal(data, &hotCVEs)
+	require.NoError(t, err, "failed to unmarshal example JSON")
+	require.Len(t, hotCVEs, 2, "expected 2 hot CVEs in example")
+
+	for i, cve := range hotCVEs {
+		t.Run(cve.CVEID, func(t *testing.T) {
+			err := cve.Validate()
+			assert.NoError(t, err, "hot CVE at index %d should be valid", i)
+			assert.NotEmpty(t, cve.CVEID)
+			assert.NotEmpty(t, cve.Severity)
+			assert.NotEmpty(t, cve.AffectedPackages)
+			for _, pkg := range cve.AffectedPackages {
+				assert.NotEmpty(t, pkg.PackageName)
+			}
+		})
+	}
+
+	// Verify specific fields from the example
+	assert.Equal(t, "CVE-2024-3094", hotCVEs[0].CVEID)
+	assert.Equal(t, "xz/liblzma backdoor", hotCVEs[0].Title)
+	assert.Equal(t, "critical", hotCVEs[0].Severity)
+	assert.Equal(t, 900, hotCVEs[0].SeverityScore)
+	assert.True(t, hotCVEs[0].IsRCE)
+	assert.Len(t, hotCVEs[0].AffectedPackages, 4)
+	assert.Equal(t, "xz-utils", hotCVEs[0].AffectedPackages[0].PackageName)
+	assert.Equal(t, []string{"deb"}, hotCVEs[0].AffectedPackages[0].PackageTypes)
+	assert.Equal(t, "5.6.0", hotCVEs[0].AffectedPackages[0].VersionStart)
+	assert.Equal(t, "5.6.2", hotCVEs[0].AffectedPackages[0].VersionEnd)
+	assert.Equal(t, "5.6.2", hotCVEs[0].AffectedPackages[0].FixedVersion)
+}
 
 func TestHotCVE_Validate(t *testing.T) {
 	validPkg := HotCVEAffectedPackage{
