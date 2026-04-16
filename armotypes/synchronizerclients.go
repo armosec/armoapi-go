@@ -17,4 +17,5 @@ type SynchronizerClient struct {
 	CloudProvider       string    `json:"cloudProvider"`
 	ClusterStatus       string    `json:"clusterStatus"`
 	LearningTime        string    `json:"learningTime"`
+	ClusterUID          string    `json:"clusterUID"`
 }
