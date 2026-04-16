@@ -21,6 +21,7 @@ type NewRuntimeIncident struct {
 	Response            *RuntimeIncidentResponse     `json:"response,omitempty"`
 	ReportTime          time.Time                    `json:"reportTime"`
 	PolicyGUIDToName    map[string]string            `json:"policyGUIDToName,omitempty"`
+	Classification      string                       `json:"classification,omitempty"`
 }
 
 type RuntimeIncidentResponse struct {
