@@ -22,7 +22,10 @@ const (
 	AlertTypeCdr
 	AlertTypeHttpRule
 	AlertTypeNetworkScan
+	AlertTypeVulnerability
 )
+
+const HotCVEMatchMessageProperty = "HOT_CVE"
 
 type AlertSourcePlatform int
 

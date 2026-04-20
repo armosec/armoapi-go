@@ -70,6 +70,28 @@ func (p *HotCVEAffectedPackage) Validate() error {
 	return nil
 }
 
+// HotCVEMatchMessage is published to the KDR ingester topic when a hot CVE
+// matches a customer's SBOM component. The HotCVEMessageProcessor creates
+// runtime incidents from these messages.
+type HotCVEMatchMessage struct {
+	CustomerGUID     string `json:"customerGUID"`
+	CVEID            string `json:"cveId"`
+	Title            string `json:"title"`
+	Description      string `json:"description"`
+	Severity         string `json:"severity"`
+	SeverityScore    int    `json:"severityScore"`
+	Component        string `json:"component"`
+	ComponentVersion string `json:"componentVersion"`
+	PackageType      string `json:"packageType"`
+	FixedVersion     string `json:"fixedVersion"`
+	ResourceHash     string `json:"resourceHash"`
+	ClusterName      string `json:"clusterName"`
+	Namespace        string `json:"namespace"`
+	WorkloadName     string `json:"workloadName"`
+	WorkloadKind     string `json:"workloadKind"`
+	IsInUse          bool   `json:"isInUse"`
+}
+
 const (
 	HotCVESentinelLayerHash = "__hot_cve__"
 	HotCVEStatusActive      = "active"

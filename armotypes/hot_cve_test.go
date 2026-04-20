@@ -181,3 +181,65 @@ func TestHotCVE_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestHotCVEMatchMessage_Serialization(t *testing.T) {
+	msg := HotCVEMatchMessage{
+		CustomerGUID:     "test-guid-1234",
+		CVEID:            "CVE-2026-9999",
+		Title:            "Critical RCE in libfoo",
+		Description:      "Remote code execution vulnerability",
+		Severity:         "Critical",
+		SeverityScore:    900,
+		Component:        "libfoo",
+		ComponentVersion: "1.2.3",
+		PackageType:      "deb",
+		FixedVersion:     "1.2.4",
+		ResourceHash:     "abc123hash",
+		ClusterName:      "prod-cluster",
+		Namespace:        "default",
+		WorkloadName:     "my-deployment",
+		WorkloadKind:     "Deployment",
+		IsInUse:          true,
+	}
+
+	data, err := json.Marshal(msg)
+	require.NoError(t, err)
+
+	var decoded HotCVEMatchMessage
+	err = json.Unmarshal(data, &decoded)
+	require.NoError(t, err)
+
+	assert.Equal(t, msg, decoded)
+}
+
+func TestHotCVEMatchMessage_IsInUseField(t *testing.T) {
+	tests := []struct {
+		name    string
+		isInUse bool
+	}{
+		{
+			name:    "isInUse true serializes as boolean true",
+			isInUse: true,
+		},
+		{
+			name:    "isInUse false serializes as boolean false",
+			isInUse: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			msg := HotCVEMatchMessage{IsInUse: tt.isInUse}
+			data, err := json.Marshal(msg)
+			require.NoError(t, err)
+
+			var raw map[string]interface{}
+			err = json.Unmarshal(data, &raw)
+			require.NoError(t, err)
+
+			val, ok := raw["isInUse"]
+			require.True(t, ok, "isInUse field must be present in JSON")
+			assert.Equal(t, tt.isInUse, val.(bool))
+		})
+	}
+}
