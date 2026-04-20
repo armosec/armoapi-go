@@ -181,3 +181,95 @@ func TestHotCVE_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestHotCVEOnFinishedMessage_RoundTrip(t *testing.T) {
+	msg := HotCVEOnFinishedMessage{
+		CustomerGUID: "guid-123",
+		CVEID:        "CVE-2026-1234",
+		Severity:     "Critical",
+		Title:        "Remote code execution in libfoo",
+		AffectedWorkloads: []HotCVEAffectedWorkload{
+			{
+				Cluster:      "prod-cluster",
+				Namespace:    "default",
+				WorkloadKind: "Deployment",
+				WorkloadName: "my-app",
+				ImageTag:     "my-app:v1.2.3",
+			},
+			{
+				Cluster:      "staging-cluster",
+				Namespace:    "kube-system",
+				WorkloadKind: "DaemonSet",
+				WorkloadName: "node-agent",
+				ImageTag:     "node-agent:latest",
+			},
+		},
+	}
+
+	data, err := json.Marshal(msg)
+	require.NoError(t, err)
+
+	var decoded HotCVEOnFinishedMessage
+	err = json.Unmarshal(data, &decoded)
+	require.NoError(t, err)
+
+	assert.Equal(t, msg, decoded)
+}
+
+func TestHotCVEOnFinishedMessage_BackwardCompatibility(t *testing.T) {
+	// Old message format without title and affectedWorkloads
+	oldJSON := `{"customerGUID":"guid-456","cveId":"CVE-2026-5678","severity":"High"}`
+
+	var msg HotCVEOnFinishedMessage
+	err := json.Unmarshal([]byte(oldJSON), &msg)
+	require.NoError(t, err)
+
+	assert.Equal(t, "guid-456", msg.CustomerGUID)
+	assert.Equal(t, "CVE-2026-5678", msg.CVEID)
+	assert.Equal(t, "High", msg.Severity)
+	assert.Empty(t, msg.Title)
+	assert.Nil(t, msg.AffectedWorkloads)
+}
+
+func TestHotCVEOnFinishedMessage_OmitEmptyFields(t *testing.T) {
+	msg := HotCVEOnFinishedMessage{
+		CustomerGUID: "guid-789",
+		CVEID:        "CVE-2026-9999",
+		Severity:     "Medium",
+	}
+
+	data, err := json.Marshal(msg)
+	require.NoError(t, err)
+
+	var raw map[string]interface{}
+	err = json.Unmarshal(data, &raw)
+	require.NoError(t, err)
+
+	_, hasTitle := raw["title"]
+	_, hasWorkloads := raw["affectedWorkloads"]
+	assert.False(t, hasTitle, "title should be omitted when empty")
+	assert.False(t, hasWorkloads, "affectedWorkloads should be omitted when nil")
+}
+
+func TestHotCVEAffectedWorkload_Serialization(t *testing.T) {
+	workload := HotCVEAffectedWorkload{
+		Cluster:      "my-cluster",
+		Namespace:    "production",
+		WorkloadKind: "StatefulSet",
+		WorkloadName: "database",
+		ImageTag:     "postgres:15.2",
+	}
+
+	data, err := json.Marshal(workload)
+	require.NoError(t, err)
+
+	var raw map[string]interface{}
+	err = json.Unmarshal(data, &raw)
+	require.NoError(t, err)
+
+	assert.Equal(t, "my-cluster", raw["cluster"])
+	assert.Equal(t, "production", raw["namespace"])
+	assert.Equal(t, "StatefulSet", raw["workloadKind"])
+	assert.Equal(t, "database", raw["workloadName"])
+	assert.Equal(t, "postgres:15.2", raw["imageTag"])
+}

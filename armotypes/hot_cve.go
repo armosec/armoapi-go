@@ -30,11 +30,22 @@ type HotCVEEndpointResponse struct {
 	HotCVEs []HotCVE `json:"hotCves"`
 }
 
+// HotCVEAffectedWorkload describes a workload affected by a hot CVE.
+type HotCVEAffectedWorkload struct {
+	Cluster      string `json:"cluster"`
+	Namespace    string `json:"namespace"`
+	WorkloadKind string `json:"workloadKind"`
+	WorkloadName string `json:"workloadName"`
+	ImageTag     string `json:"imageTag"`
+}
+
 // HotCVEOnFinishedMessage is the Pulsar message published for UNS after hot CVE processing.
 type HotCVEOnFinishedMessage struct {
-	CustomerGUID string `json:"customerGUID"`
-	CVEID        string `json:"cveId"`
-	Severity     string `json:"severity"`
+	CustomerGUID      string                   `json:"customerGUID"`
+	CVEID             string                   `json:"cveId"`
+	Severity          string                   `json:"severity"`
+	Title             string                   `json:"title,omitempty"`
+	AffectedWorkloads []HotCVEAffectedWorkload `json:"affectedWorkloads,omitempty"`
 }
 
 // Validate checks that the HotCVE has all required fields.
