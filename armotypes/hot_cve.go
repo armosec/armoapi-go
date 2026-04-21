@@ -37,6 +37,25 @@ type HotCVEOnFinishedMessage struct {
 	Severity     string `json:"severity"`
 }
 
+// HotCVEValidSeverities is the allow-list of severity values the hot-CVE
+// pipeline can propagate end-to-end. Values MUST be titlecase — the
+// postgres-connector vulnerabilities_cves view upsert INNER-joins
+// vulnerabilities_v1 with `severity = 'Critical' OR 'High' OR ...`
+// (titlecase only), and that join silently drops anything else. Keep this
+// list in lockstep with the SQL filter in postgres-connector/internal/
+// dalhelpers/templates/vulnerabilitiesCVEsViewUpsert.sql. Empirical
+// confirmation on 2026-04-21: 13 lowercase "critical" rows in dev
+// vulnerabilities_v1 were filtered out of 260,278 vulnerabilities_cves
+// rows, resulting in zero is_hot_cve=true rows cluster-wide.
+var HotCVEValidSeverities = map[string]struct{}{
+	"Critical":   {},
+	"High":       {},
+	"Medium":     {},
+	"Low":        {},
+	"Unknown":    {},
+	"Negligible": {},
+}
+
 // Validate checks that the HotCVE has all required fields.
 func (h *HotCVE) Validate() error {
 	if h.CVEID == "" {
@@ -44,6 +63,9 @@ func (h *HotCVE) Validate() error {
 	}
 	if h.Severity == "" {
 		return fmt.Errorf("severity is required")
+	}
+	if _, ok := HotCVEValidSeverities[h.Severity]; !ok {
+		return fmt.Errorf("invalid severity %q: must be one of Critical, High, Medium, Low, Unknown, Negligible (titlecase)", h.Severity)
 	}
 	if len(h.AffectedPackages) == 0 {
 		return fmt.Errorf("affectedPackages is required and must not be empty")
