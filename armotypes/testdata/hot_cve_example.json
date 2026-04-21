@@ -3,7 +3,7 @@
     "cveId": "CVE-2024-3094",
     "title": "xz/liblzma backdoor",
     "description": "Malicious code was discovered in xz-utils versions 5.6.0 and 5.6.1. The backdoor affects the sshd service via systemd.",
-    "severity": "critical",
+    "severity": "Critical",
     "severityScore": 900,
 
     "references": [
@@ -46,7 +46,7 @@
     "cveId": "CVE-2024-9999",
     "title": "Example Node.js zero-day",
     "description": "Critical remote code execution in Node.js http module.",
-    "severity": "high",
+    "severity": "High",
     "severityScore": 750,
 
     "references": [

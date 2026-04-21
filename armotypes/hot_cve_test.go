@@ -34,7 +34,7 @@ func TestHotCVE_Validate_FromJSON(t *testing.T) {
 	// Verify specific fields from the example
 	assert.Equal(t, "CVE-2024-3094", hotCVEs[0].CVEID)
 	assert.Equal(t, "xz/liblzma backdoor", hotCVEs[0].Title)
-	assert.Equal(t, "critical", hotCVEs[0].Severity)
+	assert.Equal(t, "Critical", hotCVEs[0].Severity)
 	assert.Equal(t, 900, hotCVEs[0].SeverityScore)
 	assert.Len(t, hotCVEs[0].AffectedPackages, 4)
 	assert.Equal(t, "xz-utils", hotCVEs[0].AffectedPackages[0].PackageName)
@@ -60,7 +60,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "valid hot CVE",
 			cve: HotCVE{
 				CVEID:            "CVE-2024-3094",
-				Severity:         "critical",
+				Severity:         "Critical",
 				AffectedPackages: []HotCVEAffectedPackage{validPkg},
 			},
 		},
@@ -68,7 +68,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "valid with status active",
 			cve: HotCVE{
 				CVEID:            "CVE-2024-3094",
-				Severity:         "high",
+				Severity:         "High",
 				Status:           HotCVEStatusActive,
 				AffectedPackages: []HotCVEAffectedPackage{validPkg},
 			},
@@ -77,7 +77,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "valid with status inactive",
 			cve: HotCVE{
 				CVEID:            "CVE-2024-3094",
-				Severity:         "medium",
+				Severity:         "Medium",
 				Status:           HotCVEStatusInactive,
 				AffectedPackages: []HotCVEAffectedPackage{validPkg},
 			},
@@ -85,7 +85,7 @@ func TestHotCVE_Validate(t *testing.T) {
 		{
 			name: "missing cveId",
 			cve: HotCVE{
-				Severity:         "critical",
+				Severity:         "Critical",
 				AffectedPackages: []HotCVEAffectedPackage{validPkg},
 			},
 			wantErr: "cveId is required",
@@ -102,7 +102,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "empty affected packages",
 			cve: HotCVE{
 				CVEID:            "CVE-2024-3094",
-				Severity:         "critical",
+				Severity:         "Critical",
 				AffectedPackages: []HotCVEAffectedPackage{},
 			},
 			wantErr: "affectedPackages is required",
@@ -111,7 +111,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "nil affected packages",
 			cve: HotCVE{
 				CVEID:    "CVE-2024-3094",
-				Severity: "critical",
+				Severity: "Critical",
 			},
 			wantErr: "affectedPackages is required",
 		},
@@ -119,7 +119,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "invalid status",
 			cve: HotCVE{
 				CVEID:            "CVE-2024-3094",
-				Severity:         "critical",
+				Severity:         "Critical",
 				Status:           "pending",
 				AffectedPackages: []HotCVEAffectedPackage{validPkg},
 			},
@@ -129,7 +129,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "invalid affected package — missing packageName",
 			cve: HotCVE{
 				CVEID:    "CVE-2024-3094",
-				Severity: "critical",
+				Severity: "Critical",
 				AffectedPackages: []HotCVEAffectedPackage{
 					{VersionStart: "1.0.0"},
 				},
@@ -140,7 +140,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "invalid affected package — no version constraint",
 			cve: HotCVE{
 				CVEID:    "CVE-2024-3094",
-				Severity: "critical",
+				Severity: "Critical",
 				AffectedPackages: []HotCVEAffectedPackage{
 					{PackageName: "xz-utils"},
 				},
@@ -151,7 +151,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "valid with exact version only",
 			cve: HotCVE{
 				CVEID:    "CVE-2024-3094",
-				Severity: "critical",
+				Severity: "Critical",
 				AffectedPackages: []HotCVEAffectedPackage{
 					{PackageName: "xz-utils", VersionExact: []string{"5.6.1"}},
 				},
@@ -161,11 +161,46 @@ func TestHotCVE_Validate(t *testing.T) {
 			name: "valid with start only (no upper bound)",
 			cve: HotCVE{
 				CVEID:    "CVE-2024-3094",
-				Severity: "critical",
+				Severity: "Critical",
 				AffectedPackages: []HotCVEAffectedPackage{
 					{PackageName: "xz-utils", VersionStart: "5.6.0"},
 				},
 			},
+		},
+
+		// Severity whitelist — the postgres-connector view upsert silently
+		// filters out anything other than titlecase Critical/High/Medium/Low/
+		// Unknown/Negligible (see hotCVEValidSeverities doc). These cases are
+		// the regression guards for the SUB-7201 bug where lowercase "critical"
+		// was accepted and then silently dropped by the SQL join, resulting in
+		// zero is_hot_cve=true rows across 260k vulnerabilities_cves rows in
+		// dev until this validator was tightened.
+		{
+			name:    "rejects lowercase critical",
+			cve:     HotCVE{CVEID: "CVE-2024-3094", Severity: "critical", AffectedPackages: []HotCVEAffectedPackage{validPkg}},
+			wantErr: "invalid severity",
+		},
+		{
+			name:    "rejects titlecase-but-nonmember Informational",
+			cve:     HotCVE{CVEID: "CVE-2024-3094", Severity: "Informational", AffectedPackages: []HotCVEAffectedPackage{validPkg}},
+			wantErr: "invalid severity",
+		},
+		{
+			name:    "rejects whitespace-padded Critical",
+			cve:     HotCVE{CVEID: "CVE-2024-3094", Severity: " Critical", AffectedPackages: []HotCVEAffectedPackage{validPkg}},
+			wantErr: "invalid severity",
+		},
+		{
+			name: "accepts Negligible (scanners produce this)",
+			cve:  HotCVE{CVEID: "CVE-2024-3094", Severity: "Negligible", AffectedPackages: []HotCVEAffectedPackage{validPkg}},
+		},
+		{
+			name: "accepts Unknown",
+			cve:  HotCVE{CVEID: "CVE-2024-3094", Severity: "Unknown", AffectedPackages: []HotCVEAffectedPackage{validPkg}},
+		},
+		{
+			name: "accepts Low",
+			cve:  HotCVE{CVEID: "CVE-2024-3094", Severity: "Low", AffectedPackages: []HotCVEAffectedPackage{validPkg}},
 		},
 	}
 
