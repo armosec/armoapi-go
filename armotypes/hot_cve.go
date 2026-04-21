@@ -1,6 +1,10 @@
 package armotypes
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
 
 // HotCVEAffectedPackage defines a package affected by a hot CVE.
 type HotCVEAffectedPackage struct {
@@ -37,7 +41,7 @@ type HotCVEOnFinishedMessage struct {
 	Severity     string `json:"severity"`
 }
 
-// HotCVEValidSeverities is the allow-list of severity values the hot-CVE
+// hotCVEValidSeverities is the allow-list of severity values the hot-CVE
 // pipeline can propagate end-to-end. Values MUST be titlecase — the
 // postgres-connector vulnerabilities_cves view upsert INNER-joins
 // vulnerabilities_v1 with `severity = 'Critical' OR 'High' OR ...`
@@ -47,13 +51,38 @@ type HotCVEOnFinishedMessage struct {
 // confirmation on 2026-04-21: 13 lowercase "critical" rows in dev
 // vulnerabilities_v1 were filtered out of 260,278 vulnerabilities_cves
 // rows, resulting in zero is_hot_cve=true rows cluster-wide.
-var HotCVEValidSeverities = map[string]struct{}{
+//
+// Unexported so external callers cannot mutate the allow-list at runtime;
+// use IsValidHotCVESeverity for membership checks.
+var hotCVEValidSeverities = map[string]struct{}{
 	"Critical":   {},
 	"High":       {},
 	"Medium":     {},
 	"Low":        {},
 	"Unknown":    {},
 	"Negligible": {},
+}
+
+// IsValidHotCVESeverity reports whether severity is accepted by the hot-CVE
+// pipeline. Callers outside this package should use this helper rather than
+// touching the underlying map, so the allow-list stays immutable at runtime.
+func IsValidHotCVESeverity(severity string) bool {
+	_, ok := hotCVEValidSeverities[severity]
+	return ok
+}
+
+// hotCVEValidSeveritiesList returns the allow-list as a sorted slice — used
+// to build deterministic error messages without duplicating the severity
+// strings between the allow-list and the error text. Building the list at
+// call time (rather than caching) avoids any mutation risk and keeps the
+// validator output in lockstep with the map.
+func hotCVEValidSeveritiesList() []string {
+	out := make([]string, 0, len(hotCVEValidSeverities))
+	for s := range hotCVEValidSeverities {
+		out = append(out, s)
+	}
+	sort.Strings(out)
+	return out
 }
 
 // Validate checks that the HotCVE has all required fields.
@@ -64,8 +93,8 @@ func (h *HotCVE) Validate() error {
 	if h.Severity == "" {
 		return fmt.Errorf("severity is required")
 	}
-	if _, ok := HotCVEValidSeverities[h.Severity]; !ok {
-		return fmt.Errorf("invalid severity %q: must be one of Critical, High, Medium, Low, Unknown, Negligible (titlecase)", h.Severity)
+	if !IsValidHotCVESeverity(h.Severity) {
+		return fmt.Errorf("invalid severity %q: must be one of %s (titlecase)", h.Severity, strings.Join(hotCVEValidSeveritiesList(), ", "))
 	}
 	if len(h.AffectedPackages) == 0 {
 		return fmt.Errorf("affectedPackages is required and must not be empty")

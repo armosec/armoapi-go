@@ -170,7 +170,7 @@ func TestHotCVE_Validate(t *testing.T) {
 
 		// Severity whitelist — the postgres-connector view upsert silently
 		// filters out anything other than titlecase Critical/High/Medium/Low/
-		// Unknown/Negligible (see HotCVEValidSeverities doc). These cases are
+		// Unknown/Negligible (see hotCVEValidSeverities doc). These cases are
 		// the regression guards for the SUB-7201 bug where lowercase "critical"
 		// was accepted and then silently dropped by the SQL join, resulting in
 		// zero is_hot_cve=true rows across 260k vulnerabilities_cves rows in
@@ -181,7 +181,7 @@ func TestHotCVE_Validate(t *testing.T) {
 			wantErr: "invalid severity",
 		},
 		{
-			name:    "rejects titlecase-but-nonmember NegligibleTypo",
+			name:    "rejects titlecase-but-nonmember Informational",
 			cve:     HotCVE{CVEID: "CVE-2024-3094", Severity: "Informational", AffectedPackages: []HotCVEAffectedPackage{validPkg}},
 			wantErr: "invalid severity",
 		},
