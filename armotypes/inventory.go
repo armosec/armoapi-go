@@ -24,4 +24,5 @@ type Inventory struct {
 	Tags               []string   `json:"tags,omitempty"`
 	LaunchType         string     `json:"launchType,omitempty"`
 	HostType           string     `json:"hostType,omitempty"`
+	ResourceHash       string     `json:"resourceHash,omitempty"`
 }
