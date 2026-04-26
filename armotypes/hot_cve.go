@@ -34,11 +34,40 @@ type HotCVEEndpointResponse struct {
 	HotCVEs []HotCVE `json:"hotCves"`
 }
 
+// HotCVEAffectedWorkload describes a workload (cluster/namespace/kind/name +
+// the image tag) impacted by a hot CVE. Carried inline on
+// HotCVEOnFinishedMessage so the UNS notification dispatcher can render
+// per-workload context (cluster, namespace, image, ...) into the Slack/Teams
+// alert body without an extra postgres or dashboard round-trip.
+type HotCVEAffectedWorkload struct {
+	Cluster      string `json:"cluster,omitempty" bson:"cluster,omitempty"`
+	Namespace    string `json:"namespace,omitempty" bson:"namespace,omitempty"`
+	WorkloadKind string `json:"workloadKind,omitempty" bson:"workloadKind,omitempty"`
+	WorkloadName string `json:"workloadName,omitempty" bson:"workloadName,omitempty"`
+	ImageTag     string `json:"imageTag,omitempty" bson:"imageTag,omitempty"`
+}
+
 // HotCVEOnFinishedMessage is the Pulsar message published for UNS after hot CVE processing.
+//
+// Title, References and AffectedWorkloads are all `omitempty` so existing
+// publishers that haven't been upgraded continue to produce valid messages
+// (UNS treats absent fields as the zero value).
+//   - Title is sourced from HotCVE.Title (the admin-curated headline).
+//   - References mirror HotCVE.References (admin-curated authoritative URLs:
+//     NVD, vendor advisory, etc.). UNS uses References[0] as the CVELink that
+//     the Slack template renders as a clickable hyperlink under the CVE id.
+//     Hardcoding NVD on the consumer side would override the admin's curated
+//     references — they belong to the publisher, not the consumer.
+//   - AffectedWorkloads enumerates the workloads in *this customer's* tenant
+//     that match the hot CVE — UNS uses them both for rendering context and
+//     for filtering against per-workflow scope (cluster/namespace).
 type HotCVEOnFinishedMessage struct {
-	CustomerGUID string `json:"customerGUID"`
-	CVEID        string `json:"cveId"`
-	Severity     string `json:"severity"`
+	CustomerGUID      string                   `json:"customerGUID"`
+	CVEID             string                   `json:"cveId"`
+	Severity          string                   `json:"severity"`
+	Title             string                   `json:"title,omitempty"`
+	References        []string                 `json:"references,omitempty"`
+	AffectedWorkloads []HotCVEAffectedWorkload `json:"affectedWorkloads,omitempty"`
 }
 
 // hotCVEValidSeverities is the allow-list of severity values the hot-CVE

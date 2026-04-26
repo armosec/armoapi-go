@@ -216,3 +216,68 @@ func TestHotCVE_Validate(t *testing.T) {
 		})
 	}
 }
+
+// TestHotCVEOnFinishedMessage_RoundTrip verifies a message with all current
+// fields (including the SUB-7201 follow-up additions: Title, References,
+// AffectedWorkloads) serializes and deserializes losslessly. The UNS
+// dispatcher reads References[0] for CVELink and AffectedWorkloads for
+// per-workload Slack/Teams context — any silent JSON tag rename here
+// breaks the production hot-CVE alert rendering.
+func TestHotCVEOnFinishedMessage_RoundTrip(t *testing.T) {
+	original := HotCVEOnFinishedMessage{
+		CustomerGUID: "tenant-1",
+		CVEID:        "CVE-2024-9999",
+		Severity:     "Critical",
+		Title:        "Demo hot CVE",
+		References: []string{
+			"https://nvd.nist.gov/vuln/detail/CVE-2024-9999",
+			"https://example.com/advisory",
+		},
+		AffectedWorkloads: []HotCVEAffectedWorkload{
+			{Cluster: "prod-eu", Namespace: "checkout", WorkloadKind: "Deployment", WorkloadName: "api", ImageTag: "registry.example/app:v1"},
+			{Cluster: "prod-us", Namespace: "checkout", WorkloadKind: "Deployment", WorkloadName: "api", ImageTag: "registry.example/app:v1"},
+		},
+	}
+	b, err := json.Marshal(original)
+	require.NoError(t, err)
+
+	var got HotCVEOnFinishedMessage
+	require.NoError(t, json.Unmarshal(b, &got))
+	assert.Equal(t, original, got)
+}
+
+// TestHotCVEOnFinishedMessage_BackwardCompatible_DecodesOldPayload guards
+// the contract that a message produced by an older publisher (before Title /
+// References / AffectedWorkloads were added) still decodes correctly.
+// Otherwise rolling out the new struct breaks readers of in-flight messages
+// from un-upgraded publishers.
+func TestHotCVEOnFinishedMessage_BackwardCompatible_DecodesOldPayload(t *testing.T) {
+	old := []byte(`{"customerGUID":"tenant-1","cveId":"CVE-2024-9999","severity":"Critical"}`)
+	var got HotCVEOnFinishedMessage
+	require.NoError(t, json.Unmarshal(old, &got))
+	assert.Equal(t, "tenant-1", got.CustomerGUID)
+	assert.Equal(t, "CVE-2024-9999", got.CVEID)
+	assert.Equal(t, "Critical", got.Severity)
+	assert.Empty(t, got.Title)
+	assert.Empty(t, got.References)
+	assert.Empty(t, got.AffectedWorkloads)
+}
+
+// TestHotCVEOnFinishedMessage_OmitemptyOnAddedFields guards the JSON tags:
+// the three additions are `omitempty` so a publisher that doesn't populate
+// them produces a message indistinguishable from the pre-enrichment shape.
+// Drops in `omitempty` here would force every consumer to handle
+// `"title":""` / `"references":null` / `"affectedWorkloads":null`.
+func TestHotCVEOnFinishedMessage_OmitemptyOnAddedFields(t *testing.T) {
+	minimal := HotCVEOnFinishedMessage{
+		CustomerGUID: "tenant-1",
+		CVEID:        "CVE-2024-9999",
+		Severity:     "Critical",
+	}
+	b, err := json.Marshal(minimal)
+	require.NoError(t, err)
+	body := string(b)
+	assert.NotContains(t, body, `"title"`)
+	assert.NotContains(t, body, `"references"`)
+	assert.NotContains(t, body, `"affectedWorkloads"`)
+}
