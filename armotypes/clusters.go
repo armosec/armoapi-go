@@ -10,7 +10,7 @@ type ClusterInfo struct {
 	CloudProvider    string       `json:"cloudProvider"`
 	CloudRegion      string       `json:"cloudRegion,omitempty"`
 	CloudAccountID   string       `json:"cloudAccountID,omitempty"`
-	ResourceGroup    *string      `json:"resourceGroup,omitempty"`
+	ResourceGroup    string       `json:"resourceGroup,omitempty"`
 	HelmVersion      string       `json:"helmVersion"`
 	ClusterVersion   string       `json:"clusterVersion"`
 	LastReportTime   *time.Time   `json:"lastReportTime,omitempty"`
