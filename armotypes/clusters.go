@@ -4,9 +4,13 @@ import "time"
 
 type ClusterInfo struct {
 	Cluster          string       `json:"cluster"`
+	ClusterUID       string       `json:"clusterUID,omitempty"`
 	NodeCount        int          `json:"nodeCount"`
 	CPUSum           int          `json:"cpuSum"`
 	CloudProvider    string       `json:"cloudProvider"`
+	CloudRegion      string       `json:"cloudRegion,omitempty"`
+	CloudAccountID   string       `json:"cloudAccountID,omitempty"`
+	ResourceGroup    *string      `json:"resourceGroup,omitempty"`
 	HelmVersion      string       `json:"helmVersion"`
 	ClusterVersion   string       `json:"clusterVersion"`
 	LastReportTime   *time.Time   `json:"lastReportTime,omitempty"`
