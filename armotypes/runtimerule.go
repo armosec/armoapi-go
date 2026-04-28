@@ -70,7 +70,8 @@ type RuntimeRule struct {
 	Name                    string            `json:"name" yaml:"name" bson:"name"`
 	Description             string            `json:"description" yaml:"description" bson:"description"`
 	Expressions             RuleExpressions   `json:"expressions" yaml:"expressions" bson:"expressions"`
-	ProfileDependency       ProfileDependency `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
+	ProfileDependency       ProfileDependency      `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
+	ProfileDataRequired    *ProfileDataRequired   `json:"profileDataRequired,omitempty" yaml:"profileDataRequired,omitempty" bson:"profileDataRequired,omitempty"`
 	Severity                int               `json:"severity" bson:"severity"`
 	SeverityString          string            `json:"severityString" bson:"severityString"`
 	SupportPolicy           bool              `json:"supportPolicy" yaml:"supportPolicy" bson:"supportPolicy"`

@@ -165,3 +165,38 @@ func TestProfileDataRequired_IsEmpty(t *testing.T) {
 	assert.True(t, (&ProfileDataRequired{}).IsEmpty())
 	assert.False(t, (&ProfileDataRequired{Opens: &ProfileDataField{All: true}}).IsEmpty())
 }
+
+func TestRuntimeRule_ProfileDataRequired_YAML(t *testing.T) {
+	src := `
+id: R0001
+profileDependency: 0
+profileDataRequired:
+  opens:
+    - exact: "/var/run/docker.sock"
+  execs: all
+`
+	var rule RuntimeRule
+	require.NoError(t, yaml.Unmarshal([]byte(src), &rule))
+	require.NotNil(t, rule.ProfileDataRequired)
+	require.NotNil(t, rule.ProfileDataRequired.Opens)
+	assert.Equal(t, "/var/run/docker.sock", rule.ProfileDataRequired.Opens.Patterns[0].Exact)
+	require.NotNil(t, rule.ProfileDataRequired.Execs)
+	assert.True(t, rule.ProfileDataRequired.Execs.All)
+
+	out, err := yaml.Marshal(rule)
+	require.NoError(t, err)
+	var roundTripped RuntimeRule
+	require.NoError(t, yaml.Unmarshal(out, &roundTripped))
+	assert.Equal(t, rule.ProfileDataRequired, roundTripped.ProfileDataRequired)
+}
+
+func TestRuntimeRule_ProfileDataRequired_OmittedWhenNil(t *testing.T) {
+	rule := RuntimeRule{ID: "R0002", ProfileDependency: NotRequired}
+	out, err := yaml.Marshal(rule)
+	require.NoError(t, err)
+	assert.NotContains(t, string(out), "profileDataRequired")
+
+	b, err := json.Marshal(rule)
+	require.NoError(t, err)
+	assert.NotContains(t, string(b), "profileDataRequired")
+}
