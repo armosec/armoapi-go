@@ -1,6 +1,7 @@
 package armotypes
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -172,6 +173,9 @@ func (f ProfileDataField) MarshalJSON() ([]byte, error) {
 }
 
 func (f *ProfileDataField) UnmarshalJSON(data []byte) error {
+	if string(bytes.TrimSpace(data)) == "null" {
+		return fmt.Errorf("profileDataField: must be string %q or list, got null", profileDataFieldAllSentinel)
+	}
 	var s string
 	if err := json.Unmarshal(data, &s); err == nil {
 		if s != profileDataFieldAllSentinel {

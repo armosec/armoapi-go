@@ -89,6 +89,12 @@ func TestProfileDataField_MarshalYAML_Patterns(t *testing.T) {
 	assert.Contains(t, string(out), `exact: /a`)
 }
 
+func TestProfileDataField_UnmarshalJSON_RejectsNull(t *testing.T) {
+	var f ProfileDataField
+	err := json.Unmarshal([]byte(`null`), &f)
+	assert.Error(t, err)
+}
+
 func TestProfileDataField_JSONRoundTrip(t *testing.T) {
 	for _, f := range []ProfileDataField{
 		{All: true},
