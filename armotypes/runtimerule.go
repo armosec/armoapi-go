@@ -1,5 +1,14 @@
 package armotypes
 
+import (
+	"encoding/json"
+	"fmt"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"gopkg.in/yaml.v3"
+)
+
 // copied from kubescape/node-agent/pkg/ruleengine/v1/rule.go
 const (
 	RuleSeverityNone        = 0
@@ -109,3 +118,107 @@ const (
 	EventTypeSSH          EventType = "ssh"
 	EventTypeHTTP         EventType = "http"
 )
+
+// ProfileDataField is a tagged union: either All == true (the rule needs every
+// entry on this surface) or Patterns is non-empty (the rule needs entries
+// matching any pattern). The YAML/JSON form is either the literal string "all"
+// or a list of ProfileDataPattern objects.
+type ProfileDataField struct {
+	All      bool
+	Patterns []ProfileDataPattern
+}
+
+const profileDataFieldAllSentinel = "all"
+
+func (f ProfileDataField) MarshalYAML() (any, error) {
+	if f.All {
+		return profileDataFieldAllSentinel, nil
+	}
+	return f.Patterns, nil
+}
+
+func (f *ProfileDataField) UnmarshalYAML(node *yaml.Node) error {
+	switch node.Kind {
+	case yaml.ScalarNode:
+		var s string
+		if err := node.Decode(&s); err != nil {
+			return fmt.Errorf("profileDataField: scalar must be string %q: %w", profileDataFieldAllSentinel, err)
+		}
+		if s != profileDataFieldAllSentinel {
+			return fmt.Errorf("profileDataField: scalar value must be %q, got %q", profileDataFieldAllSentinel, s)
+		}
+		f.All = true
+		f.Patterns = nil
+		return nil
+	case yaml.SequenceNode:
+		var patterns []ProfileDataPattern
+		if err := node.Decode(&patterns); err != nil {
+			return err
+		}
+		f.All = false
+		f.Patterns = patterns
+		return nil
+	default:
+		return fmt.Errorf("profileDataField: must be string %q or list, got %v", profileDataFieldAllSentinel, node.Kind)
+	}
+}
+
+func (f ProfileDataField) MarshalJSON() ([]byte, error) {
+	if f.All {
+		return json.Marshal(profileDataFieldAllSentinel)
+	}
+	return json.Marshal(f.Patterns)
+}
+
+func (f *ProfileDataField) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err == nil {
+		if s != profileDataFieldAllSentinel {
+			return fmt.Errorf("profileDataField: scalar must be %q, got %q", profileDataFieldAllSentinel, s)
+		}
+		f.All = true
+		f.Patterns = nil
+		return nil
+	}
+	var patterns []ProfileDataPattern
+	if err := json.Unmarshal(data, &patterns); err != nil {
+		return fmt.Errorf("profileDataField: must be string %q or list: %w", profileDataFieldAllSentinel, err)
+	}
+	f.All = false
+	f.Patterns = patterns
+	return nil
+}
+
+func (f ProfileDataField) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	if f.All {
+		return bson.MarshalValue(profileDataFieldAllSentinel)
+	}
+	return bson.MarshalValue(f.Patterns)
+}
+
+func (f *ProfileDataField) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
+	raw := bson.RawValue{Type: t, Value: data}
+	switch t {
+	case bsontype.String:
+		s, ok := raw.StringValueOK()
+		if !ok {
+			return fmt.Errorf("profileDataField: bson string decode failed")
+		}
+		if s != profileDataFieldAllSentinel {
+			return fmt.Errorf("profileDataField: bson scalar must be %q, got %q", profileDataFieldAllSentinel, s)
+		}
+		f.All = true
+		f.Patterns = nil
+		return nil
+	case bsontype.Array:
+		var patterns []ProfileDataPattern
+		if err := raw.Unmarshal(&patterns); err != nil {
+			return err
+		}
+		f.All = false
+		f.Patterns = patterns
+		return nil
+	default:
+		return fmt.Errorf("profileDataField: bson type must be string or array, got %v", t)
+	}
+}
