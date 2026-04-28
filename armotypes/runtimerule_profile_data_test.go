@@ -160,6 +160,8 @@ func TestProfileDataRequired_Validate_AllAndPatterns(t *testing.T) {
 }
 
 func TestProfileDataRequired_IsEmpty(t *testing.T) {
+	var nilP *ProfileDataRequired
+	assert.True(t, nilP.IsEmpty())
 	assert.True(t, (&ProfileDataRequired{}).IsEmpty())
 	assert.False(t, (&ProfileDataRequired{Opens: &ProfileDataField{All: true}}).IsEmpty())
 }
