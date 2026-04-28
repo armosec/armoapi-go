@@ -222,3 +222,77 @@ func (f *ProfileDataField) UnmarshalBSONValue(t bsontype.Type, data []byte) erro
 		return fmt.Errorf("profileDataField: bson type must be string or array, got %v", t)
 	}
 }
+
+// ProfileDataRequired declares which subsets of the container profile this rule
+// needs at runtime. Each surface field is optional; absence means "this rule
+// does not query this surface".
+type ProfileDataRequired struct {
+	Opens            *ProfileDataField `json:"opens,omitempty"            yaml:"opens,omitempty"            bson:"opens,omitempty"`
+	Execs            *ProfileDataField `json:"execs,omitempty"            yaml:"execs,omitempty"            bson:"execs,omitempty"`
+	Capabilities     *ProfileDataField `json:"capabilities,omitempty"     yaml:"capabilities,omitempty"     bson:"capabilities,omitempty"`
+	Syscalls         *ProfileDataField `json:"syscalls,omitempty"         yaml:"syscalls,omitempty"         bson:"syscalls,omitempty"`
+	Endpoints        *ProfileDataField `json:"endpoints,omitempty"        yaml:"endpoints,omitempty"        bson:"endpoints,omitempty"`
+	EgressDomains    *ProfileDataField `json:"egressDomains,omitempty"    yaml:"egressDomains,omitempty"    bson:"egressDomains,omitempty"`
+	EgressAddresses  *ProfileDataField `json:"egressAddresses,omitempty"  yaml:"egressAddresses,omitempty"  bson:"egressAddresses,omitempty"`
+	IngressDomains   *ProfileDataField `json:"ingressDomains,omitempty"   yaml:"ingressDomains,omitempty"   bson:"ingressDomains,omitempty"`
+	IngressAddresses *ProfileDataField `json:"ingressAddresses,omitempty" yaml:"ingressAddresses,omitempty" bson:"ingressAddresses,omitempty"`
+}
+
+// IsEmpty reports whether every surface field is nil. Used to detect
+// "profileDataRequired: {}" — structurally valid YAML that declares nothing.
+func (p *ProfileDataRequired) IsEmpty() bool {
+	if p == nil {
+		return true
+	}
+	return p.Opens == nil && p.Execs == nil && p.Capabilities == nil &&
+		p.Syscalls == nil && p.Endpoints == nil && p.EgressDomains == nil &&
+		p.EgressAddresses == nil && p.IngressDomains == nil && p.IngressAddresses == nil
+}
+
+// Validate reports schema violations. Single source of truth for both the
+// rulelibrary lint and node-agent's load-time check.
+func (p *ProfileDataRequired) Validate() error {
+	if p == nil {
+		return nil
+	}
+	for name, field := range map[string]*ProfileDataField{
+		"opens":            p.Opens,
+		"execs":            p.Execs,
+		"capabilities":     p.Capabilities,
+		"syscalls":         p.Syscalls,
+		"endpoints":        p.Endpoints,
+		"egressDomains":    p.EgressDomains,
+		"egressAddresses":  p.EgressAddresses,
+		"ingressDomains":   p.IngressDomains,
+		"ingressAddresses": p.IngressAddresses,
+	} {
+		if field == nil {
+			continue
+		}
+		if err := validateProfileDataField(name, field); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateProfileDataField(name string, f *ProfileDataField) error {
+	if f.All && len(f.Patterns) > 0 {
+		return fmt.Errorf("profileDataRequired.%s: cannot have both 'all' and pattern list", name)
+	}
+	if !f.All && len(f.Patterns) == 0 {
+		return fmt.Errorf("profileDataRequired.%s: must declare 'all' or at least one pattern", name)
+	}
+	for i, pat := range f.Patterns {
+		filled := 0
+		for _, v := range []string{pat.Exact, pat.Prefix, pat.Suffix, pat.Contains} {
+			if v != "" {
+				filled++
+			}
+		}
+		if filled != 1 {
+			return fmt.Errorf("profileDataRequired.%s[%d]: exactly one of {exact, prefix, suffix, contains} must be set, got %d", name, i, filled)
+		}
+	}
+	return nil
+}

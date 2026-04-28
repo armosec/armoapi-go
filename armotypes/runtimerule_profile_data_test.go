@@ -117,3 +117,49 @@ func TestProfileDataField_BSONRoundTrip(t *testing.T) {
 		assert.Equal(t, f, got.Field)
 	}
 }
+
+func TestProfileDataRequired_Validate_Valid(t *testing.T) {
+	p := &ProfileDataRequired{
+		Opens: &ProfileDataField{Patterns: []ProfileDataPattern{{Exact: "/a"}}},
+		Execs: &ProfileDataField{All: true},
+	}
+	assert.NoError(t, p.Validate())
+}
+
+func TestProfileDataRequired_Validate_FieldEmpty(t *testing.T) {
+	p := &ProfileDataRequired{Opens: &ProfileDataField{}}
+	err := p.Validate()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "opens")
+}
+
+func TestProfileDataRequired_Validate_PatternMultiKey(t *testing.T) {
+	p := &ProfileDataRequired{
+		Opens: &ProfileDataField{Patterns: []ProfileDataPattern{{Exact: "a", Prefix: "b"}}},
+	}
+	err := p.Validate()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "exactly one")
+}
+
+func TestProfileDataRequired_Validate_PatternEmpty(t *testing.T) {
+	p := &ProfileDataRequired{
+		Opens: &ProfileDataField{Patterns: []ProfileDataPattern{{}}},
+	}
+	err := p.Validate()
+	require.Error(t, err)
+}
+
+func TestProfileDataRequired_Validate_AllAndPatterns(t *testing.T) {
+	p := &ProfileDataRequired{
+		Opens: &ProfileDataField{All: true, Patterns: []ProfileDataPattern{{Exact: "a"}}},
+	}
+	err := p.Validate()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "all")
+}
+
+func TestProfileDataRequired_IsEmpty(t *testing.T) {
+	assert.True(t, (&ProfileDataRequired{}).IsEmpty())
+	assert.False(t, (&ProfileDataRequired{Opens: &ProfileDataField{All: true}}).IsEmpty())
+}
