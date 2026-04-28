@@ -86,6 +86,15 @@ type RuleExpression struct {
 	Expression string    `json:"expression" yaml:"expression" bson:"expression"`
 }
 
+// ProfileDataPattern declares a single match pattern for a profile-data
+// surface. Exactly one of the four fields must be non-empty.
+type ProfileDataPattern struct {
+	Exact    string `json:"exact,omitempty"    yaml:"exact,omitempty"    bson:"exact,omitempty"`
+	Prefix   string `json:"prefix,omitempty"   yaml:"prefix,omitempty"   bson:"prefix,omitempty"`
+	Suffix   string `json:"suffix,omitempty"   yaml:"suffix,omitempty"   bson:"suffix,omitempty"`
+	Contains string `json:"contains,omitempty" yaml:"contains,omitempty" bson:"contains,omitempty"`
+}
+
 type EventType string
 
 const (
