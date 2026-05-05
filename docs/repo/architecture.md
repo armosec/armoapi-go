@@ -26,14 +26,16 @@ armoapi-go/
 │   ├── networkpolicies.go   # NetworkPoliciesWorkload
 │   ├── registrytypes.go     # RegistryInfo, RegistryJobParams
 │   ├── cdr/                 # Cloud Detection & Response types
-│   │   └── types.go         # CdrAlert, CloudMetadata, CloudTrailEvent
-│   └── common/              # Shared sub-types (Identifiers)
+│   │   ├── cdr.go           # CdrAlert, CloudMetadata, CdrAlertBatch
+│   │   └── aws.go           # CloudTrailEvent, AWS-specific types
+│   └── common/              # Shared runtime sub-types (ProcessEntity, FileEntity)
 ├── identifiers/             # Resource designator system
 │   ├── designators.go       # PortalDesignator, DesignatorType, constants
 │   ├── armocontext.go       # ArmoContext helpers
 │   └── utils.go             # WLID/SID parsing utilities
 ├── containerscan/           # Vulnerability scan report contracts
-│   ├── commondatastructures.go  # Interfaces: ScanReport, VulnerabilityResult
+│   ├── interfaces.go            # Interfaces: ScanReport, VulnerabilityResult
+│   ├── commondatastructures.go  # CommonContainerVulnerabilityResult, scan structs
 │   ├── commonadapters.go        # Severity mapping, adapter logic
 │   ├── consts.go                # Severity levels, scan status constants
 │   └── v1/                      # Concrete implementation of interfaces
