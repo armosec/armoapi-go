@@ -1,0 +1,20 @@
+name: docs-lint
+
+# Thin wrapper — actual logic lives in
+# armosec-ai-shared-rules/.github/workflows/docs-lint-reusable.yml.
+# Updates land automatically on the next CI run via `@main`.
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "docs/**"
+      - ".github/workflows/docs-lint.yml"
+
+jobs:
+  lint:
+    name: docs-lint
+    uses: armosec/armosec-ai-shared-rules/.github/workflows/docs-lint-reusable.yml@main
+    secrets: inherit
+    with:
+      extra-flags: "--no-services"
