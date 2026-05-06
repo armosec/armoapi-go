@@ -12,7 +12,7 @@ service: armoapi-go
 
 `armoapi-go` is a shared Go types library that provides domain types, API definitions, and data contracts for the Armosec platform. It serves as the canonical source of truth for data structures exchanged between backend services, in-cluster agents, and the portal.
 
-This is a **pure type/utility library** with no runtime dependencies (no HTTP servers, database drivers, or message brokers).
+This is a **pure type/utility library** with no runtime services (no HTTP servers, no message brokers, no database connections). It does depend on serialization libraries (e.g., MongoDB BSON for struct tags) but does not establish any connections at import time.
 
 ## Package Inventory
 
@@ -97,7 +97,7 @@ type MyEntity struct {
 
 - **Module path**: `github.com/armosec/armoapi-go`
 - **Tag format**: `v0.0.XXX` (auto-incremented on merge to main)
-- **Release automation**: Tags are created automatically by `.github/workflows/release.yaml` on every push to `main`
+- **Release automation**: Tags are created automatically by `.github/workflows/release.yaml` on pushes to `main` that include non-Markdown changes
 - **Consumer pinning**: Downstream services pin versions via `go.mod` and update as needed
 - **Compatibility**: Exported struct fields with `json`/`bson` tags are serialization contracts. Renaming or removing tags is a breaking change.
 
