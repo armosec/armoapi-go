@@ -97,6 +97,30 @@ func TestProfileDataField_UnmarshalJSON_AcceptsNull(t *testing.T) {
 	assert.Nil(t, f.Patterns)
 }
 
+func TestProfileDataField_UnmarshalJSON_NullClearsNonZero(t *testing.T) {
+	f := ProfileDataField{All: true, Patterns: []ProfileDataPattern{{Prefix: "/stale"}}}
+	err := json.Unmarshal([]byte(`null`), &f)
+	assert.NoError(t, err)
+	assert.False(t, f.All)
+	assert.Nil(t, f.Patterns)
+}
+
+func TestProfileDataField_UnmarshalBSONValue_AcceptsNull(t *testing.T) {
+	var f ProfileDataField
+	err := f.UnmarshalBSONValue(bson.TypeNull, nil)
+	assert.NoError(t, err)
+	assert.False(t, f.All)
+	assert.Nil(t, f.Patterns)
+}
+
+func TestProfileDataField_UnmarshalBSONValue_NullClearsNonZero(t *testing.T) {
+	f := ProfileDataField{All: true, Patterns: []ProfileDataPattern{{Prefix: "/stale"}}}
+	err := f.UnmarshalBSONValue(bson.TypeNull, nil)
+	assert.NoError(t, err)
+	assert.False(t, f.All)
+	assert.Nil(t, f.Patterns)
+}
+
 func TestProfileDataField_JSONRoundTrip(t *testing.T) {
 	for _, f := range []ProfileDataField{
 		{All: true},

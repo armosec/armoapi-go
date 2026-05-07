@@ -174,6 +174,7 @@ func (f ProfileDataField) MarshalJSON() ([]byte, error) {
 
 func (f *ProfileDataField) UnmarshalJSON(data []byte) error {
 	if string(bytes.TrimSpace(data)) == "null" {
+		*f = ProfileDataField{}
 		return nil
 	}
 	var s string
@@ -203,6 +204,7 @@ func (f ProfileDataField) MarshalBSONValue() (bsontype.Type, []byte, error) {
 
 func (f *ProfileDataField) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 	if t == bsontype.Null {
+		*f = ProfileDataField{}
 		return nil
 	}
 	raw := bson.RawValue{Type: t, Value: data}
