@@ -84,6 +84,10 @@ type RuntimeRule struct {
 	MitreTechnique          string            `json:"mitreTechnique" bson:"mitreTechnique"`
 	Category                string            `json:"category" bson:"category"`
 	IncidentTypeId          string            `json:"incidentTypeId" bson:"incidentTypeId"`
+	// Documentation is the rendered markdown documentation for this rule,
+	// sourced from the rule's README.md in the rulelibrary repo. Empty for
+	// customer-authored rules.
+	Documentation           string            `json:"documentation,omitempty" yaml:"documentation,omitempty" bson:"documentation,omitempty"`
 }
 
 type RuleExpressions struct {
