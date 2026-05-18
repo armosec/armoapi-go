@@ -74,6 +74,15 @@ type LinearTicketIdentifiers struct {
 	Fields      map[string]interface{} `json:"fields,omitempty" bson:"fields,omitempty"`
 }
 
+type GitHubTicketIdentifiers struct {
+	CollaborationGUID string   `json:"collaborationGUID,omitempty" bson:"collaborationGUID,omitempty"`
+	OrganizationName  string   `json:"organizationName,omitempty" bson:"organizationName,omitempty"`
+	RepositoryName    string   `json:"repositoryName,omitempty" bson:"repositoryName,omitempty"`
+	Labels            []string `json:"labels,omitempty" bson:"labels,omitempty"`
+	Assignees         []string `json:"assignees,omitempty" bson:"assignees,omitempty"`
+	MilestoneID       *int     `json:"milestoneID,omitempty" bson:"milestoneID,omitempty"`
+}
+
 type AlertChannel struct {
 	ChannelType             ChannelProvider           `json:"channelType,omitempty" bson:"channelType,omitempty"`
 	Scope                   []AlertScope              `json:"scope,omitempty" bson:"scope,omitempty"`
@@ -81,6 +90,7 @@ type AlertChannel struct {
 	Alerts                  []AlertConfig             `json:"notifications,omitempty" bson:"notifications,omitempty"`
 	JiraTicketIdentifiers   []JiraTicketIdentifiers   `json:"jiraTicketIdentifiers,omitempty" bson:"jiraTicketIdentifiers,omitempty"`
 	LinearTicketIdentifiers []LinearTicketIdentifiers `json:"linearTicketIdentifiers,omitempty" bson:"linearTicketIdentifiers,omitempty"`
+	GitHubTicketIdentifiers []GitHubTicketIdentifiers `json:"githubTicketIdentifiers,omitempty" bson:"githubTicketIdentifiers,omitempty"`
 }
 
 type NotificationParams struct {
@@ -92,14 +102,14 @@ type NotificationParams struct {
 	Severities []string `json:"severities,omitempty" bson:"severities,omitempty"`
 
 	// vulnerability params
-	KnownExploited *bool    `json:"knownExploited,omitempty" bson:"knownExploited,omitempty"` // Known Exploited (CISA KEV)
-	HighLikelihood *bool    `json:"highLikelihood,omitempty" bson:"highLikelihood,omitempty"` // High Likelihood (EPSS ≥ 10%)
-	CVSS              *float32 `json:"cvss,omitempty" bson:"cvss,omitempty"`                           // CVSS (Common Vulnerability Scoring System) min threshold (≥)
-	CVSSMax           *float32 `json:"cvssMax,omitempty" bson:"cvssMax,omitempty"`                     // CVSS max threshold (≤)
-	InUse             *bool    `json:"inUse,omitempty" bson:"inUse,omitempty"`                         // In Use (CISA IU)
-	Fixable           *bool    `json:"fixable,omitempty" bson:"fixable,omitempty"`                     // Fixable (CISA FX)
-	NoExploitability  *bool    `json:"noExploitability,omitempty" bson:"noExploitability,omitempty"`   // No exploit intelligence
-	RiskFactors       []string `json:"riskFactors,omitempty" bson:"riskFactors,omitempty"`             // Risk Factors
+	KnownExploited   *bool    `json:"knownExploited,omitempty" bson:"knownExploited,omitempty"`     // Known Exploited (CISA KEV)
+	HighLikelihood   *bool    `json:"highLikelihood,omitempty" bson:"highLikelihood,omitempty"`     // High Likelihood (EPSS ≥ 10%)
+	CVSS             *float32 `json:"cvss,omitempty" bson:"cvss,omitempty"`                         // CVSS (Common Vulnerability Scoring System) min threshold (≥)
+	CVSSMax          *float32 `json:"cvssMax,omitempty" bson:"cvssMax,omitempty"`                   // CVSS max threshold (≤)
+	InUse            *bool    `json:"inUse,omitempty" bson:"inUse,omitempty"`                       // In Use (CISA IU)
+	Fixable          *bool    `json:"fixable,omitempty" bson:"fixable,omitempty"`                   // Fixable (CISA FX)
+	NoExploitability *bool    `json:"noExploitability,omitempty" bson:"noExploitability,omitempty"` // No exploit intelligence
+	RiskFactors      []string `json:"riskFactors,omitempty" bson:"riskFactors,omitempty"`           // Risk Factors
 
 	// security risks params
 	SecurityRiskIDs []string `json:"securityRiskIDs,omitempty" bson:"securityRiskIDs,omitempty"` // Security Risk ID
@@ -147,7 +157,7 @@ const (
 	NotificationTypeSecurityRiskNew    NotificationType = NotificationTypeSecurityRiskPush + ":newSecurityRisk"
 	NotificationTypeRuntimeIncidentNew NotificationType = NotificationTypeRuntimeIncidentPush + ":newRuntimeIncident"
 
-	NotificationTypeScanFailurePush NotificationType = "scanFailurePush"                          // scan failure
+	NotificationTypeScanFailurePush NotificationType = "scanFailurePush"                                   // scan failure
 	NotificationTypeScanFailureNew  NotificationType = NotificationTypeScanFailurePush + ":newScanFailure" // new scan failure event
 )
 
