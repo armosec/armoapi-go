@@ -80,7 +80,7 @@ type GitHubTicketIdentifiers struct {
 	RepositoryName    string   `json:"repositoryName,omitempty" bson:"repositoryName,omitempty"`
 	Labels            []string `json:"labels,omitempty" bson:"labels,omitempty"`
 	Assignees         []string `json:"assignees,omitempty" bson:"assignees,omitempty"`
-	MilestoneID       *int     `json:"milestoneID,omitempty" bson:"milestoneID,omitempty"`
+	MilestoneID       *int     `json:"milestoneId,omitempty" bson:"milestoneId,omitempty"`
 }
 
 type AlertChannel struct {

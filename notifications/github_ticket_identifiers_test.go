@@ -21,6 +21,15 @@ func TestGitHubTicketIdentifiers_Serialization(t *testing.T) {
 	data, err := json.Marshal(identifiers)
 	require.NoError(t, err)
 
+	var raw map[string]interface{}
+	require.NoError(t, json.Unmarshal(data, &raw))
+	require.Contains(t, raw, "collaborationGUID")
+	require.Contains(t, raw, "organizationName")
+	require.Contains(t, raw, "repositoryName")
+	require.Contains(t, raw, "labels")
+	require.Contains(t, raw, "assignees")
+	require.Contains(t, raw, "milestoneId")
+
 	var decoded GitHubTicketIdentifiers
 	require.NoError(t, json.Unmarshal(data, &decoded))
 
