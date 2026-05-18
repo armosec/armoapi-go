@@ -22,4 +22,8 @@ type AlertChannelAPI struct {
 	// Linear ticket identifiers for automatic ticket creation
 	// Example: [{workspaceId: "abc", teamId: "xyz"}]
 	LinearTicketIdentifiers []LinearTicketIdentifiers `json:"linearTicketIdentifiers,omitempty"`
+
+	// GitHub ticket identifiers for automatic ticket creation
+	// Example: [{collaborationGUID: "abc", organizationName: "my-org", repositoryName: "my-repo"}]
+	GitHubTicketIdentifiers []GitHubTicketIdentifiers `json:"githubTicketIdentifiers,omitempty"`
 }
