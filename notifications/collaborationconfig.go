@@ -57,6 +57,7 @@ const (
 	CollaborationTypeEmail   ChannelProvider = "email"
 	CollaborationTypeWebhook ChannelProvider = "webhook"
 	CollaborationTypeLinear  ChannelProvider = "linear"
+	CollaborationTypeGitHub  ChannelProvider = "github"
 )
 
 // swagger:model CollaborationConfig
