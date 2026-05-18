@@ -25,6 +25,7 @@ This is a **pure type/utility library** with no runtime services (no HTTP server
 | `identifiers` | Workload and resource designator system (WLID, SID, PortalDesignator) with parsing utilities |
 | `containerscan` | Container vulnerability scan report interfaces defining the contract between scanner and consumers |
 | `containerscan/v1` | Concrete implementation of the `containerscan` interfaces |
+| `armotypes` (ticketing) | `TicketManager` type and provider constants (`TicketManagerJira`, `TicketManagerLinear`, `TicketManagerGitHub`), `Ticket` struct |
 | `notifications` | Alert channel configuration, collaboration integrations (Jira, Linear, Slack, GitHub), SIEM, and incident notification types |
 | `broadcastevents` | Platform analytics and audit event types with factory constructors |
 | `package_versions` | Multi-format package version parsing and comparison (semver, APK, deb, RPM, Maven, PEP440, Go modules) |

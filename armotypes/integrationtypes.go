@@ -7,6 +7,7 @@ type TicketManager string
 const (
 	TicketManagerJira   TicketManager = "jira"
 	TicketManagerLinear TicketManager = "linear"
+	TicketManagerGitHub TicketManager = "github"
 )
 
 type Ticket struct {
