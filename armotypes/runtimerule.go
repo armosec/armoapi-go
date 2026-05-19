@@ -123,6 +123,7 @@ const (
 	EventTypeHardlink     EventType = "hardlink"
 	EventTypeSSH          EventType = "ssh"
 	EventTypeHTTP         EventType = "http"
+	EventTypeK8sAdmission EventType = "k8s-admission"
 )
 
 // ProfileDataField is a tagged union: either All == true (the rule needs every
