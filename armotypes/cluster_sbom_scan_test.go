@@ -13,6 +13,10 @@ import (
 // removing fields the consumer relies on.
 func TestClusterSBOMScanMessage_RoundTrip(t *testing.T) {
 	orig := ClusterSBOMScanMessage{
+		PortalBase: PortalBase{
+			GUID: "msg-7a3f", // per-message id, useful for tracing/dedup downstream
+			Name: "cluster-sbom-scan",
+		},
 		CustomerGUID:         "11111111-1111-1111-1111-111111111111",
 		Cluster:              "prod-east-1",
 		WorkloadKind:         "Deployment",
@@ -35,8 +39,13 @@ func TestClusterSBOMScanMessage_RoundTrip(t *testing.T) {
 
 // The consumer reads exact json tag names, so freeze them — a rename
 // here would silently break the Vulnerability Scanner's deserialiser.
+// PortalBase contributes guid/name (always serialized) and
+// attributes/updatedTime (omitempty); only the always-emitted PortalBase
+// fields are asserted here so the test stays focused on the cluster-
+// scan-specific wire shape.
 func TestClusterSBOMScanMessage_JSONFieldNames(t *testing.T) {
 	wire, err := json.Marshal(ClusterSBOMScanMessage{
+		PortalBase:           PortalBase{GUID: "g", Name: "n"},
 		CustomerGUID:         "c",
 		Cluster:              "cl",
 		WorkloadKind:         "wk",
@@ -53,6 +62,8 @@ func TestClusterSBOMScanMessage_JSONFieldNames(t *testing.T) {
 	var asMap map[string]string
 	require.NoError(t, json.Unmarshal(wire, &asMap))
 	assert.Equal(t, map[string]string{
+		"guid":                 "g",
+		"name":                 "n",
 		"customerGUID":         "c",
 		"cluster":              "cl",
 		"workloadKind":         "wk",
