@@ -89,6 +89,38 @@ func TestIdentifiersFlatten(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "CDR entities - all fields populated",
+			Identifiers: &Identifiers{
+				Event: &EventDetailsEntity{
+					EventName:   "CreateUser",
+					EventSource: "iam.amazonaws.com",
+				},
+				UserIdentity: &UserIdentityEntity{
+					UserName:    "alice",
+					Type:        "IAMUser",
+					ARN:         "arn:aws:iam::123456789012:user/alice",
+					PrincipalID: "AIDA1234EXAMPLE",
+					AccessKeyID: "AKIA1234EXAMPLE",
+				},
+				SourceInformation: &SourceInformationEntity{
+					SourceIPAddress: "203.0.113.42",
+					UserAgent:       "aws-cli/2.13.0",
+				},
+			},
+		},
+		{
+			Name: "CDR entities - partial fields",
+			Identifiers: &Identifiers{
+				Event: &EventDetailsEntity{
+					EventName: "DeleteBucket",
+				},
+				UserIdentity: &UserIdentityEntity{
+					ARN:  "arn:aws:iam::123456789012:role/admin",
+					Type: "AssumedRole",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

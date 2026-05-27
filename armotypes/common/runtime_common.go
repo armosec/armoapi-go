@@ -37,13 +37,36 @@ type CloudAPIEntity struct {
 	User     string `json:"user,omitempty" bson:"user,omitempty"`
 }
 
+// Those are for CDR alerts
+
+type EventDetailsEntity struct {
+	EventName   string `json:"name,omitempty" bson:"name,omitempty"`
+	EventSource string `json:"source,omitempty" bson:"source,omitempty"`
+}
+
+type UserIdentityEntity struct {
+	UserName    string `json:"userName,omitempty" bson:"userName,omitempty"`
+	Type        string `json:"type,omitempty" bson:"type,omitempty"`
+	ARN         string `json:"ARN,omitempty" bson:"ARN,omitempty"`
+	PrincipalID string `json:"principalID,omitempty" bson:"principalID,omitempty"`
+	AccessKeyID string `json:"accessKeyID,omitempty" bson:"accessKeyID,omitempty"`
+}
+
+type SourceInformationEntity struct {
+	SourceIPAddress string `json:"sourceIPAddress,omitempty" bson:"sourceIPAddress,omitempty"`
+	UserAgent       string `json:"userAgent,omitempty" bson:"userAgent,omitempty"`
+}
+
 type Identifiers struct {
-	Process  *ProcessEntity  `json:"process,omitempty" bson:"process,omitempty"`
-	File     *FileEntity     `json:"file,omitempty" bson:"file,omitempty"`
-	Dns      *DnsEntity      `json:"dns,omitempty" bson:"dns,omitempty"`
-	Network  *NetworkEntity  `json:"network,omitempty" bson:"network,omitempty"`
-	Http     *HttpEntity     `json:"http,omitempty" bson:"http,omitempty"`
-	CloudAPI *CloudAPIEntity `json:"cloud,omitempty" bson:"cloud,omitempty"`
+	Process           *ProcessEntity           `json:"process,omitempty" bson:"process,omitempty"`
+	File              *FileEntity              `json:"file,omitempty" bson:"file,omitempty"`
+	Dns               *DnsEntity               `json:"dns,omitempty" bson:"dns,omitempty"`
+	Network           *NetworkEntity           `json:"network,omitempty" bson:"network,omitempty"`
+	Http              *HttpEntity              `json:"http,omitempty" bson:"http,omitempty"`
+	CloudAPI          *CloudAPIEntity          `json:"cloud,omitempty" bson:"cloud,omitempty"`
+	Event             *EventDetailsEntity      `json:"event,omitempty" bson:"event,omitempty"`
+	UserIdentity      *UserIdentityEntity      `json:"userIdentity,omitempty" bson:"userIdentity,omitempty"`
+	SourceInformation *SourceInformationEntity `json:"sourceInformation,omitempty" bson:"sourceInformation,omitempty"`
 }
 
 func (identifiers *Identifiers) Flatten() map[string]string {
@@ -110,6 +133,39 @@ func (identifiers *Identifiers) Flatten() map[string]string {
 		}
 		if identifiers.CloudAPI.User != "" {
 			identifiers_map["cloud.user"] = identifiers.CloudAPI.User
+		}
+	}
+	if identifiers.Event != nil {
+		if identifiers.Event.EventName != "" {
+			identifiers_map["event.name"] = identifiers.Event.EventName
+		}
+		if identifiers.Event.EventSource != "" {
+			identifiers_map["event.source"] = identifiers.Event.EventSource
+		}
+	}
+	if identifiers.UserIdentity != nil {
+		if identifiers.UserIdentity.UserName != "" {
+			identifiers_map["userIdentity.userName"] = identifiers.UserIdentity.UserName
+		}
+		if identifiers.UserIdentity.Type != "" {
+			identifiers_map["userIdentity.type"] = identifiers.UserIdentity.Type
+		}
+		if identifiers.UserIdentity.ARN != "" {
+			identifiers_map["userIdentity.ARN"] = identifiers.UserIdentity.ARN
+		}
+		if identifiers.UserIdentity.PrincipalID != "" {
+			identifiers_map["userIdentity.principalID"] = identifiers.UserIdentity.PrincipalID
+		}
+		if identifiers.UserIdentity.AccessKeyID != "" {
+			identifiers_map["userIdentity.accessKeyID"] = identifiers.UserIdentity.AccessKeyID
+		}
+	}
+	if identifiers.SourceInformation != nil {
+		if identifiers.SourceInformation.SourceIPAddress != "" {
+			identifiers_map["sourceInformation.sourceIPAddress"] = identifiers.SourceInformation.SourceIPAddress
+		}
+		if identifiers.SourceInformation.UserAgent != "" {
+			identifiers_map["sourceInformation.userAgent"] = identifiers.SourceInformation.UserAgent
 		}
 	}
 	return identifiers_map
