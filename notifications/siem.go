@@ -277,6 +277,9 @@ func (s *SIEMIntegration) SetWebhookConfig(config *WebhookConfig) {
 	s.Configuration = map[string]interface{}{
 		"webhookURL": config.WebhookURL,
 	}
+	if config.Headers != nil {
+		s.Configuration["headers"] = *config.Headers
+	}
 }
 
 func (s *SIEMIntegration) GetName() string {
