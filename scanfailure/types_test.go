@@ -21,6 +21,11 @@ func TestReasonFriendlyText(t *testing.T) {
 			expected: "SBOM scanner was killed due to memory limits — consider increasing the scanner memory limit",
 		},
 		{
+			name:     "image schema unsupported code",
+			code:     ReasonImageSchemaUnsupported,
+			expected: "The container image manifest uses a schema the scanner cannot read",
+		},
+		{
 			name:     "empty string returns unexpected text",
 			code:     "",
 			expected: reasonFriendlyText[ReasonUnexpected],
@@ -51,7 +56,8 @@ func TestAllReasonCodesHaveFriendlyText(t *testing.T) {
 	codes := []string{
 		ReasonSBOMGenerationFailed, ReasonImageTooLarge, ReasonSBOMTooLarge,
 		ReasonSBOMIncomplete, ReasonImageAuthFailed, ReasonImageNotFound,
-		ReasonCVEMatchingFailed, ReasonResultUploadFailed, ReasonSBOMStorageFailed,
+		ReasonImageSchemaUnsupported, ReasonCVEMatchingFailed, ReasonResultUploadFailed,
+		ReasonSBOMStorageFailed,
 		ReasonScannerOOMKilled, ReasonScanTimeout, ReasonUnexpected,
 	}
 	for _, code := range codes {
