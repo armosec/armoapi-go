@@ -23,34 +23,36 @@ const (
 // human-friendly text at render time, so notification wording can be changed
 // without redeploying in-cluster scanners.
 const (
-	ReasonSBOMGenerationFailed = "sbom_generation_failed"
-	ReasonImageTooLarge        = "image_too_large"
-	ReasonSBOMTooLarge         = "sbom_too_large"
-	ReasonSBOMIncomplete       = "sbom_incomplete"
-	ReasonImageAuthFailed      = "image_auth_failed"
-	ReasonImageNotFound        = "image_not_found"
-	ReasonCVEMatchingFailed    = "cve_matching_failed"
-	ReasonResultUploadFailed   = "result_upload_failed"
-	ReasonSBOMStorageFailed    = "sbom_storage_failed"
-	ReasonScannerOOMKilled     = "scanner_oom_killed"
-	ReasonScanTimeout          = "scan_timeout"
-	ReasonUnexpected           = "unexpected_error"
+	ReasonSBOMGenerationFailed   = "sbom_generation_failed"
+	ReasonImageTooLarge          = "image_too_large"
+	ReasonSBOMTooLarge           = "sbom_too_large"
+	ReasonSBOMIncomplete         = "sbom_incomplete"
+	ReasonImageAuthFailed        = "image_auth_failed"
+	ReasonImageNotFound          = "image_not_found"
+	ReasonImageSchemaUnsupported = "image_schema_unsupported"
+	ReasonCVEMatchingFailed      = "cve_matching_failed"
+	ReasonResultUploadFailed     = "result_upload_failed"
+	ReasonSBOMStorageFailed      = "sbom_storage_failed"
+	ReasonScannerOOMKilled       = "scanner_oom_killed"
+	ReasonScanTimeout            = "scan_timeout"
+	ReasonUnexpected             = "unexpected_error"
 )
 
 // reasonFriendlyText maps reason codes to human-friendly text for notifications.
 var reasonFriendlyText = map[string]string{
-	ReasonSBOMGenerationFailed: "Failed to generate software inventory (SBOM) for this image",
-	ReasonImageTooLarge:        "Image exceeds the maximum size limit for vulnerability scanning",
-	ReasonSBOMTooLarge:         "Generated software inventory (SBOM) exceeds the maximum size limit",
-	ReasonSBOMIncomplete:       "SBOM generation was incomplete — the scan may have timed out or the image exceeded size limits",
-	ReasonImageAuthFailed:      "Failed to authenticate when pulling the container image",
-	ReasonImageNotFound:        "Container image manifest not found in registry",
-	ReasonCVEMatchingFailed:    "Failed to match image components against vulnerability databases",
-	ReasonResultUploadFailed:   "Scan completed but results could not be uploaded to the platform",
-	ReasonSBOMStorageFailed:    "Failed to store the generated software inventory (SBOM)",
-	ReasonScannerOOMKilled:     "SBOM scanner was killed due to memory limits — consider increasing the scanner memory limit",
-	ReasonScanTimeout:          "Vulnerability scan timed out before completion",
-	ReasonUnexpected:           "An unexpected error occurred during vulnerability scanning",
+	ReasonSBOMGenerationFailed:   "Failed to generate software inventory (SBOM) for this image",
+	ReasonImageTooLarge:          "Image exceeds the maximum size limit for vulnerability scanning",
+	ReasonSBOMTooLarge:           "Generated software inventory (SBOM) exceeds the maximum size limit",
+	ReasonSBOMIncomplete:         "SBOM generation was incomplete — the scan may have timed out or the image exceeded size limits",
+	ReasonImageAuthFailed:        "Failed to authenticate when pulling the container image",
+	ReasonImageNotFound:          "Container image manifest not found in registry",
+	ReasonImageSchemaUnsupported: "The container image manifest uses a schema the scanner cannot read",
+	ReasonCVEMatchingFailed:      "Failed to match image components against vulnerability databases",
+	ReasonResultUploadFailed:     "Scan completed but results could not be uploaded to the platform",
+	ReasonSBOMStorageFailed:      "Failed to store the generated software inventory (SBOM)",
+	ReasonScannerOOMKilled:       "SBOM scanner was killed due to memory limits — consider increasing the scanner memory limit",
+	ReasonScanTimeout:            "Vulnerability scan timed out before completion",
+	ReasonUnexpected:             "An unexpected error occurred during vulnerability scanning",
 }
 
 // ReasonFriendlyText returns the human-friendly notification text for a reason code.
