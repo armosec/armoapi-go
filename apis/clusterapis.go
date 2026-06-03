@@ -53,4 +53,8 @@ const (
 	// Delete a CronJob that runs registry scans
 	TypeDeleteRegistryScanCronJob NotificationPolicyType = "deleteRegistryScanCronJob"
 	TypeTestRegistryConnectivity  NotificationPolicyType = "testRegistryConnectivity"
+	// Trigger an operator cluster operation (post-scan remediation, e.g.
+	// annotate/quarantine/cordon). The concrete operation is carried in
+	// Command.Args as an OperatorActionArgs; see operatoraction.go.
+	TypeOperatorAction NotificationPolicyType = "operatorAction"
 )
