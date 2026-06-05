@@ -22,8 +22,7 @@ const (
 )
 
 // OperatorActionTarget identifies a single concrete object an action operates
-// on. Either a fully-specified Target or a findings-driven Selector is provided;
-// when both are present the Selector resolves an additional target set.
+// on.
 type OperatorActionTarget struct {
 	Kind      string `json:"kind,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
@@ -45,6 +44,9 @@ type OperatorActionSelector struct {
 
 // OperatorActionArgs is the typed schema for Command.Args when
 // Command.CommandName == TypeOperatorAction.
+//
+// Either a fully-specified Target or a findings-driven Selector is provided;
+// when both are present the Selector resolves an additional target set.
 //
 // Safe-by-default: DryRun is a *bool so its zero value (nil / absent on the
 // wire) means dry-run. The operator therefore treats any request that does not

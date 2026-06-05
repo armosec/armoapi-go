@@ -72,7 +72,16 @@ func TestOperatorActionArgsDryRunDefaultsSafe(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, out.IsDryRun(), "operator must read an omitted DryRun as a dry-run")
 
-	// Only an explicit false applies.
+	// Only an explicit false applies, and that must survive the wire round-trip:
+	// DryRun=false serializes as "dryRun": false and reads back as apply.
 	apply := OperatorActionArgs{Action: OperatorActionCordon, DryRun: boolPtr(false)}
 	assert.False(t, apply.IsDryRun())
+
+	am, err := apply.ToArgs()
+	require.NoError(t, err)
+	assert.Equal(t, false, am["dryRun"], "explicit DryRun=false must serialize on the wire")
+
+	applyOut, err := OperatorActionArgsFromMap(am)
+	require.NoError(t, err)
+	assert.False(t, applyOut.IsDryRun(), "operator must read an explicit DryRun=false as apply")
 }
