@@ -34,6 +34,8 @@ type AiSandboxInfo struct {
 
 	HostID string `json:"hostID"`
 
+	ExposureFlags []string `json:"exposureFlags"`
+
 	// EnablementState is observing|active.
 	EnablementState string    `json:"enablementState"`
 	FirstSeen       time.Time `json:"firstSeen"`
