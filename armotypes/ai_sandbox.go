@@ -17,8 +17,11 @@ type AiSandboxInfo struct {
 	CustomerGUID string `json:"customerGUID"`
 	ResourceHash string `json:"resourceHash"`
 
-	// HostType is the kind of host running the subject:
-	// kubernetes|ecs-ec2|ecs-fargate|ec2.
+	// HostType is the kind of host running the subject. Values are the
+	// platform's canonical HostType constants (this package):
+	// HostTypeKubernetes|HostTypeEcsEc2|HostTypeEcsFargate|HostTypeEc2 — never a
+	// hand-written literal. Kept as string here to match the stored column type;
+	// producers must assign string(armotypes.HostType*) values.
 	HostType string `json:"hostType"`
 	WLID     string `json:"wlid"`
 	Name     string `json:"name"`
