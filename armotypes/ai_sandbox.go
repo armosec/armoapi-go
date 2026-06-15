@@ -222,3 +222,26 @@ type AiSandboxEvent struct {
 	Rule      string `json:"rule,omitempty"`
 	PolicyRef string `json:"policyRef,omitempty"`
 }
+
+// AiSandboxK8sPermission is one Kubescape RBAC/posture control finding attributed
+// to a K8s sandbox subject (read-time join over resource_control_results, scoped
+// to the latest cluster posture report). Severity is intentionally absent — it
+// lives in the Kubescape catalog, not Postgres. Status mirrors control_scan_results
+// ("passed"|"failed"|"skipped").
+type AiSandboxK8sPermission struct {
+	ControlID   string `json:"controlID"`             // e.g. "C-0267"
+	ControlName string `json:"controlName,omitempty"` // e.g. "Workload with cluster takeover roles"
+	Status      string `json:"status"`                // passed|failed|skipped
+	Framework   string `json:"framework,omitempty"`   // e.g. "AllControls"
+}
+
+// AiSandboxPermissionsSummary is the rolled-up RBAC posture of a subject: counts
+// by status plus the failed RBAC control names (the "permissions risk badges").
+type AiSandboxPermissionsSummary struct {
+	Section        string                   `json:"section"` // "k8s"
+	FailedCount    int                      `json:"failedCount"`
+	PassedCount    int                      `json:"passedCount"`
+	SkippedCount   int                      `json:"skippedCount"`
+	FailedControls []string                 `json:"failedControls,omitempty"` // human names, failed only
+	Findings       []AiSandboxK8sPermission `json:"findings,omitempty"`
+}
