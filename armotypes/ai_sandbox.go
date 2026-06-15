@@ -119,6 +119,30 @@ type AiSandboxView struct {
 	EntityType        string   `json:"entityType"`
 }
 
+// AiSandboxBoundRole is one Role/ClusterRole bound to a K8s identity — a unit of
+// its permissions. Kind is "ClusterRole" or "Role". Binding is the
+// (Cluster)RoleBinding that grants it.
+type AiSandboxBoundRole struct {
+	Kind    string `json:"kind"` // "ClusterRole" | "Role"
+	Name    string `json:"name"`
+	Binding string `json:"binding,omitempty"` // the (Cluster)RoleBinding name
+}
+
+// AiSandboxIdentity is an identity a sandbox subject runs as, plus its
+// permissions. For K8s: section="k8s", the ServiceAccount, and the Roles bound to
+// it. Sourced read-time from the subject's pod spec (serviceAccountName, from the
+// synced object) joined to the PG role-binding graph — NOT from compliance
+// controls. IsAdmin is true when any bound role is cluster-admin/admin. Usage
+// fields (in_use/last_used) are a later, agent-blocked overlay — absent in v1.
+type AiSandboxIdentity struct {
+	Section string               `json:"section"`         // "k8s" (cloud/api later)
+	Name    string               `json:"name"`            // ServiceAccount name
+	Type    string               `json:"type"`            // "ServiceAccount"
+	Scope   string               `json:"scope,omitempty"` // namespace
+	IsAdmin bool                 `json:"isAdmin"`         // bound to cluster-admin/admin
+	Roles   []AiSandboxBoundRole `json:"roles,omitempty"` // bound Roles/ClusterRoles
+}
+
 // AiSandboxInstanceInfo is the shared serving DTO for one running unit of
 // a sandboxed subject — a Kubernetes pod or an ECS task.
 type AiSandboxInstanceInfo struct {
