@@ -200,9 +200,18 @@ type AiSandboxEvent struct {
 	// Summary is a short human-readable description for the activity feed.
 	Summary string `json:"summary,omitempty"`
 
+	// LogRecordUID carries the OTel log.record.uid — the agent's globally-unique
+	// per-event id — and is the canonical dedup key for the ai_sandbox_events
+	// serving table (the lake already dedups on it; PG should too, instead of a
+	// fragile composite key).
+	LogRecordUID string `json:"logRecordUID,omitempty"`
+
 	// SessionID and Turn are stamped during SILVER sessionization (R-L7).
+	// Turn is a pointer so that nil means "not yet sessionized" and a stamped
+	// first-turn value of 0 is preserved (plain int + omitempty would silently
+	// drop a real zero, making turn 0 indistinguishable from "unsessionized").
 	SessionID string `json:"sessionID,omitempty"`
-	Turn      int    `json:"turn,omitempty"`
+	Turn      *int   `json:"turn,omitempty"`
 
 	// Detail carries the type-specific payload for event layers that do not yet
 	// have first-class fields (the contract's `detail` jsonb column).
