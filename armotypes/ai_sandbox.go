@@ -136,6 +136,24 @@ type AiSandboxInstanceInfo struct {
 	LastSeen  time.Time `json:"lastSeen"`
 }
 
+// AiSandboxEvent.EventLayer — UI grouping of an activity event by protocol/kind.
+// Derived at serving time from the agent's event_type (exec→proc, network→net,
+// open→file, …); the UI groups/filters the Activity feed by these.
+const (
+	AiSandboxEventLayerNetwork = "net"
+	AiSandboxEventLayerDNS     = "dns"
+	AiSandboxEventLayerHTTP    = "http"
+	AiSandboxEventLayerProcess = "proc"
+	AiSandboxEventLayerFile    = "file"
+	AiSandboxEventLayerSyscall = "syscall"
+)
+
+// AiSandboxEvent.Direction — for the network/L7 layers (egress vs ingress, audit R5).
+const (
+	AiSandboxEventDirectionIngress = "ingress"
+	AiSandboxEventDirectionEgress  = "egress"
+)
+
 // AiSandboxEvent is the shared READ DTO for one row of the per-sandbox Activity
 // & Events surface (UI Track D). It mirrors the lake-backed ai_sandbox_events
 // serving table (a hot, short-TTL table). The json tags are the armoapi DTO
@@ -150,12 +168,11 @@ type AiSandboxInstanceInfo struct {
 // the event, joining back to ai_sandboxes / ai_sandbox_instances on
 // (customer_guid, resource_hash) and instance_ref.
 //
-// The typed process fields (ExePath, Argv, Cwd, Pid, Ppid, ParentExePath) are
-// populated NOW for R-PROC-1 (process-exec, EventType == EventTypeExec) events;
-// other event families (network/dns/http/file/syscall) carry their type-specific
-// payload in Detail until they get first-class fields. Verdict/Rule/PolicyRef are
-// enforcement stubs reserved per the policies-descoped decision — always empty
-// for now.
+// Type-specific payload (R-PROC-1 exe_path/argv/cwd/pid/ppid/parent_exe_path now;
+// host/method/model for L7 later) lives in the generic Detail jsonb — so the
+// hot-table column set stays STABLE as network/dns/http/file/syscall layers come
+// online, no column-per-type sprawl. Verdict/Rule/PolicyRef are enforcement stubs
+// reserved per the policies-descoped decision — always empty for now.
 //
 // NOTE: the contract keeps a generic `detail` jsonb column for not-yet-typed
 // event families; it is surfaced here as a raw json.RawMessage so the read model
@@ -168,28 +185,20 @@ type AiSandboxEvent struct {
 
 	EventTime time.Time `json:"eventTime"`
 
-	// EventFamily is the node-agent's `event.family` envelope value — the R-*
-	// family the agent emits (R-PROC-1, R-NET-1, R-NET-2/DNS, R-L7-1/HTTP,
-	// R-FILE-1, R-SYSCALL-1). Kept as string to mirror the stored column; it is
-	// NOT a new net|proc|file vocabulary.
-	EventFamily string `json:"eventFamily"`
-	// EventType is the specific event within the family, using the shared
+	// EventLayer is the UI grouping of the event by protocol/kind — one of
+	// AiSandboxEventLayer* (net/dns/http/proc/file/syscall). Derived at serving
+	// time from EventType (exec→proc, network→net, open→file, …).
+	EventLayer string `json:"eventLayer,omitempty"`
+	// Direction applies to the network/L7 layers — AiSandboxEventDirection*
+	// (ingress/egress). Empty for proc/file/syscall.
+	Direction string `json:"direction,omitempty"`
+	// EventType is the specific event, using the shared
 	// armotypes.EventType vocabulary (EventTypeExec=="exec", EventTypeDNS=="dns",
 	// EventTypeHTTP=="http", …) — the same string values the node-agent emits in
 	// the `event_type` envelope key. Process-exec events carry EventTypeExec.
 	EventType EventType `json:"eventType"`
 	// Summary is a short human-readable description for the activity feed.
 	Summary string `json:"summary,omitempty"`
-
-	// R-PROC-1 process-exec typed fields (populated NOW for EventTypeExec events).
-	// Field names mirror the agent's structured attrs / BRONZE columns:
-	// exe_path, argv, cwd, pid, ppid, parent_exe_path.
-	ExePath       string   `json:"exePath,omitempty"`
-	Argv          []string `json:"argv,omitempty"`
-	Cwd           string   `json:"cwd,omitempty"`
-	Pid           int      `json:"pid,omitempty"`
-	Ppid          int      `json:"ppid,omitempty"`
-	ParentExePath string   `json:"parentExePath,omitempty"`
 
 	// SessionID and Turn are stamped during SILVER sessionization (R-L7).
 	SessionID string `json:"sessionID,omitempty"`
