@@ -1,6 +1,9 @@
 package armotypes
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // AiSandboxInfo is the WRITE model for one sandboxed subject — a Kubernetes
 // workload, an ECS service, or a host — in the AI-Sandbox (AI-SPM) feature.
@@ -38,6 +41,14 @@ type AiSandboxInfo struct {
 	HostID string `json:"hostID"`
 
 	ExposureFlags []string `json:"exposureFlags"`
+
+	// AIReachableEndpoints is the set of AI-provider hosts the workload's DNS
+	// resolution shows it can contact — e.g. bedrock-runtime, *.openai.com,
+	// *.anthropic.com, generativelanguage.googleapis.com. This is DNS-derived
+	// REACHABILITY (the workload resolved/can reach these hosts), NOT confirmed
+	// usage: presence here does not imply the workload actually issued an AI call.
+	// Stored on the subject row so it flows into AiSandboxView via the embed.
+	AIReachableEndpoints []string `json:"aiReachableEndpoints,omitempty"`
 
 	// EnablementState is observing|active.
 	EnablementState string    `json:"enablementState"`
@@ -93,4 +104,61 @@ type AiSandboxInstanceInfo struct {
 
 	FirstSeen time.Time `json:"firstSeen"`
 	LastSeen  time.Time `json:"lastSeen"`
+}
+
+// AiSandboxEvent is the shared READ DTO for one row of the per-sandbox Activity
+// & Events surface (UI Track D). It mirrors the lake-backed ai_sandbox_events
+// serving table (a hot, short-TTL table) — every json tag is the stored column
+// name the aggregator/SILVER writes and cadashboardbe reads. This is a clean
+// read model: producers project rows into it, the UI binds to it; there is no
+// separate write split because events are append-only and never upserted.
+//
+// Envelope keys identify the sandboxed subject and the running unit that emitted
+// the event, joining back to ai_sandboxes / ai_sandbox_instances on
+// (customer_guid, resource_hash) and instance_ref.
+//
+// The typed process fields (ExePath, Argv, Cwd, Pid, Ppid, ParentExePath) are
+// populated NOW for R-PROC process-exec events; other event layers
+// (net/dns/http/file/syscall) carry their type-specific payload in Detail until
+// they get first-class fields. Verdict/Rule/PolicyRef are enforcement stubs
+// reserved per the policies-descoped decision — always empty for now.
+//
+// NOTE: the contract keeps a generic `detail` jsonb column for not-yet-typed
+// event layers; it is surfaced here as a raw json.RawMessage so the read model
+// stays lossless without committing to a schema for those layers yet.
+type AiSandboxEvent struct {
+	CustomerGUID string `json:"customerGUID"`
+	ResourceHash string `json:"resourceHash"`
+	WLID         string `json:"wlid"`
+	InstanceRef  string `json:"instanceRef"`
+
+	EventTime time.Time `json:"eventTime"`
+
+	// EventLayer is the event family/discriminator: net|dns|http|proc|file|syscall.
+	EventLayer string `json:"eventLayer"`
+	// EventType is the specific event within the layer (e.g. "process-exec").
+	EventType string `json:"eventType"`
+	// Summary is a short human-readable description for the activity feed.
+	Summary string `json:"summary,omitempty"`
+
+	// R-PROC process-exec typed fields (populated NOW for proc events).
+	ExePath       string   `json:"exePath,omitempty"`
+	Argv          []string `json:"argv,omitempty"`
+	Cwd           string   `json:"cwd,omitempty"`
+	Pid           int      `json:"pid,omitempty"`
+	Ppid          int      `json:"ppid,omitempty"`
+	ParentExePath string   `json:"parentExePath,omitempty"`
+
+	// SessionID and Turn are stamped during SILVER sessionization (R-L7).
+	SessionID string `json:"sessionID,omitempty"`
+	Turn      int    `json:"turn,omitempty"`
+
+	// Detail carries the type-specific payload for event layers that do not yet
+	// have first-class fields (the contract's `detail` jsonb column).
+	Detail json.RawMessage `json:"detail,omitempty"`
+
+	// Enforcement stubs — descoped (policies). Always empty for now.
+	Verdict   string `json:"verdict,omitempty"`
+	Rule      string `json:"rule,omitempty"`
+	PolicyRef string `json:"policyRef,omitempty"`
 }
