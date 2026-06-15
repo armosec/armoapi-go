@@ -108,24 +108,28 @@ type AiSandboxInstanceInfo struct {
 
 // AiSandboxEvent is the shared READ DTO for one row of the per-sandbox Activity
 // & Events surface (UI Track D). It mirrors the lake-backed ai_sandbox_events
-// serving table (a hot, short-TTL table) — every json tag is the stored column
-// name the aggregator/SILVER writes and cadashboardbe reads. This is a clean
-// read model: producers project rows into it, the UI binds to it; there is no
-// separate write split because events are append-only and never upserted.
+// serving table (a hot, short-TTL table). The json tags are the armoapi DTO
+// (camelCase) convention shared with the sibling AiSandbox* types; the stored
+// BRONZE/serving columns are the snake_case envelope keys (event_time,
+// instance_ref, exe_path, …) the aggregator/SILVER writes and cadashboardbe
+// reads, mapped to these fields. This is a clean read model: producers project
+// rows into it, the UI binds to it; there is no separate write split because
+// events are append-only and never upserted.
 //
 // Envelope keys identify the sandboxed subject and the running unit that emitted
 // the event, joining back to ai_sandboxes / ai_sandbox_instances on
 // (customer_guid, resource_hash) and instance_ref.
 //
 // The typed process fields (ExePath, Argv, Cwd, Pid, Ppid, ParentExePath) are
-// populated NOW for R-PROC process-exec events; other event layers
-// (net/dns/http/file/syscall) carry their type-specific payload in Detail until
-// they get first-class fields. Verdict/Rule/PolicyRef are enforcement stubs
-// reserved per the policies-descoped decision — always empty for now.
+// populated NOW for R-PROC-1 (process-exec, EventType == EventTypeExec) events;
+// other event families (network/dns/http/file/syscall) carry their type-specific
+// payload in Detail until they get first-class fields. Verdict/Rule/PolicyRef are
+// enforcement stubs reserved per the policies-descoped decision — always empty
+// for now.
 //
 // NOTE: the contract keeps a generic `detail` jsonb column for not-yet-typed
-// event layers; it is surfaced here as a raw json.RawMessage so the read model
-// stays lossless without committing to a schema for those layers yet.
+// event families; it is surfaced here as a raw json.RawMessage so the read model
+// stays lossless without committing to a schema for those families yet.
 type AiSandboxEvent struct {
 	CustomerGUID string `json:"customerGUID"`
 	ResourceHash string `json:"resourceHash"`
@@ -134,14 +138,22 @@ type AiSandboxEvent struct {
 
 	EventTime time.Time `json:"eventTime"`
 
-	// EventLayer is the event family/discriminator: net|dns|http|proc|file|syscall.
-	EventLayer string `json:"eventLayer"`
-	// EventType is the specific event within the layer (e.g. "process-exec").
-	EventType string `json:"eventType"`
+	// EventFamily is the node-agent's `event.family` envelope value — the R-*
+	// family the agent emits (R-PROC-1, R-NET-1, R-NET-2/DNS, R-L7-1/HTTP,
+	// R-FILE-1, R-SYSCALL-1). Kept as string to mirror the stored column; it is
+	// NOT a new net|proc|file vocabulary.
+	EventFamily string `json:"eventFamily"`
+	// EventType is the specific event within the family, using the shared
+	// armotypes.EventType vocabulary (EventTypeExec=="exec", EventTypeDNS=="dns",
+	// EventTypeHTTP=="http", …) — the same string values the node-agent emits in
+	// the `event_type` envelope key. Process-exec events carry EventTypeExec.
+	EventType EventType `json:"eventType"`
 	// Summary is a short human-readable description for the activity feed.
 	Summary string `json:"summary,omitempty"`
 
-	// R-PROC process-exec typed fields (populated NOW for proc events).
+	// R-PROC-1 process-exec typed fields (populated NOW for EventTypeExec events).
+	// Field names mirror the agent's structured attrs / BRONZE columns:
+	// exe_path, argv, cwd, pid, ppid, parent_exe_path.
 	ExePath       string   `json:"exePath,omitempty"`
 	Argv          []string `json:"argv,omitempty"`
 	Cwd           string   `json:"cwd,omitempty"`
