@@ -5,6 +5,35 @@ import (
 	"time"
 )
 
+// AiSandboxAIEndpoint observation source: how the endpoint was detected.
+const (
+	AiSandboxEndpointSourceDNS = "dns" // DNS resolution — reachability, NOT confirmed usage
+	AiSandboxEndpointSourceL7  = "l7"  // R-L7 structured payload — confirmed usage
+)
+
+// AiSandboxAIEndpoint plane/kind: which face of the provider the endpoint is.
+const (
+	AiSandboxEndpointKindInference    = "inference"     // model data-plane (bedrock-runtime, api.openai.com)
+	AiSandboxEndpointKindControlPlane = "control-plane" // management API (bedrock.<region>)
+	AiSandboxEndpointKindModelHost    = "model-host"    // model hosting (sagemaker)
+)
+
+// AiSandboxAIEndpoint is one AI-provider endpoint a sandboxed workload is
+// observed contacting. v1 entries are DNS-derived (Source="dns" → reachability,
+// not confirmed usage); the R-L7 payload later adds confirmed-usage entries
+// (Source="l7"). It is the lightweight precursor of the
+// ai_sandbox_external_services detail model — same host/provider keying, ready
+// to merge when typed L7 lands.
+type AiSandboxAIEndpoint struct {
+	Host      string     `json:"host"`                // e.g. bedrock-runtime.us-east-1.amazonaws.com
+	Provider  string     `json:"provider,omitempty"`  // aligns to workload_statuses ai_client_providers vocab, e.g. "AWS Bedrock"
+	Kind      string     `json:"kind,omitempty"`      // one of AiSandboxEndpointKind*
+	Region    string     `json:"region,omitempty"`    // e.g. us-east-1 (when derivable from the host)
+	Source    string     `json:"source"`              // one of AiSandboxEndpointSource*
+	FirstSeen *time.Time `json:"firstSeen,omitempty"` // first observation in the rollup window
+	LastSeen  *time.Time `json:"lastSeen,omitempty"`  // most recent observation
+}
+
 // AiSandboxInfo is the WRITE model for one sandboxed subject — a Kubernetes
 // workload, an ECS service, or a host — in the AI-Sandbox (AI-SPM) feature.
 // Every field here is a STORED column: exactly what the aggregator upserts and
@@ -42,13 +71,14 @@ type AiSandboxInfo struct {
 
 	ExposureFlags []string `json:"exposureFlags"`
 
-	// AIReachableEndpoints is the set of AI-provider hosts the workload's DNS
-	// resolution shows it can contact — e.g. bedrock-runtime, *.openai.com,
-	// *.anthropic.com, generativelanguage.googleapis.com. This is DNS-derived
-	// REACHABILITY (the workload resolved/can reach these hosts), NOT confirmed
-	// usage: presence here does not imply the workload actually issued an AI call.
-	// Stored on the subject row so it flows into AiSandboxView via the embed.
-	AIReachableEndpoints []string `json:"aiReachableEndpoints,omitempty"`
+	// AIEndpoints is the set of AI-provider endpoints the workload is observed
+	// contacting (e.g. bedrock-runtime.us-east-1, api.openai.com), each with its
+	// provider/plane/region. v1 entries are DNS-derived (Source="dns" →
+	// REACHABILITY, not confirmed usage); the R-L7 payload later adds confirmed
+	// rows (Source="l7") with model/token detail. This is the lightweight
+	// precursor of the ai_sandbox_external_services detail model. Stored on the
+	// subject row so it flows into AiSandboxView via the embed.
+	AIEndpoints []AiSandboxAIEndpoint `json:"aiEndpoints,omitempty"`
 
 	// EnablementState is observing|active.
 	EnablementState string    `json:"enablementState"`
