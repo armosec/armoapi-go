@@ -129,18 +129,44 @@ type AiSandboxBoundRole struct {
 }
 
 // AiSandboxIdentity is an identity a sandbox subject runs as, plus its
-// permissions. For K8s: section="k8s", the ServiceAccount, and the Roles bound to
-// it. Sourced read-time from the subject's pod spec (serviceAccountName, from the
-// synced object) joined to the PG role-binding graph — NOT from compliance
-// controls. IsAdmin is true when any bound role is cluster-admin/admin. Usage
-// fields (in_use/last_used) are a later, agent-blocked overlay — absent in v1.
+// permissions. It spans two sections:
+//
+//   - section="k8s": the ServiceAccount and the Roles bound to it. Sourced
+//     read-time from the subject's pod spec (serviceAccountName, from the synced
+//     object) joined to the PG role-binding graph — NOT from compliance controls.
+//     IsAdmin is true when any bound role is cluster-admin/admin.
+//   - section="cloud": the AWS IAM role the ServiceAccount federates to via IRSA
+//     (the SA's eks.amazonaws.com/role-arn annotation), plus that role's IAM
+//     posture (Findings). Provider="aws", Name is the IAM role name, Scope is the
+//     AWS account id, RoleARN is the full role arn. Findings are pinned to the
+//     latest CSPM scan. IsAdmin is true when an AdministratorAccess finding failed.
+//
+// Usage fields (in_use/last_used) are a later, agent-blocked overlay — absent in v1.
 type AiSandboxIdentity struct {
-	Section string               `json:"section"`         // "k8s" (cloud/api later)
-	Name    string               `json:"name"`            // ServiceAccount name
-	Type    string               `json:"type"`            // "ServiceAccount"
-	Scope   string               `json:"scope,omitempty"` // namespace
-	IsAdmin bool                 `json:"isAdmin"`         // bound to cluster-admin/admin
-	Roles   []AiSandboxBoundRole `json:"roles,omitempty"` // bound Roles/ClusterRoles
+	Section string               `json:"section"`         // "k8s" | "cloud"
+	Name    string               `json:"name"`            // ServiceAccount name | IAM role name
+	Type    string               `json:"type"`            // "ServiceAccount" | "IAM Role"
+	Scope   string               `json:"scope,omitempty"` // namespace | aws account id
+	IsAdmin bool                 `json:"isAdmin"`         // cluster-admin/admin (k8s) | AdministratorAccess (cloud)
+	Roles   []AiSandboxBoundRole `json:"roles,omitempty"` // k8s: bound Roles/ClusterRoles
+
+	// Cloud-only fields (section="cloud"), all omitempty so the k8s shape is unchanged.
+	Provider string                     `json:"provider,omitempty"` // cloud: "aws"
+	RoleARN  string                     `json:"roleARN,omitempty"`  // cloud: the IAM role arn
+	Findings []AiSandboxIdentityFinding `json:"findings,omitempty"` // cloud: IAM posture (latest scan)
+}
+
+// AiSandboxIdentityFinding is one IAM posture finding on a cloud identity,
+// pinned to the latest CSPM scan. Severity is the human label mapped from the
+// numeric CSPM severity; Status is "passed" | "failed".
+// AiSandboxIdentityFinding is a single IAM-posture risk on a cloud identity
+// (latest CSPM scan), surfaced as a plain risk label — title + severity + status.
+// It deliberately carries no compliance-control identifier: this feature is about
+// an identity and its risk, not control coverage.
+type AiSandboxIdentityFinding struct {
+	Title    string `json:"title"`
+	Severity string `json:"severity,omitempty"` // high | medium | low (mapped from numeric)
+	Status   string `json:"status"`             // passed | failed
 }
 
 // AiSandboxInstanceInfo is the shared serving DTO for one running unit of
