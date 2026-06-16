@@ -186,6 +186,33 @@ type AiSandboxInstanceInfo struct {
 	LastSeen  time.Time `json:"lastSeen"`
 }
 
+// AiSandboxInstanceView is the READ model for the instance-primary Sandboxes
+// list: one row per running unit (a Kubernetes pod or an ECS task), carrying a
+// compact summary of its parent workload — the subject that owns
+// identity/inventory/rollups. The list defaults to this instance axis; the
+// existing workload rows (AiSandboxView) are served under the groupBy=workload
+// toggle. Per-subject detail (identities/cloud/events) still resolves via the
+// instance's parent ResourceHash (already carried on the embedded
+// AiSandboxInstanceInfo), so the resolver is reused unchanged.
+//
+// The instance fields are persisted on ai_sandbox_instances; the parent-workload
+// summary is joined at serving time from the parent ai_sandboxes row (name/kind/
+// cluster/namespace) and the live workload_statuses join (AIClientProviders, the
+// AI badge) plus identity resolution (IdentityAdmin). Producers never populate
+// the summary; the serving query does. Every summary field is omitempty so a
+// bare instance row stays compact.
+type AiSandboxInstanceView struct {
+	AiSandboxInstanceInfo `json:",inline"` // instanceRef, resourceHash(parent), podName, status, node, first/lastSeen
+
+	// Parent-workload summary (the group this instance rolls up to):
+	WorkloadName      string   `json:"workloadName,omitempty"`
+	Kind              string   `json:"kind,omitempty"`
+	Cluster           string   `json:"cluster,omitempty"`
+	Namespace         string   `json:"namespace,omitempty"`
+	AIClientProviders []string `json:"aiClientProviders,omitempty"` // the AI badge, from the subject's workload_statuses
+	IdentityAdmin     bool     `json:"identityAdmin,omitempty"`     // any workload identity is admin (k8s or cloud)
+}
+
 // AiSandboxEvent.EventLayer — UI grouping of an activity event by protocol/kind.
 // Derived at serving time from the agent's event_type (exec→proc, network→net,
 // open→file, …); the UI groups/filters the Activity feed by these.
