@@ -19,7 +19,6 @@ type Ticket struct {
 	Link           string              `json:"link,omitempty"`           //link to the ticket
 	Status         string              `json:"status,omitempty"`         //status of the ticket
 	LinkTitle      string              `json:"linkTitle,omitempty"`      //title of the ticket
-	Severity       string              `json:"severity,omitempty"`       //severity of the ticket
 	Error          string              `json:"error,omitempty"`          //error message if any
 	ErrorCode      int                 `json:"errorCode,omitempty"`      //error code if any (e.g. http status code like 401)
 	ProviderData   map[string]string   `json:"providerData,omitempty"`   //provider specific data
