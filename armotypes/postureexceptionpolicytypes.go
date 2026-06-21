@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type PostureExceptionPolicyActions string
@@ -31,6 +32,11 @@ type PostureExceptionPolicy struct {
 	CreationTime    string                          `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
 	Actions         []PostureExceptionPolicyActions `json:"actions,omitempty" bson:"actions,omitempty"`
 	Resources       []identifiers.PortalDesignator  `json:"resources" bson:"resources,omitempty"`
+	// ObjectSelector carries a full Kubernetes label selector (matchLabels + matchExpressions)
+	// for the exception's workload-matching axis. Unlike Resources (which encodes per-key regex
+	// designators), this is evaluated with labels.Selector semantics by the exception processor.
+	// A nil selector imposes no label constraint; it is never treated as match-all.
+	ObjectSelector  *metav1.LabelSelector           `json:"objectSelector,omitempty" bson:"objectSelector,omitempty"`
 	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
 	Reason          *string                         `json:"reason,omitempty" bson:"reason,omitempty"`
 	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate"`
