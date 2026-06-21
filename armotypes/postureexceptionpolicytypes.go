@@ -35,7 +35,13 @@ type PostureExceptionPolicy struct {
 	// ObjectSelector carries a full Kubernetes label selector (matchLabels + matchExpressions)
 	// for the exception's workload-matching axis. Unlike Resources (which encodes per-key regex
 	// designators), this is evaluated with labels.Selector semantics by the exception processor.
-	// A nil selector imposes no label constraint; it is never treated as match-all.
+	//
+	// Both a nil selector and a non-nil but empty selector ({} / no matchLabels and no
+	// matchExpressions) mean "no label constraint": the consumer must skip the label axis
+	// entirely in those cases. Do NOT pass either straight to metav1.LabelSelectorAsSelector,
+	// whose conversion disagrees with that intent — nil yields labels.Nothing() (matches nothing)
+	// and an empty selector yields labels.Everything() (matches every workload). Guard for
+	// nil/empty before converting.
 	ObjectSelector  *metav1.LabelSelector           `json:"objectSelector,omitempty" bson:"objectSelector,omitempty"`
 	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
 	Reason          *string                         `json:"reason,omitempty" bson:"reason,omitempty"`
