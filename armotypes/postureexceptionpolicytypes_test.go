@@ -10,10 +10,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func objectSelectorFixture() *metav1.LabelSelector {
-	return &metav1.LabelSelector{
+func objectSelectorFixture() *LabelSelector {
+	return &LabelSelector{
 		MatchLabels: map[string]string{"app": "nginx"},
-		MatchExpressions: []metav1.LabelSelectorRequirement{
+		MatchExpressions: []LabelSelectorRequirement{
 			{
 				Key:      "tier",
 				Operator: metav1.LabelSelectorOpIn,
@@ -44,19 +44,47 @@ func TestPostureExceptionPolicyObjectSelectorRoundTrip(t *testing.T) {
 	assert.Equal(t, policy.ObjectSelector, decoded.ObjectSelector)
 }
 
-// TestPostureExceptionPolicyObjectSelectorBSONRoundTrip pins the same selector
-// contract for the bson tag, since the field is persisted via mongo-driver too.
+// TestPostureExceptionPolicyObjectSelectorBSONRoundTrip pins the selector contract for
+// the bson tag, since the field is persisted via mongo-driver too. It also asserts the
+// nested keys are stored as camelCase (matchLabels / matchExpressions) rather than the
+// lowercased fallback the metav1 type would produce, so persisted documents match the
+// JSON/API/CRD shape.
 func TestPostureExceptionPolicyObjectSelectorBSONRoundTrip(t *testing.T) {
 	policy := PostureExceptionPolicy{ObjectSelector: objectSelectorFixture()}
 
 	raw, err := bson.Marshal(policy)
 	require.NoError(t, err)
 
+	// Inspect the raw document keys, not just the symmetric round-trip.
+	var doc bson.M
+	require.NoError(t, bson.Unmarshal(raw, &doc))
+	selector, ok := doc["objectSelector"].(bson.M)
+	require.True(t, ok, "objectSelector must persist as a nested document")
+	assert.Contains(t, selector, "matchLabels")
+	assert.Contains(t, selector, "matchExpressions")
+	assert.NotContains(t, selector, "matchlabels")
+	assert.NotContains(t, selector, "matchexpressions")
+
 	var decoded PostureExceptionPolicy
 	require.NoError(t, bson.Unmarshal(raw, &decoded))
-
 	require.NotNil(t, decoded.ObjectSelector)
 	assert.Equal(t, policy.ObjectSelector, decoded.ObjectSelector)
+}
+
+// TestLabelSelectorToMetaV1 verifies the conversion to metav1.LabelSelector used by the
+// downstream exception comparator, including the nil-receiver guard.
+func TestLabelSelectorToMetaV1(t *testing.T) {
+	assert.Nil(t, (*LabelSelector)(nil).ToMetaV1())
+
+	got := objectSelectorFixture().ToMetaV1()
+	want := &metav1.LabelSelector{
+		MatchLabels: map[string]string{"app": "nginx"},
+		MatchExpressions: []metav1.LabelSelectorRequirement{
+			{Key: "tier", Operator: metav1.LabelSelectorOpIn, Values: []string{"frontend", "backend"}},
+			{Key: "track", Operator: metav1.LabelSelectorOpNotIn, Values: []string{"canary"}},
+		},
+	}
+	assert.Equal(t, want, got)
 }
 
 // TestPostureExceptionPolicyObjectSelectorOmitEmpty pins the contract that a nil
