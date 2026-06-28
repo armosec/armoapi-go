@@ -25,4 +25,10 @@ type Inventory struct {
 	LaunchType         string     `json:"launchType,omitempty"`
 	HostType           string     `json:"hostType,omitempty"`
 	ResourceHash       string     `json:"resourceHash,omitempty"`
+	// IsAgentic is the binary agentic verdict for the inventory/discovery badge.
+	// It is derived from workload_statuses providers (ai_client_providers /
+	// ai_server_providers) via armotypes.IsAgentic and is sandbox-table-independent
+	// — it does NOT depend on the ai_sandboxes tables, so the discovery badge keeps
+	// working regardless of the ai_sandboxes agentic-verdict migration state.
+	IsAgentic bool `json:"isAgentic,omitempty"`
 }

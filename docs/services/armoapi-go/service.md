@@ -108,10 +108,15 @@ agentic := armotypes.IsAgentic(clientProviders, serverProviders)
 ```
 
 `EntityTypeAIAgent` / `EntityTypeMCPServer` are the exact `entity_type` strings
-(kept in sync with postgres-connector `services/aisandbox/view.go`). The inventory
-DTO field `WorkloadViews.IsAgentic` (`bool`, `json:"isAgentic,omitempty"`) is the
+(kept in sync with postgres-connector `services/aisandbox/view.go`). The discovery
+DTO field `Inventory.IsAgentic` (`bool`, `json:"isAgentic,omitempty"`) is the
 binary agentic verdict; it is derived from `workload_statuses` providers via
 `armotypes.IsAgentic`, so it does **not** depend on the `ai_sandboxes` tables.
+The inventory (`/api/v1/inventory`) is the discovery surface that carries the badge.
+
+> **Deprecated:** `WorkloadViews.IsAgentic` is deprecated — the agentic badge
+> belongs on `Inventory.IsAgentic`. Do not add or extend the agentic badge on
+> `WorkloadViews`.
 
 ## Versioning Strategy
 

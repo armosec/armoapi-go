@@ -18,10 +18,8 @@ type WorkloadViews struct {
 	RiskFactors        []string   `json:"riskFactors,omitempty"`
 	LearningPercentage *int       `json:"learningPercentage,omitempty"`
 	HostName           string     `json:"hostName,omitempty"`
-	// IsAgentic is the binary agentic-classification badge for the inventory.
-	// It is derived from workload_statuses (ai_client_providers /
-	// ai_server_providers) via armotypes.IsAgentic — it does NOT depend on the
-	// AI-Sandbox tables, so the dashboard badge keeps working regardless of the
-	// ai_sandboxes agentic-verdict migration state.
+	// Deprecated: the agentic badge belongs on Inventory.IsAgentic (the inventory
+	// is the discovery surface). Do not add/extend the agentic badge on
+	// WorkloadViews.
 	IsAgentic bool `json:"isAgentic,omitempty"`
 }
