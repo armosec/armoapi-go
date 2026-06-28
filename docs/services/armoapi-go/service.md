@@ -107,11 +107,11 @@ entityType := armotypes.AgenticEntityType(clientProviders, serverProviders)
 agentic := armotypes.IsAgentic(clientProviders, serverProviders)
 ```
 
-`EntityTypeAIAgent` / `EntityTypeMCPServer` are the exact badge strings (kept in
-sync with postgres-connector `services/aisandbox/view.go`). The inventory DTO
-field `WorkloadViews.IsAgentic` (`json:"isAgentic"`) carries the badge; it is
-derived from `workload_statuses` providers via `armotypes.IsAgentic`, so it does
-**not** depend on the `ai_sandboxes` tables.
+`EntityTypeAIAgent` / `EntityTypeMCPServer` are the exact `entity_type` strings
+(kept in sync with postgres-connector `services/aisandbox/view.go`). The inventory
+DTO field `WorkloadViews.IsAgentic` (`bool`, `json:"isAgentic,omitempty"`) is the
+binary agentic verdict; it is derived from `workload_statuses` providers via
+`armotypes.IsAgentic`, so it does **not** depend on the `ai_sandboxes` tables.
 
 ## Versioning Strategy
 
