@@ -114,9 +114,10 @@ binary agentic verdict; it is derived from `workload_statuses` providers via
 `armotypes.IsAgentic`, so it does **not** depend on the `ai_sandboxes` tables.
 The inventory (`/api/v1/inventory`) is the discovery surface that carries the badge.
 
-> **Deprecated:** `WorkloadViews.IsAgentic` is deprecated — the agentic badge
-> belongs on `Inventory.IsAgentic`. Do not add or extend the agentic badge on
-> `WorkloadViews`.
+> **Deprecated:** the **entire `WorkloadViews`** type/view is deprecated, superseded
+> by `Inventory` (the discovery surface at `/api/v1/inventory`). Use `armotypes.Inventory`
+> for new work; do not add or extend fields on `WorkloadViews` (the agentic badge lives
+> on `Inventory.IsAgentic`).
 
 ## Versioning Strategy
 

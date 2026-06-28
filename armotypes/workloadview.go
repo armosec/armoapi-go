@@ -2,6 +2,9 @@ package armotypes
 
 import "time"
 
+// Deprecated: WorkloadViews is superseded by Inventory (the discovery surface,
+// served at /api/v1/inventory). Use armotypes.Inventory for new work; do not add
+// or extend fields on WorkloadViews.
 type WorkloadViews struct {
 	WorkloadName       string     `json:"workloadName"`
 	Kind               string     `json:"kind"` // will be deprecated in the future after type is introduced
