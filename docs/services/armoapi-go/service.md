@@ -94,6 +94,25 @@ type MyEntity struct {
 }
 ```
 
+### AI-Sandbox Agentic Classification (single source of truth)
+
+`armotypes` owns the one shared rule for the AI-Sandbox "agentic" classification,
+so the inventory/dashboard and the AI-Sandbox serving classify identical inputs
+identically (no duplicated `deriveEntityType`):
+
+```go
+// server-wins precedence: server -> "MCP Server", else client -> "AI Agent", else ""
+entityType := armotypes.AgenticEntityType(clientProviders, serverProviders)
+// binary verdict: any client OR server provider
+agentic := armotypes.IsAgentic(clientProviders, serverProviders)
+```
+
+`EntityTypeAIAgent` / `EntityTypeMCPServer` are the exact `entity_type` strings
+(kept in sync with postgres-connector `services/aisandbox/view.go`). The inventory
+DTO field `WorkloadViews.IsAgentic` (`bool`, `json:"isAgentic,omitempty"`) is the
+binary agentic verdict; it is derived from `workload_statuses` providers via
+`armotypes.IsAgentic`, so it does **not** depend on the `ai_sandboxes` tables.
+
 ## Versioning Strategy
 
 - **Module path**: `github.com/armosec/armoapi-go`
