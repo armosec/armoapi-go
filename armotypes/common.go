@@ -30,7 +30,41 @@ const (
 	RepositoryPosture        ScanType = "repository"
 	ContainerVulnerabilities ScanType = "container"
 	RegistryVulnerabilities  ScanType = "registry"
+
+	// Agentic entity-type values — the SINGLE source of truth for the AI-Sandbox
+	// agentic classification, shared by the inventory/dashboard and the
+	// AI-Sandbox serving so both classify identical inputs identically (no
+	// duplicated deriveEntityType). The exact strings MUST stay in sync with the
+	// values served by postgres-connector services/aisandbox/view.go.
+	//
+	// EntityTypeMCPServer marks a subject that exposes/serves AI capability
+	// (ai_server_providers present) — it acts as an MCP server / model host.
+	EntityTypeMCPServer = "MCP Server"
+	// EntityTypeAIAgent marks a subject that consumes AI (ai_client_providers
+	// present, no server providers) — an AI agent / client workload.
+	EntityTypeAIAgent = "AI Agent"
 )
+
+// AgenticEntityType is the SINGLE agentic classification rule shared by the
+// inventory/dashboard and the AI-Sandbox serving. Precedence is server-wins: a
+// subject that serves AI (serverProviders non-empty) is an MCP Server;
+// otherwise one that consumes AI (clientProviders non-empty) is an AI Agent;
+// neither ⇒ "" (not agentic / unknown).
+func AgenticEntityType(clientProviders, serverProviders []string) string {
+	if len(serverProviders) > 0 {
+		return EntityTypeMCPServer
+	}
+	if len(clientProviders) > 0 {
+		return EntityTypeAIAgent
+	}
+	return ""
+}
+
+// IsAgentic is the binary (yes/no) agentic verdict used by the inventory badge.
+// A subject is agentic when it has any AI client OR any AI server provider.
+func IsAgentic(clientProviders, serverProviders []string) bool {
+	return len(clientProviders) > 0 || len(serverProviders) > 0
+}
 
 var RiskFactorMapping = map[string]RiskFactor{
 	"C-0256":        RiskFactorExternalFacing,
