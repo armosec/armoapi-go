@@ -2,6 +2,9 @@ package armotypes
 
 import "time"
 
+// Deprecated: WorkloadViews is superseded by Inventory (the discovery surface,
+// served at /api/v1/inventory). Use armotypes.Inventory for new work; do not add
+// or extend fields on WorkloadViews.
 type WorkloadViews struct {
 	WorkloadName       string     `json:"workloadName"`
 	Kind               string     `json:"kind"` // will be deprecated in the future after type is introduced
@@ -18,10 +21,8 @@ type WorkloadViews struct {
 	RiskFactors        []string   `json:"riskFactors,omitempty"`
 	LearningPercentage *int       `json:"learningPercentage,omitempty"`
 	HostName           string     `json:"hostName,omitempty"`
-	// IsAgentic is the binary agentic-classification badge for the inventory.
-	// It is derived from workload_statuses (ai_client_providers /
-	// ai_server_providers) via armotypes.IsAgentic — it does NOT depend on the
-	// AI-Sandbox tables, so the dashboard badge keeps working regardless of the
-	// ai_sandboxes agentic-verdict migration state.
+	// Deprecated: the agentic badge belongs on Inventory.IsAgentic (the inventory
+	// is the discovery surface). Do not add/extend the agentic badge on
+	// WorkloadViews.
 	IsAgentic bool `json:"isAgentic,omitempty"`
 }
