@@ -1,6 +1,9 @@
 package notifications
 
 import (
+	"encoding/json"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/armosec/armoapi-go/containerscan"
@@ -81,6 +84,132 @@ type GitHubTicketIdentifiers struct {
 	Labels            []string `json:"labels,omitempty" bson:"labels,omitempty"`
 	Assignees         []string `json:"assignees,omitempty" bson:"assignees,omitempty"`
 	MilestoneID       *int     `json:"milestoneId,omitempty" bson:"milestoneId,omitempty"`
+}
+
+// UnmarshalJSON decodes GitHubTicketIdentifiers tolerantly so the workflow /
+// runtime-incident payload accepts the same select-option shape the UI submits
+// for every provider, in addition to the historical bare forms:
+//   - labels / assignees: bare strings (["bug"]) OR option objects
+//     ([{"id":"bug"}] / [{"name":"bug"}]).
+//   - milestone: the bare "milestoneId" integer (preferred) OR a "milestone"
+//     select option ({"id":"12"} / {"id":12} / "12").
+//
+// Everything normalizes into the typed fields, so existing readers (e.g. the
+// notification senders) and re-marshaling — which always emits the bare form —
+// are unaffected. For GitHub the option id IS the value the API consumes (label
+// name, assignee login, milestone number), mirroring the manual create path.
+func (g *GitHubTicketIdentifiers) UnmarshalJSON(data []byte) error {
+	var shadow struct {
+		CollaborationGUID string          `json:"collaborationGUID"`
+		OrganizationName  string          `json:"organizationName"`
+		RepositoryName    string          `json:"repositoryName"`
+		Labels            json.RawMessage `json:"labels"`
+		Assignees         json.RawMessage `json:"assignees"`
+		MilestoneID       json.RawMessage `json:"milestoneId"`
+		Milestone         json.RawMessage `json:"milestone"`
+	}
+	if err := json.Unmarshal(data, &shadow); err != nil {
+		return err
+	}
+
+	g.CollaborationGUID = shadow.CollaborationGUID
+	g.OrganizationName = shadow.OrganizationName
+	g.RepositoryName = shadow.RepositoryName
+	g.Labels = githubSelectStrings(shadow.Labels)
+	g.Assignees = githubSelectStrings(shadow.Assignees)
+
+	g.MilestoneID = nil
+	if n, ok := githubMilestoneNumber(shadow.MilestoneID); ok {
+		g.MilestoneID = &n
+	} else if n, ok := githubMilestoneNumber(shadow.Milestone); ok {
+		g.MilestoneID = &n
+	}
+	return nil
+}
+
+// githubSelectStrings coerces a labels/assignees JSON value into []string,
+// accepting bare strings and option objects ({"id":...} / {"name":...}).
+// Elements that resolve to "" are skipped; null/absent/empty input yields nil.
+func githubSelectStrings(raw json.RawMessage) []string {
+	if isEmptyJSON(raw) {
+		return nil
+	}
+	var items []json.RawMessage
+	if err := json.Unmarshal(raw, &items); err != nil || len(items) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(items))
+	for _, item := range items {
+		if s := githubOptionString(item); s != "" {
+			out = append(out, s)
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
+}
+
+// githubOptionString extracts the string value of a single select-field option,
+// reading "id" first then "name" for object options. The option id is the value
+// GitHub consumes. Returns "" when nothing usable is found.
+func githubOptionString(raw json.RawMessage) string {
+	var s string
+	if err := json.Unmarshal(raw, &s); err == nil {
+		return s
+	}
+	var obj map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &obj); err != nil {
+		return ""
+	}
+	for _, key := range []string{"id", "name"} {
+		v, ok := obj[key]
+		if !ok {
+			continue
+		}
+		var str string
+		if err := json.Unmarshal(v, &str); err == nil && str != "" {
+			return str
+		}
+		var num float64
+		if err := json.Unmarshal(v, &num); err == nil { // numeric id, e.g. {"id": 1}
+			return strconv.Itoa(int(num))
+		}
+	}
+	return ""
+}
+
+// githubMilestoneNumber coerces a milestone value into the integer milestone
+// number GitHub requires. Accepts a JSON number, a numeric string, or an option
+// object ({"id": ...}). Returns ok=false for null/absent/non-numeric input.
+func githubMilestoneNumber(raw json.RawMessage) (int, bool) {
+	if isEmptyJSON(raw) {
+		return 0, false
+	}
+	var num float64
+	if err := json.Unmarshal(raw, &num); err == nil {
+		return int(num), true
+	}
+	var s string
+	if err := json.Unmarshal(raw, &s); err == nil {
+		if t := strings.TrimSpace(s); t != "" {
+			if i, err := strconv.Atoi(t); err == nil {
+				return i, true
+			}
+		}
+		return 0, false
+	}
+	var obj map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &obj); err == nil {
+		if v, ok := obj["id"]; ok {
+			return githubMilestoneNumber(v)
+		}
+	}
+	return 0, false
+}
+
+func isEmptyJSON(raw json.RawMessage) bool {
+	return len(raw) == 0 || string(raw) == "null"
 }
 
 type AlertChannel struct {
