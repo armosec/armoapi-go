@@ -74,13 +74,17 @@ type LinearTicketIdentifiers struct {
 	Fields      map[string]interface{} `json:"fields,omitempty" bson:"fields,omitempty"`
 }
 
+// GitHubTicketIdentifiers carries the GitHub routing identifiers (org/repo) at
+// the top level and all issue content under a generic `fields` map, mirroring
+// JiraTicketIdentifiers and LinearTicketIdentifiers. Content keys match the
+// field schema's fieldId (e.g. labels, assignees, milestone); select values may
+// be bare or the UI's option-object shape ({"id": …}) — they ride the map
+// verbatim and are coerced downstream by cadashboardbe when the issue is built.
 type GitHubTicketIdentifiers struct {
-	CollaborationGUID string   `json:"collaborationGUID,omitempty" bson:"collaborationGUID,omitempty"`
-	OrganizationName  string   `json:"organizationName,omitempty" bson:"organizationName,omitempty"`
-	RepositoryName    string   `json:"repositoryName,omitempty" bson:"repositoryName,omitempty"`
-	Labels            []string `json:"labels,omitempty" bson:"labels,omitempty"`
-	Assignees         []string `json:"assignees,omitempty" bson:"assignees,omitempty"`
-	MilestoneID       *int     `json:"milestoneId,omitempty" bson:"milestoneId,omitempty"`
+	CollaborationGUID string                 `json:"collaborationGUID,omitempty" bson:"collaborationGUID,omitempty"`
+	OrganizationName  string                 `json:"organizationName,omitempty" bson:"organizationName,omitempty"`
+	RepositoryName    string                 `json:"repositoryName,omitempty" bson:"repositoryName,omitempty"`
+	Fields            map[string]interface{} `json:"fields,omitempty" bson:"fields,omitempty"`
 }
 
 type AlertChannel struct {
