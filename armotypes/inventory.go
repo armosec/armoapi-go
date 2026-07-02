@@ -31,4 +31,15 @@ type Inventory struct {
 	// — it does NOT depend on the ai_sandboxes tables, so the discovery badge keeps
 	// working regardless of the ai_sandboxes agentic-verdict migration state.
 	IsAgentic bool `json:"isAgentic,omitempty"`
+	// SandboxStatus is the AI-sandbox "add to sandbox" lifecycle status of the
+	// workload: "pending", "in_sandbox", or "failed" (empty = not-in-sandbox). It
+	// is DERIVED in the inventory query, not stored: "in_sandbox" from the live
+	// pod-template label (kubescape.io/sandbox on the synced workload), else
+	// "failed"/"pending" from the control-plane ai_sandbox_statuses event
+	// timestamps (LEFT JOIN on (customer_guid, resource_hash)). Independent of the
+	// observed ai_sandboxes telemetry tables. Host coverage tracks resource_hash
+	// availability on the inventory row — k8s and ECS carry one; cloud-host rows do
+	// not yet project one, so they read empty until the platform surfaces a host
+	// resource_hash.
+	SandboxStatus string `json:"sandboxStatus,omitempty"`
 }
