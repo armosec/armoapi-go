@@ -55,6 +55,9 @@ func (c *CollaborationConfig) GetHealth() IntegrationHealth {
 // Idempotent with respect to DegradedSince: re-marking an already-degraded
 // config refreshes LastChecked/LastError but keeps the original transition time.
 func (c *CollaborationConfig) SetHealthDegraded(reason string) {
+	if c == nil {
+		return
+	}
 	if c.Attributes == nil {
 		c.Attributes = map[string]interface{}{}
 	}
@@ -70,6 +73,9 @@ func (c *CollaborationConfig) SetHealthDegraded(reason string) {
 // SetHealthChecked records a successful health evaluation, clearing any
 // degraded state.
 func (c *CollaborationConfig) SetHealthChecked() {
+	if c == nil {
+		return
+	}
 	if c.Attributes == nil {
 		c.Attributes = map[string]interface{}{}
 	}
