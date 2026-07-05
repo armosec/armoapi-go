@@ -42,6 +42,7 @@ armoapi-go/
 ├── notifications/           # Alert & collaboration configuration
 │   ├── alertchannelapi.go   # AlertChannelAPI, AlertConfig
 │   ├── collaborationconfig.go # CollaborationConfig (Jira, Linear, etc.)
+│   ├── integrationhealth.go # Integration token-health attributes + helpers
 │   └── runtimeincidents.go  # Runtime incident notification types
 ├── broadcastevents/         # Platform event types for analytics pipeline
 │   ├── events.go            # EventBase, LoginEvent, HelmInstalledEvent
