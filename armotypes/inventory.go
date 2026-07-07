@@ -35,7 +35,7 @@ type Inventory struct {
 	// workload: "pending" or "in_sandbox" (empty = not-in-sandbox). It is DERIVED
 	// in the inventory query, not stored: "in_sandbox" from the live pod-template
 	// label (kubescape.io/sandbox on the synced workload), else "pending" from the
-	// control-plane ai_sandbox_statuses event timestamps (LEFT JOIN on
+	// control-plane ai_sandbox_statuses request timestamp (LEFT JOIN on
 	// (customer_guid, resource_hash)). Independent of the observed ai_sandboxes
 	// telemetry tables.
 	//
