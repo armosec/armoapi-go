@@ -90,6 +90,11 @@ type IntegrationConnectionStatus string
 const (
 	Connected    IntegrationConnectionStatus = "connected"
 	Disconnected IntegrationConnectionStatus = "disconnected"
+	// Degraded means the integration is configured but its credentials are no
+	// longer usable (e.g. expired/revoked OAuth refresh token) and user action
+	// (reconnect) is required. Derived from the persisted health attributes on
+	// the CollaborationConfig — never from a live provider call.
+	Degraded IntegrationConnectionStatus = "degraded"
 )
 
 type IntegrationsConnectionStatus struct {
