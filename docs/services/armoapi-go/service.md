@@ -116,16 +116,18 @@ The inventory (`/api/v1/inventory`) is the discovery surface that carries the ba
 
 The discovery DTO also carries `Inventory.SandboxStatus` (`string`,
 `json:"sandboxStatus,omitempty"`) — the AI-Sandbox "add to sandbox" apply-lifecycle
-status: `pending` | `in_sandbox` | `failed` (an empty/absent value means
-not-in-sandbox). Unlike the telemetry-owned `ai_sandboxes` tables, this is the
-**write-path control-plane** status (owned by cadashboardbe `/enable` →
-event-ingester apply). It is **derived** in the inventory query, not stored:
-`in_sandbox` from the live pod-template label (`kubescape.io/sandbox` on the synced
-workload), else `failed`/`pending` from the `ai_sandbox_statuses` event timestamps,
-LEFT-JOINed on `(customer_guid, resource_hash)` — the table stores no status column
-and there are no status constants. Host coverage tracks
-`resource_hash` availability on the inventory row (k8s + ECS today; cloud-host
-rows carry none yet).
+status: `pending` | `in_sandbox` (an empty/absent value means not-in-sandbox).
+There is intentionally **no `failed` state** (product decision, SUB-7442): the
+lifecycle is `not-in-sandbox → pending → in_sandbox`, and deterministic enable
+errors are handled in the write-path (logged, not surfaced). Unlike the
+telemetry-owned `ai_sandboxes` tables, this is the **write-path control-plane**
+status (owned by cadashboardbe `/enable` → event-ingester apply). It is
+**derived** in the inventory query, not stored: `in_sandbox` from the live
+pod-template label (`kubescape.io/sandbox` on the synced workload), else `pending`
+from the `ai_sandbox_statuses` request timestamp, LEFT-JOINed on
+`(customer_guid, resource_hash)` — the table stores no status column and there are
+no status constants. Host coverage tracks `resource_hash` availability on the
+inventory row (k8s + ECS today; cloud-host rows carry none yet).
 
 > **Deprecated:** the **entire `WorkloadViews`** type/view is deprecated, superseded
 > by `Inventory` (the discovery surface at `/api/v1/inventory`). Use `armotypes.Inventory`
