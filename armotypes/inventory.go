@@ -32,14 +32,20 @@ type Inventory struct {
 	// working regardless of the ai_sandboxes agentic-verdict migration state.
 	IsAgentic bool `json:"isAgentic,omitempty"`
 	// SandboxStatus is the AI-sandbox "add to sandbox" lifecycle status of the
-	// workload: "pending", "in_sandbox", or "failed" (empty = not-in-sandbox). It
-	// is DERIVED in the inventory query, not stored: "in_sandbox" from the live
-	// pod-template label (kubescape.io/sandbox on the synced workload), else
-	// "failed"/"pending" from the control-plane ai_sandbox_statuses event
-	// timestamps (LEFT JOIN on (customer_guid, resource_hash)). Independent of the
-	// observed ai_sandboxes telemetry tables. Host coverage tracks resource_hash
-	// availability on the inventory row — k8s and ECS carry one; cloud-host rows do
-	// not yet project one, so they read empty until the platform surfaces a host
-	// resource_hash.
+	// workload: "pending" or "in_sandbox" (empty = not-in-sandbox). It is DERIVED
+	// in the inventory query, not stored: "in_sandbox" from the live pod-template
+	// label (kubescape.io/sandbox on the synced workload), else "pending" from the
+	// control-plane ai_sandbox_statuses event timestamps (LEFT JOIN on
+	// (customer_guid, resource_hash)). Independent of the observed ai_sandboxes
+	// telemetry tables.
+	//
+	// There is intentionally NO "failed" state (product decision, SUB-7442): the
+	// lifecycle is not-in-sandbox -> pending -> in_sandbox. Deterministic enable
+	// errors are handled in the write-path (unsupported kinds / not-found are
+	// logged, not surfaced) rather than exposed as a status.
+	//
+	// Host coverage tracks resource_hash availability on the inventory row - k8s
+	// and ECS carry one; cloud-host rows do not yet project one, so they read
+	// empty until the platform surfaces a host resource_hash.
 	SandboxStatus string `json:"sandboxStatus,omitempty"`
 }
