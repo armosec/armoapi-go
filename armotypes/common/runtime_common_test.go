@@ -54,6 +54,7 @@ func TestIdentifiersFlatten(t *testing.T) {
 					DstIP:    "1.1.1.1",
 					DstPort:  8080,
 					Protocol: "TCP",
+					SourceIP: "2.2.2.2",
 				},
 				Http: &HttpEntity{
 					Method:    "POST",

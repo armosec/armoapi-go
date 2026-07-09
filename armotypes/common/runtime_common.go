@@ -20,6 +20,7 @@ type NetworkEntity struct {
 	DstIP    string `json:"dstIP,omitempty" bson:"dstIP,omitempty"`
 	DstPort  int    `json:"dstPort,omitempty" bson:"dstPort,omitempty"`
 	Protocol string `json:"protocol,omitempty" bson:"protocol,omitempty"`
+	SourceIP string `json:"sourceIP,omitempty" bson:"sourceIP,omitempty"`
 }
 
 type HttpEntity struct {
@@ -102,6 +103,9 @@ func (identifiers *Identifiers) Flatten() map[string]string {
 		}
 		if identifiers.Network.Protocol != "" {
 			identifiers_map["network.protocol"] = identifiers.Network.Protocol
+		}
+		if identifiers.Network.SourceIP != "" {
+			identifiers_map["network.sourceIP"] = identifiers.Network.SourceIP
 		}
 	}
 	if identifiers.Http != nil {
