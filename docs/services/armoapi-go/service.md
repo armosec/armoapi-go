@@ -20,7 +20,7 @@ This is a **pure type/utility library** with no runtime services (no HTTP server
 |---------|-------------|
 | `apis` | Command dispatch types, websocket scan commands, backend connector interfaces, and pagination helpers |
 | `armotypes` | Core platform domain types: clusters, configurations, policies, incidents, security risks, registries, vulnerability exceptions |
-| `armotypes/cdr` | Cloud Detection & Response alert types (CdrAlert, CloudTrailEvent, AWS-specific structures) |
+| `armotypes/cdr` | Cloud Detection & Response alert types (CdrAlert, CloudTrailEvent, AzureActivityLogEvent; AWS + Azure structures) |
 | `armotypes/common` | Shared runtime sub-types (ProcessEntity, FileEntity) used across detection features |
 | `identifiers` | Workload and resource designator system (WLID, SID, PortalDesignator) with parsing utilities |
 | `containerscan` | Container vulnerability scan report interfaces defining the contract between scanner and consumers |
