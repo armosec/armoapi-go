@@ -2,7 +2,11 @@ package cdr
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // azureActivityLogSample is a trimmed real Azure Activity Log record captured in
@@ -103,5 +107,60 @@ func TestAzureEventDataEmbedding(t *testing.T) {
 	}
 	if got.AWSCloudTrail != nil {
 		t.Errorf("AWS path should be nil, got %+v", got.AWSCloudTrail)
+	}
+}
+
+// TestCdrAlertAzureJsonPath verifies the Azure subscription/tenant JSON-path
+// constants match the json tags on CdrAlert, so config-service lookups don't
+// drift from the wire contract (mirrors TestCdrAlertJsonPath for AWS).
+func TestCdrAlertAzureJsonPath(t *testing.T) {
+	tests := []struct {
+		Name          string
+		Path          string
+		CdrAlert      CdrAlert
+		ExpectedValue string
+	}{
+		{
+			Name: "Test CdrEventAzureSubscriptionIDJsonPath",
+			Path: CdrEventAzureSubscriptionIDJsonPath,
+			CdrAlert: CdrAlert{
+				EventData: EventData{
+					AzureActivityLog: &AzureActivityLogEvent{
+						SubscriptionID: "8fc00071-75e6-4b3f-82d4-844e7865bab3",
+					},
+				},
+			},
+			ExpectedValue: "8fc00071-75e6-4b3f-82d4-844e7865bab3",
+		},
+		{
+			Name: "Test CdrEventAzureTenantIDJsonPath",
+			Path: CdrEventAzureTenantIDJsonPath,
+			CdrAlert: CdrAlert{
+				EventData: EventData{
+					AzureActivityLog: &AzureActivityLogEvent{
+						TenantID: "50a70646-52e3-4e46-911e-6ca1b46afba3",
+					},
+				},
+			},
+			ExpectedValue: "50a70646-52e3-4e46-911e-6ca1b46afba3",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			// 1. Marshal to JSON
+			data, err := json.Marshal(test.CdrAlert)
+			require.NoError(t, err)
+
+			// 2. Unmarshal into a generic map
+			var genericCdrAlert map[string]interface{}
+			require.NoError(t, json.Unmarshal(data, &genericCdrAlert))
+
+			// 3. Traverse the path (shared helper lives in aws_test.go)
+			pathWithoutPrefix := strings.TrimPrefix(test.Path, "cdrevent.")
+			val, ok := getValueAtJsonPath(genericCdrAlert, pathWithoutPrefix)
+			require.True(t, ok)
+			assert.Equal(t, test.ExpectedValue, val)
+		})
 	}
 }
