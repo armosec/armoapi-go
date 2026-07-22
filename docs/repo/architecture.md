@@ -27,7 +27,8 @@ armoapi-go/
 │   ├── registrytypes.go     # RegistryInfo, RegistryJobParams
 │   ├── cdr/                 # Cloud Detection & Response types
 │   │   ├── cdr.go           # CdrAlert, CloudMetadata, CdrAlertBatch
-│   │   └── aws.go           # CloudTrailEvent, AWS-specific types
+│   │   ├── aws.go           # CloudTrailEvent, AWS-specific types
+│   │   └── azure.go         # AzureActivityLogEvent, Azure-specific types
 │   └── common/              # Shared runtime sub-types (ProcessEntity, FileEntity)
 ├── identifiers/             # Resource designator system
 │   ├── designators.go       # PortalDesignator, DesignatorType, constants

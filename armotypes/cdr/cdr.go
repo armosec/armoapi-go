@@ -15,6 +15,8 @@ type CloudService string
 const (
 	// CloudTrail is the cloudtrail service
 	CloudTrail CloudService = "cloudtrail"
+	// ActivityLogs is the Azure Activity Log service (control-plane audit log)
+	ActivityLogs CloudService = "activitylogs"
 	// Add more cloud services here
 )
 
@@ -24,6 +26,8 @@ type CloudProvider string
 const (
 	// AWS is the AWS cloud provider
 	AWS CloudProvider = "aws"
+	// Azure is the Microsoft Azure cloud provider
+	Azure CloudProvider = "azure"
 	// Add more cloud providers here
 )
 
@@ -38,6 +42,8 @@ type CloudMetadata struct {
 type EventData struct {
 	// AWSCloudTrail cloudtrail event
 	AWSCloudTrail *CloudTrailEvent `json:"awsCloudTrail,omitempty"`
+	// AzureActivityLog azure activity log event
+	AzureActivityLog *AzureActivityLogEvent `json:"azureActivityLog,omitempty"`
 	// Target resource
 	TargetResource string `json:"targetResource,omitempty"`
 	// Identifiers of the alert
