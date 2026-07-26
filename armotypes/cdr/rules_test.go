@@ -2,6 +2,7 @@ package cdr
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -38,13 +39,13 @@ func TestCdrRuleBundleRoundTrip(t *testing.T) {
 		t.Fatalf("unmarshal: %v", err)
 	}
 	if decoded.Version != original.Version || decoded.Provider != original.Provider ||
-		!decoded.GeneratedAt.Equal(original.GeneratedAt) || len(decoded.Rules) != 1 {
-		t.Fatalf("bundle mismatch: %+v", decoded)
+		!decoded.GeneratedAt.Equal(original.GeneratedAt) {
+		t.Fatalf("bundle header mismatch: %+v", decoded)
 	}
-	got, want := decoded.Rules[0], original.Rules[0]
-	if got.RuleID != want.RuleID || got.Service != want.Service || got.Expression != want.Expression ||
-		got.Priority != want.Priority || got.Origin != want.Origin || len(got.Tags) != len(want.Tags) {
-		t.Errorf("rule mismatch:\n got  %+v\n want %+v", got, want)
+	// Full-fidelity check: every rule field (incl. Name, MitreTechnique, Message, and tag values)
+	// must round-trip unchanged — this test locks the wire contract.
+	if !reflect.DeepEqual(decoded.Rules, original.Rules) {
+		t.Errorf("rules did not round-trip:\n got  %+v\n want %+v", decoded.Rules, original.Rules)
 	}
 }
 

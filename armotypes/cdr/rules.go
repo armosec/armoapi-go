@@ -4,7 +4,8 @@ import "time"
 
 // CdrRuleOrigin distinguishes centrally-managed rules from customer-authored ones. Customer
 // authoring is not yet supported; the field exists so the delivery contract can carry custom rules
-// in future without a wire change. An empty value means managed.
+// in future without a wire change. The server always sets it (managed or custom); a consumer should
+// treat an absent value as managed.
 type CdrRuleOrigin string
 
 const (
