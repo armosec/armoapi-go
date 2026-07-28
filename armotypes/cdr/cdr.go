@@ -17,6 +17,10 @@ const (
 	CloudTrail CloudService = "cloudtrail"
 	// ActivityLogs is the Azure Activity Log service (control-plane audit log)
 	ActivityLogs CloudService = "activitylogs"
+	// CloudAuditLogs is the GCP Cloud Audit Logs service; the CDR pipe consumes
+	// the Admin Activity control-plane audit log (the GCP equivalent of AWS
+	// CloudTrail management events / the Azure Activity Log).
+	CloudAuditLogs CloudService = "cloudauditlogs"
 	// Add more cloud services here
 )
 
@@ -28,6 +32,8 @@ const (
 	AWS CloudProvider = "aws"
 	// Azure is the Microsoft Azure cloud provider
 	Azure CloudProvider = "azure"
+	// GCP is the Google Cloud Platform cloud provider
+	GCP CloudProvider = "gcp"
 	// Add more cloud providers here
 )
 
@@ -44,6 +50,8 @@ type EventData struct {
 	AWSCloudTrail *CloudTrailEvent `json:"awsCloudTrail,omitempty"`
 	// AzureActivityLog azure activity log event
 	AzureActivityLog *AzureActivityLogEvent `json:"azureActivityLog,omitempty"`
+	// GcpAuditLog gcp cloud audit log (Admin Activity) event
+	GcpAuditLog *GcpAuditLogEvent `json:"gcpAuditLog,omitempty"`
 	// Target resource
 	TargetResource string `json:"targetResource,omitempty"`
 	// Identifiers of the alert
