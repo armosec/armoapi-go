@@ -1,6 +1,9 @@
 package cdr
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 const (
 	// CdrEventGcpProjectIDJsonPath is the JSON path to the GCP project ID on a GCP
@@ -134,8 +137,11 @@ type GcpAuditLogPayload struct {
 	// e.g. for data-residency-aware rules.
 	ResourceLocation *GcpResourceLocation `json:"resourceLocation,omitempty"`
 	// NumResponseItems is the number of items returned by a list/query method.
-	// protojson encodes int64 as a JSON string, so it is modeled as a string.
-	NumResponseItems string `json:"numResponseItems,omitempty"`
+	// protojson encodes int64 as a quoted JSON string ("3"), but the protobuf-JSON
+	// spec also accepts a bare number (3) on parse. json.Number accepts BOTH forms;
+	// a plain string would fail the whole decode on a bare number — a dropped event
+	// for a field nothing depends on.
+	NumResponseItems json.Number `json:"numResponseItems,omitempty"`
 	// Request is the operation-specific request bag; shape varies by method.
 	Request map[string]interface{} `json:"request,omitempty"`
 	// Response is the operation-specific response bag; for create-style methods

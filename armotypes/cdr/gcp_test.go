@@ -280,6 +280,21 @@ func TestGcpImpersonationFields(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// TestGcpNumResponseItemsBothForms guards that numResponseItems decodes from both
+// wire forms — protojson's quoted string ("3") and a bare number (3, spec-legal on
+// parse). A plain string type would fail the whole-event decode on the bare form.
+func TestGcpNumResponseItemsBothForms(t *testing.T) {
+	for _, in := range []string{
+		`{"protoPayload":{"numResponseItems":"3"}}`,
+		`{"protoPayload":{"numResponseItems":3}}`,
+	} {
+		var e GcpAuditLogEvent
+		require.NoError(t, json.Unmarshal([]byte(in), &e), "decode failed for %s", in)
+		require.NotNil(t, e.ProtoPayload)
+		assert.Equal(t, "3", e.ProtoPayload.NumResponseItems.String())
+	}
+}
+
 // TestGcpAuditLogSyncSpecifics pins the two GCP quirks that are easy to regress:
 // resourceName is the parent (real target in response.name) for create-style
 // methods, and status is empty ({}) on success so status.code is absent.
