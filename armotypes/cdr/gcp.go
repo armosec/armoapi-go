@@ -126,11 +126,31 @@ type GcpAuditLogPayload struct {
 	// Status is the operation status. Present but EMPTY ({}) on success, so
 	// status.code is absent rather than 0 — guard with has() in CEL.
 	Status *GcpStatus `json:"status,omitempty"`
+	// PolicyViolationInfo carries org-policy / VPC Service Controls violation
+	// details when a request is denied by policy — a detection class of its own
+	// (org-policy and perimeter denials). Shape varies; kept generic.
+	PolicyViolationInfo map[string]interface{} `json:"policyViolationInfo,omitempty"`
+	// ResourceLocation is where the resource is/was located (current vs original),
+	// e.g. for data-residency-aware rules.
+	ResourceLocation *GcpResourceLocation `json:"resourceLocation,omitempty"`
+	// NumResponseItems is the number of items returned by a list/query method.
+	// protojson encodes int64 as a JSON string, so it is modeled as a string.
+	NumResponseItems string `json:"numResponseItems,omitempty"`
 	// Request is the operation-specific request bag; shape varies by method.
 	Request map[string]interface{} `json:"request,omitempty"`
 	// Response is the operation-specific response bag; for create-style methods
 	// Response["name"] is the created resource (the real target).
 	Response map[string]interface{} `json:"response,omitempty"`
+	// Metadata is where several services (GKE, BigQuery, Cloud SQL, ...) put their
+	// audit detail instead of Request / Response; shape varies by service.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
+// GcpResourceLocation is the AuditLog.resourceLocation — the resource's current
+// and (for moves) original locations.
+type GcpResourceLocation struct {
+	CurrentLocations  []string `json:"currentLocations,omitempty"`
+	OriginalLocations []string `json:"originalLocations,omitempty"`
 }
 
 // GcpAuthenticationInfo is the AuditLog.authenticationInfo — the caller identity.
@@ -141,8 +161,36 @@ type GcpAuthenticationInfo struct {
 	// which cleanly distinguishes user from service-account callers for
 	// common.Identifiers normalization (POC FINDINGS §1c⑤).
 	PrincipalSubject string `json:"principalSubject,omitempty"`
+	// ServiceAccountKeyName is the resource name of the service-account key used
+	// to authenticate, when a long-lived key was used rather than short-lived
+	// credentials — a standing detection / compliance signal.
+	ServiceAccountKeyName string `json:"serviceAccountKeyName,omitempty"`
+	// ServiceAccountDelegationInfo is the identity-delegation (impersonation)
+	// chain. Service-account impersonation (iam.serviceAccounts.getAccessToken /
+	// actAs) is the canonical GCP privilege-escalation path; this is what lets an
+	// alert say who impersonated whom. Absent unless impersonation occurred (so
+	// not seen in the human-auth POC run — its absence there is not evidence of
+	// rarity in the field).
+	ServiceAccountDelegationInfo []GcpServiceAccountDelegationInfo `json:"serviceAccountDelegationInfo,omitempty"`
 	// OAuthInfo carries the OAuth client that made the call, when present.
 	OAuthInfo *GcpOAuthInfo `json:"oauthInfo,omitempty"`
+}
+
+// GcpServiceAccountDelegationInfo is one link in the impersonation chain
+// (AuditLog.authenticationInfo.serviceAccountDelegationInfo[]).
+type GcpServiceAccountDelegationInfo struct {
+	// PrincipalSubject is the delegated principal at this link.
+	PrincipalSubject string `json:"principalSubject,omitempty"`
+	// FirstPartyPrincipal is set when a first-party (Google) identity delegated.
+	FirstPartyPrincipal *GcpFirstPartyPrincipal `json:"firstPartyPrincipal,omitempty"`
+	// ThirdPartyPrincipal is set for third-party (external) delegation; shape
+	// varies, kept generic.
+	ThirdPartyPrincipal map[string]interface{} `json:"thirdPartyPrincipal,omitempty"`
+}
+
+// GcpFirstPartyPrincipal is the first-party identity in a delegation link.
+type GcpFirstPartyPrincipal struct {
+	PrincipalEmail string `json:"principalEmail,omitempty"`
 }
 
 // GcpOAuthInfo is the AuditLog.authenticationInfo.oauthInfo block.
@@ -162,6 +210,19 @@ type GcpAuthorizationInfo struct {
 	PermissionType string `json:"permissionType,omitempty"`
 	Granted        bool   `json:"granted,omitempty"`
 	Resource       string `json:"resource,omitempty"`
+	// ResourceAttributes describes the resource the permission was checked
+	// against. Its Type (e.g. "iam.googleapis.com/ServiceAccount") is the kind of
+	// thing touched — the field to fall back on when ResourceName is the parent
+	// rather than the target (POC FINDINGS §1c②); mirrors AWS Resource.ResourceType.
+	ResourceAttributes *GcpResourceAttributes `json:"resourceAttributes,omitempty"`
+}
+
+// GcpResourceAttributes is the AuthorizationInfo.resourceAttributes — the typed
+// resource the authorization decision was made against.
+type GcpResourceAttributes struct {
+	Service string `json:"service,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Type    string `json:"type,omitempty"`
 }
 
 // GcpRequestMetadata is the AuditLog.requestMetadata — the caller's network
@@ -169,6 +230,14 @@ type GcpAuthorizationInfo struct {
 type GcpRequestMetadata struct {
 	CallerIP                string `json:"callerIp,omitempty"`
 	CallerSuppliedUserAgent string `json:"callerSuppliedUserAgent,omitempty"`
+	// CallerNetwork is the VPC network the call originated from, when applicable.
+	CallerNetwork string `json:"callerNetwork,omitempty"`
+	// RequestAttributes is the request context (time, auth, method, ...); shape
+	// varies, kept generic.
+	RequestAttributes map[string]interface{} `json:"requestAttributes,omitempty"`
+	// DestinationAttributes is the request destination context; shape varies,
+	// kept generic.
+	DestinationAttributes map[string]interface{} `json:"destinationAttributes,omitempty"`
 }
 
 // GcpStatus is the AuditLog.status (google.rpc.Status). Empty ({}) on success,

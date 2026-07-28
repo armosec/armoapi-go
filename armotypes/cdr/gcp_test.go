@@ -9,12 +9,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// gcpSyncAuditLogSample is a real synchronous Admin Activity entry captured in
-// the gcp-cdr-poc (FINDINGS.md §1d, redacted). Synchronous admin calls carry NO
-// top-level "operation" block — the majority case the detection gate
-// `!has(operation) || operation.last` must let through. Note resourceName is the
-// PARENT project while the created service account is only in response.name, and
-// status is {} on success.
+// gcpSyncAuditLogSample is the real synchronous Admin Activity entry captured in
+// the gcp-cdr-poc (FINDINGS.md §1d, redacted) — kept UNTRIMMED, including
+// authorizationInfo[].resourceAttributes and requestMetadata.requestAttributes,
+// so TestGcpAuditLogFieldCoverage can assert we model every field the real
+// capture carries. Synchronous admin calls carry NO top-level "operation" block —
+// the majority case the detection gate `!has(operation) || operation.last` must
+// let through. Note resourceName is the PARENT project while the created service
+// account is only in response.name, and status is {} on success.
 const gcpSyncAuditLogSample = `{
   "insertId": "1ort6tqf2s9qz6",
   "logName": "projects/cdr-project-503613/logs/cloudaudit.googleapis.com%2Factivity",
@@ -35,11 +37,13 @@ const gcpSyncAuditLogSample = `{
     },
     "authorizationInfo": [
       { "granted": true, "permission": "iam.serviceAccounts.create",
-        "permissionType": "ADMIN_WRITE", "resource": "projects/cdr-project-503613" }
+        "permissionType": "ADMIN_WRITE", "resource": "projects/cdr-project-503613",
+        "resourceAttributes": { "type": "iam.googleapis.com/ServiceAccount" } }
     ],
     "requestMetadata": {
       "callerIp": "199.203.132.136",
-      "callerSuppliedUserAgent": "google-cloud-sdk gcloud/552.0.0"
+      "callerSuppliedUserAgent": "google-cloud-sdk gcloud/552.0.0",
+      "requestAttributes": { "time": "2026-07-26T13:42:27.024755819Z" }
     },
     "request": {
       "@type": "type.googleapis.com/google.iam.admin.v1.CreateServiceAccountRequest",
@@ -193,6 +197,87 @@ func TestGcpAuditLogRoundTrip(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
+}
+
+// TestGcpAuditLogFieldCoverage decodes the untrimmed real capture with
+// DisallowUnknownFields, so the struct is proven to model every field the real
+// GCP event carries. This is the guard the plain round-trip lacks: encoding/json
+// silently drops unmodeled fields, so without this a wire field we forgot to
+// model would vanish undetected. If GCP (or a fixture update) introduces a field
+// we don't model, this fails loudly — the signal to extend the struct.
+func TestGcpAuditLogFieldCoverage(t *testing.T) {
+	dec := json.NewDecoder(strings.NewReader(gcpSyncAuditLogSample))
+	dec.DisallowUnknownFields()
+	var e GcpAuditLogEvent
+	require.NoError(t, dec.Decode(&e), "an unmodeled field is present in the real capture — extend GcpAuditLogEvent")
+
+	// The two fields Ben's review flagged as silently dropped are now modeled.
+	require.NotNil(t, e.ProtoPayload)
+	require.Len(t, e.ProtoPayload.AuthorizationInfo, 1)
+	require.NotNil(t, e.ProtoPayload.AuthorizationInfo[0].ResourceAttributes)
+	assert.Equal(t, "iam.googleapis.com/ServiceAccount", e.ProtoPayload.AuthorizationInfo[0].ResourceAttributes.Type)
+	require.NotNil(t, e.ProtoPayload.RequestMetadata)
+	assert.NotEmpty(t, e.ProtoPayload.RequestMetadata.RequestAttributes["time"])
+}
+
+// gcpImpersonationSample is a synthetic (NOT POC-captured) Admin Activity entry
+// modeling a service-account impersonation + static-key call — the canonical GCP
+// privilege-escalation path. The POC authenticated as a human via gcloud so it
+// never exercised these fields; this fixture guards that the struct models them.
+const gcpImpersonationSample = `{
+  "insertId": "imp1",
+  "logName": "projects/cdr-project-503613/logs/cloudaudit.googleapis.com%2Factivity",
+  "timestamp": "2026-07-26T14:00:00Z",
+  "resource": { "type": "service_account", "labels": { "project_id": "cdr-project-503613" } },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "serviceName": "iamcredentials.googleapis.com",
+    "methodName": "GenerateAccessToken",
+    "resourceName": "projects/-/serviceAccounts/victim@cdr-project-503613.iam.gserviceaccount.com",
+    "authenticationInfo": {
+      "principalEmail": "victim@cdr-project-503613.iam.gserviceaccount.com",
+      "principalSubject": "serviceAccount:victim@cdr-project-503613.iam.gserviceaccount.com",
+      "serviceAccountKeyName": "projects/cdr-project-503613/serviceAccounts/attacker@cdr-project-503613.iam.gserviceaccount.com/keys/abc123",
+      "serviceAccountDelegationInfo": [
+        { "principalSubject": "user:attacker@armosec.io",
+          "firstPartyPrincipal": { "principalEmail": "attacker@armosec.io" } }
+      ]
+    },
+    "authorizationInfo": [
+      { "granted": false, "permission": "iam.serviceAccounts.getAccessToken",
+        "permissionType": "ADMIN_WRITE",
+        "resource": "projects/-/serviceAccounts/victim@cdr-project-503613.iam.gserviceaccount.com" }
+    ],
+    "policyViolationInfo": { "orgPolicyViolationInfo": { "violationInfo": [] } }
+  }
+}`
+
+// TestGcpImpersonationFields verifies the privilege-escalation fields Ben's review
+// added (serviceAccountDelegationInfo, serviceAccountKeyName) parse, and that a
+// denied attempt (granted:false, omitted on the wire) reads as false.
+func TestGcpImpersonationFields(t *testing.T) {
+	var e GcpAuditLogEvent
+	require.NoError(t, json.Unmarshal([]byte(gcpImpersonationSample), &e))
+	require.NotNil(t, e.ProtoPayload)
+
+	ai := e.ProtoPayload.AuthenticationInfo
+	require.NotNil(t, ai)
+	assert.Equal(t, "projects/cdr-project-503613/serviceAccounts/attacker@cdr-project-503613.iam.gserviceaccount.com/keys/abc123", ai.ServiceAccountKeyName)
+	require.Len(t, ai.ServiceAccountDelegationInfo, 1)
+	assert.Equal(t, "user:attacker@armosec.io", ai.ServiceAccountDelegationInfo[0].PrincipalSubject)
+	require.NotNil(t, ai.ServiceAccountDelegationInfo[0].FirstPartyPrincipal)
+	assert.Equal(t, "attacker@armosec.io", ai.ServiceAccountDelegationInfo[0].FirstPartyPrincipal.PrincipalEmail)
+
+	// Denied attempt: granted omitted-when-false => reads false (denied-attempt rule signal).
+	require.Len(t, e.ProtoPayload.AuthorizationInfo, 1)
+	assert.False(t, e.ProtoPayload.AuthorizationInfo[0].Granted)
+
+	// policyViolationInfo present (org-policy/VPC-SC denial detail).
+	assert.NotNil(t, e.ProtoPayload.PolicyViolationInfo)
+
+	// Round-trips without error.
+	_, err := json.Marshal(e)
+	require.NoError(t, err)
 }
 
 // TestGcpAuditLogSyncSpecifics pins the two GCP quirks that are easy to regress:
