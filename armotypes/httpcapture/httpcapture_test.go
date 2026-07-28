@@ -31,13 +31,21 @@ func TestNewTransactionID(t *testing.T) {
 	if a != b {
 		t.Errorf("same inputs must yield same id: %q vs %q", a, b)
 	}
-	// identical except the nonce — must differ (reused ssl_ptr)
-	if c := NewTransactionID("inst-1", 42, 100, 0xdeadbeef, 2); c == a {
-		t.Errorf("nonce must disambiguate a reused ssl_ptr, got %q for both", a)
-	}
-	// different instance — must differ
-	if d := NewTransactionID("inst-2", 42, 100, 0xdeadbeef, 1); d == a {
-		t.Errorf("instance id must namespace the transaction id, got %q for both", a)
+	// Every input must independently affect the id — change exactly one from the
+	// baseline at a time, so the test fails if any part is dropped from the id.
+	for _, tc := range []struct {
+		name string
+		id   string
+	}{
+		{"nonce", NewTransactionID("inst-1", 42, 100, 0xdeadbeef, 2)},
+		{"instanceID", NewTransactionID("inst-2", 42, 100, 0xdeadbeef, 1)},
+		{"pid", NewTransactionID("inst-1", 43, 100, 0xdeadbeef, 1)},
+		{"procStartNS", NewTransactionID("inst-1", 42, 101, 0xdeadbeef, 1)},
+		{"sslPtr", NewTransactionID("inst-1", 42, 100, 0xdeadbee0, 1)},
+	} {
+		if tc.id == a {
+			t.Errorf("changing %s must change the transaction id, but both were %q", tc.name, a)
+		}
 	}
 }
 
@@ -55,6 +63,12 @@ func TestFragmentJSONRoundTrip(t *testing.T) {
 	b, err := json.Marshal(in)
 	if err != nil {
 		t.Fatal(err)
+	}
+	// Pin the exact wire shape (field names + order + base64 Data) so a JSON-tag
+	// regression is caught — round-tripping the same Go type alone would not.
+	const wantJSON = `{"protocolVersion":"1.0","transactionId":"inst-1:2a:64:deadbeef:1","direction":"response","sequenceNumber":3,"endOfStream":true,"data":"AAH/aGk="}`
+	if string(b) != wantJSON {
+		t.Fatalf("wire JSON =\n  %s\nwant\n  %s", b, wantJSON)
 	}
 	var out Fragment
 	if err := json.Unmarshal(b, &out); err != nil {
