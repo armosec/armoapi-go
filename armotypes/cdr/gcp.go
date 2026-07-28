@@ -4,9 +4,9 @@ import "time"
 
 const (
 	// CdrEventGcpProjectIDJsonPath is the JSON path to the GCP project ID on a GCP
-	// Cloud Audit Log event — the account key the CDR alert is matched to (see
-	// SUB-7649). It is the GCP equivalent of the AWS accountId / Azure
-	// subscriptionId account-matching path.
+	// Cloud Audit Log event — the account key the CDR alert is matched to. It is
+	// the GCP equivalent of the AWS accountId / Azure subscriptionId
+	// account-matching path.
 	//
 	// GCP exposes NO org-key equivalent of the AWS orgId / Azure tenantId path:
 	// the audit record carries only project_id, with no org/folder ancestry, so
