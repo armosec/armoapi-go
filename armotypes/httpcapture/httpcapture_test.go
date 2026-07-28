@@ -3,6 +3,8 @@ package httpcapture
 import (
 	"encoding/json"
 	"testing"
+
+	"github.com/armosec/armoapi-go/armotypes"
 )
 
 // The wire string values are part of the contract — both sensor and backend match
@@ -56,8 +58,10 @@ func TestFragmentJSONRoundTrip(t *testing.T) {
 		ProtocolVersion: CurrentProtocolVersion,
 		TransactionID:   "inst-1:2a:64:deadbeef:1",
 		Direction:       DirectionResponse,
+		Part:            PartBody,
 		SequenceNumber:  3,
 		EndOfStream:     true,
+		CapturedAt:      1700000000000000000,
 		Data:            []byte{0x00, 0x01, 0xff, 'h', 'i'}, // non-UTF8: proves bytes carrier
 	}
 	b, err := json.Marshal(in)
@@ -66,7 +70,7 @@ func TestFragmentJSONRoundTrip(t *testing.T) {
 	}
 	// Pin the exact wire shape (field names + order + base64 Data) so a JSON-tag
 	// regression is caught — round-tripping the same Go type alone would not.
-	const wantJSON = `{"protocolVersion":"1.0","transactionId":"inst-1:2a:64:deadbeef:1","direction":"response","sequenceNumber":3,"endOfStream":true,"data":"AAH/aGk="}`
+	const wantJSON = `{"protocolVersion":"1.0","transactionId":"inst-1:2a:64:deadbeef:1","direction":"response","part":"body","sequenceNumber":3,"endOfStream":true,"capturedAt":1700000000000000000,"data":"AAH/aGk="}`
 	if string(b) != wantJSON {
 		t.Fatalf("wire JSON =\n  %s\nwant\n  %s", b, wantJSON)
 	}
@@ -75,8 +79,53 @@ func TestFragmentJSONRoundTrip(t *testing.T) {
 		t.Fatal(err)
 	}
 	if out.ProtocolVersion != in.ProtocolVersion || out.TransactionID != in.TransactionID ||
-		out.Direction != in.Direction || out.SequenceNumber != in.SequenceNumber ||
-		out.EndOfStream != in.EndOfStream || string(out.Data) != string(in.Data) {
+		out.Direction != in.Direction || out.Part != in.Part ||
+		out.SequenceNumber != in.SequenceNumber || out.EndOfStream != in.EndOfStream ||
+		out.CapturedAt != in.CapturedAt || string(out.Data) != string(in.Data) {
 		t.Errorf("round-trip mismatch:\n in=%+v\nout=%+v", in, out)
+	}
+}
+
+// The reused identity (per fragment, "B") and the reused process tree (per
+// transaction, "A") round-trip — proving we compose the existing armotypes structs
+// rather than inventing our own process/cloud attribution.
+func TestReusedIdentityAndProcessTree(t *testing.T) {
+	// Fragment carries the lightweight identity (B).
+	f := Fragment{
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "t1", Direction: DirectionRequest, Part: PartHeaders,
+		CustomerGUID: "cust-abc", SandboxID: "sbx-1",
+		K8s:   &armotypes.RuntimeAlertK8sDetails{PodName: "orders-7c9", WorkloadName: "orders", NodeName: "node-7"},
+		Cloud: &armotypes.CloudMetadata{AccountID: "1234", Region: "eu-central-1"},
+	}
+	var fo Fragment
+	if b, err := json.Marshal(f); err != nil {
+		t.Fatal(err)
+	} else if err := json.Unmarshal(b, &fo); err != nil {
+		t.Fatal(err)
+	}
+	if fo.K8s == nil || fo.K8s.PodName != "orders-7c9" || fo.Cloud == nil || fo.Cloud.Region != "eu-central-1" || fo.CustomerGUID != "cust-abc" {
+		t.Errorf("fragment identity did not round-trip: %+v", fo)
+	}
+
+	// Envelope carries the full process lineage (A): P1 spawned by P2.
+	env := CaptureEnvelope{
+		ProtocolVersion: CurrentProtocolVersion, TransactionID: "t1",
+		ProcessTree: armotypes.ProcessTree{ProcessTree: armotypes.Process{
+			PID: 200, Comm: "sandbox-agent",
+			ChildrenMap: map[armotypes.CommPID]*armotypes.Process{
+				{Comm: "python3", PID: 201}: {PID: 201, PPID: 200, Comm: "python3"},
+			},
+		}},
+		ServerAddress: "api.example.com", ServerPort: 443,
+	}
+	var eo CaptureEnvelope
+	if b, err := json.Marshal(env); err != nil {
+		t.Fatal(err)
+	} else if err := json.Unmarshal(b, &eo); err != nil {
+		t.Fatal(err)
+	}
+	if eo.ProcessTree.ProcessTree.PID != 200 || eo.ProcessTree.FindProcessByPID(201) == nil {
+		t.Errorf("process tree/lineage did not round-trip: %+v", eo.ProcessTree)
 	}
 }
