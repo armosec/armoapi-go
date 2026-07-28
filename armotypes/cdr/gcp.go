@@ -44,8 +44,12 @@ const (
 //   - AuthorizationInfo carries permission / permissionType / granted, enabling
 //     denied-attempt (granted:false) detection rules.
 //
-// All optional fields are nil-safe / omitempty so CEL has()-guards behave and
-// GCP's per-service field omissions round-trip cleanly.
+// All optional object/slice/string fields are pointers or omitempty so CEL
+// has()-guards behave and GCP's per-service omissions round-trip cleanly. The
+// two time.Time fields follow the aws.go/azure.go convention (bare, non-pointer);
+// like EventTime/Time there, an absent timestamp re-serializes as the zero time
+// rather than staying omitted — harmless in practice, as Cloud Logging stamps
+// both timestamp and receiveTimestamp on every delivered entry.
 type GcpAuditLogEvent struct {
 	// InsertID uniquely identifies the log entry; it is stable across Pub/Sub
 	// redeliveries and forms half of the dedup key hash(insertId + rule_id).
