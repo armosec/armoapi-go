@@ -36,8 +36,14 @@ const (
 // DefaultMaxFragmentBytes is the default per-fragment payload cap. It sits well
 // under the ~4 MB OTLP/gRPC message ceiling to leave headroom for the record
 // envelope and for the ~33% base64 expansion a bytes value incurs when a LogRecord
-// is JSON-encoded; 1 MiB of raw payload encodes to well under 4 MB.
+// is JSON-encoded; 1 MiB of raw payload encodes to well under 4 MB (spec §5.10).
 const DefaultMaxFragmentBytes = 1 << 20 // 1 MiB
+
+// CurrentProtocolVersion is the wire-contract version stamped on every record and
+// every config response "from day one" (spec §5.10): with two sensor types and a
+// fidelity enum evolving independently, versioning the contract now is cheap
+// insurance against a breaking change later. Bump on a breaking wire change.
+const CurrentProtocolVersion = "1.0"
 
 // Attribute keys carried on each fragment LogRecord (spec §5.2). Defined here so
 // the sensor that writes them and the backend that reads them share one source of
@@ -49,6 +55,7 @@ const (
 	AttrEndOfStream     = "http.capture.end_of_stream"
 	AttrCaptureFidelity = "http.capture.fidelity"
 	AttrFidelityReason  = "http.capture.fidelity_reason"
+	AttrProtocolVersion = "http.capture.protocol_version"
 )
 
 // Fragment is one unit on the wire (spec §5.2): a slice of one direction of one
@@ -61,6 +68,10 @@ const (
 // until EndOfStream. Completeness requires the terminal marker AND contiguous
 // SequenceNumber coverage 0..N; a gap resolves to FidelityPartial.
 type Fragment struct {
+	// ProtocolVersion is the wire-contract version this record was produced under
+	// (spec §5.10) — carried on every record from day one so the two sensor types
+	// and the fidelity enum can evolve without a silent breaking change.
+	ProtocolVersion string `json:"protocolVersion"`
 	// TransactionID correlates all fragments of one logical HTTP transaction —
 	// BOTH directions (request + response) share it. It MUST be globally unique
 	// across every sensor instance and tenant (see NewTransactionID); the backend

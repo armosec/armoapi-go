@@ -45,11 +45,12 @@ func TestNewTransactionID(t *testing.T) {
 // (bytes) survives — this is the binary-safe carrier for raw captured payload.
 func TestFragmentJSONRoundTrip(t *testing.T) {
 	in := Fragment{
-		TransactionID:  "inst-1:2a:64:deadbeef:1",
-		Direction:      DirectionResponse,
-		SequenceNumber: 3,
-		EndOfStream:    true,
-		Data:           []byte{0x00, 0x01, 0xff, 'h', 'i'}, // non-UTF8: proves bytes carrier
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "inst-1:2a:64:deadbeef:1",
+		Direction:       DirectionResponse,
+		SequenceNumber:  3,
+		EndOfStream:     true,
+		Data:            []byte{0x00, 0x01, 0xff, 'h', 'i'}, // non-UTF8: proves bytes carrier
 	}
 	b, err := json.Marshal(in)
 	if err != nil {
@@ -59,9 +60,9 @@ func TestFragmentJSONRoundTrip(t *testing.T) {
 	if err := json.Unmarshal(b, &out); err != nil {
 		t.Fatal(err)
 	}
-	if out.TransactionID != in.TransactionID || out.Direction != in.Direction ||
-		out.SequenceNumber != in.SequenceNumber || out.EndOfStream != in.EndOfStream ||
-		string(out.Data) != string(in.Data) {
+	if out.ProtocolVersion != in.ProtocolVersion || out.TransactionID != in.TransactionID ||
+		out.Direction != in.Direction || out.SequenceNumber != in.SequenceNumber ||
+		out.EndOfStream != in.EndOfStream || string(out.Data) != string(in.Data) {
 		t.Errorf("round-trip mismatch:\n in=%+v\nout=%+v", in, out)
 	}
 }
