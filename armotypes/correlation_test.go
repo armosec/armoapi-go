@@ -81,3 +81,56 @@ func TestCorrelationAlert_EmptyOmitsField(t *testing.T) {
 	assert.Equal(t, "{}", string(data),
 		"an alert with no correlations must add nothing to the payload")
 }
+
+func TestRuntimeAlert_CorrelationsAreTopLevel(t *testing.T) {
+	alert := RuntimeAlert{
+		BaseRuntimeAlert: BaseRuntimeAlert{
+			AlertName:   "Process executed from mount connected to external endpoint",
+			InfectedPID: 4471,
+			Severity:    8,
+			Timestamp:   time.Date(2026, 7, 28, 12, 0, 3, 480000000, time.UTC),
+		},
+		RuleID: "R1089",
+		CorrelationAlert: CorrelationAlert{
+			Correlations: []CorrelationEvidence{{
+				Name:      "mount_exec",
+				EventType: string(EventTypeExec),
+				Scope:     string(StateScopeContainer),
+				Key:       "4471",
+				Process:   &Process{PID: 4471, Comm: "xmrig", Path: "/mnt/data/xmrig"},
+			}},
+		},
+	}
+
+	data, err := json.Marshal(alert)
+	require.NoError(t, err)
+
+	// Inlined, so "correlations" sits beside "alertName" -- not nested under a
+	// "correlationAlert" object.
+	var flat map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(data, &flat))
+	require.Contains(t, flat, "correlations")
+	assert.NotContains(t, flat, "correlationAlert")
+	assert.Contains(t, flat, "alertName")
+
+	var decoded RuntimeAlert
+	require.NoError(t, json.Unmarshal(data, &decoded))
+	require.Len(t, decoded.Correlations, 1)
+	assert.Equal(t, "mount_exec", decoded.Correlations[0].Name)
+	assert.Equal(t, uint32(4471), decoded.Correlations[0].Process.PID)
+	// The triggering event's identity is untouched by correlation.
+	assert.Equal(t, uint32(4471), decoded.InfectedPID)
+	assert.Equal(t, "R1089", decoded.RuleID)
+}
+
+func TestRuntimeAlert_WithoutCorrelations_IsUnchanged(t *testing.T) {
+	alert := RuntimeAlert{
+		BaseRuntimeAlert: BaseRuntimeAlert{AlertName: "Unexpected process launched"},
+		RuleID:           "R0001",
+	}
+
+	data, err := json.Marshal(alert)
+	require.NoError(t, err)
+	assert.NotContains(t, string(data), "correlations",
+		"non-correlation alerts must serialize exactly as before")
+}

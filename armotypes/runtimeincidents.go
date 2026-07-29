@@ -383,6 +383,7 @@ type RuntimeAlert struct {
 	cdr.CdrAlert           `json:"cdrevent,omitempty" bson:"cdrevent"`
 	HttpRuleAlert          `json:",inline" bson:"inline"`
 	NetworkScanAlert       `json:"networkscan,inline" bson:"networkscan"`
+	CorrelationAlert       `json:",inline" bson:"inline"`
 	AlertType              AlertType           `json:"alertType" bson:"alertType"`
 	AlertSourcePlatform    AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
 	// Rule ID
