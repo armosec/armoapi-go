@@ -124,7 +124,43 @@ const (
 	EventTypeSSH          EventType = "ssh"
 	EventTypeHTTP         EventType = "http"
 	EventTypeK8sAdmission EventType = "k8s-admission"
+
+	// Node-telemetry event types emitted by node-agent. Added so a stateWrites
+	// clause can name any node-agent event stream, not just the subset that
+	// happened to be referenced by admission rules.
+	EventTypePtrace  EventType = "ptrace"
+	EventTypeBPF     EventType = "bpf"
+	EventTypeKmod    EventType = "kmod"
+	EventTypeUnshare EventType = "unshare"
+	EventTypeIoUring EventType = "iouring"
+	EventTypeRandomX EventType = "randomx"
+	EventTypeProcfs  EventType = "procfs"
+	EventTypeFork    EventType = "fork"
+	EventTypeExit    EventType = "exit"
+
+	// EventTypeAll is a wildcard used by rule bindings, not a real event stream.
+	EventTypeAll EventType = "all"
 )
+
+// knownEventTypes is the authoritative set of event types the rule contract
+// accepts. Kept in sync with node-agent's utils.EventType.
+var knownEventTypes = map[EventType]struct{}{
+	EventTypeExec: {}, EventTypeOpen: {}, EventTypeCapabilities: {},
+	EventTypeDNS: {}, EventTypeNetwork: {}, EventTypeSyscall: {},
+	EventTypeSymlink: {}, EventTypeHardlink: {}, EventTypeSSH: {},
+	EventTypeHTTP: {}, EventTypeK8sAdmission: {}, EventTypePtrace: {},
+	EventTypeBPF: {}, EventTypeKmod: {}, EventTypeUnshare: {},
+	EventTypeIoUring: {}, EventTypeRandomX: {}, EventTypeProcfs: {},
+	EventTypeFork: {}, EventTypeExit: {}, EventTypeAll: {},
+}
+
+// IsKnownEventType reports whether e is a recognised event type. Rule loaders
+// use this to reject a stateWrites or ruleExpression entry naming an event
+// stream that does not exist, rather than silently never matching.
+func IsKnownEventType(e EventType) bool {
+	_, ok := knownEventTypes[e]
+	return ok
+}
 
 // ProfileDataField is a tagged union: either All == true (the rule needs every
 // entry on this surface) or Patterns is non-empty (the rule needs entries
