@@ -93,9 +93,21 @@ carries correlation evidence for both.
 triggering event cannot express. Without it, an alert would say only "a process made
 an outbound connection" and drop the exec that makes it interesting.
 
-`Process` and `Admission` are a **tagged union**: exactly one is set, determined by
-the engine that wrote the entry. An admission request has no PID, and its useful
-identity (who did what to which object) has no home in `Process`.
+`Process` and `Admission` are a **tagged union by producer discipline**: node-agent
+populates `Process`, the operator populates `Admission`. An admission request has no
+PID, and its useful identity (who did what to which object) has no home in `Process`.
+
+This is **not enforced at deserialization**, deliberately. These types are the wire and
+persistence shape of the alert pipeline, so a rejecting `UnmarshalJSON` would turn a
+producer bug into a *dropped alert* and would apply retroactively to every stored
+document. For a security product a mis-shaped alert beats a missing one, and the entry
+is still usable — `name`, `eventType`, `timestamp`, `scope` and `key` carry the
+correlation regardless. The invariant belongs where entries are constructed
+(node-agent `pkg/rulestate`, operator `admission/`).
+
+Consumers should therefore treat "both set" as a producer bug and prefer `Process`, and
+treat "neither set" as legitimate-but-sparse — a node-agent entry whose source event
+carried no process fields will have `process` absent.
 
 | Field | Meaning |
 |---|---|
