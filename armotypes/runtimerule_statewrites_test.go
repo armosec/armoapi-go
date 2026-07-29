@@ -105,3 +105,28 @@ func TestStateWrite_EventTypeIsValidated(t *testing.T) {
 	assert.False(t, IsKnownEventType(w.EventType))
 	assert.True(t, IsKnownEventType(StateWrite{EventType: EventTypePtrace}.EventType))
 }
+
+// EventTypeAll is a rule-binding wildcard, not an event stream. A state write
+// must name a concrete stream to drive it: `stateWrites.eventType: all` would
+// otherwise pass validation and then never match anything, which is precisely
+// the silently-dead-rule failure this contract exists to prevent.
+func TestIsValidStateWriteEventType_RejectsTheAllWildcard(t *testing.T) {
+	assert.True(t, IsKnownEventType(EventTypeAll),
+		"all remains valid for rule bindings")
+	assert.False(t, IsValidStateWriteEventType(EventTypeAll),
+		"but it cannot drive a state write")
+}
+
+func TestIsValidStateWriteEventType_AcceptsConcreteStreams(t *testing.T) {
+	for _, et := range []EventType{
+		EventTypeExec, EventTypeOpen, EventTypeNetwork, EventTypePtrace,
+		EventTypeKmod, EventTypeBPF, EventTypeK8sAdmission,
+	} {
+		assert.True(t, IsValidStateWriteEventType(et), "%s should drive a state write", et)
+	}
+}
+
+func TestIsValidStateWriteEventType_RejectsUnknown(t *testing.T) {
+	assert.False(t, IsValidStateWriteEventType(EventType("nonsense")))
+	assert.False(t, IsValidStateWriteEventType(EventType("")))
+}

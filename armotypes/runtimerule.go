@@ -211,12 +211,27 @@ var knownEventTypes = map[EventType]struct{}{
 	EventTypeFork: {}, EventTypeExit: {}, EventTypeAll: {},
 }
 
-// IsKnownEventType reports whether e is a recognised event type. Rule loaders
-// use this to reject a stateWrites or ruleExpression entry naming an event
-// stream that does not exist, rather than silently never matching.
+// IsKnownEventType reports whether e is a recognised event type, including the
+// EventTypeAll binding wildcard. Rule loaders use this to reject an entry
+// naming an event stream that does not exist, rather than silently never
+// matching.
+//
+// For state-write clauses use IsValidStateWriteEventType instead: a write must
+// be driven by a concrete stream, and EventTypeAll is not one.
 func IsKnownEventType(e EventType) bool {
 	_, ok := knownEventTypes[e]
 	return ok
+}
+
+// IsValidStateWriteEventType reports whether e may drive a StateWrite.
+//
+// This is stricter than IsKnownEventType: EventTypeAll is a rule-binding
+// wildcard rather than an event stream, so it cannot drive a write. Accepting it
+// would let `stateWrites.eventType: all` pass validation and then never match a
+// concrete event -- a rule that loads cleanly and silently never fires, which is
+// the failure mode this contract is built to avoid.
+func IsValidStateWriteEventType(e EventType) bool {
+	return e != EventTypeAll && IsKnownEventType(e)
 }
 
 // ProfileDataField is a tagged union: either All == true (the rule needs every

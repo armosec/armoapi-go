@@ -119,17 +119,35 @@ node-agent has 20, so `ptrace`, `bpf`, `kmod`, `unshare`, `iouring`, `randomx`,
 may name any of them.
 
 ```go
-func IsKnownEventType(e EventType) bool
+func IsKnownEventType(e EventType) bool           // includes the `all` wildcard
+func IsValidStateWriteEventType(e EventType) bool // excludes it
 ```
 
-Rule loaders use this to reject a clause naming an event stream that does not exist.
+Rule loaders use these to reject a clause naming an event stream that does not exist.
 `EventType` is a string type, so an unknown value would otherwise deserialize happily
 and produce a rule that silently never matches — the failure mode this contract works
 hardest to avoid.
 
+The two differ on **`all`**, which is a rule-binding wildcard rather than an event
+stream:
+
+- `ruleExpression` / rule bindings — `all` is meaningful, so use `IsKnownEventType`.
+- **`stateWrites` — `all` is invalid**, because a write must be driven by a concrete
+  stream. Use `IsValidStateWriteEventType`. Accepting `all` would let a clause pass
+  validation and then never match a concrete event.
+
 ## Compatibility
 
-Purely additive. No existing field was renamed, retyped, or retagged. All new fields
-are `omitempty` on `json`, `yaml` and `bson`, so rules and alerts that do not use
-correlation serialize byte-identically to before. `runtimerule_statewrites_test.go`
-and `correlation_test.go` assert this directly.
+Purely additive. No existing field was renamed, retyped, or retagged. Rules and alerts
+that do not use correlation serialize byte-identically to before —
+`runtimerule_statewrites_test.go` and `correlation_test.go` assert this directly.
+
+Tag coverage follows each file's existing convention rather than being uniform:
+
+| Types | Tags | Why |
+|---|---|---|
+| `StateWrite`, `StateScope` (`runtimerule.go`) | `json`, `yaml`, `bson` | Rules are authored as YAML in the rule libraries and persisted by the backend |
+| `CorrelationAlert`, `CorrelationEvidence`, `AdmissionEvidence` (`runtimeincidents.go`) | `json`, `bson` | Alerts are never YAML-serialized; **no** type in `runtimeincidents.go` carries a `yaml` tag |
+
+Adding `yaml` tags to the correlation types would make them the only ones in that file
+with them, implying a YAML path that does not exist.
