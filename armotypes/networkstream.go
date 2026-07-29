@@ -63,6 +63,14 @@ const processRefSep = "/"
 // The unit costs nothing on the wire: ProcessRef is text-marshalled, so these
 // field names never appear in JSON at all.
 //
+// The start time is in the identity purely to survive pid reuse — that is the
+// stated mitigation in the network-reputation GA design (shared-designs-and-docs
+// projects/epics/network-reputation-ga/network-reputation-consolidation-design.md
+// §13: "join reliability across process restarts / pid reuse (mitigated by
+// startTime in the key)"). Nothing renders it. Anything that needs a
+// human-facing process start time should read Process.StartTime off the tree
+// this ref resolves to, which is a wall-clock time.Time.
+//
 // Ticks rather than a time.Time, deliberately:
 //
 //   - The only start-time source with full process coverage is
@@ -283,7 +291,15 @@ type NetworkStreamEvent struct {
 	// removeProcessTreeFromEvents); it survives because private-node-agent
 	// wires an in-process notification channel that its host network sensor
 	// reads pre-nil (pkg/hostnetworksensor/v1 reads outbound.ProcessTree
-	// directly). Do not remove or repurpose it.
+	// directly). Searching only the OSS node-agent makes it look dead — that
+	// main passes nil for the channel.
+	//
+	// So: do not remove it as part of adding attribution. It does become
+	// removable once HostNetworkSensor is retired, which the network-reputation
+	// GA design (shared-designs-and-docs
+	// projects/epics/network-reputation-ga/network-reputation-consolidation-design.md
+	// §5) plans across private-node-agent's three mains and pkg/hostnetworksensor.
+	// Drop it in that change, not this one.
 	//
 	// It is a pointer so `omitempty` actually drops it — encoding/json does not
 	// omit zero structs, and an always-present "processRef":"0/0" on every

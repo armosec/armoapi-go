@@ -117,6 +117,24 @@ shared between containers and buy nothing.
 A **zero** value means the sensor could not read the start time; such a ref
 carries pid-only identity and must not be compared across messages.
 
+The start time is in the identity **purely to survive pid reuse**, which is the
+mitigation the GA design itself names
+(`projects/epics/network-reputation-ga/network-reputation-consolidation-design.md`
+§13: "join reliability across process restarts / pid reuse (mitigated by
+`startTime` in the key)"). Nothing renders this value. Anything needing a
+human-facing process start time reads `Process.StartTime` off the resolved tree,
+which is a wall-clock `time.Time`.
+
+> **Open question — units.** node-agent's process tree already carries
+> `StartTimeNs uint64` ("Process start time in nanoseconds for unique
+> identification", `pkg/processtree/conversion/types.go:30`), fed from eBPF event
+> timestamps and a procfs scan. Ticks therefore require the sensor to divide
+> ns by 10⁷, discarding precision it already holds, and leave two different units
+> for one concept. Nanoseconds would match the producer exactly at a cost of ~6
+> bytes per connection (≈2.3 KB base64 on a 283-connection message). Ticks were
+> specified for this change; switching to ns is a one-line change now and a
+> breaking one after the sensor ships.
+
 The field name carries the unit because `armotypes.Process.StartTime` — the same
 concept on the tree this ref points at — is a wall-clock `time.Time`. The unit is
 free on the wire: `ProcessRef` is text-marshalled, so its field names never
