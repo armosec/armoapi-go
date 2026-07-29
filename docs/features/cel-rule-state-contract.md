@@ -1,6 +1,6 @@
 ---
 type: feature
-status: in-progress
+status: active
 owner: ben@armosec.io
 scope: repo
 related_code:
