@@ -108,24 +108,52 @@ func TestReusedIdentityAndProcessTree(t *testing.T) {
 		t.Errorf("fragment identity did not round-trip: %+v", fo)
 	}
 
-	// Envelope carries the full process lineage (A): P1 spawned by P2.
-	env := CaptureEnvelope{
+	// The FIRST fragment (request headers, seq 0) carries the full process lineage
+	// (A): P1 spawned by P2. On other fragments ProcessTree is nil.
+	first := Fragment{
 		ProtocolVersion: CurrentProtocolVersion, TransactionID: "t1",
-		ProcessTree: armotypes.ProcessTree{ProcessTree: armotypes.Process{
+		Direction: DirectionRequest, Part: PartHeaders, SequenceNumber: 0,
+		ProcessTree: &armotypes.ProcessTree{ProcessTree: armotypes.Process{
 			PID: 200, Comm: "sandbox-agent",
 			ChildrenMap: map[armotypes.CommPID]*armotypes.Process{
 				{Comm: "python3", PID: 201}: {PID: 201, PPID: 200, Comm: "python3"},
 			},
 		}},
-		ServerAddress: "api.example.com", ServerPort: 443,
+		ServerAddress: "api.example.com", ServerPort: 443, SensorInstanceID: "node-7",
 	}
-	var eo CaptureEnvelope
-	if b, err := json.Marshal(env); err != nil {
+	var firstO Fragment
+	if b, err := json.Marshal(first); err != nil {
 		t.Fatal(err)
-	} else if err := json.Unmarshal(b, &eo); err != nil {
+	} else if err := json.Unmarshal(b, &firstO); err != nil {
 		t.Fatal(err)
 	}
-	if eo.ProcessTree.ProcessTree.PID != 200 || eo.ProcessTree.FindProcessByPID(201) == nil {
-		t.Errorf("process tree/lineage did not round-trip: %+v", eo.ProcessTree)
+	if firstO.ProcessTree == nil || firstO.ProcessTree.ProcessTree.PID != 200 || firstO.ProcessTree.FindProcessByPID(201) == nil {
+		t.Errorf("process tree/lineage did not round-trip on the first fragment: %+v", firstO.ProcessTree)
+	}
+	if fo.ProcessTree != nil {
+		t.Error("non-first fragment must not carry a process tree")
+	}
+}
+
+// CaptureConfig round-trips the caps + masking controls the backend delivers.
+func TestCaptureConfigRoundTrip(t *testing.T) {
+	mask := false
+	in := CaptureConfig{
+		ProtocolVersion: CurrentProtocolVersion, Enabled: true,
+		MaxFragmentBytes: 1 << 20, MaxTransactionBytes: 8 << 20, MaxTransactionsPerHour: 5000,
+		MaskKnownCredentialHeaders: &mask, ExtraCredentialHeaders: []string{"x-acme-signature"},
+	}
+	b, err := json.Marshal(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out CaptureConfig
+	if err := json.Unmarshal(b, &out); err != nil {
+		t.Fatal(err)
+	}
+	if !out.Enabled || out.MaxTransactionsPerHour != 5000 || out.MaxTransactionBytes != 8<<20 ||
+		out.MaskKnownCredentialHeaders == nil || *out.MaskKnownCredentialHeaders != false ||
+		len(out.ExtraCredentialHeaders) != 1 {
+		t.Errorf("config did not round-trip: %+v", out)
 	}
 }

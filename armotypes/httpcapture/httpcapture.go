@@ -120,7 +120,7 @@ type Fragment struct {
 	// So the backend can attribute any fragment and query "in a sandbox" without a
 	// join. These REUSE the existing armotypes identity structs — the agent does not
 	// define its own process/cloud attribution. (The heavy process TREE is NOT here;
-	// it rides once per transaction on CaptureEnvelope — placement "A".)
+	// it rides once, on the first fragment — placement "A", see below.)
 	//
 	// This identity may also be propagated to OTLP resource attributes to avoid
 	// repeating it per fragment; that is a later, easy-to-add optimization.
@@ -128,35 +128,52 @@ type Fragment struct {
 	SandboxID    string                            `json:"sandboxId,omitempty"`
 	K8s          *armotypes.RuntimeAlertK8sDetails `json:"k8s,omitempty"`   // pod / node / container / workload / cluster
 	Cloud        *armotypes.CloudMetadata          `json:"cloud,omitempty"` // account_id / region / provider / zone
+
+	// --- Per-transaction attribution, on the FIRST fragment only (placement A) ---
+	// Carried once — on the request-headers fragment (SequenceNumber 0) — not a
+	// separate record and not repeated per fragment (the process tree can be large).
+	// nil/zero on every other fragment. Reuses armotypes.ProcessTree (RuntimeAlert
+	// tree) — the agent defines no process attribution of its own.
+	ProcessTree      *armotypes.ProcessTree `json:"processTree,omitempty"` // full process lineage (P1 spawned by P2)
+	ServerAddress    string                 `json:"serverAddress,omitempty"`
+	ServerPort       uint16                 `json:"serverPort,omitempty"`
+	SensorInstanceID string                 `json:"sensorInstanceId,omitempty"`
+
+	// Fidelity marks a capture gap on this fragment (§5.1); empty ⇒ complete. On a
+	// per-transaction size-cap truncation the terminal fragment carries
+	// EndOfStream=true AND Fidelity=FidelityTruncated.
+	Fidelity       CaptureFidelity `json:"fidelity,omitempty"`
+	FidelityReason string          `json:"fidelityReason,omitempty"`
 }
 
-// CaptureEnvelope is the per-transaction correlation envelope (spec §5.7): who the
-// transaction came from and where it went. It is sent ONCE per transaction (keyed
-// by TransactionID), not repeated on every body fragment, so a large multi-fragment
-// body doesn't re-ship the attribution. Attribution is populated to the sensor's
-// capability; consumers must treat individual fields as optional.
-type CaptureEnvelope struct {
+// CaptureConfig is the backend-supplied capture configuration the sensor polls
+// (spec §5.3/§5.4). It carries enablement, the caps, and the masking controls. The
+// sensor uses built-in defaults until a config is fetched (a 0 cap ⇒ agent default),
+// and fails closed (captures nothing) with no config. The per-target upload-policy
+// rules (host/path → full|headers|none) are the agent's uploadpolicy types today and
+// migrate into this package next.
+type CaptureConfig struct {
 	ProtocolVersion string `json:"protocolVersion"`
-	// TransactionID links the envelope to its fragments.
-	TransactionID string `json:"transactionId"`
-	// CapturedAt is when the transaction was first observed (unix nanoseconds).
-	CapturedAt int64 `json:"capturedAt"`
+	// Enabled is the master switch; false ⇒ the sensor captures nothing.
+	Enabled bool `json:"enabled"`
 
-	// ProcessTree — WHICH PROCESS this transaction is from, with its FULL lineage
-	// (placement "A"): the process and every ancestor before it, so e.g. an HTTP
-	// call in P1 carries that P2 (the sandbox agent) spawned P1. It REUSES the
-	// existing armotypes.ProcessTree (the RuntimeAlert process tree) — the agent does
-	// NOT define its own process attribution. It rides ONCE per transaction, not on
-	// every fragment, because the tree can be large.
-	ProcessTree armotypes.ProcessTree `json:"processTree"`
+	// Size caps in bytes (0 ⇒ use the agent default). MaxFragmentBytes bounds one
+	// fragment; MaxTransactionBytes bounds a whole transaction — on hit the body is
+	// truncated (headers are still sent) and the terminal fragment is marked
+	// EndOfStream + FidelityTruncated.
+	MaxFragmentBytes    int64 `json:"maxFragmentBytes,omitempty"`
+	MaxTransactionBytes int64 `json:"maxTransactionBytes,omitempty"`
 
-	// Destination — WHERE it went (recovered per transaction; absent when
-	// unrecoverable, reflected as FidelityTupleMissing on the fragments).
-	ServerAddress string `json:"serverAddress,omitempty"`
-	ServerPort    uint16 `json:"serverPort,omitempty"`
+	// MaxTransactionsPerHour is the per-agent volume cap (0 ⇒ agent default). When it
+	// is exhausted the agent uploads NOTHING for further transactions this window and
+	// emits a "limit exhausted" signal to the backend.
+	MaxTransactionsPerHour int64 `json:"maxTransactionsPerHour,omitempty"`
 
-	// SensorInstanceID identifies the emitting sensor (node-agent pod / gateway).
-	SensorInstanceID string `json:"sensorInstanceId,omitempty"`
+	// Credential-header masking (§5.6). MaskKnownCredentialHeaders is a pointer so
+	// absent ⇒ default true (fail-safe: mask). ExtraCredentialHeaders adds names to
+	// the masked set. Masking is a one-way (irreversible) fingerprint.
+	MaskKnownCredentialHeaders *bool    `json:"maskKnownCredentialHeaders,omitempty"`
+	ExtraCredentialHeaders     []string `json:"extraCredentialHeaders,omitempty"`
 }
 
 // NewTransactionID composes a globally-unique transaction id from readily-available
