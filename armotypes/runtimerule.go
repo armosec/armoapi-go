@@ -66,28 +66,31 @@ func RuleSeverityToString(severity int) string {
 }
 
 type RuntimeRule struct {
-	Enabled                 bool              `json:"enabled" yaml:"enabled" bson:"enabled"`
-	ID                      string            `json:"id" yaml:"id" bson:"id"`
-	Name                    string            `json:"name" yaml:"name" bson:"name"`
-	Description             string            `json:"description" yaml:"description" bson:"description"`
-	Expressions             RuleExpressions   `json:"expressions" yaml:"expressions" bson:"expressions"`
-	ProfileDependency       ProfileDependency      `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
-	ProfileDataRequired    *ProfileDataRequired   `json:"profileDataRequired,omitempty" yaml:"profileDataRequired,omitempty" bson:"profileDataRequired,omitempty"`
-	Severity                int               `json:"severity" bson:"severity"`
-	SeverityString          string            `json:"severityString" bson:"severityString"`
-	SupportPolicy           bool              `json:"supportPolicy" yaml:"supportPolicy" bson:"supportPolicy"`
-	Tags                    []string          `json:"tags" yaml:"tags" bson:"tags"`
-	State                   map[string]any    `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
-	AgentVersionRequirement string            `json:"agentVersionRequirement" yaml:"agentVersionRequirement" bson:"agentVersionRequirement"`
-	IsTriggerAlert          bool              `json:"isTriggerAlert" yaml:"isTriggerAlert" bson:"isTriggerAlert"`
-	MitreTactic             string            `json:"mitreTactic" bson:"mitreTactic"`
-	MitreTechnique          string            `json:"mitreTechnique" bson:"mitreTechnique"`
-	Category                string            `json:"category" bson:"category"`
-	IncidentTypeId          string            `json:"incidentTypeId" bson:"incidentTypeId"`
+	Enabled     bool            `json:"enabled" yaml:"enabled" bson:"enabled"`
+	ID          string          `json:"id" yaml:"id" bson:"id"`
+	Name        string          `json:"name" yaml:"name" bson:"name"`
+	Description string          `json:"description" yaml:"description" bson:"description"`
+	Expressions RuleExpressions `json:"expressions" yaml:"expressions" bson:"expressions"`
+	// StateWrites declares what this rule remembers across events. Empty for
+	// the overwhelming majority of rules, which are stateless predicates.
+	StateWrites             []StateWrite         `json:"stateWrites,omitempty" yaml:"stateWrites,omitempty" bson:"stateWrites,omitempty"`
+	ProfileDependency       ProfileDependency    `json:"profileDependency" yaml:"profileDependency" bson:"profileDependency"`
+	ProfileDataRequired     *ProfileDataRequired `json:"profileDataRequired,omitempty" yaml:"profileDataRequired,omitempty" bson:"profileDataRequired,omitempty"`
+	Severity                int                  `json:"severity" bson:"severity"`
+	SeverityString          string               `json:"severityString" bson:"severityString"`
+	SupportPolicy           bool                 `json:"supportPolicy" yaml:"supportPolicy" bson:"supportPolicy"`
+	Tags                    []string             `json:"tags" yaml:"tags" bson:"tags"`
+	State                   map[string]any       `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
+	AgentVersionRequirement string               `json:"agentVersionRequirement" yaml:"agentVersionRequirement" bson:"agentVersionRequirement"`
+	IsTriggerAlert          bool                 `json:"isTriggerAlert" yaml:"isTriggerAlert" bson:"isTriggerAlert"`
+	MitreTactic             string               `json:"mitreTactic" bson:"mitreTactic"`
+	MitreTechnique          string               `json:"mitreTechnique" bson:"mitreTechnique"`
+	Category                string               `json:"category" bson:"category"`
+	IncidentTypeId          string               `json:"incidentTypeId" bson:"incidentTypeId"`
 	// Documentation is the rendered markdown documentation for this rule,
 	// sourced from the rule's README.md in the rulelibrary repo. Empty for
 	// customer-authored rules.
-	Documentation           string            `json:"documentation,omitempty" yaml:"documentation,omitempty" bson:"documentation,omitempty"`
+	Documentation string `json:"documentation,omitempty" yaml:"documentation,omitempty" bson:"documentation,omitempty"`
 }
 
 type RuleExpressions struct {
@@ -99,6 +102,60 @@ type RuleExpressions struct {
 type RuleExpression struct {
 	EventType  EventType `json:"eventType" yaml:"eventType" bson:"eventType"`
 	Expression string    `json:"expression" yaml:"expression" bson:"expression"`
+}
+
+// StateScope names the bucket a state entry belongs to. The scope determines
+// which entries a read can see, and the engine — never the rule — resolves the
+// concrete scope ID from the event, so cross-tenant leakage is not expressible.
+//
+// container/pod/node are node-agent scopes; identity is the operator's only
+// scope (admission chains are defined by the caller who performed them).
+type StateScope string
+
+const (
+	StateScopeContainer StateScope = "container"
+	StateScopePod       StateScope = "pod"
+	StateScopeNode      StateScope = "node"
+	StateScopeIdentity  StateScope = "identity"
+)
+
+// StateWrite is one declarative write clause: on events of EventType, when the
+// When guard holds, remember a marker under Name (optionally discriminated by
+// Key) inside Scope for TTL.
+//
+// Writes are declared rather than expressed as a CEL setter so that remembering
+// is decoupled from alerting: a rule may carry a write clause for an event type
+// it never alerts on, and the guard is evaluated exactly once, unaffected by
+// boolean short-circuiting or CEL's static optimiser.
+type StateWrite struct {
+	// EventType is the event stream that drives this write. It need not match
+	// any eventType in Expressions.RuleExpression — that is what allows a rule
+	// to remember on exec and alert on network.
+	EventType EventType `json:"eventType" yaml:"eventType" bson:"eventType"`
+
+	// When is a CEL boolean guard. Empty means "always write".
+	When string `json:"when,omitempty" yaml:"when,omitempty" bson:"when,omitempty"`
+
+	Scope StateScope `json:"scope" yaml:"scope" bson:"scope"`
+
+	// Name is what kind of fact this is — a string literal, never an
+	// expression, so it stays statically analysable and safe as a metric label.
+	Name string `json:"name" yaml:"name" bson:"name"`
+
+	// Key is who the fact is about: a CEL string expression, evaluated per
+	// event. Optional — omit it for a fact that is true of the whole scope
+	// rather than one subject, which yields exactly one entry per scope.
+	Key string `json:"key,omitempty" yaml:"key,omitempty" bson:"key,omitempty"`
+
+	// Value carries optional author-supplied extras as CEL expressions keyed by
+	// name. Keys must not begin with "_", which is reserved for engine-stamped
+	// provenance. Enforced by the consuming engine at rule load.
+	Value map[string]any `json:"value,omitempty" yaml:"value,omitempty" bson:"value,omitempty"`
+
+	// TTL is a Go duration string ("10m", "30m"). The consuming engine clamps
+	// it to its configured maxTTL at load, so no rule can pin memory
+	// indefinitely.
+	TTL string `json:"ttl" yaml:"ttl" bson:"ttl"`
 }
 
 // ProfileDataPattern declares a single match pattern for a profile-data
