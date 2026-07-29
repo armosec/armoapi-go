@@ -22,12 +22,12 @@ func TestProcessRefMarshalText(t *testing.T) {
 		ref  ProcessRef
 		want string
 	}{
-		{name: "typical", ref: ProcessRef{PID: 12345, StartTimeTicks: 91827364}, want: "12345/91827364"},
-		{name: "zero pid", ref: ProcessRef{PID: 0, StartTimeTicks: 91827364}, want: "0/91827364"},
-		{name: "unknown start time", ref: ProcessRef{PID: 12345, StartTimeTicks: 0}, want: "12345/0"},
+		{name: "typical", ref: ProcessRef{PID: 12345, StartTimeNs: 91827364}, want: "12345/91827364"},
+		{name: "zero pid", ref: ProcessRef{PID: 0, StartTimeNs: 91827364}, want: "0/91827364"},
+		{name: "unknown start time", ref: ProcessRef{PID: 12345, StartTimeNs: 0}, want: "12345/0"},
 		{name: "zero value", ref: ProcessRef{}, want: "0/0"},
-		{name: "max pid", ref: ProcessRef{PID: math.MaxUint32, StartTimeTicks: 1}, want: "4294967295/1"},
-		{name: "max start time", ref: ProcessRef{PID: 1, StartTimeTicks: math.MaxUint64}, want: "1/18446744073709551615"},
+		{name: "max pid", ref: ProcessRef{PID: math.MaxUint32, StartTimeNs: 1}, want: "4294967295/1"},
+		{name: "max start time", ref: ProcessRef{PID: 1, StartTimeNs: math.MaxUint64}, want: "1/18446744073709551615"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -52,12 +52,12 @@ func TestProcessRefMarshalText(t *testing.T) {
 func TestProcessRefRoundTrip(t *testing.T) {
 	t.Parallel()
 	tests := []ProcessRef{
-		{PID: 12345, StartTimeTicks: 91827364},
-		{PID: 0, StartTimeTicks: 91827364},
-		{PID: 12345, StartTimeTicks: 0},
+		{PID: 12345, StartTimeNs: 91827364},
+		{PID: 0, StartTimeNs: 91827364},
+		{PID: 12345, StartTimeNs: 0},
 		{},
-		{PID: math.MaxUint32, StartTimeTicks: math.MaxUint64},
-		{PID: 1, StartTimeTicks: 1},
+		{PID: math.MaxUint32, StartTimeNs: math.MaxUint64},
+		{PID: 1, StartTimeNs: 1},
 	}
 	for _, want := range tests {
 		text, err := want.MarshalText()
@@ -85,10 +85,10 @@ func TestProcessRefUnmarshalTextIgnoresExtraComponents(t *testing.T) {
 		text string
 		want ProcessRef
 	}{
-		{name: "one extra component", text: "12345/678/90", want: ProcessRef{PID: 12345, StartTimeTicks: 678}},
-		{name: "several extra components", text: "1/2/3/4/5", want: ProcessRef{PID: 1, StartTimeTicks: 2}},
-		{name: "extra component is non numeric", text: "1/2/abc", want: ProcessRef{PID: 1, StartTimeTicks: 2}},
-		{name: "trailing separator", text: "1/2/", want: ProcessRef{PID: 1, StartTimeTicks: 2}},
+		{name: "one extra component", text: "12345/678/90", want: ProcessRef{PID: 12345, StartTimeNs: 678}},
+		{name: "several extra components", text: "1/2/3/4/5", want: ProcessRef{PID: 1, StartTimeNs: 2}},
+		{name: "extra component is non numeric", text: "1/2/abc", want: ProcessRef{PID: 1, StartTimeNs: 2}},
+		{name: "trailing separator", text: "1/2/", want: ProcessRef{PID: 1, StartTimeNs: 2}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -132,9 +132,9 @@ func TestProcessRefUnmarshalTextErrors(t *testing.T) {
 // not survive encoding/json — see TestNetworkStreamEventMalformedRefInstallsZeroPointer.
 func TestProcessRefUnmarshalTextDoesNotPartiallyMutate(t *testing.T) {
 	t.Parallel()
-	got := ProcessRef{PID: 7, StartTimeTicks: 8}
+	got := ProcessRef{PID: 7, StartTimeNs: 8}
 	require.Error(t, got.UnmarshalText([]byte("99/bad")))
-	assert.Equal(t, ProcessRef{PID: 7, StartTimeTicks: 8}, got)
+	assert.Equal(t, ProcessRef{PID: 7, StartTimeNs: 8}, got)
 }
 
 // TestProcessRefUnmarshalTextAcceptsNonCanonical documents that leading zeros
@@ -154,7 +154,7 @@ func TestProcessRefUnmarshalTextAcceptsNonCanonical(t *testing.T) {
 	require.NoError(t, json.Unmarshal([]byte(payload), &out))
 	require.Len(t, out.Processes, 1, "non-canonical keys for one process collapse to one entry")
 
-	tree := out.Processes[ProcessRef{PID: 12345, StartTimeTicks: 1}]
+	tree := out.Processes[ProcessRef{PID: 12345, StartTimeNs: 1}]
 	require.NotNil(t, tree)
 	assert.Equal(t, "third", tree.ProcessTree.Comm, "last key wins")
 }
@@ -165,7 +165,7 @@ func TestProcessRefUnmarshalTextAcceptsNonCanonical(t *testing.T) {
 // string formatting at the call site.
 func TestProcessRefAsJSONMapKey(t *testing.T) {
 	t.Parallel()
-	ref := ProcessRef{PID: 4242, StartTimeTicks: 314159}
+	ref := ProcessRef{PID: 4242, StartTimeNs: 314159}
 	in := NetworkStream{
 		ProcessAttributionVersion: NetworkStreamProcessAttributionV1,
 		Processes: map[ProcessRef]*ProcessTree{
@@ -221,7 +221,7 @@ func TestProcessRefAsJSONMapKey(t *testing.T) {
 // which is reachable from a malformed payload.
 func TestProcessTreeForDegradesToNil(t *testing.T) {
 	t.Parallel()
-	ref := ProcessRef{PID: 1, StartTimeTicks: 2}
+	ref := ProcessRef{PID: 1, StartTimeNs: 2}
 	tests := []struct {
 		name   string
 		stream *NetworkStream
@@ -233,7 +233,7 @@ func TestProcessTreeForDegradesToNil(t *testing.T) {
 		{name: "no processes map", stream: &NetworkStream{}, event: &NetworkStreamEvent{ProcessRef: &ref}},
 		{
 			name:   "dangling ref",
-			stream: &NetworkStream{Processes: map[ProcessRef]*ProcessTree{{PID: 9, StartTimeTicks: 9}: {}}},
+			stream: &NetworkStream{Processes: map[ProcessRef]*ProcessTree{{PID: 9, StartTimeNs: 9}: {}}},
 			event:  &NetworkStreamEvent{ProcessRef: &ref},
 		},
 		{
@@ -257,11 +257,11 @@ func TestProcessTreeForNilMapValueFromPayload(t *testing.T) {
 	var out NetworkStream
 	require.NoError(t, json.Unmarshal([]byte(`{"processes":{"1/2":null}}`), &out))
 
-	tree, ok := out.Processes[ProcessRef{PID: 1, StartTimeTicks: 2}]
+	tree, ok := out.Processes[ProcessRef{PID: 1, StartTimeNs: 2}]
 	require.True(t, ok, "key present")
 	require.Nil(t, tree, "value nil — a bare map index would return a nil tree that reads as found")
 
-	assert.Nil(t, out.ProcessTreeFor(&NetworkStreamEvent{ProcessRef: &ProcessRef{PID: 1, StartTimeTicks: 2}}))
+	assert.Nil(t, out.ProcessTreeFor(&NetworkStreamEvent{ProcessRef: &ProcessRef{PID: 1, StartTimeNs: 2}}))
 }
 
 // TestNetworkStreamEventMalformedRefInstallsZeroPointer documents that
@@ -346,7 +346,7 @@ func TestNetworkStreamPreProcessAttributionPayloadDecodes(t *testing.T) {
 // processRef.pid where JSONB needs the string.
 func TestProcessRefBSONRoundTrip(t *testing.T) {
 	t.Parallel()
-	ref := ProcessRef{PID: 4242, StartTimeTicks: 314159}
+	ref := ProcessRef{PID: 4242, StartTimeNs: 314159}
 	in := NetworkStream{
 		ProcessAttributionVersion: NetworkStreamProcessAttributionV1,
 		Processes:                 map[ProcessRef]*ProcessTree{ref: {ProcessTree: Process{PID: 4242, Comm: "curl"}}},
@@ -366,7 +366,7 @@ func TestProcessRefBSONRoundTrip(t *testing.T) {
 	event := raw["entities"].(bson.M)["entity-1"].(bson.M)["outbound"].(bson.M)["1.2.3.4/443/TCP"].(bson.M)
 	// Both components widen to int64: mongo-driver encodes Go unsigned integers
 	// as int64 so the full unsigned range survives.
-	assert.Equal(t, bson.M{"pid": int64(4242), "startTimeTicks": int64(314159)}, event["processRef"],
+	assert.Equal(t, bson.M{"pid": int64(4242), "startTimeNs": int64(314159)}, event["processRef"],
 		"bson emits the event-level ref as a subdocument, NOT the text form")
 
 	var out NetworkStream

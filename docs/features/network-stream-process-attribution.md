@@ -30,8 +30,8 @@ envelope whose `patch` field is **base64-encoded JSON**. Consumers:
 
 ## What this adds
 
-1. **`ProcessRef`** — `{PID uint32, StartTimeTicks uint64}`, text-marshalled to
-   the single string `"<pid>/<startTimeTicks>"`, plus `String()`.
+1. **`ProcessRef`** — `{PID uint32, StartTimeNs uint64}`, text-marshalled to
+   the single string `"<pid>/<startTimeNs>"`, plus `String()`.
 2. **`NetworkStream.Processes map[ProcessRef]*ProcessTree`** — message-scoped,
    one tree per process.
 3. **`NetworkStreamEvent.ProcessRef *ProcessRef`** — per-connection pointer into
@@ -99,23 +99,10 @@ pids are node-unique and a stream message covers exactly one node, so keys are
 already unique message-wide. Per-container scoping would duplicate every tree
 shared between containers and buy nothing.
 
-## Why StartTimeTicks is ticks, not a `time.Time`
+## Why StartTimeNs is boot-relative nanoseconds, not a `time.Time`
 
-`StartTimeTicks` is CLOCK_BOOTTIME in clock ticks since boot (USER_HZ = 100,
-10 ms per tick).
-
-- The only start-time source with full process coverage is `/proc/<pid>/stat`
-  field 22, which is denominated in clock ticks.
-- Converting to wall-clock needs `/proc/stat` `btime`, which has **whole-second
-  resolution only**. A `time.Time` on the wire would therefore be lossy by up to
-  a second — for a value whose entire job is to disambiguate identity, that is
-  the wrong trade.
-- Ticks are exact and need no boot-time lookup. 10 ms granularity is safe for
-  pid-reuse disambiguation by 2–5 orders of magnitude.
-
-64-bit because ticks outgrow `uint32` after ~497 days of uptime at USER_HZ = 100.
-A **zero** value means the sensor could not read the start time; such a ref
-carries pid-only identity and must not be compared across messages.
+`StartTimeNs` is the process's **creation** time as nanoseconds since boot
+(CLOCK_BOOTTIME).
 
 The start time is in the identity **purely to survive pid reuse**, which is the
 mitigation the GA design itself names
@@ -125,20 +112,62 @@ mitigation the GA design itself names
 human-facing process start time reads `Process.StartTime` off the resolved tree,
 which is a wall-clock `time.Time`.
 
-> **Open question — units.** node-agent's process tree already carries
-> `StartTimeNs uint64` ("Process start time in nanoseconds for unique
-> identification", `pkg/processtree/conversion/types.go:30`), fed from eBPF event
-> timestamps and a procfs scan. Ticks therefore require the sensor to divide
-> ns by 10⁷, discarding precision it already holds, and leave two different units
-> for one concept. Nanoseconds would match the producer exactly at a cost of ~6
-> bytes per connection (≈2.3 KB base64 on a 283-connection message). Ticks were
-> specified for this change; switching to ns is a one-line change now and a
-> breaking one after the sensor ships.
+**Boot-relative, not wall-clock**, because converting to wall-clock needs
+`/proc/stat btime`, which has whole-second resolution only. A `time.Time` on the
+wire would be lossy by up to a second — wrong for a value whose entire job is
+disambiguation. A boot-relative integer needs no boot-time lookup and is exact.
+
+**Nanoseconds rather than clock ticks**, because that objection rules out a
+*timestamp*, not a unit: both ticks and boot-ns are boot-relative integers, so it
+says nothing about which. Between them:
+
+- **Conversion only loses information in the ticks direction.** procfs ticks → ns
+  is an exact ×10⁷; a boot-ns source → ticks is a lossy division. Choosing ns
+  means no source ever has to discard anything.
+- **One unit for one concept.** Two units either side of a serialisation boundary
+  is a bug factory.
+- **The cost is noise** — ~6 bytes per connection, ≈2.3 KB base64 at the largest
+  observed message, against a 5 MiB limit.
+
+> ⚠️ **Nanoseconds are the unit, not the resolution.** Do not read this as a
+> precise timestamp. The only start-time source with full process coverage is
+> `/proc/<pid>/stat` field 22, denominated in clock ticks (USER_HZ = 100, 10 ms),
+> so procfs-derived values are exact multiples of 10,000,000 ns and carry far less
+> precision than the unit implies. This does not affect correctness — 10 ms is
+> safe for pid-reuse disambiguation by several orders of magnitude — but someone
+> will eventually try to use it as a precise timestamp.
+
+⚠️ **Never derive this from an exec event.** `exec` does not create a process, so
+an exec-derived value changes when a process re-execs and the identity silently
+breaks mid-life.
+
+64-bit is required: boot-ns exceeds `uint32` after ~4.3 seconds of uptime, and
+reaches the `uint64` ceiling after ~584 years. A **zero** value means the sensor
+could not read the start time; such a ref carries pid-only identity and must not
+be compared across messages.
 
 The field name carries the unit because `armotypes.Process.StartTime` — the same
 concept on the tree this ref points at — is a wall-clock `time.Time`. The unit is
 free on the wire: `ProcessRef` is text-marshalled, so its field names never
 appear in JSON at all.
+
+### Producer note: node-agent has the field name, not yet a working value
+
+node-agent already declares `StartTimeNs uint64` — *"Process start time in
+nanoseconds for unique identification"* (`pkg/processtree/conversion/types.go:30`)
+— so this schema aligns with an existing name and unit. It does **not** align with
+a working value, and the sensor-side change cannot simply forward it:
+
+- The exec/fork/exit feeders set it from the **event timestamp**
+  (`pkg/processtree/conversion/convert.go`, *"Use event timestamp for
+  consistency"*). For an exec event that is the exec instant, not process
+  creation — semantically wrong for identity, per the warning above.
+- The procfs feeder passes through `procfsEvent.StartTimeNs`, which nothing
+  upstream ever assigns, so it is **always zero for procfs-sourced processes** —
+  the one source with full coverage. Verified: no `/proc/<pid>/stat` field-22
+  parse exists anywhere in node-agent.
+
+Populating it correctly is separately tracked sensor-side work.
 
 ## The parser is deliberately permissive
 
@@ -204,7 +233,7 @@ read it. That is what the permissive parser above is for.
   connection is the per-connection waste this design exists to avoid.
 - **The field is named `ProcessRef`, not `Process`.** `armotypes.Process` is a
   different, heavily-used type in the same package, and its `StartTime` is a
-  wall-clock `time.Time` where `ProcessRef.StartTimeTicks` is boot ticks —
+  wall-clock `time.Time` where `ProcessRef.StartTimeNs` is boot ticks —
   `event.Process` would read as `*armotypes.Process` to anyone who had not read
   this file. Naming the field after its type also matches the adjacent
   `ProcessTree *ProcessTree`. Costs ~1.1 KB base64 on a worst-case message
@@ -236,7 +265,7 @@ event-level ref is a string in JSON and a **subdocument** in BSON:
 
 ```
 JSON: "processRef":"4242/314159"
-BSON: "processRef":{"pid":NumberLong(4242),"startTimeTicks":NumberLong(314159)}
+BSON: "processRef":{"pid":NumberLong(4242),"startTimeNs":NumberLong(314159)}
 ```
 
 Both round-trip (`TestProcessRefBSONRoundTrip`), but a Mongo query needs

@@ -33,7 +33,7 @@ const (
 
 // NetworkStreamProcessAttributionV1 is the current revision of the
 // process-attribution extension to NetworkStream: NetworkStream.Processes plus
-// the per-connection NetworkStreamEvent.Process reference. See
+// the per-connection NetworkStreamEvent.ProcessRef reference. See
 // NetworkStream.ProcessAttributionVersion for why an explicit marker exists at
 // all, and bump this constant if the meaning of either field changes.
 const NetworkStreamProcessAttributionV1 = 1
@@ -56,12 +56,12 @@ const processRefSep = "/"
 // process tree with NetworkStream.ProcessTreeFor — no string formatting at the
 // call site and no way for the two sides to disagree on key format.
 //
-// StartTimeTicks is CLOCK_BOOTTIME in clock ticks since boot (USER_HZ = 100,
-// i.e. 10 ms per tick), NOT a wall-clock time. The name carries the unit
-// because armotypes.Process.StartTime — the same concept on the tree this ref
-// points at — is a wall-clock time.Time, and confusing the two would be silent.
-// The unit costs nothing on the wire: ProcessRef is text-marshalled, so these
-// field names never appear in JSON at all.
+// StartTimeNs is the process's creation time as nanoseconds since boot
+// (CLOCK_BOOTTIME), NOT a wall-clock time. The name carries the unit because
+// armotypes.Process.StartTime — the same concept on the tree this ref points
+// at — is a wall-clock time.Time, and confusing the two would be silent. The
+// unit costs nothing on the wire: ProcessRef is text-marshalled, so these field
+// names never appear in JSON at all.
 //
 // The start time is in the identity purely to survive pid reuse — that is the
 // stated mitigation in the network-reputation GA design (shared-designs-and-docs
@@ -71,23 +71,33 @@ const processRefSep = "/"
 // human-facing process start time should read Process.StartTime off the tree
 // this ref resolves to, which is a wall-clock time.Time.
 //
-// Ticks rather than a time.Time, deliberately:
+// Boot-relative rather than a wall-clock time.Time, deliberately: converting to
+// wall-clock requires the boot timestamp from /proc/stat `btime`, which has
+// whole-second resolution only. A time.Time on the wire would therefore be lossy
+// by up to a second — for a value whose entire job is to disambiguate identity,
+// that is the wrong trade. A boot-relative integer needs no boot-time lookup and
+// is exact.
 //
-//   - The only start-time source with full process coverage is
-//     /proc/<pid>/stat field 22 (starttime), which is denominated in clock
-//     ticks since boot.
-//   - Rendering those ticks to wall-clock requires the boot timestamp from
-//     /proc/stat `btime`, which has whole-second resolution only. A time.Time
-//     on the wire would therefore be lossy by up to a second — for a value
-//     whose entire job is to disambiguate identity, that is the wrong trade.
-//   - Ticks are exact, need no boot-time lookup, and 10 ms granularity is
-//     safe for pid-reuse disambiguation by 2-5 orders of magnitude (a kernel
-//     needs to cycle the whole pid space to reuse a pid).
+// NANOSECONDS ARE THE UNIT, NOT THE RESOLUTION. Do not read this as a precise
+// timestamp. The only start-time source with full process coverage is
+// /proc/<pid>/stat field 22, which is denominated in clock ticks (USER_HZ = 100,
+// i.e. 10 ms), so procfs-derived values are exact multiples of 10,000,000 ns and
+// carry far less precision than the unit implies. Nanoseconds are chosen anyway
+// because conversion only loses information in the other direction — ticks to ns
+// is an exact x10^7, ns to ticks is a lossy division — so no source has to
+// discard anything, and there is one unit for one concept either side of the
+// serialisation boundary. 10 ms granularity is safe for pid-reuse
+// disambiguation by 2-5 orders of magnitude (a kernel must cycle the whole pid
+// space to reuse a pid).
 //
-// A zero StartTimeTicks means the sensor could not read the process's start
-// time (typically a process that exited before /proc could be sampled). Such a
-// ref carries pid-only identity: it is still a valid key within the message, but
-// it must not be treated as equal to a ref for the same pid with a known start
+// The value MUST be process creation time. Never derive it from an exec event:
+// exec does not create a process, so an exec-derived value changes when a
+// process re-execs and the identity silently breaks mid-life.
+//
+// A zero StartTimeNs means the sensor could not read the process's start time
+// (typically a process that exited before /proc could be sampled). Such a ref
+// carries pid-only identity: it is still a valid key within the message, but it
+// must not be treated as equal to a ref for the same pid with a known start
 // time, and it is not safe to compare across messages.
 //
 // PID is a host-namespace pid, matching what the sensor's eBPF network gadget
@@ -95,12 +105,12 @@ const processRefSep = "/"
 // pid-namespace translation on that path). Host pids are node-unique, which is
 // what makes a single message-scoped Processes map correct.
 type ProcessRef struct {
-	PID            uint32 `json:"pid,omitempty" bson:"pid,omitempty"`
-	StartTimeTicks uint64 `json:"startTimeTicks,omitempty" bson:"startTimeTicks,omitempty"`
+	PID         uint32 `json:"pid,omitempty" bson:"pid,omitempty"`
+	StartTimeNs uint64 `json:"startTimeNs,omitempty" bson:"startTimeNs,omitempty"`
 }
 
 // MarshalText implements encoding.TextMarshaler, rendering a ProcessRef as the
-// single string "<pid>/<startTimeTicks>". It never returns an error.
+// single string "<pid>/<startTimeNs>". It never returns an error.
 //
 // encoding/json uses this for both map keys and plain values, so JSON carries
 // the text form everywhere. mongo-driver honours encoding.TextMarshaler for map
@@ -111,10 +121,10 @@ func (p ProcessRef) MarshalText() ([]byte, error) {
 	return []byte(p.String()), nil
 }
 
-// String returns the same "<pid>/<startTimeTicks>" text as MarshalText, so a
+// String returns the same "<pid>/<startTimeNs>" text as MarshalText, so a
 // logged ref is greppable against the payload it came from.
 func (p ProcessRef) String() string {
-	return strconv.FormatUint(uint64(p.PID), 10) + processRefSep + strconv.FormatUint(p.StartTimeTicks, 10)
+	return strconv.FormatUint(uint64(p.PID), 10) + processRefSep + strconv.FormatUint(p.StartTimeNs, 10)
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
@@ -149,14 +159,14 @@ func (p *ProcessRef) UnmarshalText(text []byte) error {
 	if err != nil {
 		return fmt.Errorf("invalid ProcessRef pid %q: %w", pidStr, err)
 	}
-	// Ticks since boot outgrow uint32 after ~497 days of uptime at
-	// USER_HZ = 100, so this is parsed and stored as 64-bit.
-	startTimeTicks, err := strconv.ParseUint(startTimeStr, 10, 64)
+	// Nanoseconds since boot need 64 bits: they exceed uint32 after ~4.3
+	// seconds of uptime, and reach the uint64 ceiling after ~584 years.
+	startTimeNs, err := strconv.ParseUint(startTimeStr, 10, 64)
 	if err != nil {
-		return fmt.Errorf("invalid ProcessRef startTimeTicks %q: %w", startTimeStr, err)
+		return fmt.Errorf("invalid ProcessRef startTimeNs %q: %w", startTimeStr, err)
 	}
 	p.PID = uint32(pid) // range-checked by ParseUint's bitSize 32 above
-	p.StartTimeTicks = startTimeTicks
+	p.StartTimeNs = startTimeNs
 	return nil
 }
 
@@ -305,7 +315,7 @@ type NetworkStreamEvent struct {
 	// omit zero structs, and an always-present "processRef":"0/0" on every
 	// unattributed connection is exactly the per-connection waste this design
 	// exists to avoid. A single text-marshalled field also beats two flat
-	// scalars (pid + startTimeTicks) on the wire by 6 bytes per connection,
+	// scalars (pid + startTimeNs) on the wire by 6 bytes per connection,
 	// because it spends one JSON key instead of two.
 	ProcessRef *ProcessRef `json:"processRef,omitempty" bson:"processRef,omitempty"`
 	// endpoint kind (pod, service, raw)
