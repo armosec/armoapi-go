@@ -14,9 +14,9 @@ func TestCorrelationEvidence_NodeAgentShape(t *testing.T) {
 	ts := time.Date(2026, 7, 28, 12, 0, 3, 100000000, time.UTC)
 	ev := CorrelationEvidence{
 		Name:      "mount_exec",
-		EventType: string(EventTypeExec),
+		EventType: EventTypeExec,
 		Timestamp: ts,
-		Scope:     string(StateScopeContainer),
+		Scope:     StateScopeContainer,
 		Key:       "4471",
 		Process: &Process{
 			PID: 4471, PPID: 1201,
@@ -45,9 +45,9 @@ func TestCorrelationEvidence_NodeAgentShape(t *testing.T) {
 func TestCorrelationEvidence_AdmissionShape(t *testing.T) {
 	ev := CorrelationEvidence{
 		Name:      "pod_created",
-		EventType: string(EventTypeK8sAdmission),
+		EventType: EventTypeK8sAdmission,
 		Timestamp: time.Date(2026, 7, 28, 11, 42, 10, 0, time.UTC),
-		Scope:     string(StateScopeIdentity),
+		Scope:     StateScopeIdentity,
 		Admission: &AdmissionEvidence{
 			Username:        "system:serviceaccount:kube-system:deployer",
 			Operation:       "CREATE",
@@ -94,8 +94,8 @@ func TestRuntimeAlert_CorrelationsAreTopLevel(t *testing.T) {
 		CorrelationAlert: CorrelationAlert{
 			Correlations: []CorrelationEvidence{{
 				Name:      "mount_exec",
-				EventType: string(EventTypeExec),
-				Scope:     string(StateScopeContainer),
+				EventType: EventTypeExec,
+				Scope:     StateScopeContainer,
 				Key:       "4471",
 				Process:   &Process{PID: 4471, Comm: "xmrig", Path: "/mnt/data/xmrig"},
 			}},

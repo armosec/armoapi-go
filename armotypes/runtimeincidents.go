@@ -351,11 +351,11 @@ type CorrelationEvidence struct {
 	// Name is the state variable the entry was stored under.
 	Name string `json:"name" bson:"name"`
 	// EventType is the stream the remembered event came from.
-	EventType string `json:"eventType" bson:"eventType"`
+	EventType EventType `json:"eventType" bson:"eventType"`
 	// Timestamp is the kernel/request time of the remembered event, not the
 	// time it was observed. Ordering comparisons rely on this.
-	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
-	Scope     string    `json:"scope,omitempty" bson:"scope,omitempty"`
+	Timestamp time.Time  `json:"timestamp" bson:"timestamp"`
+	Scope     StateScope `json:"scope,omitempty" bson:"scope,omitempty"`
 	// Key is the subject discriminator, empty for scope-wide markers.
 	Key string `json:"key,omitempty" bson:"key,omitempty"`
 
