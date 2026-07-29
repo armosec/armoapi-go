@@ -315,8 +315,10 @@ type NetworkStreamEvent struct {
 	// omit zero structs, and an always-present "processRef":"0/0" on every
 	// unattributed connection is exactly the per-connection waste this design
 	// exists to avoid. A single text-marshalled field also beats two flat
-	// scalars (pid + startTimeNs) on the wire by 6 bytes per connection,
-	// because it spends one JSON key instead of two.
+	// scalars (pid + startTimeNs) on the wire by 5 bytes per connection,
+	// because it spends one JSON key instead of two. That 5 is pure key
+	// overhead — independent of the pid and start-time values, but it shifts if
+	// either field is renamed.
 	ProcessRef *ProcessRef `json:"processRef,omitempty" bson:"processRef,omitempty"`
 	// endpoint kind (pod, service, raw)
 	Kind EndpointKind `json:"kind,omitempty"`

@@ -126,8 +126,9 @@ says nothing about which. Between them:
   means no source ever has to discard anything.
 - **One unit for one concept.** Two units either side of a serialisation boundary
   is a bug factory.
-- **The cost is noise** — ~6 bytes per connection, ≈2.3 KB base64 at the largest
-  observed message, against a 5 MiB limit.
+- **The cost is noise** — exactly 7 bytes per connection, ≈2.6 KB base64 at the
+  largest observed message, against a 5 MiB limit. Exactly 7 because ns is
+  ticks × 10⁷, which appends precisely 7 decimal digits at every magnitude.
 
 > ⚠️ **Nanoseconds are the unit, not the resolution.** Do not read this as a
 > precise timestamp. The only start-time source with full process coverage is
@@ -225,22 +226,28 @@ read it. That is what the permissive parser above is for.
 
 ## Field shape and naming trade-offs
 
-- **One text-marshalled field beats two flat scalars.** `,"processRef":"12345/91827364"`
-  spends one JSON key instead of two — 6 bytes per connection, ≈2.3 KB base64 on
-  a 283-connection message — *and* it is type-safe and identical to the map key.
+- **One text-marshalled field beats two flat scalars.**
+  `,"processRef":"12345/918273640000000"` (37 bytes) against
+  `,"pid":12345,"startTimeNs":918273640000000` (42 bytes) — one JSON key instead
+  of two saves **5 bytes per connection**, ≈1.9 KB base64 on a 283-connection
+  message. The saving is exactly 5 regardless of the pid and start-time values,
+  since it is purely the difference in key overhead; it does move if either field
+  is renamed. And it is type-safe and identical to the map key.
 - **The field is a pointer** so `omitempty` drops it. `encoding/json` does not
   omit zero structs; an always-present `"processRef":"0/0"` on every unattributed
   connection is the per-connection waste this design exists to avoid.
 - **The field is named `ProcessRef`, not `Process`.** `armotypes.Process` is a
   different, heavily-used type in the same package, and its `StartTime` is a
-  wall-clock `time.Time` where `ProcessRef.StartTimeNs` is boot ticks —
-  `event.Process` would read as `*armotypes.Process` to anyone who had not read
-  this file. Naming the field after its type also matches the adjacent
-  `ProcessTree *ProcessTree`. Costs ~1.1 KB base64 on a worst-case message
-  (~0.1%), the cheap side of the trade.
-- **Keys are spelled out, not abbreviated.** `proc` would save ~1.1 KB base64
-  (0.1%) at the cost of being the only abbreviated key in a file whose tags are
-  all spelled-out camelCase (`ipAddress`, `podNamespace`, `workloadKind`).
+  wall-clock `time.Time` where `ProcessRef.StartTimeNs` is boot-relative
+  nanoseconds — `event.Process` would read as `*armotypes.Process` to anyone who
+  had not read this file. Naming the field after its type also matches the
+  adjacent `ProcessTree *ProcessTree`. Costs 3 bytes per connection over
+  `process`, ≈1.1 KB base64 on a 283-connection message: the cheap side of the
+  trade.
+- **Keys are spelled out, not abbreviated.** `proc` would save 6 bytes per
+  connection over `processRef`, ≈2.3 KB base64, at the cost of being the only
+  abbreviated key in a file whose tags are all spelled-out camelCase
+  (`ipAddress`, `podNamespace`, `workloadKind`).
 - **The separator is `/`, not `CommPID`'s U+241F (`␟`).** `CommPID` needs an
   exotic separator because `Comm` is free-form and may contain `/` or `:`. Every
   `ProcessRef` component is a decimal integer, so no escaping hazard exists; `/`
@@ -264,8 +271,8 @@ values. So `Processes` is keyed by the same composite string in both, but the
 event-level ref is a string in JSON and a **subdocument** in BSON:
 
 ```
-JSON: "processRef":"4242/314159"
-BSON: "processRef":{"pid":NumberLong(4242),"startTimeNs":NumberLong(314159)}
+JSON: "processRef":"4242/3141590000000"
+BSON: "processRef":{"pid":NumberLong(4242),"startTimeNs":NumberLong(3141590000000)}
 ```
 
 Both round-trip (`TestProcessRefBSONRoundTrip`), but a Mongo query needs

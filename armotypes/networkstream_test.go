@@ -22,8 +22,8 @@ func TestProcessRefMarshalText(t *testing.T) {
 		ref  ProcessRef
 		want string
 	}{
-		{name: "typical", ref: ProcessRef{PID: 12345, StartTimeNs: 91827364}, want: "12345/91827364"},
-		{name: "zero pid", ref: ProcessRef{PID: 0, StartTimeNs: 91827364}, want: "0/91827364"},
+		{name: "typical", ref: ProcessRef{PID: 12345, StartTimeNs: 918273640000000}, want: "12345/918273640000000"},
+		{name: "zero pid", ref: ProcessRef{PID: 0, StartTimeNs: 918273640000000}, want: "0/918273640000000"},
 		{name: "unknown start time", ref: ProcessRef{PID: 12345, StartTimeNs: 0}, want: "12345/0"},
 		{name: "zero value", ref: ProcessRef{}, want: "0/0"},
 		{name: "max pid", ref: ProcessRef{PID: math.MaxUint32, StartTimeNs: 1}, want: "4294967295/1"},
@@ -52,8 +52,8 @@ func TestProcessRefMarshalText(t *testing.T) {
 func TestProcessRefRoundTrip(t *testing.T) {
 	t.Parallel()
 	tests := []ProcessRef{
-		{PID: 12345, StartTimeNs: 91827364},
-		{PID: 0, StartTimeNs: 91827364},
+		{PID: 12345, StartTimeNs: 918273640000000},
+		{PID: 0, StartTimeNs: 918273640000000},
 		{PID: 12345, StartTimeNs: 0},
 		{},
 		{PID: math.MaxUint32, StartTimeNs: math.MaxUint64},
@@ -165,7 +165,7 @@ func TestProcessRefUnmarshalTextAcceptsNonCanonical(t *testing.T) {
 // string formatting at the call site.
 func TestProcessRefAsJSONMapKey(t *testing.T) {
 	t.Parallel()
-	ref := ProcessRef{PID: 4242, StartTimeNs: 314159}
+	ref := ProcessRef{PID: 4242, StartTimeNs: 3141590000000}
 	in := NetworkStream{
 		ProcessAttributionVersion: NetworkStreamProcessAttributionV1,
 		Processes: map[ProcessRef]*ProcessTree{
@@ -201,8 +201,8 @@ func TestProcessRefAsJSONMapKey(t *testing.T) {
 		} `json:"entities"`
 	}
 	require.NoError(t, json.Unmarshal(data, &top))
-	assert.Equal(t, []string{"4242/314159"}, sortedKeys(top.Processes))
-	assert.Equal(t, "4242/314159", top.Entities["entity-1"].Outbound["1.2.3.4/443/TCP"].ProcessRef)
+	assert.Equal(t, []string{"4242/3141590000000"}, sortedKeys(top.Processes))
+	assert.Equal(t, "4242/3141590000000", top.Entities["entity-1"].Outbound["1.2.3.4/443/TCP"].ProcessRef)
 
 	var out NetworkStream
 	require.NoError(t, json.Unmarshal(data, &out))
@@ -346,7 +346,7 @@ func TestNetworkStreamPreProcessAttributionPayloadDecodes(t *testing.T) {
 // processRef.pid where JSONB needs the string.
 func TestProcessRefBSONRoundTrip(t *testing.T) {
 	t.Parallel()
-	ref := ProcessRef{PID: 4242, StartTimeNs: 314159}
+	ref := ProcessRef{PID: 4242, StartTimeNs: 3141590000000}
 	in := NetworkStream{
 		ProcessAttributionVersion: NetworkStreamProcessAttributionV1,
 		Processes:                 map[ProcessRef]*ProcessTree{ref: {ProcessTree: Process{PID: 4242, Comm: "curl"}}},
@@ -366,7 +366,7 @@ func TestProcessRefBSONRoundTrip(t *testing.T) {
 	event := raw["entities"].(bson.M)["entity-1"].(bson.M)["outbound"].(bson.M)["1.2.3.4/443/TCP"].(bson.M)
 	// Both components widen to int64: mongo-driver encodes Go unsigned integers
 	// as int64 so the full unsigned range survives.
-	assert.Equal(t, bson.M{"pid": int64(4242), "startTimeNs": int64(314159)}, event["processRef"],
+	assert.Equal(t, bson.M{"pid": int64(4242), "startTimeNs": int64(3141590000000)}, event["processRef"],
 		"bson emits the event-level ref as a subdocument, NOT the text form")
 
 	var out NetworkStream
