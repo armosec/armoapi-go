@@ -140,7 +140,8 @@ func TestCaptureConfigRoundTrip(t *testing.T) {
 	mask := false
 	in := CaptureConfig{
 		ProtocolVersion: CurrentProtocolVersion, Enabled: true,
-		MaxFragmentBytes: 1 << 20, MaxTransactionBytes: 8 << 20, MaxTransactionsPerHour: 5000,
+		MaxFragmentBytes: 1 << 20, MaxTransactionBytes: 8 << 20,
+		MaxTransactionsPerHour: 5000, MaxTransactionsPerSandboxPerHour: 500,
 		MaskKnownCredentialHeaders: &mask, ExtraCredentialHeaders: []string{"x-acme-signature"},
 	}
 	b, err := json.Marshal(in)
@@ -151,7 +152,8 @@ func TestCaptureConfigRoundTrip(t *testing.T) {
 	if err := json.Unmarshal(b, &out); err != nil {
 		t.Fatal(err)
 	}
-	if !out.Enabled || out.MaxTransactionsPerHour != 5000 || out.MaxTransactionBytes != 8<<20 ||
+	if !out.Enabled || out.MaxTransactionsPerHour != 5000 || out.MaxTransactionsPerSandboxPerHour != 500 ||
+		out.MaxTransactionBytes != 8<<20 ||
 		out.MaskKnownCredentialHeaders == nil || *out.MaskKnownCredentialHeaders != false ||
 		len(out.ExtraCredentialHeaders) != 1 {
 		t.Errorf("config did not round-trip: %+v", out)

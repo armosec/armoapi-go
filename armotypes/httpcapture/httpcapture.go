@@ -172,10 +172,19 @@ type CaptureConfig struct {
 	MaxFragmentBytes    int64 `json:"maxFragmentBytes,omitempty"`
 	MaxTransactionBytes int64 `json:"maxTransactionBytes,omitempty"`
 
-	// MaxTransactionsPerHour is the per-agent volume cap (0 ⇒ agent default). When it
-	// is exhausted the agent uploads NOTHING for further transactions this window and
-	// emits a "limit exhausted" signal to the backend.
-	MaxTransactionsPerHour int64 `json:"maxTransactionsPerHour,omitempty"`
+	// Transaction volume caps (0 ⇒ agent default). Both count whole transactions over a
+	// rolling window; when either is exhausted the agent uploads NOTHING for further
+	// transactions and emits a "limit exhausted" signal.
+	//   - MaxTransactionsPerHour: the global cap for the whole agent — every sandbox on
+	//     the node shares it.
+	//   - MaxTransactionsPerSandboxPerHour: a per-sandbox (container / pod / VM) fairness
+	//     cap the agent enforces with a per-sandbox_id counter, so one "bomber" sandbox
+	//     doing millions of requests cannot consume the global budget and starve the
+	//     other sandboxes. Agent-local (a sandbox instance lives on one node, so this
+	//     agent sees all of its traffic); a restart is a new sandbox_id with a fresh
+	//     budget, which is correct for a fairness cap.
+	MaxTransactionsPerHour           int64 `json:"maxTransactionsPerHour,omitempty"`
+	MaxTransactionsPerSandboxPerHour int64 `json:"maxTransactionsPerSandboxPerHour,omitempty"`
 
 	// Credential-header masking (§5.6). MaskKnownCredentialHeaders is a pointer so
 	// absent ⇒ default true (fail-safe: mask). ExtraCredentialHeaders adds names to
