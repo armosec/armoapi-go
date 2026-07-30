@@ -41,6 +41,8 @@ type CdrRule struct {
 	Tags []string `json:"tags,omitempty"`
 	// Message is the alert-message template emitted on a match.
 	Message string `json:"message,omitempty"`
+	// UniqueID is the templated dedup key for a match.
+	UniqueID string `json:"uniqueID,omitempty"`
 	// Origin is managed (default) or custom.
 	Origin CdrRuleOrigin `json:"origin,omitempty"`
 }

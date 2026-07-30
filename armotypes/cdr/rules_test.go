@@ -25,6 +25,7 @@ func TestCdrRuleBundleRoundTrip(t *testing.T) {
 				MitreTechnique: "T1098",
 				Tags:           []string{"iam", "azure"},
 				Message:        "Role assignment created",
+				UniqueID:       "event.subscriptionId + event.caller",
 				Origin:         CdrRuleOriginManaged,
 			},
 		},
