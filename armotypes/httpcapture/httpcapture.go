@@ -65,6 +65,14 @@ const CurrentProtocolVersion = "1.0"
 // Attribute keys carried on each fragment LogRecord (spec §5.2). Defined here so
 // the sensor that writes them and the backend that reads them share one source of
 // truth for the key strings.
+//
+// These are the fragment-specific keys owned by this contract. Each Fragment is
+// emitted as one OTLP LogRecord whose Body is the raw Data bytes; the identity fields
+// below (K8s/Cloud/SandboxID/Server*/ProcessTree/…) are encoded with the shared
+// sandbox-event-schema keys, NOT http.capture.* keys, so capture fragments carry one
+// identity scheme with every other event family. The full LogRecord encoding
+// (resource attrs + record attrs + Body + a worked example) is documented in
+// private-node-agent docs/features/http-capture.md §3.1 "OTEL LogRecord encoding".
 const (
 	AttrTransactionID   = "http.capture.transaction_id"
 	AttrSequenceNumber  = "http.capture.sequence_number"
@@ -124,20 +132,20 @@ type Fragment struct {
 	//
 	// This identity may also be propagated to OTLP resource attributes to avoid
 	// repeating it per fragment; that is a later, easy-to-add optimization.
-	CustomerGUID string                            `json:"customerGuid,omitempty"`
-	SandboxID    string                            `json:"sandboxId,omitempty"`
-	K8s          *armotypes.RuntimeAlertK8sDetails `json:"k8s,omitempty"`   // pod / node / container / workload / cluster
-	Cloud        *armotypes.CloudMetadata          `json:"cloud,omitempty"` // account_id / region / provider / zone
+	CustomerGUID string                            `json:"customerGuid,omitempty"` // OTEL: customer_guid (resource attr)
+	SandboxID    string                            `json:"sandboxId,omitempty"`    // OTEL: sandbox_id / instance_ref
+	K8s          *armotypes.RuntimeAlertK8sDetails `json:"k8s,omitempty"`          // OTEL: wlid / pod_name / namespace / container.id / container_name
+	Cloud        *armotypes.CloudMetadata          `json:"cloud,omitempty"`        // OTEL: cloud.account_id / cloud.region / cloud.provider
 
 	// --- Per-transaction attribution, on the FIRST fragment only (placement A) ---
 	// Carried once — on the request-headers fragment (SequenceNumber 0) — not a
 	// separate record and not repeated per fragment (the process tree can be large).
 	// nil/zero on every other fragment. Reuses armotypes.ProcessTree (RuntimeAlert
 	// tree) — the agent defines no process attribution of its own.
-	ProcessTree      *armotypes.ProcessTree `json:"processTree,omitempty"` // full process lineage (P1 spawned by P2)
-	ServerAddress    string                 `json:"serverAddress,omitempty"`
-	ServerPort       uint16                 `json:"serverPort,omitempty"`
-	SensorInstanceID string                 `json:"sensorInstanceId,omitempty"`
+	ProcessTree      *armotypes.ProcessTree `json:"processTree,omitempty"`      // OTEL: process_lineage (JSON, first fragment)
+	ServerAddress    string                 `json:"serverAddress,omitempty"`    // OTEL: server.address (every fragment)
+	ServerPort       uint16                 `json:"serverPort,omitempty"`       // OTEL: server.port (every fragment)
+	SensorInstanceID string                 `json:"sensorInstanceId,omitempty"` // OTEL: sensor_instance_id (first fragment)
 
 	// Fidelity marks a capture gap on this fragment (§5.1); empty ⇒ complete. On a
 	// per-transaction size-cap truncation the terminal fragment carries
