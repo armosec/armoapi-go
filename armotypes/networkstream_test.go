@@ -11,10 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// TestProcessRefMarshalText pins the exact textual form of a ProcessRef. The
-// format is part of the wire contract (it is the JSON object key of
-// NetworkStream.Processes), so a change here is a breaking change for every
-// consumer that decodes the map.
+// Pins the textual form: it is the JSON object key of NetworkStream.Processes,
+// so changing it breaks every consumer that decodes the map.
 func TestProcessRefMarshalText(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -42,13 +40,8 @@ func TestProcessRefMarshalText(t *testing.T) {
 	}
 }
 
-// TestProcessRefRoundTrip asserts ref -> text -> ref is lossless, including the
-// edge cases that matter for identity: pid 0 and a zero start time must survive
-// rather than being silently dropped, because the pair is what disambiguates a
-// reused pid.
-//
-// Note this is one direction only. text -> ref -> text is NOT injective; see
-// TestProcessRefUnmarshalTextAcceptsNonCanonical.
+// ref -> text -> ref is lossless, including pid 0 and a zero start time. The
+// reverse direction is not injective; see TestProcessRefUnmarshalTextAcceptsNonCanonical.
 func TestProcessRefRoundTrip(t *testing.T) {
 	t.Parallel()
 	tests := []ProcessRef{
@@ -72,12 +65,8 @@ func TestProcessRefRoundTrip(t *testing.T) {
 	}
 }
 
-// TestProcessRefUnmarshalTextIgnoresExtraComponents is the forward-compatibility
-// guarantee. encoding/json aborts the ENTIRE decode when a TextUnmarshaler map
-// key fails (unlike int keys, which only skip the entry), and both stream
-// consumers nack or drop a message whose decode errors. So a future revision
-// that appends a component to the key format must not be able to make older
-// consumers reject whole messages.
+// Forward compatibility: appending a key component must not make older consumers
+// reject whole messages. See TestNetworkStreamMalformedKeyDiscardsWholeMap for why.
 func TestProcessRefUnmarshalTextIgnoresExtraComponents(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -127,9 +116,8 @@ func TestProcessRefUnmarshalTextErrors(t *testing.T) {
 	}
 }
 
-// TestProcessRefUnmarshalTextDoesNotPartiallyMutate asserts a rejected input
-// leaves the receiver untouched for a DIRECT caller. Note this guarantee does
-// not survive encoding/json — see TestNetworkStreamEventMalformedRefInstallsZeroPointer.
+// Rejected input leaves the receiver untouched — for direct callers only; see
+// TestNetworkStreamEventMalformedRefInstallsZeroPointer.
 func TestProcessRefUnmarshalTextDoesNotPartiallyMutate(t *testing.T) {
 	t.Parallel()
 	got := ProcessRef{PID: 7, StartTimeNs: 8}
@@ -137,11 +125,8 @@ func TestProcessRefUnmarshalTextDoesNotPartiallyMutate(t *testing.T) {
 	assert.Equal(t, ProcessRef{PID: 7, StartTimeNs: 8}, got)
 }
 
-// TestProcessRefUnmarshalTextAcceptsNonCanonical documents that leading zeros
-// are accepted, so distinct wire keys for the same process collapse to one map
-// entry (last wins). Tightening this would turn a cosmetically odd producer
-// into a whole-message decode failure, which is the worse trade — see
-// TestProcessRefUnmarshalTextIgnoresExtraComponents.
+// Leading zeros are accepted, so non-canonical keys for one process collapse to
+// a single entry (last wins). Tightening this would fail the whole message.
 func TestProcessRefUnmarshalTextAcceptsNonCanonical(t *testing.T) {
 	t.Parallel()
 	const payload = `{"processes":{
@@ -159,10 +144,8 @@ func TestProcessRefUnmarshalTextAcceptsNonCanonical(t *testing.T) {
 	assert.Equal(t, "third", tree.ProcessTree.Comm, "last key wins")
 }
 
-// TestProcessRefAsJSONMapKey is the load-bearing test for the design: the same
-// ProcessRef value is both the key of NetworkStream.Processes and the value of
-// NetworkStreamEvent.ProcessRef, so a consumer resolves the tree without any
-// string formatting at the call site.
+// The load-bearing test: one ProcessRef value serves as both map key and event
+// reference, so the join needs no string formatting at the call site.
 func TestProcessRefAsJSONMapKey(t *testing.T) {
 	t.Parallel()
 	ref := ProcessRef{PID: 4242, StartTimeNs: 3141590000000}
@@ -189,9 +172,7 @@ func TestProcessRefAsJSONMapKey(t *testing.T) {
 	data, err := json.Marshal(in)
 	require.NoError(t, err)
 
-	// Both sides must render the ref as the same composite string, so the two
-	// are joinable on the wire. Asserted structurally rather than as a
-	// substring, so the test does not depend on key ordering.
+	// Asserted structurally, not as a substring, so key ordering is irrelevant.
 	var top struct {
 		Processes map[string]json.RawMessage `json:"processes"`
 		Entities  map[string]struct {
@@ -215,10 +196,8 @@ func TestProcessRefAsJSONMapKey(t *testing.T) {
 	assert.Equal(t, "curl", tree.ProcessTree.Comm)
 }
 
-// TestProcessTreeForDegradesToNil covers every way attribution can be absent or
-// broken. ProcessTreeFor exists so consumers do not each reimplement these
-// guards — a bare Processes[*event.ProcessRef] panics on a null map value,
-// which is reachable from a malformed payload.
+// Every way attribution can be absent or broken. ProcessTreeFor exists so each
+// consumer need not reimplement these guards.
 func TestProcessTreeForDegradesToNil(t *testing.T) {
 	t.Parallel()
 	ref := ProcessRef{PID: 1, StartTimeNs: 2}
@@ -264,11 +243,9 @@ func TestProcessTreeForNilMapValueFromPayload(t *testing.T) {
 	assert.Nil(t, out.ProcessTreeFor(&NetworkStreamEvent{ProcessRef: &ProcessRef{PID: 1, StartTimeNs: 2}}))
 }
 
-// TestNetworkStreamEventMalformedRefInstallsZeroPointer documents that
-// encoding/json allocates the pointer target before calling UnmarshalText and
-// leaves it installed on failure. A caller that ignores the Unmarshal error
-// therefore sees a NON-nil ref reading as pid 0. Both stream consumers do check
-// the error, so this is a documented sharp edge rather than a live hazard.
+// encoding/json leaves the allocated pointer installed when UnmarshalText fails,
+// so ignoring its error yields a non-nil ref reading as pid 0. Both consumers do
+// check the error, so this is a sharp edge rather than a live hazard.
 func TestNetworkStreamEventMalformedRefInstallsZeroPointer(t *testing.T) {
 	t.Parallel()
 	for _, payload := range []string{`{"processRef":"abc/1"}`, `{"processRef":"1"}`, `{"processRef":123}`} {
@@ -280,10 +257,9 @@ func TestNetworkStreamEventMalformedRefInstallsZeroPointer(t *testing.T) {
 	}
 }
 
-// TestNetworkStreamMalformedKeyDiscardsWholeMap records the cost of a typed map
-// key: unlike an int-keyed map (which skips the bad entry and continues),
-// encoding/json returns immediately, so the whole Processes map is lost and the
-// caller gets an error. This is why UnmarshalText tolerates extra components.
+// The cost of a typed map key: encoding/json returns immediately rather than
+// skipping the bad entry, so one unparseable key discards the whole map. This is
+// why UnmarshalText is permissive.
 func TestNetworkStreamMalformedKeyDiscardsWholeMap(t *testing.T) {
 	t.Parallel()
 	const payload = `{"entities":{"e1":{"containerName":"nginx"}},"processes":{"BAD":{"processTree":{"comm":"x"}},"1/2":{"processTree":{"comm":"good"}}}}`
@@ -294,10 +270,8 @@ func TestNetworkStreamMalformedKeyDiscardsWholeMap(t *testing.T) {
 	assert.Empty(t, out.Processes, "one unparseable key discards every entry, including valid ones")
 }
 
-// TestNetworkStreamProcessAttributionOmitted asserts the addition is invisible
-// on the wire for an un-upgraded sensor. Both consumers decode with plain
-// json.Unmarshal and neither sets DisallowUnknownFields, so absent fields are
-// the entire backward-compatibility story.
+// The addition must be invisible on the wire for an un-upgraded sensor: absent
+// fields are the entire backward-compatibility story.
 func TestNetworkStreamProcessAttributionOmitted(t *testing.T) {
 	t.Parallel()
 	in := NetworkStream{
@@ -322,10 +296,8 @@ func TestNetworkStreamProcessAttributionOmitted(t *testing.T) {
 	assert.NotContains(t, sortedKeys(event), "processRef")
 }
 
-// TestNetworkStreamPreProcessAttributionPayloadDecodes asserts a payload
-// produced by a sensor that predates process attribution still decodes, and
-// that the absent version marker reads as "no attribution available" rather
-// than "attribution ran and found nothing".
+// A pre-attribution payload still decodes, and the absent version marker reads as
+// "sensor cannot attribute" rather than "attributed nothing".
 func TestNetworkStreamPreProcessAttributionPayloadDecodes(t *testing.T) {
 	t.Parallel()
 	const legacy = `{"entities":{"e1":{"kind":"container","containerName":"nginx","outbound":{"1.2.3.4/443/TCP":{"ipAddress":"1.2.3.4","port":443,"protocol":"TCP"}}}}}`
@@ -338,12 +310,9 @@ func TestNetworkStreamPreProcessAttributionPayloadDecodes(t *testing.T) {
 	assert.Nil(t, out.Entities["e1"].Outbound["1.2.3.4/443/TCP"].ProcessRef)
 }
 
-// TestProcessRefBSONRoundTrip covers the bson tags, and pins the fact that bson
-// and JSON do NOT agree on the per-connection representation: mongo-driver
-// honours encoding.TextMarshaler for map KEYS only, so Processes is keyed by the
-// same composite string in both, while the event-level ref is a string in JSON
-// and a subdocument in BSON. It round-trips either way, but a Mongo query needs
-// processRef.pid where JSONB needs the string.
+// Covers the bson tags, and pins that BSON and JSON disagree on the event-level
+// ref: mongo-driver honours TextMarshaler for map keys only, so a Mongo query
+// needs processRef.pid where JSONB needs the string.
 func TestProcessRefBSONRoundTrip(t *testing.T) {
 	t.Parallel()
 	ref := ProcessRef{PID: 4242, StartTimeNs: 3141590000000}
@@ -364,8 +333,7 @@ func TestProcessRefBSONRoundTrip(t *testing.T) {
 	assert.Contains(t, raw["processes"], ref.String(), "map key is the composite string in bson too")
 
 	event := raw["entities"].(bson.M)["entity-1"].(bson.M)["outbound"].(bson.M)["1.2.3.4/443/TCP"].(bson.M)
-	// Both components widen to int64: mongo-driver encodes Go unsigned integers
-	// as int64 so the full unsigned range survives.
+	// Both widen to int64 — mongo-driver encodes Go unsigned ints that way.
 	assert.Equal(t, bson.M{"pid": int64(4242), "startTimeNs": int64(3141590000000)}, event["processRef"],
 		"bson emits the event-level ref as a subdocument, NOT the text form")
 
@@ -385,8 +353,7 @@ func sortedKeys[V any](m map[string]V) []string {
 	return keys
 }
 
-// mustNestedEvent extracts the single outbound event object from a marshalled
-// NetworkStream.
+// mustNestedEvent extracts the single outbound event from a marshalled NetworkStream.
 func mustNestedEvent(t *testing.T, data []byte) []byte {
 	t.Helper()
 	var top struct {
