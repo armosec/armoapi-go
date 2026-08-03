@@ -63,7 +63,7 @@ type DBCommand struct {
 // Oauth2 verification process
 type Oauth2Customer struct {
 	CustomerName string `json:"customerName"`
-	CustomerGUID string `json:"customerGUID"`
+	CustomerGUID string `json:"customerGUID_renamed"` // S7 E2E: scratch json-tag rename (silent-drop class)
 }
 
 type LoginObject struct {
