@@ -3,7 +3,9 @@ package armotypes
 import (
 	"encoding/json"
 	"math"
+	"reflect"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -342,6 +344,249 @@ func TestProcessRefBSONRoundTrip(t *testing.T) {
 	require.NotNil(t, out.Processes[ref])
 	assert.Equal(t, "curl", out.Processes[ref].ProcessTree.Comm)
 	assert.Equal(t, &ref, out.Entities["entity-1"].Outbound["1.2.3.4/443/TCP"].ProcessRef)
+}
+
+// Host and ECS workload identity. Design and the bridge to the Kubernetes-shaped
+// fields: docs/features/network-stream-workload-identity.md
+
+// `json:",inline"` is a Kubernetes convention that encoding/json does not
+// implement — what actually flattens these structs is anonymous-field promotion.
+// Pinned per platform because a nested identity object would be a silent break:
+// consumers read these keys at the entity's top level.
+//
+// The fixtures are the agreed host/ECS mapping, so they also record that the
+// typed fields ship *alongside* the bridged Kubernetes-shaped ones.
+func TestNetworkStreamEntityIdentityIsFlattened(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name   string
+		entity NetworkStreamEntity
+		want   []string
+	}{
+		{
+			name: "kubernetes container is unchanged by this addition",
+			entity: NetworkStreamEntity{
+				Kind: NetworkStreamEntityKindContainer,
+				NetworkStreamEntityContainer: NetworkStreamEntityContainer{
+					ContainerName: "nginx", ContainerID: "cid", PodNamespace: "default",
+					PodName: "nginx-abc", WorkloadName: "nginx", WorkloadKind: "Deployment",
+				},
+			},
+			want: []string{"containerID", "containerName", "kind", "podName", "podNamespace", "workloadKind", "workloadName"},
+		},
+		{
+			name: "host keeps kind host and carries the host struct plus the bridge",
+			entity: NetworkStreamEntity{
+				Kind:                    NetworkStreamEntityKindHost,
+				NetworkStreamEntityHost: NetworkStreamEntityHost{HostID: "machine-id-1", HostName: "ip-10-0-0-1"},
+				NetworkStreamEntityContainer: NetworkStreamEntityContainer{
+					PodNamespace: "host", WorkloadName: "machine-id-1", WorkloadKind: "Host",
+				},
+			},
+			want: []string{"hostID", "hostName", "kind", "podNamespace", "workloadKind", "workloadName"},
+		},
+		{
+			name: "ecs service keeps kind container so the traffic view still writes it",
+			entity: NetworkStreamEntity{
+				Kind: NetworkStreamEntityKindContainer,
+				NetworkStreamEntityECS: NetworkStreamEntityECS{
+					ECSClusterName: "prod", ClusterARN: "arn:aws:ecs:us-east-1:1:cluster/prod",
+					ServiceName: "checkout", TaskFamily: "checkout-task", TaskRevision: "7",
+					TaskARN: "arn:aws:ecs:us-east-1:1:task/prod/abc", ECSTaskID: "abc", LaunchType: "EC2",
+				},
+				NetworkStreamEntityContainer: NetworkStreamEntityContainer{
+					ContainerName: "app", ContainerID: "cid",
+					PodNamespace: "checkout", WorkloadName: "checkout-checkout-task-7", WorkloadKind: "ECSService",
+				},
+			},
+			want: []string{
+				"clusterArn", "containerID", "containerName", "ecsClusterName", "ecsTaskID", "kind", "launchType",
+				"podNamespace", "serviceName", "taskArn", "taskFamily", "taskRevision", "workloadKind", "workloadName",
+			},
+		},
+		{
+			name: "standalone ecs task omits serviceName and bridges as ECSTask",
+			entity: NetworkStreamEntity{
+				Kind: NetworkStreamEntityKindContainer,
+				NetworkStreamEntityECS: NetworkStreamEntityECS{
+					ECSClusterName: "prod", TaskFamily: "batch", TaskRevision: "3", LaunchType: "FARGATE",
+				},
+				NetworkStreamEntityContainer: NetworkStreamEntityContainer{
+					PodNamespace: "prod", WorkloadName: "batch-3", WorkloadKind: "ECSTask",
+				},
+			},
+			want: []string{"ecsClusterName", "kind", "launchType", "podNamespace", "taskFamily", "taskRevision", "workloadKind", "workloadName"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			data, err := json.Marshal(tt.entity)
+			require.NoError(t, err)
+
+			var got map[string]json.RawMessage
+			require.NoError(t, json.Unmarshal(data, &got))
+			assert.Equal(t, tt.want, sortedKeys(got), "identity must be flat, and unset identity must cost nothing")
+
+			var out NetworkStreamEntity
+			require.NoError(t, json.Unmarshal(data, &out))
+			assert.Equal(t, tt.entity, out)
+		})
+	}
+}
+
+// encoding/json drops **both** fields when two promoted fields at the same depth
+// share a JSON key — silently, with no error. Reflecting over every field of the
+// three inlined structs is what makes a future colliding field fail here instead
+// of erasing identity in production.
+func TestNetworkStreamEntityIdentityKeysAreUnique(t *testing.T) {
+	t.Parallel()
+	var (
+		container NetworkStreamEntityContainer
+		ecs       NetworkStreamEntityECS
+		host      NetworkStreamEntityHost
+	)
+	// Seeded with NetworkStreamEntity's own keys: a promoted field colliding with
+	// one of those is *shadowed* by the outer field rather than dropped, which the
+	// key-set assertion below would report only as an opaque diff.
+	want := map[string]string{"kind": "", "inbound": "", "outbound": ""}
+	fillStringFields(t, &container, want)
+	fillStringFields(t, &ecs, want)
+	fillStringFields(t, &host, want)
+	for _, outer := range []string{"kind", "inbound", "outbound"} {
+		delete(want, outer)
+	}
+
+	data, err := json.Marshal(NetworkStreamEntity{
+		Kind:                         NetworkStreamEntityKindContainer,
+		NetworkStreamEntityContainer: container,
+		NetworkStreamEntityECS:       ecs,
+		NetworkStreamEntityHost:      host,
+	})
+	require.NoError(t, err)
+
+	var got map[string]string
+	require.NoError(t, json.Unmarshal(data, &got))
+	delete(got, "kind")
+	assert.Equal(t, want, got, "every inlined identity field must reach the wire under its own key")
+}
+
+// A payload from a sensor that predates host/ECS identity decodes unchanged, and
+// the absent structs read as zero rather than failing the message.
+func TestNetworkStreamPreIdentityPayloadDecodes(t *testing.T) {
+	t.Parallel()
+	const legacy = `{"entities":{"e1":{"kind":"host","workloadKind":"Host","outbound":{"1.2.3.4/443/TCP":{"ipAddress":"1.2.3.4","port":443,"protocol":"TCP"}}}}}`
+
+	var out NetworkStream
+	require.NoError(t, json.Unmarshal([]byte(legacy), &out))
+
+	entity := out.Entities["e1"]
+	assert.Equal(t, NetworkStreamEntityKindHost, entity.Kind)
+	assert.Equal(t, "Host", entity.WorkloadKind, "the bridge field still decodes")
+	assert.Equal(t, NetworkStreamEntityECS{}, entity.NetworkStreamEntityECS)
+	assert.Equal(t, NetworkStreamEntityHost{}, entity.NetworkStreamEntityHost)
+}
+
+// One message per node, but a node can be a host reporting itself alongside the
+// ECS containers it runs. Pins that identity stays per entity and that process
+// attribution still resolves across the addition.
+func TestNetworkStreamMixedPlatformEntitiesRoundTrip(t *testing.T) {
+	t.Parallel()
+	ref := ProcessRef{PID: 99, StartTimeNs: 10000000}
+	in := NetworkStream{
+		ProcessAttributionVersion: NetworkStreamProcessAttributionV1,
+		Processes:                 map[ProcessRef]*ProcessTree{ref: {ProcessTree: Process{PID: 99, Comm: "curl"}}},
+		Entities: map[string]NetworkStreamEntity{
+			"ip-10-0-0-1": {
+				Kind:                    NetworkStreamEntityKindHost,
+				NetworkStreamEntityHost: NetworkStreamEntityHost{HostID: "machine-id-1", HostName: "ip-10-0-0-1"},
+				Outbound: map[string]NetworkStreamEvent{
+					"1.2.3.4/443/TCP": {IPAddress: "1.2.3.4", Port: 443, Protocol: NetworkStreamEventProtocolTCP, ProcessRef: &ref},
+				},
+			},
+			"container-abc": {
+				Kind:                   NetworkStreamEntityKindContainer,
+				NetworkStreamEntityECS: NetworkStreamEntityECS{ECSClusterName: "prod", ServiceName: "checkout", LaunchType: "EC2"},
+			},
+		},
+	}
+
+	data, err := json.Marshal(in)
+	require.NoError(t, err)
+	var out NetworkStream
+	require.NoError(t, json.Unmarshal(data, &out))
+	assert.Equal(t, in, out)
+
+	host := out.Entities["ip-10-0-0-1"]
+	assert.Equal(t, "machine-id-1", host.HostID)
+	assert.Empty(t, host.ECSClusterName, "identity does not bleed between entities")
+	assert.Empty(t, out.Entities["container-abc"].HostID)
+
+	event := host.Outbound["1.2.3.4/443/TCP"]
+	require.NotNil(t, out.ProcessTreeFor(&event), "attribution still resolves alongside identity")
+}
+
+// The new structs carry bson:",inline" so BSON agrees with JSON on their keys.
+// The pre-existing container embed has no bson tags, so it lands as a nested,
+// default-lowercased subdocument instead. Both halves are pinned so neither
+// changes by accident. No BSON path consumes the network stream today — see the
+// bson section of docs/features/network-stream-process-attribution.md.
+func TestNetworkStreamEntityIdentityBSONRoundTrip(t *testing.T) {
+	t.Parallel()
+	in := NetworkStreamEntity{
+		Kind: NetworkStreamEntityKindContainer,
+		NetworkStreamEntityECS: NetworkStreamEntityECS{
+			ECSClusterName: "prod", ServiceName: "checkout", TaskRevision: "7", LaunchType: "EC2",
+		},
+		NetworkStreamEntityContainer: NetworkStreamEntityContainer{
+			WorkloadName: "checkout-checkout-task-7", WorkloadKind: "ECSService",
+		},
+	}
+
+	data, err := bson.Marshal(in)
+	require.NoError(t, err)
+
+	var raw bson.M
+	require.NoError(t, bson.Unmarshal(data, &raw))
+	assert.Equal(t, "prod", raw["ecsClusterName"], "inlined, and under the same key as json")
+	assert.Equal(t, "EC2", raw["launchType"])
+	assert.NotContains(t, raw, "networkstreamentityecs", "bson:\",inline\" must keep the ecs struct flat")
+	assert.NotContains(t, raw, "hostID", "an empty identity struct contributes no keys in bson either")
+
+	nested, ok := raw["networkstreamentitycontainer"].(bson.M)
+	require.True(t, ok, "the container embed predates this change and has no bson tags, so it nests")
+	assert.Equal(t, "ECSService", nested["workloadkind"], "and its keys are default-lowercased, unlike json")
+
+	var out NetworkStreamEntity
+	require.NoError(t, bson.Unmarshal(data, &out))
+	assert.Equal(t, in, out)
+}
+
+// fillStringFields sets every string field of the struct behind ptr to a unique
+// marker and records it under the field's JSON key, failing if that key was
+// already claimed — which is the collision encoding/json would swallow.
+func fillStringFields(t *testing.T, ptr any, keys map[string]string) {
+	t.Helper()
+	value := reflect.ValueOf(ptr).Elem()
+	typ := value.Type()
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		key, _, _ := strings.Cut(field.Tag.Get("json"), ",")
+		require.NotEmpty(t, key, "%s.%s declares no json name", typ.Name(), field.Name)
+		if key == "-" {
+			continue // deliberately off the wire, so it cannot collide
+		}
+		require.Equal(t, reflect.String, field.Type.Kind(),
+			"%s.%s is not a string — extend this helper so the field stays covered", typ.Name(), field.Name)
+		_, duplicate := keys[key]
+		require.False(t, duplicate,
+			"json key %q is already claimed on NetworkStreamEntity; encoding/json silently drops both "+
+				"fields when two promoted ones collide, or lets an outer field shadow a promoted one", key)
+
+		marker := typ.Name() + "." + field.Name
+		value.Field(i).SetString(marker)
+		keys[key] = marker
+	}
 }
 
 func sortedKeys[V any](m map[string]V) []string {
