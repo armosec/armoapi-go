@@ -143,6 +143,11 @@ func TestCaptureConfigRoundTrip(t *testing.T) {
 		MaxFragmentBytes: 1 << 20, MaxTransactionBytes: 8 << 20,
 		MaxTransactionsPerHour: 5000, MaxTransactionsPerSandboxPerHour: 500,
 		MaskKnownCredentialHeaders: &mask, ExtraCredentialHeaders: []string{"x-acme-signature"},
+		DefaultLevel: CaptureLevelHeaders,
+		Rules: []CaptureRule{
+			{Protocol: CaptureProtocolHTTPS, Host: "api.openai.com", PathContains: "/v1/chat/completions", Level: CaptureLevelFull},
+			{Level: CaptureLevelNone},
+		},
 	}
 	b, err := json.Marshal(in)
 	if err != nil {
@@ -157,5 +162,11 @@ func TestCaptureConfigRoundTrip(t *testing.T) {
 		out.MaskKnownCredentialHeaders == nil || *out.MaskKnownCredentialHeaders != false ||
 		len(out.ExtraCredentialHeaders) != 1 {
 		t.Errorf("config did not round-trip: %+v", out)
+	}
+	if out.DefaultLevel != CaptureLevelHeaders || len(out.Rules) != 2 ||
+		out.Rules[0].Protocol != CaptureProtocolHTTPS || out.Rules[0].Host != "api.openai.com" ||
+		out.Rules[0].PathContains != "/v1/chat/completions" || out.Rules[0].Level != CaptureLevelFull ||
+		out.Rules[1].Level != CaptureLevelNone {
+		t.Errorf("capture policy did not round-trip: %+v", out)
 	}
 }
