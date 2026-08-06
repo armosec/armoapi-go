@@ -191,6 +191,31 @@ type CaptureConfig struct {
 	// the masked set. Masking is a one-way (irreversible) fingerprint.
 	MaskKnownCredentialHeaders *bool    `json:"maskKnownCredentialHeaders,omitempty"`
 	ExtraCredentialHeaders     []string `json:"extraCredentialHeaders,omitempty"`
+
+	// Capture policy — migrated here from the node-agent's uploadpolicy so config-service,
+	// the dashboard, and the agent share one schema. DefaultLevel is the capture level applied
+	// when no rule matches ("none"|"headers"|"full"); absent ⇒ "none" (fail-closed). Rules is
+	// the ordered, FIRST-MATCH-WINS upload policy.
+	DefaultLevel string        `json:"defaultLevel,omitempty"`
+	Rules        []CaptureRule `json:"rules,omitempty"`
+}
+
+// CaptureRule is one first-match-wins upload-policy rule: it matches a transaction by
+// host/path (every set field is AND-ed; an empty field matches anything) and applies Level.
+// Migrated from the node-agent's uploadpolicy.Rule so config-service, the dashboard, and the
+// agent share one schema; the agent maps Level (the wire string) to its internal level on parse.
+type CaptureRule struct {
+	// Protocol scopes the rule to "http" | "https" | "" (any).
+	Protocol string `json:"protocol,omitempty"`
+	// Host matches an exact host or a dot-anchored subdomain of it; "" = any.
+	Host string `json:"host,omitempty"`
+	// HostPrefix / HostSuffix are required leading / trailing substrings of the host; "" = any.
+	HostPrefix string `json:"hostPrefix,omitempty"`
+	HostSuffix string `json:"hostSuffix,omitempty"`
+	// PathContains is a case-sensitive substring of the request path; "" = any.
+	PathContains string `json:"pathContains,omitempty"`
+	// Level is the wire capture level: "none" | "headers" | "full".
+	Level string `json:"level"`
 }
 
 // NewTransactionID composes a globally-unique transaction id from readily-available
