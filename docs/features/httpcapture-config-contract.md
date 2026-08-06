@@ -2,8 +2,7 @@
 type: feature
 status: done
 owner: jonathang
-scope: service
-service: armoapi-go
+scope: repo
 ---
 
 # HTTP-capture Config Contract (`armotypes/httpcapture`)

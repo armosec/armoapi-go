@@ -160,17 +160,31 @@ type Fragment struct {
 // and fails closed (captures nothing) with no config. The per-target upload-policy
 // rules (host/path → full|headers|none) are the agent's uploadpolicy types today and
 // migrate into this package next.
+// Capture levels — the wire values for CaptureRule.Level and CaptureConfig.DefaultLevel.
+// Exported so consumers pin them instead of duplicating the string literals.
+const (
+	CaptureLevelNone    = "none"    // drop the transaction entirely
+	CaptureLevelHeaders = "headers" // headers only, body dropped
+	CaptureLevelFull    = "full"    // headers + request/response body
+)
+
+// Capture-rule protocols — the wire values for CaptureRule.Protocol ("" = any).
+const (
+	CaptureProtocolHTTP  = "http"
+	CaptureProtocolHTTPS = "https"
+)
+
 type CaptureConfig struct {
-	ProtocolVersion string `json:"protocolVersion"`
+	ProtocolVersion string `json:"protocolVersion" bson:"protocolVersion"`
 	// Enabled is the master switch; false ⇒ the sensor captures nothing.
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" bson:"enabled"`
 
 	// Size caps in bytes (0 ⇒ use the agent default). MaxFragmentBytes bounds one
 	// fragment; MaxTransactionBytes bounds a whole transaction — on hit the body is
 	// truncated (headers are still sent) and the terminal fragment is marked
 	// EndOfStream + FidelityTruncated.
-	MaxFragmentBytes    int64 `json:"maxFragmentBytes,omitempty"`
-	MaxTransactionBytes int64 `json:"maxTransactionBytes,omitempty"`
+	MaxFragmentBytes    int64 `json:"maxFragmentBytes,omitempty" bson:"maxFragmentBytes,omitempty"`
+	MaxTransactionBytes int64 `json:"maxTransactionBytes,omitempty" bson:"maxTransactionBytes,omitempty"`
 
 	// Transaction volume caps (0 ⇒ agent default). Both count whole transactions over a
 	// rolling window; when either is exhausted the agent uploads NOTHING for further
@@ -183,39 +197,41 @@ type CaptureConfig struct {
 	//     other sandboxes. Agent-local (a sandbox instance lives on one node, so this
 	//     agent sees all of its traffic); a restart is a new sandbox_id with a fresh
 	//     budget, which is correct for a fairness cap.
-	MaxTransactionsPerHour           int64 `json:"maxTransactionsPerHour,omitempty"`
-	MaxTransactionsPerSandboxPerHour int64 `json:"maxTransactionsPerSandboxPerHour,omitempty"`
+	MaxTransactionsPerHour           int64 `json:"maxTransactionsPerHour,omitempty" bson:"maxTransactionsPerHour,omitempty"`
+	MaxTransactionsPerSandboxPerHour int64 `json:"maxTransactionsPerSandboxPerHour,omitempty" bson:"maxTransactionsPerSandboxPerHour,omitempty"`
 
 	// Credential-header masking (§5.6). MaskKnownCredentialHeaders is a pointer so
 	// absent ⇒ default true (fail-safe: mask). ExtraCredentialHeaders adds names to
 	// the masked set. Masking is a one-way (irreversible) fingerprint.
-	MaskKnownCredentialHeaders *bool    `json:"maskKnownCredentialHeaders,omitempty"`
-	ExtraCredentialHeaders     []string `json:"extraCredentialHeaders,omitempty"`
+	MaskKnownCredentialHeaders *bool    `json:"maskKnownCredentialHeaders,omitempty" bson:"maskKnownCredentialHeaders,omitempty"`
+	ExtraCredentialHeaders     []string `json:"extraCredentialHeaders,omitempty" bson:"extraCredentialHeaders,omitempty"`
 
 	// Capture policy — migrated here from the node-agent's uploadpolicy so config-service,
 	// the dashboard, and the agent share one schema. DefaultLevel is the capture level applied
-	// when no rule matches ("none"|"headers"|"full"); absent ⇒ "none" (fail-closed). Rules is
-	// the ordered, FIRST-MATCH-WINS upload policy.
-	DefaultLevel string        `json:"defaultLevel,omitempty"`
-	Rules        []CaptureRule `json:"rules,omitempty"`
+	// when no rule matches (CaptureLevel*); absent ⇒ "none" (fail-closed). Rules is the
+	// ordered, FIRST-MATCH-WINS upload policy. bson tags match json so config-service can store
+	// the embedded config in MongoDB with the same field names it serves over REST.
+	DefaultLevel string        `json:"defaultLevel,omitempty" bson:"defaultLevel,omitempty"`
+	Rules        []CaptureRule `json:"rules,omitempty" bson:"rules,omitempty"`
 }
 
 // CaptureRule is one first-match-wins upload-policy rule: it matches a transaction by
-// host/path (every set field is AND-ed; an empty field matches anything) and applies Level.
-// Migrated from the node-agent's uploadpolicy.Rule so config-service, the dashboard, and the
-// agent share one schema; the agent maps Level (the wire string) to its internal level on parse.
+// protocol / host / path (every set field is AND-ed; an empty field matches anything) and
+// applies Level. Migrated from the node-agent's uploadpolicy.Rule so config-service, the
+// dashboard, and the agent share one schema; the agent maps Level (the wire string) to its
+// internal level on parse.
 type CaptureRule struct {
-	// Protocol scopes the rule to "http" | "https" | "" (any).
-	Protocol string `json:"protocol,omitempty"`
+	// Protocol scopes the rule to CaptureProtocolHTTP | CaptureProtocolHTTPS | "" (any).
+	Protocol string `json:"protocol,omitempty" bson:"protocol,omitempty"`
 	// Host matches an exact host or a dot-anchored subdomain of it; "" = any.
-	Host string `json:"host,omitempty"`
+	Host string `json:"host,omitempty" bson:"host,omitempty"`
 	// HostPrefix / HostSuffix are required leading / trailing substrings of the host; "" = any.
-	HostPrefix string `json:"hostPrefix,omitempty"`
-	HostSuffix string `json:"hostSuffix,omitempty"`
+	HostPrefix string `json:"hostPrefix,omitempty" bson:"hostPrefix,omitempty"`
+	HostSuffix string `json:"hostSuffix,omitempty" bson:"hostSuffix,omitempty"`
 	// PathContains is a case-sensitive substring of the request path; "" = any.
-	PathContains string `json:"pathContains,omitempty"`
-	// Level is the wire capture level: "none" | "headers" | "full".
-	Level string `json:"level"`
+	PathContains string `json:"pathContains,omitempty" bson:"pathContains,omitempty"`
+	// Level is the wire capture level: CaptureLevelNone | CaptureLevelHeaders | CaptureLevelFull.
+	Level string `json:"level" bson:"level"`
 }
 
 // NewTransactionID composes a globally-unique transaction id from readily-available
