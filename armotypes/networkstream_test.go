@@ -530,7 +530,8 @@ func TestNetworkStreamMixedPlatformEntitiesRoundTrip(t *testing.T) {
 // The pre-existing container embed has no bson tags, so it lands as a nested,
 // default-lowercased subdocument instead. Both halves are pinned so neither
 // changes by accident. No BSON path consumes the network stream today — see the
-// bson section of docs/features/network-stream-process-attribution.md.
+// bson section of docs/features/network-stream-workload-identity.md, which carries
+// the four-repo survey forward from the process-attribution doc.
 func TestNetworkStreamEntityIdentityBSONRoundTrip(t *testing.T) {
 	t.Parallel()
 	in := NetworkStreamEntity{

@@ -224,8 +224,9 @@ type NetworkStreamEntityECS struct {
 	// LaunchType is an unvalidated passthrough of what ECS reports; "EC2" and
 	// "FARGATE" are the values observed, and ECS Anywhere would add "EXTERNAL".
 	// Compare case-sensitively against a known value rather than assuming the set
-	// is closed — RuntimeAlert.GetAlertSourcePlatform treats anything that is not
-	// exactly "FARGATE" as EC2.
+	// is closed — RuntimeAlert.GetAlertSourcePlatform has no third branch: on an
+	// ECS-shaped alert, anything not exactly "FARGATE" (including "EXTERNAL", or a
+	// lowercased "fargate") returns AlertSourcePlatformECSAgent, its ECS-on-EC2 branch.
 	//
 	// It is also what keeps Fargate a value rather than a second schema: a Fargate
 	// sensor that later learns to stream needs no change here.

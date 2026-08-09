@@ -140,7 +140,10 @@ being written** to `network_traffic_events` with ECS workload names once agents
 stream. Whether they are then *visible* is a separate question — the read path
 filters on an exact three-way match of `workload_name` + `workload_kind` +
 `workload_namespace` and rejects empty values, so a caller has to query with
-`workload_kind = "ECSService"` and the ECS service name as the namespace. Host
+`workload_kind = "ECSService"` and the ECS service name as the namespace — or, for
+a standalone task, `workload_kind = "ECSTask"` with the ECS **cluster** name as the
+namespace, per the bridge table above. A wrong namespace returns zero rows rather
+than an error, so missing the standalone-task shape looks like "no ECS traffic". Host
 entities are not written at all — host streams feed reputation only, unless that
 one-line kind check is widened. (DNS-protocol events are dropped for every
 platform, kind notwithstanding.)
@@ -148,7 +151,8 @@ platform, kind notwithstanding.)
 ## Fargate needs no schema change
 
 ECS-on-EC2 and ECS-on-Fargate share one struct and differ only by `launchType`
-(`"EC2"` | `"FARGATE"`, as the ECS task metadata endpoint reports it), matching how
+(here `"EC2"` and `"FARGATE"` — examples, not a closed set: the field is an
+unvalidated passthrough and ECS Anywhere reports `"EXTERNAL"`), matching how
 the alert model already distinguishes them. A Fargate sensor that later learns to
 emit the stream needs **no schema negotiation** — only sensor-side capture work.
 Nothing in `NetworkStreamEntityECS` is EC2-specific.
