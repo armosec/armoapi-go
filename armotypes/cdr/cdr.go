@@ -95,4 +95,6 @@ type CdrAlertBatch struct {
 	Provider CloudProvider `json:"provider,omitempty"`
 	// RuleFailures is the list of rule failures
 	RuleFailures []CdrAlert `json:"ruleFailures,omitempty"`
+	// IsHeartbeat marks a periodic liveness message (no RuleFailures); absent/false = a normal alert batch. See docs/features/cdr-heartbeat-contract.md.
+	IsHeartbeat bool `json:"isHeartbeat,omitempty"`
 }
