@@ -95,11 +95,6 @@ type CdrAlertBatch struct {
 	Provider CloudProvider `json:"provider,omitempty"`
 	// RuleFailures is the list of rule failures
 	RuleFailures []CdrAlert `json:"ruleFailures,omitempty"`
-	// IsHeartbeat marks a periodic liveness message rather than a detection batch.
-	// When true the batch carries no RuleFailures; the ingester refreshes the CADR
-	// feature's connected / last-keep-alive state and skips the alert pipeline.
-	// Provider-neutral: Azure/GCP collectors emit these (startup = connect,
-	// periodic = keep-alive), while AWS keeps its StackReady + real-alert liveness.
-	// Absent/false = a normal alert batch (back-compatible).
+	// IsHeartbeat marks a periodic liveness message (no RuleFailures); absent/false = a normal alert batch. See docs/features/cdr-heartbeat-contract.md.
 	IsHeartbeat bool `json:"isHeartbeat,omitempty"`
 }
