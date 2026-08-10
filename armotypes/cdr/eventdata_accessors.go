@@ -38,12 +38,14 @@ func (e EventData) SourceIP() string {
 }
 
 // Region returns the cloud region of whichever provider event is set, or "".
-// The Azure Activity Log envelope carries no top-level region; GCP uses the
-// first of the resource's current locations.
+// Azure uses the Activity Log's `location` (often "global" for control-plane
+// operations); GCP uses the first of the resource's current locations.
 func (e EventData) Region() string {
 	switch {
 	case e.AWSCloudTrail != nil:
 		return e.AWSCloudTrail.AWSRegion
+	case e.AzureActivityLog != nil:
+		return e.AzureActivityLog.Location
 	case e.GcpAuditLog != nil:
 		if e.GcpAuditLog.ProtoPayload != nil && e.GcpAuditLog.ProtoPayload.ResourceLocation != nil {
 			if locs := e.GcpAuditLog.ProtoPayload.ResourceLocation.CurrentLocations; len(locs) > 0 {

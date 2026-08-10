@@ -52,7 +52,8 @@ func TestEventDataRegion(t *testing.T) {
 		want string
 	}{
 		{"aws", EventData{AWSCloudTrail: &CloudTrailEvent{AWSRegion: "us-east-1"}}, "us-east-1"},
-		{"azure has no top-level region", EventData{AzureActivityLog: &AzureActivityLogEvent{}}, ""},
+		{"azure location", EventData{AzureActivityLog: &AzureActivityLogEvent{Location: "global"}}, "global"},
+		{"azure empty location", EventData{AzureActivityLog: &AzureActivityLogEvent{}}, ""},
 		{"gcp first current location", EventData{GcpAuditLog: &GcpAuditLogEvent{ProtoPayload: &GcpAuditLogPayload{ResourceLocation: &GcpResourceLocation{CurrentLocations: []string{"us-central1", "us-east1"}}}}}, "us-central1"},
 		{"gcp nil payload", EventData{GcpAuditLog: &GcpAuditLogEvent{}}, ""},
 		{"none", EventData{}, ""},
