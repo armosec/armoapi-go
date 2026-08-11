@@ -41,6 +41,10 @@ type AzureActivityLogEvent struct {
 	// Caller is the identity that performed the operation (UPN or object ID).
 	Caller string `json:"caller,omitempty"`
 	Level  string `json:"level,omitempty"`
+	// Location is the Azure region the operation acted in — the analog of AWS
+	// awsRegion. Often "global" for control-plane operations (subscription /
+	// resource-group scope), a region (e.g. "eastus") for regional resources.
+	Location string `json:"location,omitempty"`
 	// Channels is the Activity Log channel (e.g. "Operation").
 	Channels string `json:"channels,omitempty"`
 	// SubscriptionID / TenantID / ResourceGroupName are the account identifiers
