@@ -15,6 +15,9 @@ network stream. This library change defines the wire contract only; populating i
 lives in node-agent and consuming it in event-ingester-service /
 postgres-connector.
 
+For "which workload opened this connection?" on hosts and ECS tasks, see the
+sibling doc [network-stream-workload-identity.md](network-stream-workload-identity.md).
+
 ## The flow this sits on
 
 node-agent builds `armotypes.GenericCRD[armotypes.NetworkStream]` and POSTs it.

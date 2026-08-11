@@ -20,7 +20,9 @@ type NetworkStreamEntityKind string
 const (
 	NetworkStreamEntityKindContainer NetworkStreamEntityKind = "container" // container
 	NetworkStreamEntityKindHost      NetworkStreamEntityKind = "host"      // host
-	// more types can be added here
+	// more types can be added here, but not one per platform: ECS entities are
+	// container-kind and carry NetworkStreamEntityECS instead. See
+	// docs/features/network-stream-workload-identity.md before adding a kind.
 )
 
 type EndpointKind string
@@ -144,13 +146,24 @@ type NetworkStreamEntity struct {
 	Kind NetworkStreamEntityKind `json:"kind,omitempty"`
 	// entity details
 	NetworkStreamEntityContainer `json:",inline"`
+	// Platform identity for hosts and ECS tasks, populated *alongside* the
+	// Kubernetes-shaped fields above, never instead of them. Typed fields win
+	// where present; the fields above are the compatibility bridge that keeps
+	// today's consumers working unchanged. Both are all-omitempty, so a
+	// Kubernetes entity serialises exactly as it does today.
+	NetworkStreamEntityECS  `json:",inline" bson:",inline"`
+	NetworkStreamEntityHost `json:",inline" bson:",inline"`
 	// inbound network events
 	Inbound map[string]NetworkStreamEvent `json:"inbound,omitempty"`
 	// outbound network events
 	Outbound map[string]NetworkStreamEvent `json:"outbound,omitempty"`
 }
 
-// NetworkStreamEntityContainer represents a container generating network events
+// NetworkStreamEntityContainer represents a container generating network events.
+//
+// On host and ECS entities these same fields carry bridged identity (e.g.
+// WorkloadKind "Host"/"ECSService") so that consumers keying off them need no
+// change. Read the typed structs below in preference to these.
 type NetworkStreamEntityContainer struct {
 	// ContainerName is the name of the container generating these network events
 	ContainerName string `json:"containerName,omitempty"`
@@ -164,6 +177,77 @@ type NetworkStreamEntityContainer struct {
 	WorkloadName string `json:"workloadName,omitempty"`
 	// WorkloadKind is the type of the parent workload (e.g., Deployment, StatefulSet)
 	WorkloadKind string `json:"workloadKind,omitempty"`
+}
+
+// Host and ECS workload identity on the network stream. Design, the bridge to the
+// Kubernetes-shaped fields above and consumer guidance:
+// docs/features/network-stream-workload-identity.md
+
+// NetworkStreamEntityECS identifies the ECS task a container belongs to.
+//
+// Entity Kind stays NetworkStreamEntityKindContainer. An ECS workload *is* a
+// container, and the traffic-view writer drops every entity whose kind is not
+// "container" (postgres-connector `services/networktraffic/service.go`,
+// createNetworkTrafficEvent), so minting an "ecs" kind would silently delete
+// these rows from the traffic view.
+//
+// Field names and JSON keys mirror RuntimeAlertECSDetails so the stream and the
+// alert describe one workload the same way, with two additions the alert model has
+// no counterpart for: TaskRevision, needed because the bridged WorkloadName is
+// "<service>-<taskFamily>-<revision>", and ECSTaskID.
+//
+// Deliberately absent: ECSContainerName and ECSContainerID, whose values already
+// ride the bridge ContainerName field and the Entities map key respectively —
+// typed duplicates would give one value two sources of truth.
+type NetworkStreamEntityECS struct {
+	ECSClusterName string `json:"ecsClusterName,omitempty" bson:"ecsClusterName,omitempty"`
+	ClusterARN     string `json:"clusterArn,omitempty" bson:"clusterArn,omitempty"`
+	// ServiceName is empty on a standalone task — one launched with no ECS
+	// service — which is also what makes the bridged WorkloadKind "ECSTask".
+	ServiceName string `json:"serviceName,omitempty" bson:"serviceName,omitempty"`
+	TaskFamily  string `json:"taskFamily,omitempty" bson:"taskFamily,omitempty"`
+	// TaskRevision is a string because that is what the ECS task metadata
+	// endpoint returns and what the sensor already holds; making it numeric here
+	// would only move a parse onto the producer.
+	TaskRevision string `json:"taskRevision,omitempty" bson:"taskRevision,omitempty"`
+	TaskARN      string `json:"taskArn,omitempty" bson:"taskArn,omitempty"`
+	// ECSTaskID is the stable per-task identifier — the short form of the same
+	// identity TaskARN carries region-qualified. Prefer it as a grouping key; keep
+	// TaskARN for anything that has to address the task in an AWS API.
+	//
+	// Named with the ECS prefix, unlike its TaskFamily/TaskRevision/TaskARN
+	// neighbours, because these structs are inlined: every key here shares one flat
+	// namespace with the container and host structs, so a bare "taskID" is the kind
+	// of generic key a future non-ECS concept would collide with. See
+	// TestNetworkStreamEntityIdentityKeysAreUnique.
+	ECSTaskID string `json:"ecsTaskID,omitempty" bson:"ecsTaskID,omitempty"`
+	// LaunchType is an unvalidated passthrough of what ECS reports; "EC2" and
+	// "FARGATE" are the values observed, and ECS Anywhere would add "EXTERNAL".
+	// Compare case-sensitively against a known value rather than assuming the set
+	// is closed — RuntimeAlert.GetAlertSourcePlatform has no third branch: on an
+	// ECS-shaped alert, anything not exactly "FARGATE" (including "EXTERNAL", or a
+	// lowercased "fargate") returns AlertSourcePlatformECSAgent, its ECS-on-EC2 branch.
+	//
+	// It is also what keeps Fargate a value rather than a second schema: a Fargate
+	// sensor that later learns to stream needs no change here.
+	LaunchType string `json:"launchType,omitempty" bson:"launchType,omitempty"`
+}
+
+// NetworkStreamEntityHost identifies the host itself, on entities of kind
+// NetworkStreamEntityKindHost — which until now was a kind with no fields behind
+// it. The only host identifier on the wire was the Entities map key, which both
+// consumers discard, so hosts shared one identity downstream.
+type NetworkStreamEntityHost struct {
+	// HostID is an opaque, producer-chosen stable host identifier — treat it as
+	// a grouping key, not as any particular system value. The shipped host agent
+	// resolves it to the cloud instance ID, falling back to /etc/machine-id and
+	// then the hostname, so consumers must not join it against any one of those.
+	// It can also be a non-unique sentinel when every source fails.
+	//
+	// Prefer it to HostName, which is display-oriented and can change under a host.
+	HostID string `json:"hostID,omitempty" bson:"hostID,omitempty"`
+	// HostName is the host's reported hostname.
+	HostName string `json:"hostName,omitempty" bson:"hostName,omitempty"`
 }
 
 // NetworkStreamEvent represents an aggregation of network connections from/to a specific source
