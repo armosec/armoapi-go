@@ -57,7 +57,10 @@ const (
     ConnectionLevelOrganization ConnectionLevel = "organization"
 )
 
-// ConnectionLevel ConnectionLevel `json:"connectionLevel,omitempty"`
+type CdrAlertBatch struct {
+    // ... existing fields ...
+    ConnectionLevel ConnectionLevel `json:"connectionLevel,omitempty"`
+}
 ```
 
 `ConnectionLevel` states whether the batch belongs to a single-account connection or an
