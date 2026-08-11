@@ -47,6 +47,34 @@ IsHeartbeat bool `json:"isHeartbeat,omitempty"`
   it to refresh the CADR feature's connected / `LastKeepAlive` state and **skips the
   alert pipeline** (no incident is created).
 
+## Connection level (routing)
+
+```go
+type ConnectionLevel string
+
+const (
+    ConnectionLevelAccount      ConnectionLevel = "account"
+    ConnectionLevelOrganization ConnectionLevel = "organization"
+)
+
+// ConnectionLevel ConnectionLevel `json:"connectionLevel,omitempty"`
+```
+
+`ConnectionLevel` states whether the batch belongs to a single-account connection or an
+organization/tenant-wide one, so the ingester routes keep-alive by **stated intent** rather
+than inferring it from `OrgID` presence. It applies to **both** heartbeats and real alert
+batches.
+
+- **`account`** — keep-alive is keyed on `CloudAccountID` (the account/subscription), even
+  when `OrgID` (the tenant) is also carried as data.
+- **`organization`** — keep-alive is keyed on `OrgID`.
+- **Absent** — legacy inference: `OrgID == ""` → account, else organization. Existing AWS
+  producers set nothing, so their routing is unchanged.
+
+This lets a producer always send both `CloudAccountID` and `OrgID` without `OrgID`'s presence
+being misread as "this is an org connection." Design:
+`shared-designs-and-docs/docs/superpowers/specs/2026-08-11-cdr-connection-level-dispatch-design.md`.
+
 ## Producer expectations
 
 Because a heartbeat has no `RuleFailures`, the batch **must** set the batch-level
@@ -55,6 +83,10 @@ identity itself — the consumer cannot fall back to a rule's `CloudMetadata`:
 - `Provider` — required (the consumer's provider resolution otherwise reads
   `RuleFailures[0].CloudMetadata.Provider`, which is absent here).
 - `CustomerGUID`, and `CloudAccountID` (single account) and/or `OrgID` (org/tenant-wide).
+- `ConnectionLevel` — recommended, so routing is explicit rather than inferred. Set
+  `account` for a single-account connection (carry the tenant in `OrgID` as data if known)
+  and `organization` for a tenant-wide one. Omitting it falls back to legacy `OrgID`-presence
+  inference.
 
 Cadence is the producer's responsibility: send one on startup (acts as the connect
 signal) and then periodically at an interval **shorter than the disconnect threshold**.
@@ -63,6 +95,9 @@ signal) and then periodically at an interval **shorter than the disconnect thres
 
 - Treat `IsHeartbeat == true` as a liveness signal: refresh connected / `LastKeepAlive`
   and return before the detection path.
+- Route keep-alive on `ConnectionLevel` when set (`account` → key on `CloudAccountID`,
+  `organization` → key on `OrgID`); when absent, fall back to `OrgID`-presence inference.
+  An unrecognized value must fall back to inference, never error.
 - The legacy AWS `StackReady` rule-name path stays as-is (deploy-time connect) — a
   heartbeat does not replace it, and the two are dispatched independently.
 
