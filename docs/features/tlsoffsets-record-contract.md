@@ -36,6 +36,26 @@ storage and in the shared type they stay independent so each can evolve on its o
 `sha256:<hex>` for a content-digest fallback), used as the key in the served `tlsOffsets`
 map — it is **not** a field on `Record`.
 
+## Served envelope (`armotypes/aisandboxconfig`)
+
+The agent pulls **one** merged response: the capture policy plus the offsets section.
+That wire shape is the shared type `aisandboxconfig.Response` — defined once so the
+producer (cadashboardbe) and consumer (node-agent) cannot drift on the envelope or the
+`tlsOffsets` key:
+
+```go
+type Response struct {
+    httpcapture.CaptureConfig `json:",inline"`                     // capture policy, top-level
+    TLSOffsets json.RawMessage `json:"tlsOffsets,omitempty"`       // offsets section, opaque
+}
+```
+
+`TLSOffsets` is **raw JSON** (a `map[identity]Record` once decoded), kept opaque at this
+layer so a malformed offsets section can never fail the fail-closed capture decode — the
+agent decodes it leniently, per record. `Response.SetTLSOffsets(map[string]Record)` is the
+producer helper that encodes the section. The two sections remain independent types and
+independent config-service collections; this envelope only defines how they ride together.
+
 ## Consumers
 
 - **config-service** — stores it in `v1_tls_offsets`, global (`customers:[""]`) docs; filters
