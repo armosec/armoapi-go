@@ -74,15 +74,17 @@ const CurrentProtocolVersion = "1.0"
 // (resource attrs + record attrs + Body + a worked example) is documented in
 // private-node-agent docs/features/http-capture.md §3.1 "OTEL LogRecord encoding".
 const (
-	AttrTransactionID   = "http.capture.transaction_id"
-	AttrSequenceNumber  = "http.capture.sequence_number"
-	AttrDirection       = "http.capture.direction"
-	AttrEndOfStream     = "http.capture.end_of_stream"
-	AttrCaptureFidelity = "http.capture.fidelity"
-	AttrFidelityReason  = "http.capture.fidelity_reason"
-	AttrProtocolVersion = "http.capture.protocol_version"
-	AttrPart            = "http.capture.part"
-	AttrCapturedAt      = "http.capture.captured_at"
+	AttrTransactionID    = "http.capture.transaction_id"
+	AttrSequenceNumber   = "http.capture.sequence_number"
+	AttrDirection        = "http.capture.direction"
+	AttrEndOfStream      = "http.capture.end_of_stream"
+	AttrCaptureFidelity  = "http.capture.fidelity"
+	AttrFidelityReason   = "http.capture.fidelity_reason"
+	AttrProtocolVersion  = "http.capture.protocol_version"
+	AttrPart             = "http.capture.part"
+	AttrCapturedAt       = "http.capture.captured_at"
+	AttrSuppressedReason = "http.capture.suppressed_reason"
+	AttrSuppressedCount  = "http.capture.suppressed_count"
 )
 
 // Fragment is one unit on the wire (spec §5.2): a slice of one direction of one
@@ -152,6 +154,36 @@ type Fragment struct {
 	// EndOfStream=true AND Fidelity=FidelityTruncated.
 	Fidelity       CaptureFidelity `json:"fidelity,omitempty"`
 	FidelityReason string          `json:"fidelityReason,omitempty"`
+
+	// SuppressedReason + SuppressedCount are a NON-LOSS signal, deliberately separate
+	// from Fidelity/FidelityReason above. Fidelity always means "content was lost" — a
+	// capture gap the backend must treat as a defect. A suppression is the opposite: a
+	// sensor-side POLICY decision to withhold items it chose not to upload (e.g. a
+	// periodic keepalive/heartbeat pattern with no analytical value). Conflating the
+	// two would misreport deliberate noise reduction as a capture defect, which is
+	// exactly the mistake this pair of fields exists to prevent.
+	//
+	// SuppressedReason is a short, sensor-defined tag identifying WHAT was withheld
+	// (e.g. "ws-keepalive"); SuppressedCount is how many items were withheld under
+	// that reason, scoped to this fragment's transaction. Both empty/zero ⇒ nothing
+	// was withheld. A sensor emitting more than one reason for the same transaction
+	// uses more than one non-suppressed fragment to carry them — this pair is not a
+	// map, deliberately, to keep the wire shape simple for the first (and likely only)
+	// consumer of it.
+	//
+	// Sequence-number contract: suppression NEVER creates a SequenceNumber gap. A
+	// withheld item never reaches the fragment stream in the first place, so
+	// SequenceNumber stays contiguous (0..N, unbroken) across whatever fragments ARE
+	// emitted — there are simply fewer of them. The backend must not infer
+	// FidelityPartial, or any other loss signal, from a SuppressedCount > 0; the
+	// sensor-side reference implementation (private-node-agent, pkg/wscapture) proves
+	// this by construction: a suppressed item returns before the call that would
+	// assign it a SequenceNumber, so the counter backing SequenceNumber is simply
+	// never incremented for it. See private-node-agent's
+	// docs/features/ws-keepalive-filtering.md for the motivating case (first, and as
+	// of this writing only, consumer of this pair).
+	SuppressedReason string `json:"suppressedReason,omitempty"`
+	SuppressedCount  uint32 `json:"suppressedCount,omitempty"`
 }
 
 // CaptureConfig is the backend-supplied capture configuration the sensor polls
