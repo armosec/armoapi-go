@@ -15,6 +15,13 @@ const CurrentProtocolVersion = "1.0"
 // envelope fields config-service filters on (InnerFilters) — no consumer parses
 // Payload to filter. Payload is the target-specific offset data, opaque to store
 // and transport (agent claude/opencode ⇒ internal/verify OffsetRecord JSON).
+//
+// Deliberately does NOT embed armotypes.PortalBase, mirroring httpcapture.CaptureConfig:
+// this is an agent-facing wire+store envelope, so it stays minimal and free of portal
+// metadata. The GUID/name/attributes are added one layer up by config-service's
+// types.TLSOffsetRecord (PortalBase + Record), exactly as types.HTTPCaptureConfig wraps
+// httpcapture.CaptureConfig. A record's identity is the config-service doc GUID (the
+// served-map key), by design not a field here.
 type Record struct {
 	Target          string          `json:"target" bson:"target"`
 	Platform        string          `json:"platform" bson:"platform"`

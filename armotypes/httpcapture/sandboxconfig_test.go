@@ -1,17 +1,16 @@
-package aisandboxconfig
+package httpcapture
 
 import (
 	"encoding/json"
 	"strings"
 	"testing"
 
-	"github.com/armosec/armoapi-go/armotypes/httpcapture"
 	"github.com/armosec/armoapi-go/armotypes/tlsoffsets"
 )
 
-func TestResponse_CaptureInline_OffsetsSeparateSection(t *testing.T) {
-	var r Response
-	r.CaptureConfig = httpcapture.CaptureConfig{ProtocolVersion: httpcapture.CurrentProtocolVersion, Enabled: true}
+func TestSandboxConfigResponse_CaptureInline_OffsetsSeparateSection(t *testing.T) {
+	var r SandboxConfigResponse
+	r.CaptureConfig = CaptureConfig{ProtocolVersion: CurrentProtocolVersion, Enabled: true}
 	if err := r.SetTLSOffsets(map[string]tlsoffsets.Record{
 		"bid123": {Target: "claude", Platform: "linux", Arch: "x86_64", Payload: json.RawMessage(`{"buildID":"bid123"}`)},
 	}); err != nil {
@@ -28,7 +27,7 @@ func TestResponse_CaptureInline_OffsetsSeparateSection(t *testing.T) {
 		t.Fatalf("unexpected wire shape: %s", s)
 	}
 
-	var out Response
+	var out SandboxConfigResponse
 	if err := json.Unmarshal(b, &out); err != nil {
 		t.Fatalf("unmarshal: %v", err)
 	}
@@ -45,9 +44,9 @@ func TestResponse_CaptureInline_OffsetsSeparateSection(t *testing.T) {
 	}
 }
 
-func TestResponse_NoOffsets_OmitsSection(t *testing.T) {
-	var r Response
-	r.CaptureConfig = httpcapture.CaptureConfig{ProtocolVersion: httpcapture.CurrentProtocolVersion}
+func TestSandboxConfigResponse_NoOffsets_OmitsSection(t *testing.T) {
+	var r SandboxConfigResponse
+	r.CaptureConfig = CaptureConfig{ProtocolVersion: CurrentProtocolVersion}
 	if err := r.SetTLSOffsets(nil); err != nil {
 		t.Fatalf("SetTLSOffsets(nil): %v", err)
 	}
