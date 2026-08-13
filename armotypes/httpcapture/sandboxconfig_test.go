@@ -55,3 +55,19 @@ func TestSandboxConfigResponse_NoOffsets_OmitsSection(t *testing.T) {
 		t.Fatalf("empty offsets must be omitted: %s", b)
 	}
 }
+
+// SetTLSOffsets surfaces an invalid record payload: json.Marshal validates the embedded
+// json.RawMessage and returns an error, which SetTLSOffsets propagates without setting the
+// section (so a broken payload can never produce a malformed wire response).
+func TestSandboxConfigResponse_SetTLSOffsets_RejectsInvalidPayload(t *testing.T) {
+	var r SandboxConfigResponse
+	err := r.SetTLSOffsets(map[string]tlsoffsets.Record{
+		"bad": {Target: "claude", Payload: json.RawMessage("{not valid json")},
+	})
+	if err == nil {
+		t.Fatal("expected an error for an invalid record payload")
+	}
+	if r.TLSOffsets != nil {
+		t.Fatalf("TLSOffsets must remain unset when SetTLSOffsets errors, got %s", r.TLSOffsets)
+	}
+}

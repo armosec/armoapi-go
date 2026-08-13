@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TestRecord_JSONRoundTrip_PreservesAllFieldsAndOpaquePayload(t *testing.T) {
@@ -58,5 +60,54 @@ func TestRecord_JSONTagsAreCamelCase(t *testing.T) {
 		if !strings.Contains(s, key) {
 			t.Fatalf("missing expected camelCase key %s in %s", key, s)
 		}
+	}
+}
+
+// The bson tags are load-bearing: config-service persists this envelope to MongoDB. Assert the
+// on-the-wire bson keys are exactly the expected lowercase field names (a typo'd tag would
+// silently break storage) and that the opaque payload round-trips byte-for-byte.
+func TestRecord_BSONTagsAndRoundTrip(t *testing.T) {
+	in := Record{Target: "opencode", Platform: "linux", Arch: "arm64", Payload: json.RawMessage(`{"buildID":"x","machine":183}`)}
+	b, err := bson.Marshal(in)
+	if err != nil {
+		t.Fatalf("bson marshal: %v", err)
+	}
+	var doc bson.M
+	if err := bson.Unmarshal(b, &doc); err != nil {
+		t.Fatalf("bson unmarshal to map: %v", err)
+	}
+	for _, k := range []string{"target", "platform", "arch", "payload"} {
+		if _, ok := doc[k]; !ok {
+			t.Fatalf("missing expected bson key %q in %v", k, doc)
+		}
+	}
+	var out Record
+	if err := bson.Unmarshal(b, &out); err != nil {
+		t.Fatalf("bson unmarshal to Record: %v", err)
+	}
+	if out.Target != in.Target || out.Platform != in.Platform || out.Arch != in.Arch {
+		t.Fatalf("bson envelope fields not preserved: %+v", out)
+	}
+	if !bytes.Equal(out.Payload, in.Payload) {
+		t.Fatalf("bson opaque payload not preserved:\n got  %s\n want %s", out.Payload, in.Payload)
+	}
+}
+
+// A nil payload is valid and round-trips as JSON null.
+func TestRecord_NilPayload_RoundTrips(t *testing.T) {
+	in := Record{Target: "claude", Platform: "linux", Arch: "x86_64"} // Payload nil
+	b, err := json.Marshal(in)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if !strings.Contains(string(b), `"payload":null`) {
+		t.Fatalf("nil payload should marshal to null: %s", b)
+	}
+	var out Record
+	if err := json.Unmarshal(b, &out); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if out.Target != "claude" || out.Platform != "linux" || out.Arch != "x86_64" {
+		t.Fatalf("envelope fields lost on nil-payload round-trip: %+v", out)
 	}
 }
