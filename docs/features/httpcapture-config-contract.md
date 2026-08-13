@@ -34,6 +34,26 @@ Migrated from the node-agent's `uploadpolicy.Rule`. A transaction is matched by
 AND-ed; empty = any) and assigned `level` — the wire string `"none" | "headers" | "full"`.
 The agent maps `Level` to its internal `uploadpolicy.Level` on parse.
 
+## `SandboxConfigResponse` — the served merged response
+
+What the node-agent actually pulls is **one** response combining the capture policy with
+the TLS offset-map section (TLS Offset-Map Distribution, SUB-7970):
+
+```go
+type SandboxConfigResponse struct {
+    CaptureConfig `json:",inline"`                            // capture policy, top-level
+    TLSOffsets json.RawMessage `json:"tlsOffsets,omitempty"`  // offsets, opaque raw JSON
+}
+```
+
+Defined here so producer (cadashboardbe) and consumer (node-agent) share one envelope and
+can't drift on the `tlsOffsets` key. `TLSOffsets` is raw (a `map[identity]tlsoffsets.Record`
+once decoded) so a malformed offsets section can never fail the fail-closed capture decode;
+`SetTLSOffsets` is the producer helper. **`CaptureConfig` is not widened** — it stays the
+capture-only contract config-service stores; offsets keep their own type
+([`armotypes/tlsoffsets`](tlsoffsets-record-contract.md)) and their own collection. The two
+only ride together in this response. careportsreceiver forwards it as opaque bytes.
+
 ## Consumers
 
 - **config-service** — stores it (`v1_http_capture_config`), global (`customers:[""]`) +
