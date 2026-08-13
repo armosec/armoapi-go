@@ -1,9 +1,7 @@
 package cdr
 
 import (
-	"bytes"
 	"encoding/json"
-	"strings"
 	"time"
 )
 
@@ -27,16 +25,24 @@ type AzureActivityLogBatch struct {
 // audit event that is the Azure equivalent of an AWS CloudTrail management event
 // (see CloudTrailEvent in aws.go).
 //
-// Two delivery paths deliver the same event in slightly different shapes, and
-// this struct models BOTH (verified against captured samples of each):
+// The same record reaches us in two shapes that disagree on where the caller
+// identity lives, and this struct models the identity of BOTH (verified against
+// captured samples of each):
 //
 //   - Event Hub / diagnostic-settings export — what the in-account collector
-//     consumes. Nests the RBAC context and token claims under an "identity"
-//     object, carries no top-level "caller", and adds wrapper fields
-//     (RoleLocation, Stamp, ReleaseVersion, VmSku) that are intentionally not
-//     modelled.
+//     consumes, and the only shape decoded through this struct today. Nests the
+//     RBAC context and token claims under an "identity" object, carries no
+//     top-level "caller", and adds wrapper fields (RoleLocation, Stamp,
+//     ReleaseVersion, VmSku) that are intentionally not modelled.
 //   - Azure Monitor REST / management API — puts "authorization" and "claims"
 //     at the top level alongside a "caller".
+//
+// The REST shape is modelled for its IDENTITY LAYOUT only. A verbatim REST
+// response does NOT decode through this struct: REST sends operationName and
+// category as {value, localizedValue} objects, which the string fields below
+// reject. That is deliberate — no code decodes a REST response here, and the
+// collector's records always carry the string form. Add normalization when a
+// REST reader actually exists, not before.
 //
 // Read the identity through EffectiveClaims / EffectiveAuthorization /
 // EffectiveCaller rather than the fields directly, so callers work on both
@@ -78,8 +84,14 @@ type AzureActivityLogEvent struct {
 	// authorization and claims. Nil on the REST/management shape.
 	Identity *AzureIdentity `json:"identity,omitempty"`
 	// Properties is the operation-specific bag (eventCategory, entity, message,
-	// hierarchy, statusCode, responseBody, ...); shape varies by operation.
-	Properties AzureProperties `json:"properties,omitempty"`
+	// hierarchy, statusCode, responseBody, ...). Kept raw on purpose: Activity Log
+	// delivers it as an object for most operations and as a STRING containing JSON
+	// for some, so a map[string]any field rejects the second form and — because the
+	// failure is not local — fails the WHOLE record decode, discarding a detection
+	// over a field no rule references. json.RawMessage cannot fail to decode and
+	// round-trips byte-for-byte into the alert payload. No Go code reads it; rules
+	// are evaluated against the raw record JSON, not this struct.
+	Properties json.RawMessage `json:"properties,omitempty"`
 }
 
 // AzureIdentity is the "identity" object of an Event Hub Activity Log record,
@@ -100,8 +112,9 @@ const (
 )
 
 // EffectiveClaims returns the caller's token claims from whichever shape the
-// event arrived in, preferring the Event Hub's nested identity. Never nil-maps a
-// lookup: the zero value is an empty map, so indexing is always safe.
+// event arrived in, preferring the Event Hub's nested identity. It always
+// returns a non-nil map, so ranging over the result is safe even when the event
+// carries no claims at all.
 func (e AzureActivityLogEvent) EffectiveClaims() map[string]string {
 	if e.Identity != nil && len(e.Identity.Claims) > 0 {
 		return e.Identity.Claims
@@ -135,60 +148,6 @@ func (e AzureActivityLogEvent) EffectiveCaller() string {
 		}
 	}
 	return ""
-}
-
-// AzureProperties is the operation-specific property bag. Activity Log delivers
-// it either as a JSON object or, for some operations, as a STRING containing
-// JSON. A plain map[string]any fails to unmarshal the second form, and because
-// the whole record decode then fails, a detection built from that record is
-// discarded — so this type accepts both and never fails the surrounding decode.
-type AzureProperties map[string]any
-
-// UnmarshalJSON accepts an object, a JSON-encoded string, or a bare string. A
-// bare (non-JSON) string is preserved under the "message" key rather than
-// dropped, since that is what Activity Log puts there.
-func (p *AzureProperties) UnmarshalJSON(data []byte) error {
-	trimmed := bytes.TrimSpace(data)
-	if len(trimmed) == 0 || bytes.Equal(trimmed, []byte("null")) {
-		*p = nil
-		return nil
-	}
-
-	// The common case: a JSON object.
-	if trimmed[0] == '{' {
-		var m map[string]any
-		if err := json.Unmarshal(trimmed, &m); err != nil {
-			return err
-		}
-		*p = m
-		return nil
-	}
-
-	// A JSON string. Its contents are usually themselves JSON.
-	if trimmed[0] == '"' {
-		var s string
-		if err := json.Unmarshal(trimmed, &s); err != nil {
-			return err
-		}
-		inner := strings.TrimSpace(s)
-		if strings.HasPrefix(inner, "{") {
-			var m map[string]any
-			if err := json.Unmarshal([]byte(inner), &m); err == nil {
-				*p = m
-				return nil
-			}
-		}
-		*p = map[string]any{"message": s}
-		return nil
-	}
-
-	// Anything else (array, number, bool): keep it rather than failing the record.
-	var v any
-	if err := json.Unmarshal(trimmed, &v); err != nil {
-		return err
-	}
-	*p = map[string]any{"value": v}
-	return nil
 }
 
 // AzureAuthorization is the RBAC authorization context of an Activity Log operation.

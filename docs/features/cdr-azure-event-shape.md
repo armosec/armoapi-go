@@ -27,6 +27,15 @@ Reading the wrong fields yields silent emptiness, not an error.
 
 Both are captured as fixtures in `azure_shapes_test.go`.
 
+**The struct models the REST shape's identity layout only.** A verbatim REST
+response does not decode through it — `operationName` and `category` arrive as
+`{value, localizedValue}` objects and the string fields reject them. That is
+deliberate: nothing in the codebase decodes a REST response through this struct,
+and the collector's records always carry the string form, so normalizing the
+object form would be speculative. If a REST reader is ever added, the `restShape`
+fixture is where the object form has to appear first, and the failure will be a
+loud unmarshal error rather than a silent one.
+
 ## Read identity through the accessors
 
 ```go
@@ -35,11 +44,22 @@ claims := ev.EffectiveClaims()          // NOT ev.Claims
 auth   := ev.EffectiveAuthorization()   // NOT ev.Authorization
 ```
 
-Each prefers the nested `identity` and falls back to the flat field, so callers
-work on either shape. `EffectiveCaller` resolves the Event Hub case from the
-`upn` / `name` claims (including their WS-Fed URI forms), since that path has no
-`caller`. `EffectiveClaims` returns an empty map rather than nil, so indexing a
-missing claim is always safe.
+They do not all resolve the same way:
+
+| Accessor | Precedence |
+|---|---|
+| `EffectiveClaims` | nested `identity.claims` → flat `claims` → non-nil empty map |
+| `EffectiveAuthorization` | nested `identity.authorization` → flat `authorization` → nil |
+| `EffectiveCaller` | flat `caller` **first** → then `upn`, `name`, and their WS-Fed URI forms out of `EffectiveClaims` → `""` |
+
+`EffectiveCaller` is the odd one out: it reads the flat field first because
+`caller`, when present, is the identity Azure itself resolved, and the Event Hub
+shape has no `caller` at all — so the claim fallback only ever runs on the shape
+that needs it.
+
+`EffectiveClaims` always returns a **non-nil** map, so ranging over the result is
+safe on an event with no claims. (Indexing a nil map is already safe in Go; the
+guarantee here is about ranging and about handing the map to code that appends.)
 
 **Reading `ev.Claims` or `ev.Caller` directly is a bug** for anything processing
 collector traffic: those are always empty on the Event Hub shape. That defect
@@ -58,23 +78,34 @@ matching real collector traffic. A regression test asserts the string decode.
 Compare case-insensitively: this path upper-cases `operationName` and
 `resourceId`, while `category` and `resultType` keep their casing.
 
-## `properties` may be an object or a string
+## `properties` is held raw
 
 Some operations deliver `properties` as a JSON-**encoded string** rather than an
-object. `AzureProperties.UnmarshalJSON` accepts:
+object, so the field is typed `json.RawMessage`:
 
-| Delivered | Result |
-|---|---|
-| `{"statusCode":"OK"}` | the map |
-| `"{\"statusCode\":\"OK\"}"` | parsed into the map |
-| `"something happened"` | `{"message": "something happened"}` |
-| `null` / absent | nil |
-| anything else | `{"value": …}` |
+```go
+Properties json.RawMessage `json:"properties,omitempty"`
+```
 
-It never fails the surrounding decode. That matters because the failure was not
-local: a failed record decode made the collector's alert builder return an error,
-and the detection built from that record was discarded — a dropped alert caused by
-a field the detection never referenced.
+Any well-formed JSON value decodes, and the bytes are forwarded into the alert
+payload unchanged. Read it by unmarshalling into whatever you expect:
+
+```go
+var props map[string]any
+_ = json.Unmarshal(ev.Properties, &props)   // handle the error; may be a string
+```
+
+**Why this matters more than it looks.** A typed `map[string]any` rejects the
+string form, and the failure is not local: the whole record decode fails, the
+collector's alert builder returns an error, and the detection built from that
+record is discarded — a dropped alert caused by a field the detection never
+referenced. `json.RawMessage` cannot fail that way.
+
+**Why raw rather than a tolerant map.** No Go code reads this field; rules are
+evaluated against the raw record JSON, not this struct. Coercing the string form
+into a map would mean inventing keys (`message`, `value`) that no consumer reads,
+and rewriting an audit record before it reaches the backend. Raw keeps it
+byte-for-byte faithful to what Azure sent.
 
 ## Fields deliberately not modelled
 

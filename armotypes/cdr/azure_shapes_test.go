@@ -50,8 +50,16 @@ const eventHubShape = `{
   "tenantId": "dddddddd-1111-2222-3333-444444444444"
 }`
 
-// restShape is the same operation as returned by the Azure Monitor REST API,
-// which puts caller/authorization/claims at the top level.
+// restShape captures the Azure Monitor REST API's IDENTITY LAYOUT — caller,
+// authorization and claims at the top level — which is the only part of that
+// shape this struct models.
+//
+// It is deliberately NOT a verbatim REST response: real REST sends
+// operationName and category as {value, localizedValue} objects, which the
+// struct's string fields reject. Nothing decodes a REST response through this
+// struct (the collector only ever sees the Event Hub shape), so normalizing
+// those objects would be speculative. If a REST reader is ever added, this
+// fixture is where the object form has to appear first.
 const restShape = `{
   "time": "2026-08-12T15:11:47Z",
   "resourceId": "/subscriptions/aaaaaaaa/resourceGroups/RG1",
@@ -104,7 +112,7 @@ func TestEventHubShape_FlatFieldsDecodeAsStrings(t *testing.T) {
 	assert.Equal(t, "dddddddd-1111-2222-3333-444444444444", ev.TenantID)
 }
 
-func TestRESTShape_StillWorks(t *testing.T) {
+func TestRESTShape_FlatIdentityLayoutStillResolves(t *testing.T) {
 	var ev AzureActivityLogEvent
 	require.NoError(t, json.Unmarshal([]byte(restShape), &ev))
 
@@ -144,52 +152,47 @@ func TestEffectiveCaller_PrefersTopLevelThenUPNThenName(t *testing.T) {
 	}
 }
 
-func TestProperties_AcceptsObjectOrString(t *testing.T) {
+func TestProperties_NeverFailsTheRecordAndSurvivesVerbatim(t *testing.T) {
 	// A record whose "properties" arrives as a JSON string used to fail the whole
-	// decode, which discarded the detection built from it.
+	// decode, which discarded the detection built from it. Holding the field raw
+	// makes that impossible for any well-formed JSON value, and forwards exactly
+	// what Azure sent instead of a rewritten approximation of it.
 	tests := []struct {
-		name  string
-		raw   string
-		check func(t *testing.T, p AzureProperties)
+		name string
+		raw  string
+		want string // what "properties" must look like after a decode/encode cycle
 	}{
-		{
-			name:  "object",
-			raw:   `{"properties":{"statusCode":"OK"}}`,
-			check: func(t *testing.T, p AzureProperties) { assert.Equal(t, "OK", p["statusCode"]) },
-		},
-		{
-			name:  "JSON encoded as a string",
-			raw:   `{"properties":"{\"statusCode\":\"OK\"}"}`,
-			check: func(t *testing.T, p AzureProperties) { assert.Equal(t, "OK", p["statusCode"]) },
-		},
-		{
-			name:  "bare string is preserved as message",
-			raw:   `{"properties":"something happened"}`,
-			check: func(t *testing.T, p AzureProperties) { assert.Equal(t, "something happened", p["message"]) },
-		},
-		{
-			name:  "null",
-			raw:   `{"properties":null}`,
-			check: func(t *testing.T, p AzureProperties) { assert.Nil(t, p) },
-		},
-		{
-			name:  "absent",
-			raw:   `{"category":"Administrative"}`,
-			check: func(t *testing.T, p AzureProperties) { assert.Nil(t, p) },
-		},
-		{
-			name:  "unexpected array does not fail the record",
-			raw:   `{"properties":[1,2]}`,
-			check: func(t *testing.T, p AzureProperties) { assert.NotNil(t, p["value"]) },
-		},
+		{"object", `{"properties":{"statusCode":"OK"}}`, `{"statusCode":"OK"}`},
+		{"JSON encoded as a string", `{"properties":"{\"statusCode\":\"OK\"}"}`, `"{\"statusCode\":\"OK\"}"`},
+		{"bare string", `{"properties":"something happened"}`, `"something happened"`},
+		{"array", `{"properties":[1,2]}`, `[1,2]`},
+		{"null", `{"properties":null}`, `null`},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			var ev AzureActivityLogEvent
 			require.NoError(t, json.Unmarshal([]byte(tc.raw), &ev), "decode must not fail")
-			tc.check(t, ev.Properties)
+
+			data, err := json.Marshal(ev)
+			require.NoError(t, err)
+			var out struct {
+				Properties json.RawMessage `json:"properties"`
+			}
+			require.NoError(t, json.Unmarshal(data, &out))
+			assert.JSONEq(t, tc.want, string(out.Properties),
+				"properties must reach the backend exactly as Azure sent it")
 		})
 	}
+
+	t.Run("absent stays absent", func(t *testing.T) {
+		var ev AzureActivityLogEvent
+		require.NoError(t, json.Unmarshal([]byte(`{"category":"Administrative"}`), &ev))
+		assert.Nil(t, ev.Properties)
+
+		data, err := json.Marshal(ev)
+		require.NoError(t, err)
+		assert.NotContains(t, string(data), "properties")
+	})
 }
 
 func TestEventHubShape_RoundTripsThroughTheAlertPayload(t *testing.T) {
