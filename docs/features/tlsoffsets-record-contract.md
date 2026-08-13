@@ -29,11 +29,9 @@ storage and in the shared type they stay independent so each can evolve on its o
   transport. For `claude`/`opencode` it is the standard `encoding/json` of the agent's
   internal offset record (numeric offsets, base64 byte-signatures). config-service and
   cadashboardbe never open it.
-- **`protocolVersion`** — forward-compat handle (`CurrentProtocolVersion`); same major ⇒
-  additive fields tolerated.
 
-**Identity** of a record is the config-service doc GUID (a bare hex build-id, or
-`sha256:<hex>` for a content-digest fallback), used as the key in the served `tlsOffsets`
+**Identity** of a record is the config-service doc GUID (`buildid:<hex>`, or `sha256:<hex>`
+for a content-digest fallback), used as the key in the served `tlsOffsets`
 map — it is **not** a field on `Record`.
 
 ## Served envelope

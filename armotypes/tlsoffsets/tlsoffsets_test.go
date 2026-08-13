@@ -9,11 +9,10 @@ import (
 
 func TestRecord_JSONRoundTrip_PreservesAllFieldsAndOpaquePayload(t *testing.T) {
 	in := Record{
-		Target:          "claude",
-		Platform:        "linux",
-		Arch:            "x86_64",
-		Payload:         json.RawMessage(`{"buildID":"abc","machine":62,"read":{"fileOffset":123}}`),
-		ProtocolVersion: CurrentProtocolVersion,
+		Target:   "claude",
+		Platform: "linux",
+		Arch:     "x86_64",
+		Payload:  json.RawMessage(`{"buildID":"abc","machine":62,"read":{"fileOffset":123}}`),
 	}
 	b, err := json.Marshal(in)
 	if err != nil {
@@ -24,8 +23,8 @@ func TestRecord_JSONRoundTrip_PreservesAllFieldsAndOpaquePayload(t *testing.T) {
 		t.Fatalf("unmarshal: %v", err)
 	}
 
-	// Every envelope field must round-trip — including ProtocolVersion.
-	if out.Target != in.Target || out.Platform != in.Platform || out.Arch != in.Arch || out.ProtocolVersion != in.ProtocolVersion {
+	// Every envelope field must round-trip.
+	if out.Target != in.Target || out.Platform != in.Platform || out.Arch != in.Arch {
 		t.Fatalf("envelope fields not preserved:\n got  %+v\n want %+v", out, in)
 	}
 
@@ -45,18 +44,17 @@ func TestRecord_JSONRoundTrip_PreservesAllFieldsAndOpaquePayload(t *testing.T) {
 
 func TestRecord_JSONTagsAreCamelCase(t *testing.T) {
 	b, err := json.Marshal(Record{
-		Target:          "claude",
-		Platform:        "linux",
-		Arch:            "x86_64",
-		Payload:         json.RawMessage(`{}`),
-		ProtocolVersion: CurrentProtocolVersion,
+		Target:   "claude",
+		Platform: "linux",
+		Arch:     "x86_64",
+		Payload:  json.RawMessage(`{}`),
 	})
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
 	}
 	s := string(b)
 	// Assert the COMPLETE camelCase key set (every field, so a wrong tag is caught).
-	for _, key := range []string{`"target":`, `"platform":`, `"arch":`, `"payload":`, `"protocolVersion":`} {
+	for _, key := range []string{`"target":`, `"platform":`, `"arch":`, `"payload":`} {
 		if !strings.Contains(s, key) {
 			t.Fatalf("missing expected camelCase key %s in %s", key, s)
 		}

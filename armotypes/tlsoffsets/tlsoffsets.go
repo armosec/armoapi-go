@@ -7,10 +7,6 @@ package tlsoffsets
 
 import "encoding/json"
 
-// CurrentProtocolVersion is bumped on a breaking envelope change (same major ⇒
-// additive fields tolerated), mirroring armotypes/httpcapture.
-const CurrentProtocolVersion = "1.0"
-
 // Record is one offset record. Target/Platform/Arch are the queryable, top-level
 // envelope fields config-service filters on (InnerFilters) — no consumer parses
 // Payload to filter. Payload is the target-specific offset data, opaque to store
@@ -23,9 +19,8 @@ const CurrentProtocolVersion = "1.0"
 // httpcapture.CaptureConfig. A record's identity is the config-service doc GUID (the
 // served-map key), by design not a field here.
 type Record struct {
-	Target          string          `json:"target" bson:"target"`
-	Platform        string          `json:"platform" bson:"platform"`
-	Arch            string          `json:"arch" bson:"arch"`
-	Payload         json.RawMessage `json:"payload" bson:"payload"`
-	ProtocolVersion string          `json:"protocolVersion,omitempty" bson:"protocolVersion,omitempty"`
+	Target   string          `json:"target" bson:"target"`
+	Platform string          `json:"platform" bson:"platform"`
+	Arch     string          `json:"arch" bson:"arch"`
+	Payload  json.RawMessage `json:"payload" bson:"payload"`
 }
