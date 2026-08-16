@@ -2,6 +2,7 @@ package armotypes
 
 import (
 	"maps"
+	"regexp"
 	"strings"
 	"time"
 
@@ -37,6 +38,18 @@ type BaseExceptionPolicy struct {
 	CreatedBy      string                         `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 	Resources      []identifiers.PortalDesignator `json:"resources,omitempty" bson:"resources,omitempty"`
 	AdvancedScopes []AdvancedScopeEntity          `json:"advancedScopes,omitempty" bson:"advancedScopes,omitempty"`
+}
+
+// AnchoredIgnoreCaseRegexFilter renders a value as a V2List case-insensitive exact
+// match ("^<escaped>$|regex&ignorecase"): an anchored, regex-escaped value with the
+// ignorecase option, which config-service resolves to $regex + $options "i".
+// Exported as the single source of this encoding so consumers that today
+// re-implement it (e.g. event-ingester's BuildGetAccountWithFeatureQuery) can route
+// through it instead of drifting out of sync.
+func AnchoredIgnoreCaseRegexFilter(value string) string {
+	return "^" + regexp.QuoteMeta(value) + "$" +
+		V2ListOperatorSeparator + V2ListRegexOperator +
+		V2ListSubQuerySeparator + V2ListIgnoreCaseOption
 }
 
 // Used by cadashboardbe (countIncidents API) and event-ingester (retroactive resolve on exception creation).
@@ -88,11 +101,25 @@ func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExc
 		// cloudProvider and accountID are filtered against cloudMetadata.* rather than
 		// designators.attributes.* because CDR incidents historically stored these
 		// only in cloudMetadata.
-		if provider, ok := designator.Attributes[identifiers.AttributeCloudProvider]; ok && provider != GlobalRegex {
+		// Hoisted so the accountID branch below can reuse it. Intentionally skips a
+		// present-but-empty provider (the old code would have set the filter to ""):
+		// a no-op improvement, not an accidental behavior change.
+		provider := designator.Attributes[identifiers.AttributeCloudProvider]
+		if provider != "" && provider != GlobalRegex {
 			filter["cloudMetadata.provider"] = provider
 		}
 		if accountID, ok := designator.Attributes[identifiers.AttributeCloudAccountID]; ok && accountID != GlobalRegex {
-			filter["cloudMetadata.account_id"] = accountID
+			// Azure subscription ids arrive with inconsistent casing: incidents derive
+			// them from the uppercase Activity Log resourceId, while onboarding/storage
+			// keep the customer's original casing. Match case-insensitively — the same
+			// anchored-regex + ignorecase mechanism config-service's
+			// BuildGetAccountWithFeatureQuery uses — so an exact-equality miss can't
+			// leave an Azure risk-acceptance ineffective. AWS/GCP keep exact equality.
+			if strings.EqualFold(provider, string(ProviderAzure)) {
+				filter["cloudMetadata.account_id"] = AnchoredIgnoreCaseRegexFilter(accountID)
+			} else {
+				filter["cloudMetadata.account_id"] = accountID
+			}
 		}
 		if instanceID, ok := designator.Attributes[identifiers.AttributeInstanceId]; ok && instanceID != GlobalRegex {
 			filter["designators.attributes.instanceId"] = instanceID

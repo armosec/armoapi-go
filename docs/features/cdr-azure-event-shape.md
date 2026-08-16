@@ -114,3 +114,32 @@ carry no detection or attribution value. Unknown fields are ignored on decode, s
 adding them is unnecessary; detection rules are evaluated against the **raw**
 record JSON, not this struct, so a rule can still reference anything the export
 sends.
+
+## Subscription-id casing and identity matching
+
+The subscription id is derived from `resourceId`, which the Event Hub export
+emits **upper-cased** (`/SUBSCRIPTIONS/<UPPER>/…`). Incidents therefore store an
+upper-cased `cloudMetadata.account_id`, while account onboarding/storage keep the
+customer's **original** casing (no normalization). So any match on the Azure
+account id must be **case-insensitive** — normalizing to a single case is not
+safe because no single layer owns the canonical form.
+
+Two matchers rely on this:
+
+- **Account lookup / keep-alive** — `event-ingester`'s
+  `BuildGetAccountWithFeatureQuery` builds an anchored, escaped regex with the
+  `ignorecase` option for Azure, so heartbeat (onboarded casing) and real-alert
+  (upper-cased) batches resolve the same account.
+- **Risk-acceptance / exception matching** — `GetRuntimeIncidentsRequestFilterFromExceptionPolicy`
+  (`armotypes/exceptionpolicy.go`) emits the `cloudMetadata.account_id` filter the
+  same way for Azure (`^<escaped>$|regex&ignorecase`). Without it an exact-equality
+  match silently missed and the risk-acceptance never suppressed the incident.
+  AWS/GCP keep exact equality (numeric / already-lowercase ids).
+
+The recommended behavior is **(a) preserve the original casing everywhere and match
+case-insensitively** at the comparison points above — not (b) rewrite ids into a
+canonical case. Do not normalize casing at any layer: not the raw event (it must
+stay byte-for-byte faithful to what Azure sent; rules are evaluated against it) and
+not the derived identity fields (no single layer owns the canonical form, so a
+partial rewrite just reintroduces mismatches). Case-insensitive matching is the
+whole strategy.

@@ -147,6 +147,30 @@ func TestGetRuntimeIncidentsRequestFilterFromExceptionPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "azure account id is matched case-insensitively (anchored regex + ignorecase)",
+			policy: BaseExceptionPolicy{
+				PolicyIDs: []string{"I008"},
+				Resources: []identifiers.PortalDesignator{
+					{
+						Attributes: map[string]string{
+							identifiers.AttributeCloudProvider:  "azure",
+							identifiers.AttributeCloudAccountID: "94F9BBD2-E5A9-4920-AB09-577FF2AFDA21",
+							identifiers.AttributeRegion:         "eastus",
+						},
+					},
+				},
+			},
+			want: []map[string]string{
+				{
+					"incidentTypeID":                "I008",
+					"status":                        "Open",
+					"cloudMetadata.provider":        "azure",
+					"cloudMetadata.account_id":      "^94F9BBD2-E5A9-4920-AB09-577FF2AFDA21$|regex&ignorecase",
+					"designators.attributes.region": "eastus",
+				},
+			},
+		},
+		{
 			name: "GlobalRegex (*/*) values are omitted",
 			policy: BaseExceptionPolicy{
 				PolicyIDs: []string{"I001"},
@@ -207,9 +231,9 @@ func TestGetRuntimeIncidentsRequestFilterFromExceptionPolicy(t *testing.T) {
 			},
 			want: []map[string]string{
 				{
-					"incidentTypeID":                          "I001",
-					"status":                                  "Open",
-					"designators.attributes.cluster":          "c1",
+					"incidentTypeID":                 "I001",
+					"status":                         "Open",
+					"designators.attributes.cluster": "c1",
 					"identifiers.sourceInformation.userAgent": `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML\, like Gecko) Chrome/147.0.0.0 Safari/537.36`,
 				},
 			},
