@@ -40,6 +40,16 @@ type BaseExceptionPolicy struct {
 	AdvancedScopes []AdvancedScopeEntity          `json:"advancedScopes,omitempty" bson:"advancedScopes,omitempty"`
 }
 
+// anchoredIgnoreCaseRegexFilter renders a value as a V2List case-insensitive exact
+// match ("^<escaped>$|regex&ignorecase"): an anchored, regex-escaped value with the
+// ignorecase option, which config-service resolves to $regex + $options "i". Mirrors
+// event-ingester's BuildGetAccountWithFeatureQuery.
+func anchoredIgnoreCaseRegexFilter(value string) string {
+	return "^" + regexp.QuoteMeta(value) + "$" +
+		V2ListOperatorSeparator + V2ListRegexOperator +
+		V2ListSubQuerySeparator + V2ListIgnoreCaseOption
+}
+
 // Used by cadashboardbe (countIncidents API) and event-ingester (retroactive resolve on exception creation).
 func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExceptionPolicy) []map[string]string {
 	if len(exceptionPolicy.PolicyIDs) == 0 {
@@ -89,7 +99,8 @@ func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExc
 		// cloudProvider and accountID are filtered against cloudMetadata.* rather than
 		// designators.attributes.* because CDR incidents historically stored these
 		// only in cloudMetadata.
-		if provider, ok := designator.Attributes[identifiers.AttributeCloudProvider]; ok && provider != GlobalRegex {
+		provider := designator.Attributes[identifiers.AttributeCloudProvider]
+		if provider != "" && provider != GlobalRegex {
 			filter["cloudMetadata.provider"] = provider
 		}
 		if accountID, ok := designator.Attributes[identifiers.AttributeCloudAccountID]; ok && accountID != GlobalRegex {
@@ -99,10 +110,8 @@ func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExc
 			// anchored-regex + ignorecase mechanism config-service's
 			// BuildGetAccountWithFeatureQuery uses — so an exact-equality miss can't
 			// leave an Azure risk-acceptance ineffective. AWS/GCP keep exact equality.
-			if strings.EqualFold(designator.Attributes[identifiers.AttributeCloudProvider], string(ProviderAzure)) {
-				filter["cloudMetadata.account_id"] = "^" + regexp.QuoteMeta(accountID) + "$" +
-					V2ListOperatorSeparator + V2ListRegexOperator +
-					V2ListSubQuerySeparator + V2ListIgnoreCaseOption
+			if strings.EqualFold(provider, string(ProviderAzure)) {
+				filter["cloudMetadata.account_id"] = anchoredIgnoreCaseRegexFilter(accountID)
 			} else {
 				filter["cloudMetadata.account_id"] = accountID
 			}

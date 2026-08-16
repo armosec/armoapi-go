@@ -136,6 +136,10 @@ Two matchers rely on this:
   match silently missed and the risk-acceptance never suppressed the incident.
   AWS/GCP keep exact equality (numeric / already-lowercase ids).
 
-Do **not** rewrite the raw event's casing to fix this — the raw record is faithful
-to what Azure sent and rules are evaluated against it; normalize only the derived
-identity fields, and match case-insensitively.
+The recommended behavior is **(a) preserve the original casing everywhere and match
+case-insensitively** at the comparison points above — not (b) rewrite ids into a
+canonical case. Do not normalize casing at any layer: not the raw event (it must
+stay byte-for-byte faithful to what Azure sent; rules are evaluated against it) and
+not the derived identity fields (no single layer owns the canonical form, so a
+partial rewrite just reintroduces mismatches). Case-insensitive matching is the
+whole strategy.
