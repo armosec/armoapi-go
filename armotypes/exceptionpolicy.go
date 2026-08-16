@@ -40,11 +40,13 @@ type BaseExceptionPolicy struct {
 	AdvancedScopes []AdvancedScopeEntity          `json:"advancedScopes,omitempty" bson:"advancedScopes,omitempty"`
 }
 
-// anchoredIgnoreCaseRegexFilter renders a value as a V2List case-insensitive exact
+// AnchoredIgnoreCaseRegexFilter renders a value as a V2List case-insensitive exact
 // match ("^<escaped>$|regex&ignorecase"): an anchored, regex-escaped value with the
-// ignorecase option, which config-service resolves to $regex + $options "i". Mirrors
-// event-ingester's BuildGetAccountWithFeatureQuery.
-func anchoredIgnoreCaseRegexFilter(value string) string {
+// ignorecase option, which config-service resolves to $regex + $options "i".
+// Exported as the single source of this encoding so consumers that today
+// re-implement it (e.g. event-ingester's BuildGetAccountWithFeatureQuery) can route
+// through it instead of drifting out of sync.
+func AnchoredIgnoreCaseRegexFilter(value string) string {
 	return "^" + regexp.QuoteMeta(value) + "$" +
 		V2ListOperatorSeparator + V2ListRegexOperator +
 		V2ListSubQuerySeparator + V2ListIgnoreCaseOption
@@ -99,6 +101,9 @@ func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExc
 		// cloudProvider and accountID are filtered against cloudMetadata.* rather than
 		// designators.attributes.* because CDR incidents historically stored these
 		// only in cloudMetadata.
+		// Hoisted so the accountID branch below can reuse it. Intentionally skips a
+		// present-but-empty provider (the old code would have set the filter to ""):
+		// a no-op improvement, not an accidental behavior change.
 		provider := designator.Attributes[identifiers.AttributeCloudProvider]
 		if provider != "" && provider != GlobalRegex {
 			filter["cloudMetadata.provider"] = provider
@@ -111,7 +116,7 @@ func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExc
 			// BuildGetAccountWithFeatureQuery uses — so an exact-equality miss can't
 			// leave an Azure risk-acceptance ineffective. AWS/GCP keep exact equality.
 			if strings.EqualFold(provider, string(ProviderAzure)) {
-				filter["cloudMetadata.account_id"] = anchoredIgnoreCaseRegexFilter(accountID)
+				filter["cloudMetadata.account_id"] = AnchoredIgnoreCaseRegexFilter(accountID)
 			} else {
 				filter["cloudMetadata.account_id"] = accountID
 			}
