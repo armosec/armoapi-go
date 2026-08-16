@@ -2,6 +2,7 @@ package armotypes
 
 import (
 	"maps"
+	"regexp"
 	"strings"
 	"time"
 
@@ -92,7 +93,19 @@ func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExc
 			filter["cloudMetadata.provider"] = provider
 		}
 		if accountID, ok := designator.Attributes[identifiers.AttributeCloudAccountID]; ok && accountID != GlobalRegex {
-			filter["cloudMetadata.account_id"] = accountID
+			// Azure subscription ids arrive with inconsistent casing: incidents derive
+			// them from the uppercase Activity Log resourceId, while onboarding/storage
+			// keep the customer's original casing. Match case-insensitively — the same
+			// anchored-regex + ignorecase mechanism config-service's
+			// BuildGetAccountWithFeatureQuery uses — so an exact-equality miss can't
+			// leave an Azure risk-acceptance ineffective. AWS/GCP keep exact equality.
+			if strings.EqualFold(designator.Attributes[identifiers.AttributeCloudProvider], string(ProviderAzure)) {
+				filter["cloudMetadata.account_id"] = "^" + regexp.QuoteMeta(accountID) + "$" +
+					V2ListOperatorSeparator + V2ListRegexOperator +
+					V2ListSubQuerySeparator + V2ListIgnoreCaseOption
+			} else {
+				filter["cloudMetadata.account_id"] = accountID
+			}
 		}
 		if instanceID, ok := designator.Attributes[identifiers.AttributeInstanceId]; ok && instanceID != GlobalRegex {
 			filter["designators.attributes.instanceId"] = instanceID
