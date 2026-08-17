@@ -590,6 +590,117 @@ func fillStringFields(t *testing.T, ptr any, keys map[string]string) {
 	}
 }
 
+// Cloud metadata of the sending host. Top level rather than per entity because it
+// describes the machine that sent the message, not any one workload on it.
+
+// The consumer reconstructs cloud metadata from designator attributes, and treats
+// an absent cloud provider as "no cloud metadata at all", so the provider has to
+// survive the trip.
+//
+// The nested keys are pinned literally, not just round-tripped through Go: a
+// Go-to-Go round trip passes whatever the tags say, and producer and consumer run
+// different library versions during a rollout, so a renamed tag is a real
+// cross-version break. Note they are snake_case, unlike the camelCase keys of the
+// enclosing message — CloudMetadata predates this file and keeps its own spelling.
+func TestNetworkStreamCloudMetadataRoundTrip(t *testing.T) {
+	t.Parallel()
+	in := NetworkStream{
+		CloudMetadata: &CloudMetadata{
+			Provider:   ProviderAws,
+			Region:     "us-east-1",
+			AccountID:  "123456789012",
+			InstanceID: "i-0abc123",
+			Hostname:   "ip-192-0-2-10",
+			HostType:   HostTypeEc2,
+		},
+		Entities: map[string]NetworkStreamEntity{
+			"entity-1": {Outbound: map[string]NetworkStreamEvent{"1.2.3.4/443/TCP": {IPAddress: "1.2.3.4"}}},
+		},
+	}
+
+	data, err := json.Marshal(in)
+	require.NoError(t, err)
+
+	var top map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(data, &top))
+	require.Contains(t, top, "cloudMetadata", "the key is read at the top level of the message")
+
+	var nested map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(top["cloudMetadata"], &nested))
+	assert.Equal(t,
+		[]string{"account_id", "host_type", "hostname", "instance_id", "provider", "region"},
+		sortedKeys(nested),
+		"these are the wire keys the consumer maps to designator attributes")
+
+	var out NetworkStream
+	require.NoError(t, json.Unmarshal(data, &out))
+	assert.Equal(t, in.CloudMetadata, out.CloudMetadata)
+}
+
+// A pointer, not a value: encoding/json does not honour omitempty on a struct, so
+// a value field would add "cloudMetadata":{} to every Kubernetes payload that has
+// never carried one. Absent has to stay absent.
+//
+// TestNetworkStreamProcessAttributionOmitted already covers this incidentally, by
+// pinning the same top-level key set. This is not independent coverage; it is here
+// so the failure names the field whose shape caused it.
+func TestNetworkStreamCloudMetadataOmittedWhenAbsent(t *testing.T) {
+	t.Parallel()
+	in := NetworkStream{
+		Entities: map[string]NetworkStreamEntity{
+			"entity-1": {Outbound: map[string]NetworkStreamEvent{"1.2.3.4/443/TCP": {IPAddress: "1.2.3.4"}}},
+		},
+	}
+
+	data, err := json.Marshal(in)
+	require.NoError(t, err)
+
+	var top map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(data, &top))
+	assert.Equal(t, []string{"entities"}, sortedKeys(top), "cloudMetadata may not appear when unset")
+}
+
+// A payload from a sensor that predates the field decodes, and reads as "the
+// sender does not report cloud metadata" rather than as empty metadata.
+func TestNetworkStreamPreCloudMetadataPayloadDecodes(t *testing.T) {
+	t.Parallel()
+	const legacy = `{"entities":{"e1":{"kind":"container","outbound":{"1.2.3.4/443/TCP":{"ipAddress":"1.2.3.4","port":443}}}}}`
+
+	var out NetworkStream
+	require.NoError(t, json.Unmarshal([]byte(legacy), &out))
+
+	assert.Nil(t, out.CloudMetadata)
+}
+
+// Covers the bson tags. The stream is persisted, so a missing tag would store the
+// field under a Go-cased key that no query looks for.
+func TestNetworkStreamCloudMetadataBSONRoundTrip(t *testing.T) {
+	t.Parallel()
+	in := NetworkStream{
+		CloudMetadata: &CloudMetadata{Provider: ProviderAws, Region: "us-east-1", InstanceID: "i-0abc123"},
+	}
+
+	data, err := bson.Marshal(in)
+	require.NoError(t, err)
+
+	var raw bson.M
+	require.NoError(t, bson.Unmarshal(data, &raw))
+	require.Contains(t, raw, "cloudMetadata")
+	// Pinned as a whole subdocument rather than one key at a time: it covers all
+	// three bson tags the fixture sets, not just region, and it reports a diff
+	// rather than panicking if a driver version stops decoding nested documents as
+	// bson.M. Every CloudMetadata bson tag is omitempty, so unset fields stay out.
+	assert.Equal(t, bson.M{
+		"provider":    string(ProviderAws),
+		"region":      "us-east-1",
+		"instance_id": "i-0abc123",
+	}, raw["cloudMetadata"], "bson keys are snake_case, like the json ones")
+
+	var out NetworkStream
+	require.NoError(t, bson.Unmarshal(data, &out))
+	assert.Equal(t, in.CloudMetadata, out.CloudMetadata)
+}
+
 func sortedKeys[V any](m map[string]V) []string {
 	keys := make([]string, 0, len(m))
 	for k := range m {

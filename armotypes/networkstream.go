@@ -111,6 +111,21 @@ type NetworkStream struct {
 	// <identifier> to <network stream entity>
 	Entities map[string]NetworkStreamEntity `json:"entities,omitempty"`
 
+	// CloudMetadata describes the machine that sent this message. Message scope
+	// rather than entity scope: one sensor process reports for one host, so every
+	// entity in a message shares it.
+	//
+	// Consumers that scope host-level alerts by cloud provider, region and instance
+	// need it to place the sender. Why it was added, what the consumer reconstructs
+	// from it and what that reconstruction drops:
+	// docs/features/network-stream-cloud-metadata.md
+	//
+	// A pointer because encoding/json does not honour omitempty on a struct: a
+	// value field would add an empty object to every payload that has never
+	// carried one. Nil means the sender does not report it, which is not the same
+	// as reporting that it knows nothing.
+	CloudMetadata *CloudMetadata `json:"cloudMetadata,omitempty" bson:"cloudMetadata,omitempty"`
+
 	// ProcessAttributionVersion is the revision the producing sensor implements.
 	// Absent/zero means the sensor predates process attribution — not that it ran
 	// and found nothing, which an empty Processes map legitimately means.
