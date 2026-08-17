@@ -686,7 +686,15 @@ func TestNetworkStreamCloudMetadataBSONRoundTrip(t *testing.T) {
 	var raw bson.M
 	require.NoError(t, bson.Unmarshal(data, &raw))
 	require.Contains(t, raw, "cloudMetadata")
-	assert.Equal(t, "us-east-1", raw["cloudMetadata"].(bson.M)["region"])
+	// Pinned as a whole subdocument rather than one key at a time: it covers all
+	// three bson tags the fixture sets, not just region, and it reports a diff
+	// rather than panicking if a driver version stops decoding nested documents as
+	// bson.M. Every CloudMetadata bson tag is omitempty, so unset fields stay out.
+	assert.Equal(t, bson.M{
+		"provider":    string(ProviderAws),
+		"region":      "us-east-1",
+		"instance_id": "i-0abc123",
+	}, raw["cloudMetadata"], "bson keys are snake_case, like the json ones")
 
 	var out NetworkStream
 	require.NoError(t, bson.Unmarshal(data, &out))

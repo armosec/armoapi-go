@@ -115,11 +115,10 @@ type NetworkStream struct {
 	// rather than entity scope: one sensor process reports for one host, so every
 	// entity in a message shares it.
 	//
-	// Host alert policies are scoped by cloud provider, region and instance, and a
-	// consumer that cannot place the sending host has to drop the alert. The
-	// Kubernetes path already carries this on its own alert envelope; the network
-	// stream had no slot for it, so alerts derived from a stream could not be
-	// scoped at all.
+	// Consumers that scope host-level alerts by cloud provider, region and instance
+	// need it to place the sender. Why it was added, what the consumer reconstructs
+	// from it and what that reconstruction drops:
+	// docs/features/network-stream-cloud-metadata.md
 	//
 	// A pointer because encoding/json does not honour omitempty on a struct: a
 	// value field would add an empty object to every payload that has never
