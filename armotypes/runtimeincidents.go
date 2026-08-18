@@ -327,6 +327,52 @@ type NetworkScanAlert struct {
 	Addresses []string `json:"addresses,omitempty" bson:"addresses,omitempty"`
 }
 
+// AdmissionEvidence identifies a remembered admission request. It is the
+// admission-side counterpart to Process: an admission event has no PID, and its
+// useful identity (who did what to which object) has no home in Process.
+type AdmissionEvidence struct {
+	Username        string   `json:"username" bson:"username"`
+	Groups          []string `json:"groups,omitempty" bson:"groups,omitempty"`
+	Operation       string   `json:"operation,omitempty" bson:"operation,omitempty"`
+	Resource        string   `json:"resource,omitempty" bson:"resource,omitempty"`
+	Subresource     string   `json:"subresource,omitempty" bson:"subresource,omitempty"`
+	Kind            string   `json:"kind,omitempty" bson:"kind,omitempty"`
+	ObjectName      string   `json:"objectName,omitempty" bson:"objectName,omitempty"`
+	ObjectNamespace string   `json:"objectNamespace,omitempty" bson:"objectNamespace,omitempty"`
+}
+
+// CorrelationEvidence is one remembered event that contributed to a
+// correlation alert — the "other end" of the chain, which the triggering event
+// alone cannot describe.
+//
+// Process and Admission are a tagged union: exactly one is set, determined by
+// the engine that wrote the entry (node-agent or the operator).
+type CorrelationEvidence struct {
+	// Name is the state variable the entry was stored under.
+	Name string `json:"name" bson:"name"`
+	// EventType is the stream the remembered event came from.
+	EventType EventType `json:"eventType" bson:"eventType"`
+	// Timestamp is the kernel/request time of the remembered event, not the
+	// time it was observed. Ordering comparisons rely on this.
+	Timestamp time.Time  `json:"timestamp" bson:"timestamp"`
+	Scope     StateScope `json:"scope,omitempty" bson:"scope,omitempty"`
+	// Key is the subject discriminator, empty for scope-wide markers.
+	Key string `json:"key,omitempty" bson:"key,omitempty"`
+
+	Process   *Process           `json:"process,omitempty" bson:"process,omitempty"`
+	Admission *AdmissionEvidence `json:"admission,omitempty" bson:"admission,omitempty"`
+
+	// Values carries author-supplied extras from the rule's StateWrite.Value.
+	Values map[string]interface{} `json:"values,omitempty" bson:"values,omitempty"`
+}
+
+// CorrelationAlert is inlined into RuntimeAlert. Because both node-agent and
+// the operator build RuntimeAlert, this single type carries correlation
+// evidence for both engines.
+type CorrelationAlert struct {
+	Correlations []CorrelationEvidence `json:"correlations,omitempty" bson:"correlations,omitempty"`
+}
+
 type RuntimeAlert struct {
 	BaseRuntimeAlert       `json:",inline" bson:"inline"`
 	RuleAlert              `json:",inline" bson:"inline"`
@@ -337,6 +383,7 @@ type RuntimeAlert struct {
 	cdr.CdrAlert           `json:"cdrevent,omitempty" bson:"cdrevent"`
 	HttpRuleAlert          `json:",inline" bson:"inline"`
 	NetworkScanAlert       `json:"networkscan,inline" bson:"networkscan"`
+	CorrelationAlert       `json:",inline" bson:"inline"`
 	AlertType              AlertType           `json:"alertType" bson:"alertType"`
 	AlertSourcePlatform    AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
 	// Rule ID

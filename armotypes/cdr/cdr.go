@@ -15,6 +15,12 @@ type CloudService string
 const (
 	// CloudTrail is the cloudtrail service
 	CloudTrail CloudService = "cloudtrail"
+	// ActivityLogs is the Azure Activity Log service (control-plane audit log)
+	ActivityLogs CloudService = "activitylogs"
+	// CloudAuditLogs is the GCP Cloud Audit Logs service; the CDR pipe consumes
+	// the Admin Activity control-plane audit log (the GCP equivalent of AWS
+	// CloudTrail management events / the Azure Activity Log).
+	CloudAuditLogs CloudService = "cloudauditlogs"
 	// Add more cloud services here
 )
 
@@ -24,6 +30,10 @@ type CloudProvider string
 const (
 	// AWS is the AWS cloud provider
 	AWS CloudProvider = "aws"
+	// Azure is the Microsoft Azure cloud provider
+	Azure CloudProvider = "azure"
+	// GCP is the Google Cloud Platform cloud provider
+	GCP CloudProvider = "gcp"
 	// Add more cloud providers here
 )
 
@@ -38,6 +48,10 @@ type CloudMetadata struct {
 type EventData struct {
 	// AWSCloudTrail cloudtrail event
 	AWSCloudTrail *CloudTrailEvent `json:"awsCloudTrail,omitempty"`
+	// AzureActivityLog azure activity log event
+	AzureActivityLog *AzureActivityLogEvent `json:"azureActivityLog,omitempty"`
+	// GcpAuditLog gcp cloud audit log (Admin Activity) event
+	GcpAuditLog *GcpAuditLogEvent `json:"gcpAuditLog,omitempty"`
 	// Target resource
 	TargetResource string `json:"targetResource,omitempty"`
 	// Identifiers of the alert
@@ -70,6 +84,21 @@ type CdrAlert struct {
 	UniqueID string `json:"uniqueID,omitempty"`
 }
 
+// ConnectionLevel states whether a CDR batch belongs to a single-account connection or an
+// organization/tenant-wide one. The ingester routes keep-alive on this stated intent rather
+// than inferring it from OrgID presence; an empty value means "infer" — the legacy behavior
+// existing AWS producers rely on. See docs/features/cdr-heartbeat-contract.md.
+type ConnectionLevel string
+
+const (
+	// ConnectionLevelAccount is a single-account connection (AWS account / Azure
+	// subscription / GCP project); keep-alive is keyed on CloudAccountID.
+	ConnectionLevelAccount ConnectionLevel = "account"
+	// ConnectionLevelOrganization is an organization/tenant-wide connection (AWS org /
+	// Azure tenant / GCP org); keep-alive is keyed on OrgID.
+	ConnectionLevelOrganization ConnectionLevel = "organization"
+)
+
 type CdrAlertBatch struct {
 	// CustomerGUID is the unique identifier of the customer
 	CustomerGUID string `json:"customerGUID,omitempty"`
@@ -81,4 +110,8 @@ type CdrAlertBatch struct {
 	Provider CloudProvider `json:"provider,omitempty"`
 	// RuleFailures is the list of rule failures
 	RuleFailures []CdrAlert `json:"ruleFailures,omitempty"`
+	// IsHeartbeat marks a periodic liveness message (no RuleFailures); absent/false = a normal alert batch. See docs/features/cdr-heartbeat-contract.md.
+	IsHeartbeat bool `json:"isHeartbeat,omitempty"`
+	// ConnectionLevel states account- vs organization-level so the ingester routes keep-alive by intent, not by OrgID presence; empty = legacy inference. See docs/features/cdr-heartbeat-contract.md.
+	ConnectionLevel ConnectionLevel `json:"connectionLevel,omitempty"`
 }
