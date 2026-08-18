@@ -6,6 +6,7 @@ scope: repo
 related_code:
   - armotypes/cdr/azure.go
   - armotypes/cdr/azure_shapes_test.go
+  - armotypes/cdr/azure_eventhub_capture_test.go
 ---
 
 # Azure Activity Log event shape (two delivery paths)
@@ -19,13 +20,57 @@ Reading the wrong fields yields silent emptiness, not an error.
 | | Event Hub / diagnostic-settings export | Azure Monitor REST / management API |
 |---|---|---|
 | Who consumes it | the in-account CDR collector | `az monitor activity-log list`, portal, SDK queries |
-| `caller` | **absent** | present (UPN) |
+| `caller` | **almost always absent** (9/339 — `Microsoft.Sql/servers/*` only) | present (UPN) |
 | `authorization` | nested under `identity` | top level |
 | `claims` | nested under `identity` | top level |
 | `operationName`, `category` | plain **strings** (upper-cased) | `{value, localizedValue}` objects |
 | Extras | `RoleLocation`, `Stamp`, `ReleaseVersion`, `VmSku` | — |
 
-Both are captured as fixtures in `azure_shapes_test.go`.
+Both are captured as fixtures in `azure_shapes_test.go`. A sanitized **real**
+Event Hub record lives in `azure_eventhub_capture_test.go`; prefer it when
+reasoning about production behaviour.
+
+## Measured against real data (SUB-7951)
+
+Microsoft's docs contradict each other on identity placement, so it was settled
+by capture: **339 records** off a live subscription-level Event Hub diagnostic
+setting, 2026-08-18.
+
+| Field | Present |
+|---|---|
+| top-level `authorization` | **0/339** |
+| top-level `claims` | **0/339** |
+| top-level `caller` | 9/339 (`Microsoft.Sql/servers/*`) |
+| `identity.authorization` | 330/339 |
+| `identity.claims` | 330/339 |
+| `subscriptionId` | 9/339 — derive from `resourceId` (parseable 339/339) |
+| `location` | **0/339** |
+| `channels` | **0/339** |
+| `resourceGroupName` | 0/339 (9 records send `ResourceGroup`, value `"DummyValue"`) |
+
+All 339 decode through `AzureActivityLogEvent` with **zero errors**.
+
+Two consequences worth knowing:
+
+- **`upn` is never present** (0/339). `EffectiveCaller` lists it first, but real
+  resolution happens via the `name` claim. Harmless, just not what fires.
+- **8/339 records resolve to no actor at all** — service-principal calls whose
+  claims carry `appid` but neither `name` nor `upn`. Those alerts ship with an
+  empty `UserIdentity`, which is a source limitation, not a mapping bug.
+
+## There is no region on an Activity Log record
+
+`Location` is modelled but Azure never sends it — 0/339 on the Event Hub shape and
+absent from the REST representation too. This is why Azure CDR incidents show an
+empty region, and it is a **source limitation, not a pipeline bug**: nothing is
+discarded in transit. AWS CloudTrail carries `awsRegion`, so the asymmetry between
+providers is inherent to the sources.
+
+Do **not** substitute `RoleLocation`. It is the Azure infrastructure stamp that
+processed the API request, not where the resource lives — a resource in one region
+is routinely served by a stamp in another, so mapping it to region would populate
+the field with confidently wrong data. Real region would require an ARM lookup on
+`resourceId` (an API call per resource, plus a permissions expansion).
 
 **The struct models the REST shape's identity layout only.** A verbatim REST
 response does not decode through it — `operationName` and `category` arrive as
@@ -110,7 +155,11 @@ byte-for-byte faithful to what Azure sent.
 ## Fields deliberately not modelled
 
 The Event Hub wrapper fields (`RoleLocation`, `Stamp`, `ReleaseVersion`, `VmSku`)
-carry no detection or attribution value. Unknown fields are ignored on decode, so
+carry no detection or attribution value. The capture also surfaced `durationMs`
+(330/339, mostly `"0"`), `jobId`/`jobType` (58/339, Azure async-job bookkeeping
+such as `ResourceConsistencyJob`), and `LogicalServerName`/`ResourceGroup` on the
+9 SQL records — where `ResourceGroup` is the literal string `"DummyValue"`. None
+are security-relevant, so none are modelled. Unknown fields are ignored on decode, so
 adding them is unnecessary; detection rules are evaluated against the **raw**
 record JSON, not this struct, so a rule can still reference anything the export
 sends.
