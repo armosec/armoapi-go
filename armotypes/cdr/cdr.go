@@ -114,4 +114,36 @@ type CdrAlertBatch struct {
 	IsHeartbeat bool `json:"isHeartbeat,omitempty"`
 	// ConnectionLevel states account- vs organization-level so the ingester routes keep-alive by intent, not by OrgID presence; empty = legacy inference. See docs/features/cdr-heartbeat-contract.md.
 	ConnectionLevel ConnectionLevel `json:"connectionLevel,omitempty"`
+	// LogsSeen counts audit records the collector received through its log pipe since start, so the backend can gate Pending -> Connected on evidence rather than liveness; nil = producer does not report it, 0 = reports it and has seen none. Read it with LogsSeenValue. See docs/features/cdr-heartbeat-contract.md.
+	LogsSeen *uint64 `json:"logsSeen,omitempty"`
+}
+
+// LogsSeenValue returns the batch's logsSeen count and whether the producer
+// reported it at all.
+//
+// Branch on reported rather than treating a missing count as zero. The two say
+// different things, and conflating them breaks the gate in both directions: a
+// producer that does not report the signal (AWS, Azure) has to fall back to
+// liveness, while a producer reporting zero is explicitly saying "no log has
+// traversed the pipe yet" and must not be treated as connected. This is why the
+// field is a pointer — omitempty tests nil, not the pointee, so an explicit 0
+// still reaches the wire.
+//
+// The count gates the Pending -> Connected transition ONLY, and that transition
+// latches. The count is cumulative per collector instance and resets when the
+// instance is replaced, so an already-Connected account will legitimately send
+// logsSeen: 0 again after a restart; regressing it to Pending on that would flap
+// the connection on every recycle.
+func (b *CdrAlertBatch) LogsSeenValue() (count uint64, reported bool) {
+	if b == nil || b.LogsSeen == nil {
+		return 0, false
+	}
+	return *b.LogsSeen, true
+}
+
+// NewLogsSeen returns a pointer suitable for CdrAlertBatch.LogsSeen. Producers use
+// it so that reporting a genuine zero is a one-liner and does not accidentally
+// become "not reported".
+func NewLogsSeen(count uint64) *uint64 {
+	return &count
 }
