@@ -9,9 +9,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// azureActivityLogSample is a trimmed real Azure Activity Log record captured in
-// the POC (Event Hub `records[]` envelope; identity claims abbreviated). See the
-// azure-cdr-poc FINDINGS.md for the full sample.
+// azureActivityLogSample is the POC-era sample. Despite the `records[]` envelope
+// it carries authorization/claims/caller/channels at the TOP LEVEL, which is the
+// Azure Monitor REST/management identity layout — NOT what Event Hub delivers.
+// A live capture (SUB-7951) found that layout in 0/339 real Event Hub records.
+//
+// Kept deliberately: the struct models both layouts, and this is the only
+// coverage of the flat one. For the shape the collector actually consumes, see
+// azureEventHubCapture in azure_eventhub_capture_test.go — use that one when
+// reasoning about production behaviour.
 const azureActivityLogSample = `{
   "records": [
     {
