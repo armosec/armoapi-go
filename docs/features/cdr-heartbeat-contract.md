@@ -114,7 +114,7 @@ not the pointee, so an explicit `0` is still serialized and stays distinguishabl
 | Wire | Meaning | Consumer behavior |
 |---|---|---|
 | field absent | this producer does not report the signal (AWS and Azure today) | fall back to flipping on liveness alone |
-| `"logsSeen": 0` | producer reports it; **no log has traversed the pipe yet** | hold the connection `Pending` |
+| `"logsSeen": 0` | producer reports it; no log seen **by this instance** yet | do not advance to `Connected`; never regress from it |
 | `"logsSeen": N` (N > 0) | a log provably traversed the pipe | flip `Pending → Connected` |
 
 Conflating the first two rows breaks the gate in **both** directions: treating absent as
@@ -128,6 +128,14 @@ dereferencing or defaulting the pointer.
 Every audit record that arrived through the log pipe and decoded — **including** records
 a detection gate skips and records no rule matches. It is evidence that the *pipe* is
 live, not that a detection fired, so filtering it by either would defeat its purpose.
+
+**It is cumulative per collector instance, and resets to zero when that instance is
+replaced.** It is not a durable total and is not comparable across restarts. Instances
+*are* replaced in normal operation — a deploy, a crash, or the platform recycling a
+container (which Cloud Run does even at `min-instances=1`) — so a healthy,
+already-`Connected` account will legitimately emit `logsSeen: 0` again for as long as it
+takes the fresh instance to see its first log. See the latching rule below; this is the
+single most likely way to misimplement the consumer side.
 
 ## Producer expectations
 
@@ -162,9 +170,15 @@ signal) and then periodically at an interval **shorter than the disconnect thres
   An unrecognized value must fall back to inference, never error.
 - Read `LogsSeen` via `LogsSeenValue()`. When `reported` is false, keep the existing
   liveness behavior (flip on first heartbeat). When it is true, gate `Pending →
-  Connected` on `count > 0` and hold `Pending` at zero. Either way, keep refreshing
-  `LastKeepAlive` on every message — the count gates the *connect* transition only, never
-  the disconnect one, or a quiet account would drift to `Disconnected` while healthy.
+  Connected` on `count > 0`; at zero, **leave the connection in whatever state it is
+  already in** — do not advance it. Either way, keep refreshing `LastKeepAlive` on every
+  message: the count gates the *connect* transition only, never the disconnect one, or a
+  quiet account would drift to `Disconnected` while healthy.
+- **The `Pending → Connected` flip latches — it is one-way.** Once an account is
+  `Connected`, a later `logsSeen: 0` must never regress it to `Pending`. The count is
+  per-instance and resets on restart (above), so reading zero as "not connected" rather
+  than "no new evidence" would flap the connection on every container recycle. Treat a
+  zero as *absence of new evidence*, never as evidence of absence.
 - The legacy AWS `StackReady` rule-name path stays as-is (deploy-time connect) — a
   heartbeat does not replace it, and the two are dispatched independently.
 

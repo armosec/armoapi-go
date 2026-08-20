@@ -114,29 +114,26 @@ type CdrAlertBatch struct {
 	IsHeartbeat bool `json:"isHeartbeat,omitempty"`
 	// ConnectionLevel states account- vs organization-level so the ingester routes keep-alive by intent, not by OrgID presence; empty = legacy inference. See docs/features/cdr-heartbeat-contract.md.
 	ConnectionLevel ConnectionLevel `json:"connectionLevel,omitempty"`
-	// LogsSeen is how many raw audit records the collector has received through its
-	// log pipe since start. It is the verification signal that lets the backend flip
-	// Pending -> Connected only once a log has provably traversed the pipe, rather
-	// than merely on collector liveness.
-	//
-	// It is a POINTER because absent and zero mean different things, and conflating
-	// them breaks the gate in both directions:
-	//   - nil  = this producer does not report the signal (AWS and Azure today).
-	//            The backend must fall back to flipping on liveness alone.
-	//   - 0    = the producer DOES report it and no log has traversed the pipe yet.
-	//            The backend must hold the connection Pending.
-	// omitempty on a pointer tests nil, not the pointee, so an explicit 0 is still
-	// serialized and stays distinguishable from "not reported".
-	//
-	// See docs/features/cdr-heartbeat-contract.md.
+	// LogsSeen counts audit records the collector received through its log pipe since start, so the backend can gate Pending -> Connected on evidence rather than liveness; nil = producer does not report it, 0 = reports it and has seen none. Read it with LogsSeenValue. See docs/features/cdr-heartbeat-contract.md.
 	LogsSeen *uint64 `json:"logsSeen,omitempty"`
 }
 
 // LogsSeenValue returns the batch's logsSeen count and whether the producer
-// reported it at all. Consumers must branch on reported rather than treating a
-// missing count as zero: a producer that does not report the signal has to fall
-// back to liveness, whereas a producer reporting zero is explicitly saying "no log
-// has traversed the pipe yet" and must NOT be treated as connected.
+// reported it at all.
+//
+// Branch on reported rather than treating a missing count as zero. The two say
+// different things, and conflating them breaks the gate in both directions: a
+// producer that does not report the signal (AWS, Azure) has to fall back to
+// liveness, while a producer reporting zero is explicitly saying "no log has
+// traversed the pipe yet" and must not be treated as connected. This is why the
+// field is a pointer — omitempty tests nil, not the pointee, so an explicit 0
+// still reaches the wire.
+//
+// The count gates the Pending -> Connected transition ONLY, and that transition
+// latches. The count is cumulative per collector instance and resets when the
+// instance is replaced, so an already-Connected account will legitimately send
+// logsSeen: 0 again after a restart; regressing it to Pending on that would flap
+// the connection on every recycle.
 func (b *CdrAlertBatch) LogsSeenValue() (count uint64, reported bool) {
 	if b == nil || b.LogsSeen == nil {
 		return 0, false

@@ -2,7 +2,6 @@ package cdr
 
 import (
 	"encoding/json"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,9 +35,24 @@ func TestCdrAlertBatchConnectionLevel(t *testing.T) {
 	t.Run("omitted when empty (AWS back-compat)", func(t *testing.T) {
 		b, err := json.Marshal(CdrAlertBatch{CustomerGUID: "cg", Provider: AWS})
 		require.NoError(t, err)
-		assert.False(t, strings.Contains(string(b), "connectionLevel"),
+		assert.NotContains(t, jsonKeys(t, b), "connectionLevel",
 			"an unset ConnectionLevel must not appear on the wire")
 	})
+}
+
+// jsonKeys returns the top-level key set of a marshalled batch. Absence is
+// asserted on the key set rather than with strings.Contains on the raw JSON: a
+// substring check can pass or fail on an unrelated field's *value* that happens to
+// contain the name, so it does not actually test what it claims to.
+func jsonKeys(t *testing.T, b []byte) map[string]struct{} {
+	t.Helper()
+	var m map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(b, &m))
+	keys := make(map[string]struct{}, len(m))
+	for k := range m {
+		keys[k] = struct{}{}
+	}
+	return keys
 }
 
 // TestCdrAlertBatchLogsSeen locks the wire contract for LogsSeen. The load-bearing
@@ -51,8 +65,8 @@ func TestCdrAlertBatchLogsSeen(t *testing.T) {
 	t.Run("omitted when not reported (AWS/Azure back-compat)", func(t *testing.T) {
 		b, err := json.Marshal(CdrAlertBatch{CustomerGUID: "cg", Provider: AWS, IsHeartbeat: true})
 		require.NoError(t, err)
-		assert.False(t, strings.Contains(string(b), "logsSeen"),
-			"a producer that does not report logsSeen must not put it on the wire")
+		assert.NotContains(t, jsonKeys(t, b), "logsSeen",
+			"a producer that does not report logsSeen must not put the key on the wire")
 	})
 
 	t.Run("an explicit zero IS serialized", func(t *testing.T) {
@@ -66,7 +80,14 @@ func TestCdrAlertBatchLogsSeen(t *testing.T) {
 			LogsSeen:        NewLogsSeen(0),
 		})
 		require.NoError(t, err)
-		assert.Contains(t, string(b), `"logsSeen":0`)
+		assert.Contains(t, jsonKeys(t, b), "logsSeen",
+			"an explicit zero must reach the wire, or it is indistinguishable from not reporting")
+
+		var got CdrAlertBatch
+		require.NoError(t, json.Unmarshal(b, &got))
+		count, reported := got.LogsSeenValue()
+		assert.True(t, reported)
+		assert.Equal(t, uint64(0), count)
 	})
 
 	t.Run("non-zero round-trips", func(t *testing.T) {
@@ -76,7 +97,7 @@ func TestCdrAlertBatchLogsSeen(t *testing.T) {
 			LogsSeen: NewLogsSeen(42),
 		})
 		require.NoError(t, err)
-		assert.Contains(t, string(b), `"logsSeen":42`)
+		assert.Contains(t, jsonKeys(t, b), "logsSeen")
 
 		var got CdrAlertBatch
 		require.NoError(t, json.Unmarshal(b, &got))
