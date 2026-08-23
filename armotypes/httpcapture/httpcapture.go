@@ -50,11 +50,17 @@ const (
 	FidelityPartial      CaptureFidelity = "partial"       // a fragment was lost / reassembly timed out
 )
 
-// DefaultMaxFragmentBytes is the default per-fragment payload cap. It sits well
-// under the ~4 MB OTLP/gRPC message ceiling to leave headroom for the record
-// envelope and for the ~33% base64 expansion a bytes value incurs when a LogRecord
-// is JSON-encoded; 1 MiB of raw payload encodes to well under 4 MB (spec §5.10).
-const DefaultMaxFragmentBytes = 1 << 20 // 1 MiB
+// DefaultMaxFragmentBytes is the default per-fragment payload cap. Two limits bind: the ~1 MB
+// Kinesis Firehose per-RECORD limit (one fragment = one JSON record on the fragment->Iceberg
+// hop) and the ~4 MB OTLP/gRPC message ceiling (a batch of records). A bytes value incurs ~33%
+// base64 expansion when the LogRecord is JSON-encoded, so 256 KiB of raw payload encodes to
+// ~350 KB: safely under the 1 MB Firehose record cap. That also bounds the per-record
+// contribution to an OTLP batch (~350 KB vs ~1.4 MB at 1 MiB), so a reasonably bounded batch
+// fits the 4 MB ceiling -- though the exporter, not this cap, owns the batch bound. 1 MiB was
+// unsafe on the Firehose axis: ~1.4 MB per record exceeds the 1 MB limit and jams the delivery
+// stream. Real fragments are tiny (p50 ~140 B, max ~145 KB observed), so this cap only ever
+// clips rare jumbo bodies.
+const DefaultMaxFragmentBytes = 1 << 18 // 256 KiB
 
 // CurrentProtocolVersion is the wire-contract version stamped on every record and
 // every config response "from day one" (spec §5.10): with two sensor types and a
