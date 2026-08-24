@@ -31,6 +31,13 @@ var MandatorySeccompSyscalls = []string{"epoll_wait", "tgkill", "sched_yield"}
 // Allowing this set trades a small amount of tightness for the guarantee that a
 // generated profile can never prevent a workload from starting. It is far narrower
 // than the container runtime's default profile, which allows roughly 300 syscalls.
+//
+// Architecture scope: this is the baseline for the architectures generated profiles
+// declare today (SCMP_ARCH_X86_64/X86/X32, see the seccomp profile generator), so
+// x86-specific names such as arch_prctl and getpgrp are correct here. Names that do
+// not resolve on the running kernel are skipped by the deployed runtime rather than
+// rejected (measured: profiles carrying an unresolvable name applied and started).
+// If generated profiles ever declare arm64, key this baseline by architecture.
 var SeccompRuntimeBaselineSyscalls = []string{
 	// container runtime init and process setup
 	"arch_prctl", "capget", "capset", "chdir", "clone", "clone3", "execve", "execveat",
@@ -41,16 +48,19 @@ var SeccompRuntimeBaselineSyscalls = []string{
 	// file descriptors and metadata, used by runc when closing exec fds
 	"close", "close_range", "dup2", "dup3", "fcntl", "fstat", "fstatfs", "lseek",
 	"newfstatat", "stat", "statfs", "statx",
-	// filesystem access performed by the loader and libc startup
+	// filesystem access performed by the loader and libc startup; the dynamic
+	// loader reads ELF and program headers with pread64 and resolves paths with
+	// readlink before the entrypoint runs
 	"access", "faccessat2", "getcwd", "getdents64", "open", "openat", "openat2",
-	"read", "write",
+	"pread64", "read", "readlink", "readlinkat", "write",
 	// signals
 	"rt_sigaction", "rt_sigprocmask", "rt_sigreturn", "sigaltstack",
 	// identity and misc startup queries
 	"getegid", "geteuid", "getgid", "getpgrp", "getpid", "getppid", "getrandom",
 	"gettid", "getuid", "ioctl", "sysinfo", "uname",
-	// scheduling and synchronization primitives used from the first instruction
-	"futex", "nanosleep", "pipe2",
+	// scheduling and synchronization primitives used from the first instruction;
+	// glibc 2.35+ registers every thread with rseq during startup
+	"futex", "nanosleep", "pipe2", "rseq",
 }
 
 type SeccompWorkload struct {

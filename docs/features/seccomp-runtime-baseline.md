@@ -45,8 +45,7 @@ excluded when scoring a profile as overly permissive.
 
 ## Security tradeoff
 
-The baseline is a startup floor, not a permissive profile. It is roughly 70
-syscalls against about 300 in the container runtime default profile, so an
+The baseline is a startup floor, not a permissive profile. It targets the architectures generated profiles declare today (SCMP_ARCH_X86_64/X86/X32); names that do not resolve on the running kernel are skipped by the deployed runtime rather than rejected (measured: a profile carrying an unresolvable name applied and the container started). If generated profiles ever declare arm64, the baseline must become architecture-keyed. It is roughly 70 syscalls against about 300 in the container runtime default profile, so an
 enforced profile stays meaningfully tighter than unconfined while never being able
 to prevent a workload from starting. A test asserts the list stays well under the
 runtime default size, so growth is a deliberate decision rather than drift.
@@ -58,7 +57,7 @@ runtime default size, so growth is a deliberate decision rather than drift.
 | runtime init and process setup | runc init, credential and namespace setup, `execve` |
 | memory | loader and allocator setup |
 | file descriptors and metadata | includes `fstatfs`, needed when runc closes exec fds |
-| filesystem access | dynamic loader and libc startup reads |
+| filesystem access | loader and libc startup reads, including pread64 for ELF headers and readlink for path resolution |
 | signals | libc signal setup |
 | identity and misc startup queries | uid/gid and environment queries at startup |
 | scheduling and synchronization | primitives used from the first instruction |

@@ -18,10 +18,14 @@ func TestSeccompRuntimeBaselineCoversContainerStart(t *testing.T) {
 	// fstatfs is the syscall runc was denied when it failed with
 	// "error closing exec fds: get handle to /proc/thread-self/fd: fstatfs ... operation not permitted".
 	// The rest are the minimum for exec, memory setup, and libc startup.
+	// pread64 is how the dynamic loader reads ELF and program headers; rseq is
+	// registered by glibc 2.35+ at thread startup. Both were observed in reference
+	// captures of container startup and their absence breaks the startup guarantee.
 	for _, required := range []string{
 		"fstatfs", "execve", "mmap", "brk", "read", "write", "close",
 		"prctl", "capset", "capget", "arch_prctl", "exit_group",
 		"set_tid_address", "rt_sigaction", "rt_sigreturn",
+		"pread64", "rseq", "readlink", "readlinkat",
 	} {
 		assert.True(t, baseline[required],
 			"%q must be in SeccompRuntimeBaselineSyscalls: a container cannot start without it", required)
