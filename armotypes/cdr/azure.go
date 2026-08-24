@@ -60,11 +60,19 @@ type AzureActivityLogEvent struct {
 	// Caller is the identity that performed the operation (UPN or object ID).
 	Caller string `json:"caller,omitempty"`
 	Level  string `json:"level,omitempty"`
-	// Location is the Azure region the operation acted in — the analog of AWS
-	// awsRegion. Often "global" for control-plane operations (subscription /
-	// resource-group scope), a region (e.g. "eastus") for regional resources.
+	// Location would be the Azure region the operation acted in — the analog of AWS
+	// awsRegion. In practice Activity Log records DO NOT CARRY IT: measured 0/339
+	// over a live Event Hub capture (SUB-7951), and absent from the Azure Monitor
+	// REST representation too. Kept only so a future schema that does supply it
+	// binds without a struct change; treat it as always empty and do not surface it
+	// as "region" downstream.
+	//
+	// The Event Hub wrapper field "RoleLocation" is NOT a substitute — it is the
+	// Azure infrastructure stamp that processed the request, not where the resource
+	// lives, so mapping it to region yields confidently wrong data.
 	Location string `json:"location,omitempty"`
-	// Channels is the Activity Log channel (e.g. "Operation").
+	// Channels is the Activity Log channel (e.g. "Operation"). Absent on the Event
+	// Hub shape (0/339 in the SUB-7951 capture); present only on the REST shape.
 	Channels string `json:"channels,omitempty"`
 	// SubscriptionID / TenantID / ResourceGroupName are the account identifiers
 	// (Azure's equivalents of the AWS accountId/orgId). Present on the
