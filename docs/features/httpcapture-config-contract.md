@@ -23,6 +23,10 @@ The config the node-agent pulls (via careportsreceiver) and applies, fail-closed
   `maxTransactionBytes`), volume caps (`maxTransactionsPerHour`,
   `maxTransactionsPerSandboxPerHour`), and credential masking
   (`maskKnownCredentialHeaders` *(pointer; absent ⇒ mask)*, `extraCredentialHeaders`).
+  `maxFragmentBytes` absent/0 ⇒ `DefaultMaxFragmentBytes` = **256 KiB**: one fragment is one
+  base64-encoded JSON record on the fragment→Iceberg Firehose hop, so the raw cap must leave
+  room for the ~33% expansion under the ~1 MB Firehose per-record limit (256 KiB → ~350 KB;
+  1 MiB → ~1.4 MB would exceed it and jam the stream).
 - **Capture policy** (added for SUB-7696 — the migration the type's doc comment promised):
   - `defaultLevel` (string) — level when no rule matches; absent ⇒ `"none"` (fail-closed).
   - `rules` (`[]CaptureRule`) — ordered, **first-match-wins** upload policy.
