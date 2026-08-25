@@ -22,10 +22,11 @@ Design/analysis: `shared-designs-and-docs/cdr/cdr-backend-azure-readiness-audit.
 ## Why it exists
 
 CADR "connected" status is kept fresh by keep-alive: the ingester stamps the CADR
-feature's `LastKeepAlive` on every message it processes, and a disconnect cron flips
+feature's `LastKeepAlive` on the messages it processes, and a disconnect cron flips
 an account to `Disconnected` once that stamp goes stale. On a quiet subscription no
 real alerts fire, so the collector must send a periodic heartbeat or it would be
-falsely disconnected.
+falsely disconnected. (The stamp is scoped by status — a reported `logsSeen: 0` on a
+still-`Pending` connection is deliberately *not* stamped; see "Consumer expectations".)
 
 AWS encodes its one-shot, deploy-time connect signal as a rule failure named
 `"StackReady"` (fired by a CloudFormation custom resource). That is the wrong vehicle
@@ -44,8 +45,9 @@ IsHeartbeat bool `json:"isHeartbeat,omitempty"`
 - **Absent / `false`** — a normal alert batch. Existing AWS producers are unaffected;
   the field is additive and back-compatible.
 - **`true`** — a heartbeat. The batch carries **no `RuleFailures`**. The ingester uses
-  it to refresh the CADR feature's connected / `LastKeepAlive` state and **skips the
-  alert pipeline** (no incident is created).
+  it to refresh the CADR feature's connected / `LastKeepAlive` state (subject to the
+  `LogsSeen` gate and status-scoped stamping — see "Logs seen" and "Consumer expectations")
+  and **skips the alert pipeline** (no incident is created).
 
 ## Connection level (routing)
 
