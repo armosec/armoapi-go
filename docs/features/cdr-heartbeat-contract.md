@@ -169,11 +169,17 @@ signal) and then periodically at an interval **shorter than the disconnect thres
   `organization` → key on `OrgID`); when absent, fall back to `OrgID`-presence inference.
   An unrecognized value must fall back to inference, never error.
 - Read `LogsSeen` via `LogsSeenValue()`. When `reported` is false, keep the existing
-  liveness behavior (flip on first heartbeat). When it is true, gate `Pending →
-  Connected` on `count > 0`; at zero, **leave the connection in whatever state it is
-  already in** — do not advance it. Either way, keep refreshing `LastKeepAlive` on every
-  message: the count gates the *connect* transition only, never the disconnect one, or a
-  quiet account would drift to `Disconnected` while healthy.
+  liveness behavior (flip on first heartbeat, and refresh `LastKeepAlive`). When it is true,
+  gate `Pending → Connected` on `count > 0`; at zero, **leave the connection in whatever
+  state it is already in** — do not advance it.
+- **Scope the keep-alive stamp by current status.** Refresh `LastKeepAlive` whenever the
+  connection is (or becomes) `Connected`, and on any not-reported message. But a reported
+  `logsSeen: 0` on a connection that is **still `Pending`** must **not** stamp: leaving its
+  `LastKeepAlive` empty is what lets the disconnect job age a never-connected, silently-blind
+  connection out on its creation time (a heartbeat proves the collector is alive, never that a
+  log traversed the pipe). An already-`Connected` connection is always stamped — including on
+  `logsSeen: 0` — so a collector restart that resets the cumulative count cannot flap it. The
+  count gates the *connect* transition only, never the disconnect one.
 - **The `Pending → Connected` flip latches — it is one-way.** Once an account is
   `Connected`, a later `logsSeen: 0` must never regress it to `Pending`. The count is
   per-instance and resets on restart (above), so reading zero as "not connected" rather
