@@ -73,6 +73,22 @@ func TestResolveVariantExpressions_NoVariants(t *testing.T) {
 	assert.False(t, ok)
 }
 
+func TestResolveVariantExpressions_PrereleaseAgentVersionTreatedAsBelowRelease(t *testing.T) {
+	// Documented asymmetry: variant floors reject prerelease metadata outright (ValidateVariants),
+	// but agentVersion - the requester's own version, not under this package's control - is
+	// parsed with hashiVer.NewVersion's normal lenient rules, which orders a prerelease build
+	// below its corresponding release. So a requester reporting "1.5.0-rc1" does not satisfy a
+	// "1.5.0" floor - it resolves as if it were older than 1.5.0. Conservative, not unsafe, but
+	// silent - this test exists so the behavior can't drift without a test noticing.
+	variants := []RuleVariant{
+		{MinAgentVersion: "1.0.0", Expressions: expr("base")},
+		{MinAgentVersion: "1.5.0", Expressions: expr("new")},
+	}
+	got, ok := ResolveVariantExpressions(variants, "1.5.0-rc1")
+	require.True(t, ok)
+	assert.Equal(t, "base", got.Message, "a prerelease-tagged agent version must not satisfy the release floor it's a prerelease of")
+}
+
 func TestSortedVariants_UnparsableSortsLast(t *testing.T) {
 	variants := []RuleVariant{
 		{MinAgentVersion: "bogus"},
