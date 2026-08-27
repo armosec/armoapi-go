@@ -80,6 +80,15 @@ deriving this itself using `LowestVariant`; see `cadashboardbe`'s custom-rule wr
   that need the stronger guarantee must enforce it themselves. Returns `false` if `variants` is
   empty, in which case the caller should keep using the rule's plain top-level `Expressions`.
 
+  **Asymmetric leniency, deliberately noted, not enforced.** Variant floors (`MinAgentVersion`)
+  must match `ValidateVariants`' strict grammar — no prerelease/build metadata. `agentVersion` (the
+  requester's own version) is not under this package's control and is parsed with
+  `hashiVer.NewVersion`'s normal, lenient rules, which *does* accept prerelease metadata and
+  orders it below the corresponding release. A requester reporting `1.5.0-rc1` therefore does not
+  satisfy a `1.5.0` floor — conservative, not unsafe, but silent. As of this writing no known
+  caller reports a prerelease-tagged agent version, so this is a documented assumption, not an
+  observed problem.
+
 ## Rollout order — `scheduled-db-tasks` must consume this before any `variants:` rule ships
 
 `rulelibrary`'s `yaml_to_mongodb.py` produces `variants:` in its release JSON independently of

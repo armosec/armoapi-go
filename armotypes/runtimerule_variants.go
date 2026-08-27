@@ -84,6 +84,17 @@ func LowestVariant(variants []RuleVariant) (RuleVariant, bool) {
 // themselves (e.g. requiring a variant at or below a known fleet floor before accepting a rule).
 // Returns false if variants is empty (caller should keep using the RuntimeRule's plain top-level
 // Expressions in that case).
+//
+// Note the asymmetry with ValidateVariants: variant floors are required to be a strict bare
+// semver with no prerelease/build metadata, but agentVersion (the requester's own version, not
+// under this package's control) is parsed with hashiVer.NewVersion's normal, lenient rules,
+// which DOES accept prerelease metadata and orders it below the corresponding release. A
+// requester reporting "1.5.0-rc1" therefore does not satisfy a "1.5.0" floor - it resolves as if
+// it were older than 1.5.0, the conservative direction, but silently: nothing here logs or flags
+// it. As of this writing no known caller (private-node-agent's four binaries, via
+// careportsreceiver) reports a prerelease-tagged agent version, so this is currently a
+// theoretical asymmetry, not an observed one - but it isn't enforced anywhere either, so treat
+// it as a documented assumption rather than a guarantee.
 func ResolveVariantExpressions(variants []RuleVariant, agentVersion string) (RuleExpressions, bool) {
 	sorted := sortedParsedVariants(variants)
 	if len(sorted) == 0 {
