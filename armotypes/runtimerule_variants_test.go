@@ -94,6 +94,68 @@ func TestValidateVariants(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestValidateVariants_RejectsNonThreeSegment(t *testing.T) {
+	// hashiVer.NewVersion alone would accept both of these (normalizing "1.2" to "1.2.0", and
+	// happily parsing four segments) - the stricter bareSemverPattern rejects them so this
+	// grammar matches rulelibrary's Python-side twin (_parse_bare_semver), which always
+	// required exactly three segments.
+	err := ValidateVariants([]RuleVariant{{MinAgentVersion: "1.2"}})
+	require.Error(t, err, "two-segment version must be rejected, not silently normalized")
+
+	err = ValidateVariants([]RuleVariant{{MinAgentVersion: "1.2.3.4"}})
+	require.Error(t, err, "four-segment version must be rejected")
+}
+
+func TestValidateVariants_RejectsPrereleaseAndBuildMetadata(t *testing.T) {
+	// Prerelease/build metadata is where this package's ordering (hashiVer: prerelease sorts
+	// below release) and rulelibrary's Python twin (strips the suffix before comparing, so
+	// "1.2.3-rc1" == "1.2.3") could silently disagree - rejecting it outright removes the
+	// ambiguity instead of relying on two implementations to order it the same way.
+	err := ValidateVariants([]RuleVariant{{MinAgentVersion: "1.2.3-rc1"}})
+	require.Error(t, err, "prerelease suffix must be rejected")
+
+	err = ValidateVariants([]RuleVariant{{MinAgentVersion: "1.2.3+build5"}})
+	require.Error(t, err, "build metadata suffix must be rejected")
+}
+
+func TestValidateVariants_RejectsDuplicateMinAgentVersion(t *testing.T) {
+	err := ValidateVariants([]RuleVariant{
+		{MinAgentVersion: "1.0.0", Expressions: expr("a")},
+		{MinAgentVersion: "1.0.0", Expressions: expr("b")},
+	})
+	require.Error(t, err, "two variants sharing a floor must be rejected")
+}
+
+func TestValidateVariants_RejectsDuplicateMinAgentVersion_VPrefixNormalized(t *testing.T) {
+	// "1.0.0" and "v1.0.0" parse to the same hashiVer.Version, so LowestVariant and
+	// ResolveVariantExpressions would treat them as a tie too - the duplicate check must catch
+	// this normalized form, not just a literal string match.
+	err := ValidateVariants([]RuleVariant{
+		{MinAgentVersion: "1.0.0", Expressions: expr("a")},
+		{MinAgentVersion: "v1.0.0", Expressions: expr("b")},
+	})
+	require.Error(t, err)
+}
+
+func TestLowestVariant_And_ResolveVariantExpressions_AgreeOnDuplicateFloors(t *testing.T) {
+	// Before the duplicate check existed, LowestVariant (stable sort, keeps first of a tie) and
+	// ResolveVariantExpressions (resolution loop overwrites best on ties, keeps last) disagreed
+	// about which variant a tied floor actually meant - a version-unaware reader would see one
+	// body and an agent at exactly that floor would receive another. ValidateVariants now
+	// rejects this input at write time; this test pins that the two resolution functions would
+	// still agree even if a duplicate somehow reached them (defense in depth, not a substitute
+	// for the write-time check).
+	variants := []RuleVariant{
+		{MinAgentVersion: "1.0.0", Expressions: expr("a")},
+		{MinAgentVersion: "1.0.0", Expressions: expr("a")}, // identical, not just same floor
+	}
+	lowest, ok := LowestVariant(variants)
+	require.True(t, ok)
+	resolved, ok := ResolveVariantExpressions(variants, "1.0.0")
+	require.True(t, ok)
+	assert.Equal(t, lowest.Expressions, resolved, "identical duplicate floors must resolve identically regardless of tie-break direction")
+}
+
 func TestRuntimeRule_Variants_YAMLRoundTrip(t *testing.T) {
 	rule := RuntimeRule{
 		ID:          "R9999",

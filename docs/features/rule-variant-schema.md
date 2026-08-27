@@ -54,17 +54,53 @@ deriving this itself using `LowestVariant`; see `cadashboardbe`'s custom-rule wr
 
 ## API
 
-- `ValidateVariants(variants) error` — rejects any `MinAgentVersion` that isn't a parsable bare
-  semver. Run this before persisting a rule with variants.
+- `ValidateVariants(variants) error` — rejects any `MinAgentVersion` that doesn't match
+  `bareSemverPattern` (`^v?\d+\.\d+\.\d+$`: exactly three numeric segments, optional `v` prefix,
+  **no** prerelease/build metadata) and rejects two variants sharing the same `MinAgentVersion`
+  (after normalizing away the `v` prefix). Both checks exist for the same reason: without them,
+  `LowestVariant` and `ResolveVariantExpressions` can disagree about which variant a given
+  version means — a duplicate floor breaks their tie differently (stable-sort-keeps-first vs.
+  loop-overwrites-on-tie), and prerelease/build metadata is exactly the input where this
+  package's ordering (`hashiVer`, prerelease sorts below release) and rulelibrary's Python-side
+  twin (`_parse_bare_semver` in `yaml_to_mongodb.py`, which strips prerelease/build before
+  comparing) can silently rank two variants differently. Run this before persisting a rule with
+  variants — every current writer does.
 - `LowestVariant(variants) (RuleVariant, bool)` — the variant every writer derives the top-level
   `Expressions` mirror from.
 - `ResolveVariantExpressions(variants, agentVersion) (RuleExpressions, bool)` — the agent-facing
   resolver's core function: picks the highest-`MinAgentVersion` variant satisfied by
   `agentVersion`. Falls back to the **lowest** variant (never the newest) whenever `agentVersion`
-  is empty, unparsable, or below every variant's floor — an agent whose capability can't be
-  confirmed must never be handed a body it might not be able to compile. Returns `false` if
-  `variants` is empty, in which case the caller should keep using the rule's plain top-level
-  `Expressions`.
+  is empty, unparsable, or below every variant's floor. That fallback prevents the specific
+  failure this design exists to avoid — an old agent silently jumping to a body using a
+  capability it doesn't have — but it is **not** by itself a guarantee that the returned body
+  compiles on the requesting agent: if every variant's floor is above the agent's real version,
+  the lowest variant is still returned, and nothing in this package enforces that a rule's
+  lowest variant actually covers the oldest agent version the fleet runs. That floor-coverage
+  discipline is a write-time authoring convention this function cannot see or enforce; callers
+  that need the stronger guarantee must enforce it themselves. Returns `false` if `variants` is
+  empty, in which case the caller should keep using the rule's plain top-level `Expressions`.
+
+## Rollout order — `scheduled-db-tasks` must consume this before any `variants:` rule ships
+
+`rulelibrary`'s `yaml_to_mongodb.py` produces `variants:` in its release JSON independently of
+this package (it's Python, no Go dependency on `armoapi-go`) — so it can, and does, ship ahead of
+this schema landing anywhere else. But the managed-rule sync job
+(`scheduled-db-tasks`' rule-library enricher) unmarshals that release asset into
+`kdr.RuntimeRule` / `armotypes.RuntimeRule`, and its diff (`cmp.Diff`, no field allowlist) only
+notices fields the struct it's compiled against actually has.
+
+If that job's `armoapi-go` pin predates this `Variants` field, a `variants:`-bearing managed rule
+is **silently accepted and stored as a plain single-body rule** — the field is dropped on
+decode, and since `yaml_to_mongodb.py` already derives the top-level `expressions` from the
+lowest variant, the stored document looks completely normal: readers get a working base body,
+config-service's mirror backstop passes (there's no `Variants` present, so nothing to check), the
+console shows an ordinary rule. Nothing signals that version gating never actually took effect —
+newer agents get the same base body as old ones until the enricher is bumped and re-syncs.
+
+**Do not author a `variants:`-bearing managed rule until `scheduled-db-tasks` has bumped past
+this schema.** There is no dedicated PR for that bump in this rollout — it's a routine dependency
+update once this PR (or whichever PR/tag supersedes it) is available, but it has to actually
+happen before the rollout is complete, not just be theoretically possible.
 
 ## Compatibility
 
