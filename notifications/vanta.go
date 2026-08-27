@@ -8,15 +8,21 @@ const (
 	VantaAttrResourceID = "vantaResourceId"
 	// VantaAttrUserAccountResourceID / VulnResourceID / PackageVulnResourceID
 	// hold the per-resource-type ids for the families ARMO syncs.
-	VantaAttrUserAccountResourceID = "vantaUserAccountResourceId"
-	VantaAttrVulnComponentResID    = "vantaVulnerableComponentResourceId"
-	VantaAttrPackageVulnResID      = "vantaPackageVulnerabilityResourceId"
+	VantaAttrUserAccountResourceID   = "vantaUserAccountResourceId"
+	VantaAttrVulnComponentResourceID = "vantaVulnerableComponentResourceId"
+	VantaAttrPackageVulnResourceID   = "vantaPackageVulnerabilityResourceId"
 
 	VantaAttrEnabled        = "vantaEnabled"
 	VantaAttrLastSyncAt     = "vantaLastSyncAt"
 	VantaAttrLastSyncStatus = "vantaLastSyncStatus" // "ok" | "error"
 	VantaAttrLastSyncError  = "vantaLastSyncError"
 	VantaAttrSyncedCount    = "vantaSyncedCount"
+)
+
+// Vanta last-sync status values (stored under VantaAttrLastSyncStatus).
+const (
+	VantaSyncStatusOK    = "ok"
+	VantaSyncStatusError = "error"
 )
 
 // IsVantaEnabled reports whether a Vanta CollaborationConfig is enabled.
