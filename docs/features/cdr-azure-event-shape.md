@@ -130,18 +130,32 @@ binary, so incidents stored during that window hold an opaque blob that no Mongo
 filter or index can reach.
 
 `AzureProperties` therefore carries its own BSON codec, accepting every shape the
-collection now holds and always storing a document:
+collection now holds and storing the bag in its natural BSON form:
 
 | Stored as | Written by | Read back as |
 |---|---|---|
-| embedded document | the original `map[string]any` field | the object, as JSON |
+| embedded document | the original `map[string]any` field, and any object bag | the object, as JSON |
 | binary | the bare `json.RawMessage` field | the JSON payload |
-| string | Azure's JSON-in-a-string operations | the JSON it holds |
+| string | Azure's JSON-in-a-string operations, and any non-JSON bag | the JSON it holds, else the quoted string |
+| array | an array bag | the array, as JSON |
+| double / boolean / int | a top-level scalar bag | the scalar, as JSON |
 | null / absent | an event with no bag | `nil` |
 
-Decoding **never fails**: an unreadable bag yields `nil` rather than sinking the
-incident it belongs to — the same bargain the JSON side makes. Writing always
-emits a document, so the bag stays queryable and indexable.
+**Writing does not flatten the bag into a document.** An object becomes an
+embedded document and an array a BSON array — the point being that a structured
+bag stays queryable and indexable instead of becoming the opaque blob the binary
+form produced. A top-level scalar is stored as the matching BSON scalar.
+
+**Reading and writing are symmetric, and that is a property to preserve.** Every
+type the writer can emit, the reader reads back. The first version of this codec
+was not symmetric: it wrote top-level scalars as BSON doubles and booleans but
+only read documents, binary and strings, so a scalar bag round-tripped to `nil`
+with no error — silent data loss.
+`TestAzureProperties_WriterAndReaderAgreeOnEveryShape` is the guard.
+
+Decoding **never fails**: a bag of a foreign BSON type (a date, an ObjectID —
+nothing writes those here) yields `nil` rather than sinking the incident it
+belongs to, the same bargain the JSON side makes.
 
 Documents reach JSON through `jsonifyBSON`, which rewrites the driver's ordered
 `primitive.D` into a JSON object. BSON types with no JSON scalar form (dates,

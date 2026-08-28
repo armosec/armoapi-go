@@ -121,10 +121,12 @@ type AzureActivityLogEvent struct {
 // window hold an opaque blob that no Mongo filter or index can reach.
 //
 // The methods below therefore accept every shape the collection now holds —
-// document (before), binary (during), string, null — and always store a document,
-// so the bag stays queryable. Decoding never fails: an unreadable bag yields nil
-// rather than sinking the incident it belongs to, which is the same bargain the
-// JSON side makes.
+// document (before), binary (during), string, null — and store the bag in its
+// natural BSON form, so a structured bag stays queryable as a document or array
+// rather than becoming an opaque blob. Reading and writing are symmetric: every
+// shape the writer can produce, the reader reads back. Decoding never fails: an
+// unreadable bag yields nil rather than sinking the incident it belongs to,
+// which is the same bargain the JSON side makes.
 type AzureProperties json.RawMessage
 
 // MarshalJSON emits the bag verbatim. A named type does not inherit
@@ -142,16 +144,27 @@ func (p *AzureProperties) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalBSONValue stores the bag as a BSON document so it stays queryable and
-// indexable. A bag that is not valid JSON is stored as a string rather than
-// dropped, and an empty one as null.
+// MarshalBSONValue stores the bag in its natural BSON form: an object becomes an
+// embedded document and an array a BSON array, so a structured bag stays
+// queryable and indexable rather than becoming an opaque blob; a top-level JSON
+// scalar becomes the matching BSON scalar. A bag that is not valid JSON is stored
+// as a string rather than dropped, and an empty or null one as BSON null.
+//
+// Every type this can emit is read back by UnmarshalBSONValue. Keep the two in
+// step: a shape the writer emits and the reader does not recognise is silent
+// data loss on the round trip.
 func (p AzureProperties) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	if len(p) == 0 {
-		return bson.MarshalValue(nil)
+		return bsontype.Null, nil, nil
 	}
 	var v interface{}
 	if err := json.Unmarshal(p, &v); err != nil {
 		return bson.MarshalValue(string(p))
+	}
+	if v == nil {
+		// A bag that is literally JSON null. bson.MarshalValue(nil) errors
+		// ("no encoder found for <nil>"), which would fail the whole incident.
+		return bsontype.Null, nil, nil
 	}
 	return bson.MarshalValue(v)
 }
@@ -167,8 +180,13 @@ func (p AzureProperties) MarshalBSONValue() (bsontype.Type, []byte, error) {
 func (p *AzureProperties) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 	raw := bson.RawValue{Type: t, Value: data}
 	switch t {
-	case bsontype.EmbeddedDocument, bsontype.Array:
-		// Written before this type existed, by the map[string]any field.
+	case bsontype.EmbeddedDocument, bsontype.Array,
+		bsontype.Double, bsontype.Boolean, bsontype.Int32, bsontype.Int64:
+		// Documents are what the original map[string]any field wrote. Scalars are
+		// what MarshalBSONValue writes for a bag whose top-level JSON is a number
+		// or a bool — rare in Activity Log traffic, which documents properties as
+		// an object or a JSON-encoded string, but the writer emits them, so the
+		// reader has to take them back or the round trip silently drops the bag.
 		var v interface{}
 		if err := raw.Unmarshal(&v); err != nil {
 			*p = nil
@@ -206,7 +224,9 @@ func (p *AzureProperties) UnmarshalBSONValue(t bsontype.Type, data []byte) error
 		}
 		*p = b
 	default:
-		// Null, Undefined, and anything unexpected.
+		// Null, Undefined, and BSON types this type never writes (dates, ObjectIDs,
+		// Decimal128, ...). Nothing stores those in this field today; if that ever
+		// changes, add them here rather than letting them fall through to nil.
 		*p = nil
 	}
 	return nil

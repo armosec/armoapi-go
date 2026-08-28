@@ -3,10 +3,13 @@ package cdr
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
@@ -93,15 +96,24 @@ func TestAzureProperties_DecodesMissingAndNull(t *testing.T) {
 	}
 }
 
-// A bag of an unexpected BSON type yields nil rather than failing the decode —
-// the same bargain the JSON side makes.
-func TestAzureProperties_UnexpectedTypeDoesNotFailDecode(t *testing.T) {
-	raw, err := bson.Marshal(bson.M{"properties": 42})
-	require.NoError(t, err)
+// A bag of a BSON type this field never writes — nothing stores a date or an
+// ObjectID here — yields nil rather than failing the decode, the same bargain the
+// JSON side makes. Note this is about genuinely foreign types: every type the
+// writer CAN emit is covered by TestAzureProperties_WriterAndReaderAgreeOnEveryShape.
+func TestAzureProperties_ForeignTypeDoesNotFailDecode(t *testing.T) {
+	for name, bag := range map[string]interface{}{
+		"datetime": primitive.NewDateTimeFromTime(time.Unix(0, 0)),
+		"objectID": primitive.NewObjectID(),
+	} {
+		t.Run(name, func(t *testing.T) {
+			raw, err := bson.Marshal(bson.M{"properties": bag})
+			require.NoError(t, err)
 
-	var ev AzureActivityLogEvent
-	require.NoError(t, bson.Unmarshal(raw, &ev))
-	assert.Nil(t, ev.Properties)
+			var ev AzureActivityLogEvent
+			require.NoError(t, bson.Unmarshal(raw, &ev))
+			assert.Nil(t, ev.Properties)
+		})
+	}
 }
 
 // Writing stores an object bag as a document, so it stays queryable and
@@ -167,4 +179,47 @@ func TestAzureProperties_JSONToBSONToJSON(t *testing.T) {
 	served, err := json.Marshal(back)
 	require.NoError(t, err)
 	assert.JSONEq(t, record, string(served))
+}
+
+// Every shape MarshalBSONValue can emit must be read back by
+// UnmarshalBSONValue. An asymmetry here is silent data loss on the round trip:
+// a top-level scalar bag was stored as a BSON double/boolean and read back as
+// nil, with no error, because the reader only recognised documents and strings.
+func TestAzureProperties_WriterAndReaderAgreeOnEveryShape(t *testing.T) {
+	for _, tc := range []struct {
+		bag    string
+		stored bsontype.Type
+	}{
+		{`{"eventCategory":"Administrative"}`, bson.TypeEmbeddedDocument},
+		{`[1,2,3]`, bson.TypeArray},
+		{`"a string bag"`, bson.TypeString},
+		{`42`, bson.TypeDouble},
+		{`3.5`, bson.TypeDouble},
+		{`true`, bson.TypeBoolean},
+		{`null`, bson.TypeNull},
+	} {
+		t.Run(tc.bag, func(t *testing.T) {
+			ev := AzureActivityLogEvent{Properties: AzureProperties(tc.bag)}
+
+			raw, err := bson.Marshal(ev)
+			require.NoError(t, err, "a valid JSON bag must never fail to encode")
+			assert.Equal(t, tc.stored, bson.Raw(raw).Lookup("properties").Type)
+
+			var back AzureActivityLogEvent
+			require.NoError(t, bson.Unmarshal(raw, &back))
+			if tc.bag == `null` {
+				assert.Nil(t, back.Properties)
+				return
+			}
+			assert.JSONEq(t, tc.bag, string(back.Properties),
+				"the writer emitted a shape the reader dropped")
+		})
+	}
+}
+
+// A bag that is literally JSON null must not fail the encode. bson.MarshalValue(nil)
+// errors, which would have failed the whole incident insert, not just the bag.
+func TestAzureProperties_NullBagEncodes(t *testing.T) {
+	_, err := bson.Marshal(AzureActivityLogEvent{Properties: AzureProperties(`null`)})
+	require.NoError(t, err)
 }
