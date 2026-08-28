@@ -3,6 +3,10 @@ package cdr
 import (
 	"encoding/json"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -88,10 +92,174 @@ type AzureActivityLogEvent struct {
 	// delivers it as an object for most operations and as a STRING containing JSON
 	// for some, so a map[string]any field rejects the second form and — because the
 	// failure is not local — fails the WHOLE record decode, discarding a detection
-	// over a field no rule references. json.RawMessage cannot fail to decode and
-	// round-trips byte-for-byte into the alert payload. No Go code reads it; rules
-	// are evaluated against the raw record JSON, not this struct.
-	Properties json.RawMessage `json:"properties,omitempty"`
+	// over a field no rule references. No Go code reads it; rules are evaluated
+	// against the raw record JSON, not this struct. See AzureProperties for why the
+	// raw form needs its own type rather than a bare json.RawMessage.
+	Properties AzureProperties `json:"properties,omitempty" bson:"properties,omitempty"`
+}
+
+// AzureProperties holds an Activity Log record's "properties" bag verbatim as
+// JSON, and survives a MongoDB round trip in both directions.
+//
+// Raw, because Activity Log delivers the bag as an object for most operations and
+// as a STRING containing JSON for some. A typed field rejects the second form and
+// — the failure not being local — fails the WHOLE record decode, discarding a
+// detection over a field no rule references.
+//
+// Its own type, because this struct is not only a wire shape: config-service
+// persists runtime incidents with it embedded, so the bag also crosses BSON. A
+// bare json.RawMessage is a []byte there, and the driver's byte-slice codec
+// accepts only BSON binary or string — never an embedded document, which is what
+// every incident stored before this type existed holds. Reading one back failed
+// the whole find with
+//
+//	error decoding key cdrevent.eventdata.azureactivitylog.properties:
+//	cannot decode document into json.RawMessage
+//
+// and every Azure incident 500ed. Writing was as quietly wrong in the other
+// direction: []byte marshals to BSON binary, so incidents stored during that
+// window hold an opaque blob that no Mongo filter or index can reach.
+//
+// The methods below therefore accept every shape the collection now holds —
+// document (before), binary (during), string, null — and store the bag in its
+// natural BSON form, so a structured bag stays queryable as a document or array
+// rather than becoming an opaque blob. Reading and writing are symmetric: every
+// shape the writer can produce, the reader reads back. Decoding never fails: an
+// unreadable bag yields nil rather than sinking the incident it belongs to,
+// which is the same bargain the JSON side makes.
+type AzureProperties json.RawMessage
+
+// MarshalJSON emits the bag verbatim. A named type does not inherit
+// json.RawMessage's methods, and without this encoding/json would base64 it.
+func (p AzureProperties) MarshalJSON() ([]byte, error) {
+	if len(p) == 0 {
+		return []byte("null"), nil
+	}
+	return p, nil
+}
+
+// UnmarshalJSON keeps the bag verbatim, whatever JSON type it arrived as.
+func (p *AzureProperties) UnmarshalJSON(data []byte) error {
+	*p = append((*p)[:0], data...)
+	return nil
+}
+
+// MarshalBSONValue stores the bag in its natural BSON form: an object becomes an
+// embedded document and an array a BSON array, so a structured bag stays
+// queryable and indexable rather than becoming an opaque blob; a top-level JSON
+// scalar becomes the matching BSON scalar. A bag that is not valid JSON is stored
+// as a string rather than dropped, and an empty or null one as BSON null.
+//
+// Every type this can emit is read back by UnmarshalBSONValue. Keep the two in
+// step: a shape the writer emits and the reader does not recognise is silent
+// data loss on the round trip.
+func (p AzureProperties) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	if len(p) == 0 {
+		return bsontype.Null, nil, nil
+	}
+	var v interface{}
+	if err := json.Unmarshal(p, &v); err != nil {
+		return bson.MarshalValue(string(p))
+	}
+	if v == nil {
+		// A bag that is literally JSON null. bson.MarshalValue(nil) errors
+		// ("no encoder found for <nil>"), which would fail the whole incident.
+		return bsontype.Null, nil, nil
+	}
+	return bson.MarshalValue(v)
+}
+
+// UnmarshalBSONValue reads back every shape the collection holds, and never
+// fails: a bag it cannot read becomes nil instead of failing the surrounding
+// incident decode.
+//
+// Documents reach JSON through jsonifyBSON, so BSON types with no JSON scalar
+// form (dates, binary) come back as their driver representation rather than
+// their original text. An Activity Log bag is plain JSON, so this is exact in
+// practice; it is not a byte-exact round trip for arbitrary BSON.
+func (p *AzureProperties) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
+	raw := bson.RawValue{Type: t, Value: data}
+	switch t {
+	case bsontype.EmbeddedDocument, bsontype.Array,
+		bsontype.Double, bsontype.Boolean, bsontype.Int32, bsontype.Int64:
+		// Documents are what the original map[string]any field wrote. Scalars are
+		// what MarshalBSONValue writes for a bag whose top-level JSON is a number
+		// or a bool — rare in Activity Log traffic, which documents properties as
+		// an object or a JSON-encoded string, but the writer emits them, so the
+		// reader has to take them back or the round trip silently drops the bag.
+		var v interface{}
+		if err := raw.Unmarshal(&v); err != nil {
+			*p = nil
+			return nil
+		}
+		b, err := json.Marshal(jsonifyBSON(v))
+		if err != nil {
+			*p = nil
+			return nil
+		}
+		*p = b
+	case bsontype.Binary:
+		// Written by the bare json.RawMessage field: []byte marshals to binary.
+		if _, b, ok := raw.BinaryOK(); ok && json.Valid(b) {
+			*p = append((*p)[:0], b...)
+		} else {
+			*p = nil
+		}
+	case bsontype.String:
+		// A bag Azure sent as a JSON string, or one MarshalBSONValue could not
+		// parse. Keep it as the JSON it is; quote it if it is not JSON at all.
+		s, ok := raw.StringValueOK()
+		if !ok {
+			*p = nil
+			return nil
+		}
+		if json.Valid([]byte(s)) {
+			*p = []byte(s)
+			return nil
+		}
+		b, err := json.Marshal(s)
+		if err != nil {
+			*p = nil
+			return nil
+		}
+		*p = b
+	default:
+		// Null, Undefined, and BSON types this type never writes (dates, ObjectIDs,
+		// Decimal128, ...). Nothing stores those in this field today; if that ever
+		// changes, add them here rather than letting them fall through to nil.
+		*p = nil
+	}
+	return nil
+}
+
+// jsonifyBSON rewrites the driver's document and array types into their JSON
+// equivalents. The driver decodes a BSON document reached through an interface{}
+// into a primitive.D — an ordered []{Key, Value} — which encoding/json would
+// render as a list of {"Key":…,"Value":…} pairs rather than as an object. Scalars
+// pass through: every one the driver produces already marshals to valid JSON.
+func jsonifyBSON(v interface{}) interface{} {
+	switch t := v.(type) {
+	case primitive.D:
+		m := make(map[string]interface{}, len(t))
+		for _, e := range t {
+			m[e.Key] = jsonifyBSON(e.Value)
+		}
+		return m
+	case primitive.M:
+		m := make(map[string]interface{}, len(t))
+		for k, e := range t {
+			m[k] = jsonifyBSON(e)
+		}
+		return m
+	case primitive.A:
+		a := make([]interface{}, len(t))
+		for i, e := range t {
+			a[i] = jsonifyBSON(e)
+		}
+		return a
+	default:
+		return v
+	}
 }
 
 // AzureIdentity is the "identity" object of an Event Hub Activity Log record,
