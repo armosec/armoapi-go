@@ -46,6 +46,9 @@ func TestIdentifiersFlatten(t *testing.T) {
 				File: &FileEntity{
 					Name:      "file.txt",
 					Directory: "/tmp",
+					MD5:       "d41d8cd98f00b204e9800998ecf8427e",
+					SHA1:      "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+					SHA256:    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				},
 				Dns: &DnsEntity{
 					Domain: "example.com",
@@ -87,6 +90,17 @@ func TestIdentifiersFlatten(t *testing.T) {
 				Http: &HttpEntity{
 					Method:  "POST",
 					Payload: "data",
+				},
+			},
+		},
+		{
+			// The shape a malware alert produces: the file identifiers exist so a
+			// hash-scoped exception has something to compare against.
+			Name: "File entity with hashes only",
+			Identifiers: &Identifiers{
+				File: &FileEntity{
+					Name:   "mirai",
+					SHA256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				},
 			},
 		},
