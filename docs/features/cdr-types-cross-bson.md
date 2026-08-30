@@ -81,8 +81,10 @@ so nothing moved.
 
 ## Rules for these types
 
-1. **Every field needs an explicit `bson` tag.** Name and `omitempty` do not carry
-   over from `json`.
+1. **Never assume a `json` tag carries over.** Neither the name nor `omitempty`
+   does. But do not reflexively add a *named* `bson` tag either — on these types
+   that renames the stored key (above). Add `bson:",omitempty"` when you need the
+   behaviour; add a named tag only when you intend a migration.
 2. **A `[]byte`-backed type needs its own BSON codec** — it writes as binary, which
    no Mongo filter or index can reach, and it cannot read a stored document. See
    `AzureProperties` in `azure.go` for the pattern.
