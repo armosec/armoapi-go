@@ -149,7 +149,14 @@ type GcpAuditLogPayload struct {
 	// that error fails the WHOLE document write. The json tag's omitempty does not
 	// help: the driver ignores json tags unless useJSONStructTags is set, which it
 	// is not by default. Without bson omitempty, no GCP CDR incident can persist.
-	NumResponseItems json.Number `json:"numResponseItems,omitempty" bson:"numResponseItems,omitempty"`
+	//
+	// The tag deliberately names NO field. A bson tag sets the stored key, and
+	// these types carry none, so every other field here is stored under the
+	// driver's default — the lowercased Go name, "numresponseitems". Spelling the
+	// name here would rename the field to "numresponseItems" casing, orphaning any
+	// value already stored and making this the one camelCase key among its
+	// siblings. Renaming a stored field is a migration, not a side effect of a fix.
+	NumResponseItems json.Number `json:"numResponseItems,omitempty" bson:",omitempty"`
 	// Request is the operation-specific request bag; shape varies by method.
 	Request map[string]interface{} `json:"request,omitempty"`
 	// Response is the operation-specific response bag; for create-style methods

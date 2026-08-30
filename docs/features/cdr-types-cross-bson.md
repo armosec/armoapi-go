@@ -49,10 +49,35 @@ The driver only consults `json` tags when `useJSONStructTags` is enabled, and it
 empty value was always encoded, and always failed. The fix is the tag:
 
 ```go
-NumResponseItems json.Number `json:"numResponseItems,omitempty" bson:"numResponseItems,omitempty"`
+NumResponseItems json.Number `json:"numResponseItems,omitempty" bson:",omitempty"`
 ```
 
 **A `json` tag is not a `bson` tag.** On a persisted type, spell out both.
+
+### Adding a `bson` tag can rename a stored field
+
+Note the empty name in that tag. It is not a typo, and this is the trap that makes
+"just add bson tags everywhere" the wrong instinct.
+
+A `bson` tag sets the stored **key**. With no tag, the driver stores the field
+under the **lowercased Go field name** — *not* the json name:
+
+| tag | stored key |
+|---|---|
+| `json:"numResponseItems,omitempty"` (none) | `numresponseitems` |
+| `bson:",omitempty"` | `numresponseitems` — unchanged |
+| `bson:"numResponseItems,omitempty"` | `numResponseItems` — **renamed** |
+
+The CDR types carry no bson field names at all, so every field is stored
+lowercased. Naming the field in the tag would rename it, orphaning any value
+already written and leaving one camelCase key among its siblings.
+
+`AzureProperties` is the exception that proves it: its tag *does* name the field,
+`bson:"properties,omitempty"` — which is identical to `lowercase("Properties")`,
+so nothing moved.
+
+**Renaming a stored field is a migration, not a side effect of a fix.** Use
+`bson:",omitempty"` to change behaviour without touching the key.
 
 ## Rules for these types
 
@@ -88,4 +113,6 @@ document-breaking field. It also flagged, as accepted and not bugs:
   binary and reads are self-consistent. It would break the way `Properties` did if
   a writer ever stored it as a document.
 - ~428 fields with `json` `omitempty` and no `bson` tag — zero values are written
-  rather than omitted. Storage bloat, not breakage.
+  rather than omitted. Storage bloat, not breakage. **Do not bulk-add named bson
+  tags to these**: as above, that renames all 428 stored keys at once. If the bloat
+  is ever worth fixing, `bson:",omitempty"` is the safe form.

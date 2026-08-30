@@ -14,6 +14,22 @@ import (
 // runtime incidents with it embedded. These tests pin the BSON write path, which
 // a JSON round-trip test cannot reach.
 
+// storedNumResponseItemsKey is the key this field occupies in MongoDB. These types
+// carry no bson field names, so the driver stores every one of them under the
+// lowercased Go field name. Pinning it here makes an accidental rename — which
+// would orphan stored values — fail loudly instead of silently.
+const storedNumResponseItemsKey = "numresponseitems"
+
+// TestGcpAuditLog_StoredKeyIsUnchanged guards the field name against the fix that
+// introduced omitempty: `bson:",omitempty"` adds the behaviour without renaming,
+// `bson:"numResponseItems,omitempty"` would rename.
+func TestGcpAuditLog_StoredKeyIsUnchanged(t *testing.T) {
+	raw, err := bson.Marshal(GcpAuditLogPayload{NumResponseItems: "3"})
+	require.NoError(t, err)
+	_, err = bson.Raw(raw).LookupErr(storedNumResponseItemsKey)
+	assert.NoError(t, err, "the stored key must stay %q; a bson tag that names the field would rename it", storedNumResponseItemsKey)
+}
+
 // Most audit events omit numResponseItems — only list/query methods return items —
 // leaving the zero json.Number, the empty string. The driver encodes json.Number by
 // parsing it, "" parses as neither int nor float, and because BSON encoding is not
@@ -35,7 +51,7 @@ func TestGcpAuditLog_MarshalsWithoutNumResponseItems(t *testing.T) {
 	raw, err := bson.Marshal(pl)
 	require.NoError(t, err, "an event without numResponseItems must still persist")
 
-	_, err = bson.Raw(raw).LookupErr("numResponseItems")
+	_, err = bson.Raw(raw).LookupErr(storedNumResponseItemsKey)
 	assert.ErrorIs(t, err, bsoncore.ErrElementNotFound, "an empty count must not be stored at all")
 }
 
@@ -54,7 +70,7 @@ func TestGcpAuditLog_NumResponseItemsRoundTrips(t *testing.T) {
 
 			raw, err := bson.Marshal(pl)
 			require.NoError(t, err)
-			assert.Equal(t, bson.TypeInt64, bson.Raw(raw).Lookup("numResponseItems").Type,
+			assert.Equal(t, bson.TypeInt64, bson.Raw(raw).Lookup(storedNumResponseItemsKey).Type,
 				"a count must be stored as a number, so it stays queryable")
 
 			var back GcpAuditLogPayload
