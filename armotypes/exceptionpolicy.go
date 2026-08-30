@@ -26,6 +26,42 @@ type AdvancedScopeEntity struct {
 	Values   string `json:"values" bson:"values"`
 }
 
+// HashScopeEntities are the advanced-scope entities whose value is a hex file hash.
+var HashScopeEntities = map[string]bool{
+	"file.md5":    true,
+	"file.sha1":   true,
+	"file.sha256": true,
+}
+
+// NormalizeHashScopeValues lower-cases the values of hash-scoped entities in place,
+// and leaves every other entity untouched.
+//
+// The exception is matched in postgres-connector by a plain string comparison:
+// operator "in" is an equality, operator "contains" is a LIKE. PostgreSQL folds case
+// for neither. The alert carries a lower-case hash, and a hash copied from VirusTotal
+// or from a threat report is usually upper case, so an unfolded scope would be saved,
+// listed and previewed exactly like a working rule while suppressing nothing.
+//
+// This deliberately differs from the rule in docs/features/cdr-azure-event-shape.md,
+// which says not to normalize casing at any layer and to match case-insensitively
+// instead. That rule exists because an Azure subscription id has a customer-chosen
+// original casing that is displayed and re-used, so rewriting it loses information
+// and a partial rewrite reintroduces mismatches. A hex digest has no original casing
+// to preserve and no information in its case, and unlike the Mongo path there is no
+// case-insensitive operator available on the Postgres comparison - so folding on
+// write is the only option that works there, and it is lossless here.
+//
+// Kept here rather than in each caller so the write paths cannot drift apart: both
+// cadashboardbe, which parses the analyst's request, and event-ingester-service,
+// which persists it, fold through this one function.
+func NormalizeHashScopeValues(scopes []AdvancedScopeEntity) {
+	for i := range scopes {
+		if HashScopeEntities[scopes[i].Entity] {
+			scopes[i].Values = strings.ToLower(scopes[i].Values)
+		}
+	}
+}
+
 type BaseExceptionPolicy struct {
 	PortalBase `json:",inline" bson:"inline"`
 	PolicyType PolicyType `json:"policyType,omitempty" bson:"policyType,omitempty"`

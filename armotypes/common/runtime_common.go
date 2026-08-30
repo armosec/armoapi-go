@@ -10,14 +10,9 @@ type ProcessEntity struct {
 type FileEntity struct {
 	Name      string `json:"name,omitempty" bson:"name,omitempty"`
 	Directory string `json:"directory,omitempty" bson:"directory,omitempty"`
-	// Hashes of the file the alert is about. Risk acceptance scoped to a hash
-	// compares against these, so a known-good file can be excepted by identity
-	// rather than by the path it happened to occupy.
-	//
-	// Values are lower case. The comparison in postgres-connector is a plain
-	// string equality (operator "in") or LIKE (operator "contains"); neither
-	// ignores case. Producers and the exception writer both normalise, so a hash
-	// pasted from a vendor page in upper case still matches.
+	// Hashes of the file the alert is about, lower case. Risk acceptance scoped to
+	// a hash compares against these; see armotypes.NormalizeHashScopeValues for why
+	// the case matters and who folds it.
 	MD5    string `json:"md5,omitempty" bson:"md5,omitempty"`
 	SHA1   string `json:"sha1,omitempty" bson:"sha1,omitempty"`
 	SHA256 string `json:"sha256,omitempty" bson:"sha256,omitempty"`

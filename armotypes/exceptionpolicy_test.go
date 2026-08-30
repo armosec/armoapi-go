@@ -3,6 +3,7 @@ package armotypes
 import (
 	"testing"
 
+	"github.com/armosec/armoapi-go/armotypes/common"
 	"github.com/armosec/armoapi-go/identifiers"
 	"github.com/stretchr/testify/assert"
 )
@@ -235,6 +236,35 @@ func TestGetRuntimeIncidentsRequestFilterFromExceptionPolicy(t *testing.T) {
 					"status":                         "Open",
 					"designators.attributes.cluster": "c1",
 					"identifiers.sourceInformation.userAgent": `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML\, like Gecko) Chrome/147.0.0.0 Safari/537.36`,
+				},
+			},
+		},
+		{
+			// The Mongo half of risk acceptance: this filter drives the
+			// "how many incidents would this affect" count and the retroactive
+			// resolve of open incidents when an exception is created. A hash scope
+			// has to reach it, and the entity name has to become the identifier
+			// path verbatim.
+			name: "file hash scopes become identifier filters",
+			policy: BaseExceptionPolicy{
+				PolicyIDs: []string{"I002"},
+				Resources: []identifiers.PortalDesignator{
+					{Attributes: map[string]string{identifiers.AttributeCluster: "c1"}},
+				},
+				AdvancedScopes: []AdvancedScopeEntity{
+					{Entity: "file.sha256", Operator: "in", Values: "9f2b1e1d3c4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4"},
+					{Entity: "file.md5", Operator: "in", Values: "5d41402abc4b2a76b9719d911017c592"},
+					{Entity: "file.sha1", Operator: "contains", Values: "aaf4c61d"},
+				},
+			},
+			want: []map[string]string{
+				{
+					"incidentTypeID":                 "I002",
+					"status":                         "Open",
+					"designators.attributes.cluster": "c1",
+					"identifiers.file.sha256":        "9f2b1e1d3c4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4",
+					"identifiers.file.md5":           "5d41402abc4b2a76b9719d911017c592",
+					"identifiers.file.sha1":          "aaf4c61d|like",
 				},
 			},
 		},
@@ -491,4 +521,50 @@ func TestGetRuntimeIncidentsRequestFilterFromExceptionPolicy(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+// The fold has to reach every hash entity and no other entity. File paths, process
+// names and command lines are case-significant on Linux, so folding one would change
+// what the analyst's rule matches.
+func TestNormalizeHashScopeValues(t *testing.T) {
+	scopes := []AdvancedScopeEntity{
+		{Entity: "file.md5", Operator: "in", Values: "5D41402ABC4B2A76B9719D911017C592"},
+		{Entity: "file.sha1", Operator: "in", Values: "AAF4C61DDCC5E8A2DABEDE0F3B482CD9AEA9434D"},
+		{Entity: "file.sha256", Operator: "contains", Values: "9F2B1E1D"},
+		{Entity: "file.name", Operator: "in", Values: "Mirai.ELF"},
+		{Entity: "file.directory", Operator: "in", Values: "/Tmp/Payloads"},
+		{Entity: "process.commandLine", Operator: "contains", Values: "--Flag=Value"},
+	}
+
+	NormalizeHashScopeValues(scopes)
+
+	assert.Equal(t, "5d41402abc4b2a76b9719d911017c592", scopes[0].Values)
+	assert.Equal(t, "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d", scopes[1].Values)
+	assert.Equal(t, "9f2b1e1d", scopes[2].Values)
+	assert.Equal(t, "Mirai.ELF", scopes[3].Values)
+	assert.Equal(t, "/Tmp/Payloads", scopes[4].Values)
+	assert.Equal(t, "--Flag=Value", scopes[5].Values)
+}
+
+// A hash entity that Flatten() can emit but the fold does not know about would be
+// stored unfolded and never match. Derive the list from Flatten() so the two cannot
+// drift.
+func TestHashScopeEntitiesCoverEveryHashFlattenEmits(t *testing.T) {
+	populated := &common.Identifiers{
+		File: &common.FileEntity{
+			MD5:    "5d41402abc4b2a76b9719d911017c592",
+			SHA1:   "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d",
+			SHA256: "9f2b1e1d3c4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4",
+		},
+	}
+
+	for field := range populated.Flatten() {
+		assert.True(t, HashScopeEntities[field], "%s is a hash identifier but the case fold does not cover it", field)
+	}
+	assert.Len(t, HashScopeEntities, 3)
+}
+
+func TestNormalizeHashScopeValuesHandlesNoScopes(t *testing.T) {
+	assert.NotPanics(t, func() { NormalizeHashScopeValues(nil) })
+	assert.NotPanics(t, func() { NormalizeHashScopeValues([]AdvancedScopeEntity{}) })
 }
