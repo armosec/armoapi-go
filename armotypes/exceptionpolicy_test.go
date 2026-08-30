@@ -559,9 +559,9 @@ func TestHashScopeEntitiesCoverEveryHashFlattenEmits(t *testing.T) {
 	}
 
 	for field := range populated.Flatten() {
-		assert.True(t, HashScopeEntities[field], "%s is a hash identifier but the case fold does not cover it", field)
+		assert.True(t, IsHashScopeEntity(field), "%s is a hash identifier but the case fold does not cover it", field)
 	}
-	assert.Len(t, HashScopeEntities, 3)
+	assert.Len(t, hashScopeEntities, 3)
 }
 
 func TestNormalizeHashScopeValuesHandlesNoScopes(t *testing.T) {

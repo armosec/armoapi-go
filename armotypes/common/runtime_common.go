@@ -10,9 +10,12 @@ type ProcessEntity struct {
 type FileEntity struct {
 	Name      string `json:"name,omitempty" bson:"name,omitempty"`
 	Directory string `json:"directory,omitempty" bson:"directory,omitempty"`
-	// Hashes of the file the alert is about, lower case. Risk acceptance scoped to
-	// a hash compares against these; see armotypes.NormalizeHashScopeValues for why
-	// the case matters and who folds it.
+	// Hashes of the file the alert is about. Risk acceptance scoped to a hash
+	// compares against these.
+	//
+	// Callers are expected to store them lower case; this struct does not enforce
+	// it, and nothing downstream folds case. See armotypes.NormalizeHashScopeValues
+	// for who does the folding and why it has to happen on write.
 	MD5    string `json:"md5,omitempty" bson:"md5,omitempty"`
 	SHA1   string `json:"sha1,omitempty" bson:"sha1,omitempty"`
 	SHA256 string `json:"sha256,omitempty" bson:"sha256,omitempty"`

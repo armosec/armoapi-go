@@ -94,9 +94,9 @@ func TestIdentifiersFlatten(t *testing.T) {
 			},
 		},
 		{
-			// The shape a malware alert produces: the file identifiers exist so a
-			// hash-scoped exception has something to compare against.
-			Name: "File entity with hashes only",
+			// The shape a malware alert produces: a name and a hash, with no
+			// directory, which is what a bare file path yields.
+			Name: "File entity with a name and a hash, no directory",
 			Identifiers: &Identifiers{
 				File: &FileEntity{
 					Name:   "mirai",

@@ -26,11 +26,22 @@ type AdvancedScopeEntity struct {
 	Values   string `json:"values" bson:"values"`
 }
 
-// HashScopeEntities are the advanced-scope entities whose value is a hex file hash.
-var HashScopeEntities = map[string]bool{
+// hashScopeEntities are the advanced-scope entities whose value is a hex file hash.
+//
+// Unexported on purpose. An exported map is mutable by any consumer, and this one
+// decides whether a value is folded before it is compared - so a stray write would
+// change matching behaviour globally and silently. Read it through
+// IsHashScopeEntity.
+var hashScopeEntities = map[string]bool{
 	"file.md5":    true,
 	"file.sha1":   true,
 	"file.sha256": true,
+}
+
+// IsHashScopeEntity reports whether an advanced-scope entity's value is a file hash,
+// and therefore must be compared without regard to the case it was typed in.
+func IsHashScopeEntity(entity string) bool {
+	return hashScopeEntities[entity]
 }
 
 // NormalizeHashScopeValues lower-cases the values of hash-scoped entities in place,
@@ -56,7 +67,7 @@ var HashScopeEntities = map[string]bool{
 // which persists it, fold through this one function.
 func NormalizeHashScopeValues(scopes []AdvancedScopeEntity) {
 	for i := range scopes {
-		if HashScopeEntities[scopes[i].Entity] {
+		if IsHashScopeEntity(scopes[i].Entity) {
 			scopes[i].Values = strings.ToLower(scopes[i].Values)
 		}
 	}
