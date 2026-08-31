@@ -14,8 +14,10 @@ type FileEntity struct {
 	// compares against these.
 	//
 	// Callers are expected to store them lower case; this struct does not enforce
-	// it, and nothing downstream folds case. See armotypes.NormalizeHashScopeValues
-	// for who does the folding and why it has to happen on write.
+	// it, and the comparison folds no case. Two writers do the folding, one per
+	// side of that comparison: the alert side is folded by the malware producer in
+	// event-ingester-service, and the exception side by
+	// armotypes.NormalizeHashScopeValues.
 	MD5    string `json:"md5,omitempty" bson:"md5,omitempty"`
 	SHA1   string `json:"sha1,omitempty" bson:"sha1,omitempty"`
 	SHA256 string `json:"sha256,omitempty" bson:"sha256,omitempty"`

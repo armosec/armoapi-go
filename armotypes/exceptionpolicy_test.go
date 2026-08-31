@@ -1,6 +1,7 @@
 package armotypes
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/armosec/armoapi-go/armotypes/common"
@@ -546,22 +547,41 @@ func TestNormalizeHashScopeValues(t *testing.T) {
 	assert.Equal(t, "--Flag=Value", scopes[5].Values)
 }
 
-// A hash entity that Flatten() can emit but the fold does not know about would be
-// stored unfolded and never match. Derive the list from Flatten() so the two cannot
-// drift.
-func TestHashScopeEntitiesCoverEveryHashFlattenEmits(t *testing.T) {
-	populated := &common.Identifiers{
-		File: &common.FileEntity{
-			MD5:    "5d41402abc4b2a76b9719d911017c592",
-			SHA1:   "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d",
-			SHA256: "9f2b1e1d3c4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4",
-		},
+// nonHashFileIdentifiers are the file identifier keys that are deliberately NOT
+// case-folded, because they are case-significant on Linux.
+var nonHashFileIdentifiers = map[string]bool{
+	"file.name":      true,
+	"file.directory": true,
+}
+
+// Every field of FileEntity must be a declared decision: either a hash the fold
+// covers, or a value deliberately left alone. A hash added without a fold rule is
+// stored unfolded and can never match.
+//
+// The fixture is filled by REFLECTION, not by hand. An earlier version of this test
+// used a hand-written fixture and claimed it "cannot drift" - it could: adding a
+// SHA512 field to the struct and to Flatten() left the new key unset in the fixture,
+// so Flatten() never emitted it, so the loop never checked it, and every test in the
+// repository still passed. Reflection is what makes the claim true.
+func TestEveryFileIdentifierIsEitherFoldedOrDeliberatelyNot(t *testing.T) {
+	file := &common.FileEntity{}
+	value := reflect.ValueOf(file).Elem()
+	for i := 0; i < value.NumField(); i++ {
+		if field := value.Field(i); field.Kind() == reflect.String && field.CanSet() {
+			// A distinct upper-case value per field, so a fold is observable.
+			field.SetString("ABCDEF" + value.Type().Field(i).Name)
+		}
 	}
 
-	for field := range populated.Flatten() {
-		assert.True(t, IsHashScopeEntity(field), "%s is a hash identifier but the case fold does not cover it", field)
+	flattened := (&common.Identifiers{File: file}).Flatten()
+	assert.Len(t, flattened, value.NumField(),
+		"every FileEntity field must be a settable string that Flatten emits; a new field needs a Flatten case")
+
+	for key := range flattened {
+		covered := IsHashScopeEntity(key) || nonHashFileIdentifiers[key]
+		assert.True(t, covered,
+			"%s is a file identifier but nothing decides whether it is folded - add it to the fold set or to nonHashFileIdentifiers", key)
 	}
-	assert.Len(t, hashScopeEntities, 3)
 }
 
 func TestNormalizeHashScopeValuesHandlesNoScopes(t *testing.T) {

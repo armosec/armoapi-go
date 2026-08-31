@@ -65,6 +65,14 @@ func IsHashScopeEntity(entity string) bool {
 // Kept here rather than in each caller so the write paths cannot drift apart: both
 // cadashboardbe, which parses the analyst's request, and event-ingester-service,
 // which persists it, fold through this one function.
+//
+// The entity name is matched exactly. "file.SHA256" is not "file.sha256" and is not
+// folded - but it would not have matched anything anyway, because the SQL compares
+// the stored entity against the alert's flattened key, which is lower case. Nothing
+// validates Entity on the way in, so an unrecognised name is stored and silently
+// matches nothing. That is a gap in the exception API, not in this function; closing
+// it means rejecting unknown entities at the boundary, which would also affect the
+// CDR entities and needs its own decision.
 func NormalizeHashScopeValues(scopes []AdvancedScopeEntity) {
 	for i := range scopes {
 		if IsHashScopeEntity(scopes[i].Entity) {

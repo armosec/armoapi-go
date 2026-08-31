@@ -27,11 +27,11 @@ type IgnoreRuleUserInputMessage struct {
 }
 
 type PostureExceptionPolicy struct {
-	PortalBase   `json:",inline" bson:"inline"`
-	PolicyType   string                          `json:"policyType,omitempty" bson:"policyType,omitempty"`
-	CreationTime string                          `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
-	Actions      []PostureExceptionPolicyActions `json:"actions,omitempty" bson:"actions,omitempty"`
-	Resources    []identifiers.PortalDesignator  `json:"resources" bson:"resources,omitempty"`
+	PortalBase      `json:",inline" bson:"inline"`
+	PolicyType      string                          `json:"policyType,omitempty" bson:"policyType,omitempty"`
+	CreationTime    string                          `json:"creationTime,omitempty" bson:"creationTime,omitempty"`
+	Actions         []PostureExceptionPolicyActions `json:"actions,omitempty" bson:"actions,omitempty"`
+	Resources       []identifiers.PortalDesignator  `json:"resources" bson:"resources,omitempty"`
 	// ObjectSelector carries a full Kubernetes label selector (matchLabels + matchExpressions)
 	// for the exception's workload-matching axis. Unlike Resources (which encodes per-key regex
 	// designators), this is evaluated with labels.Selector semantics by the exception processor.
@@ -42,11 +42,11 @@ type PostureExceptionPolicy struct {
 	// whose conversion disagrees with that intent — nil yields labels.Nothing() (matches nothing)
 	// and an empty selector yields labels.Everything() (matches every workload). Guard for
 	// nil/empty before converting; ObjectSelector.ToMetaV1() returns nil for a nil receiver.
-	ObjectSelector  *LabelSelector  `json:"objectSelector,omitempty" bson:"objectSelector,omitempty"`
-	PosturePolicies []PosturePolicy `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
-	Reason          *string         `json:"reason,omitempty" bson:"reason,omitempty"`
-	ExpirationDate  *time.Time      `json:"expirationDate,omitempty" bson:"expirationDate"`
-	CreatedBy       string          `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
+	ObjectSelector  *LabelSelector                  `json:"objectSelector,omitempty" bson:"objectSelector,omitempty"`
+	PosturePolicies []PosturePolicy                 `json:"posturePolicies,omitempty" bson:"posturePolicies,omitempty"`
+	Reason          *string                         `json:"reason,omitempty" bson:"reason,omitempty"`
+	ExpirationDate  *time.Time                      `json:"expirationDate,omitempty" bson:"expirationDate"`
+	CreatedBy       string                          `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 }
 
 // LabelSelector mirrors metav1.LabelSelector but carries explicit bson tags so the
