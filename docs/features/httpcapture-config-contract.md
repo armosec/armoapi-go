@@ -50,7 +50,10 @@ The config the node-agent pulls (via careportsreceiver) and applies, fail-closed
 - **`mergeWithGlobal`** *(pointer; absent ⇒ **true**)* — controls whether a per-customer
   document is merged with the global default document (customer fields winning on conflict) or
   resolved as a standalone document (the global document is ignored entirely). Set explicitly to
-  `false` on a customer document to opt that customer out of merging.
+  `false` on a customer document to opt that customer out of merging. **Only meaningful on a
+  customer document** — `resolveHTTPCaptureConfig` never reads it off the global document
+  (reading it there to decide whether to merge INTO the global document would be circular).
+  Setting `mergeWithGlobal: false` on the global document itself has no effect.
 
 **Merge granularity, part of this contract (not left to each consumer to decide):** when
 `mergeWithGlobal` is `true` (the default) and both a customer and a global document exist,
