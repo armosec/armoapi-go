@@ -8,8 +8,8 @@ import (
 	"github.com/armosec/armoapi-go/armotypes/tlsoffsets"
 )
 
-func TestSandboxConfigResponse_CaptureInline_OffsetsSeparateSection(t *testing.T) {
-	var r SandboxConfigResponse
+func TestCaptureConfigResponse_CaptureInline_OffsetsSeparateSection(t *testing.T) {
+	var r CaptureConfigResponse
 	r.CaptureConfig = CaptureConfig{ProtocolVersion: CurrentProtocolVersion, Enabled: true}
 	if err := r.SetTLSOffsets(map[string]tlsoffsets.Record{
 		"bid123": {Target: "claude", Platform: "linux", Arch: "x86_64", Payload: json.RawMessage(`{"buildID":"bid123"}`)},
@@ -27,7 +27,7 @@ func TestSandboxConfigResponse_CaptureInline_OffsetsSeparateSection(t *testing.T
 		t.Fatalf("unexpected wire shape: %s", s)
 	}
 
-	var out SandboxConfigResponse
+	var out CaptureConfigResponse
 	if err := json.Unmarshal(b, &out); err != nil {
 		t.Fatalf("unmarshal: %v", err)
 	}
@@ -44,8 +44,8 @@ func TestSandboxConfigResponse_CaptureInline_OffsetsSeparateSection(t *testing.T
 	}
 }
 
-func TestSandboxConfigResponse_NoOffsets_OmitsSection(t *testing.T) {
-	var r SandboxConfigResponse
+func TestCaptureConfigResponse_NoOffsets_OmitsSection(t *testing.T) {
+	var r CaptureConfigResponse
 	r.CaptureConfig = CaptureConfig{ProtocolVersion: CurrentProtocolVersion}
 	if err := r.SetTLSOffsets(nil); err != nil {
 		t.Fatalf("SetTLSOffsets(nil): %v", err)
@@ -59,8 +59,8 @@ func TestSandboxConfigResponse_NoOffsets_OmitsSection(t *testing.T) {
 // SetTLSOffsets surfaces an invalid record payload: json.Marshal validates the embedded
 // json.RawMessage and returns an error, which SetTLSOffsets propagates without setting the
 // section (so a broken payload can never produce a malformed wire response).
-func TestSandboxConfigResponse_SetTLSOffsets_RejectsInvalidPayload(t *testing.T) {
-	var r SandboxConfigResponse
+func TestCaptureConfigResponse_SetTLSOffsets_RejectsInvalidPayload(t *testing.T) {
+	var r CaptureConfigResponse
 	err := r.SetTLSOffsets(map[string]tlsoffsets.Record{
 		"bad": {Target: "claude", Payload: json.RawMessage("{not valid json")},
 	})

@@ -38,13 +38,13 @@ Migrated from the node-agent's `uploadpolicy.Rule`. A transaction is matched by
 AND-ed; empty = any) and assigned `level` — the wire string `"none" | "headers" | "full"`.
 The agent maps `Level` to its internal `uploadpolicy.Level` on parse.
 
-## `SandboxConfigResponse` — the served merged response
+## `CaptureConfigResponse` — the served merged response
 
 What the node-agent actually pulls is **one** response combining the capture policy with
 the TLS offset-map section (TLS Offset-Map Distribution, SUB-7970):
 
 ```go
-type SandboxConfigResponse struct {
+type CaptureConfigResponse struct {
     CaptureConfig `json:",inline"`                            // capture policy, top-level
     TLSOffsets json.RawMessage `json:"tlsOffsets,omitempty"`  // offsets, opaque raw JSON
 }
