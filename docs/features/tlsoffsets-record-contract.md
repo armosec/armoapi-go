@@ -38,7 +38,7 @@ map — it is **not** a field on `Record`.
 
 A record reaches the agent inside the merged **`httpcapture.CaptureConfigResponse`** (capture
 policy inline + a raw `tlsOffsets` section keyed by identity) — documented in
-[httpcapture-config-contract.md](httpcapture-config-contract.md#sandboxconfigresponse--the-served-merged-response).
+[httpcapture-config-contract.md](httpcapture-config-contract.md#captureconfigresponse--the-served-merged-response).
 `Record` stays independent of that envelope and of the capture config.
 
 ## Consumers

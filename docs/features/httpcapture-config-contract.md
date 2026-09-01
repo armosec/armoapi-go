@@ -30,6 +30,23 @@ The config the node-agent pulls (via careportsreceiver) and applies, fail-closed
 - **Capture policy** (added for SUB-7696 — the migration the type's doc comment promised):
   - `defaultLevel` (string) — level when no rule matches; absent ⇒ `"none"` (fail-closed).
   - `rules` (`[]CaptureRule`) — ordered, **first-match-wins** upload policy.
+- **Dynamic capability toggles** (added for [ADR 0009](https://github.com/armosec/shared-designs-and-docs/blob/main/adrs/0009-node-agent-capture-config-rename-and-otel-filter.md) — all three are `*bool` so an absent
+  field is distinguishable from an explicit `false`, and each has its own polarity chosen to
+  match how sensitive the capability it gates is):
+  - `otelEventsEnabled` *(pointer; absent ⇒ **allow**, fail-safe)* — gates the node-agent's
+    dynamic, per-event OTel raw-eBPF-event export filter. Raw eBPF telemetry is a detection
+    signal, so losing it silently on a transient config-fetch issue is worse than a bounded
+    over-collection window; hence fail-*safe*, not fail-closed like the other two.
+  - `httpCaptureTapEnabled` *(pointer; absent ⇒ **deny**, fail-closed)* — the dedicated,
+    live-toggleable switch for whether the node-agent's HTTP-capture tap is *constructed* at
+    all. Distinct from `enabled` above, which is a lossless per-transaction policy decision on
+    an already-existing tap; this field instead controls the tap's existence. Extends
+    HTTP-capture's own on/off surface, so it inherits `enabled`'s fail-closed posture — captured
+    content is potentially PII-bearing.
+  - `workloadScanEnabled` *(pointer; absent ⇒ **deny**, fail-closed)* — gates the node-agent's
+    NA-3 workload scanner (snapshots the overlay upperdir, secret/SA-token mount targets, and
+    `/proc/<pid>/environ`; emits identity-material findings at least as sensitive as
+    HTTP-capture content, hence fail-closed).
 
 ## `CaptureRule`
 
