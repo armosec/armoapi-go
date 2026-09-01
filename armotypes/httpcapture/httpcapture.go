@@ -251,6 +251,33 @@ type CaptureConfig struct {
 	// the embedded config in MongoDB with the same field names it serves over REST.
 	DefaultLevel string        `json:"defaultLevel,omitempty" bson:"defaultLevel,omitempty"`
 	Rules        []CaptureRule `json:"rules,omitempty" bson:"rules,omitempty"`
+
+	// OTelEventsEnabled gates raw eBPF-event OTel export at dispatch time (ADR 0009 §3).
+	// Pointer so absent ⇒ nil ⇒ allow — fail-safe: losing a detection signal silently on
+	// a transient config-fetch issue is worse than a bounded over-collection window.
+	OTelEventsEnabled *bool `json:"otelEventsEnabled,omitempty" bson:"otelEventsEnabled,omitempty"`
+
+	// HTTPCaptureTapEnabled is the backend-driven, live-toggleable switch for whether the
+	// HTTP-capture tap is constructed at all (ADR 0009 §5). Pointer so absent ⇒ nil ⇒
+	// deny — fail-closed, the same posture as Enabled: this extends capture's own on/off
+	// surface and captured content is potentially PII-bearing. Distinct from Enabled,
+	// which is a lossless per-transaction policy decision on an already-existing tap;
+	// this field instead controls whether the tap object exists in the first place.
+	HTTPCaptureTapEnabled *bool `json:"httpCaptureTapEnabled,omitempty" bson:"httpCaptureTapEnabled,omitempty"`
+
+	// WorkloadScanEnabled gates the NA-3 workload scanner (ADR 0009 §6). Pointer so
+	// absent ⇒ nil ⇒ deny — fail-closed: the scanner snapshots the overlay upperdir,
+	// secret/SA-token mount targets, and /proc/<pid>/environ, and emits identity-material
+	// findings at least as sensitive as HTTP-capture content.
+	WorkloadScanEnabled *bool `json:"workloadScanEnabled,omitempty" bson:"workloadScanEnabled,omitempty"`
+
+	// MergeWithGlobal controls whether a per-customer document is merged with the global
+	// default document (customer fields winning on conflict) or resolved as a standalone
+	// document, when cadashboardbe's resolveHTTPCaptureConfig picks between them. Pointer
+	// so absent ⇒ nil ⇒ true — merging is the default. Set explicitly to false to opt a
+	// customer document out of merging: resolveHTTPCaptureConfig then returns it exactly
+	// as stored, never consulting the global document for any field.
+	MergeWithGlobal *bool `json:"mergeWithGlobal,omitempty" bson:"mergeWithGlobal,omitempty"`
 }
 
 // CaptureRule is one first-match-wins upload-policy rule: it matches a transaction by
