@@ -37,24 +37,43 @@ The config the node-agent pulls (via careportsreceiver) and applies, fail-closed
     dynamic, per-event OTel raw-eBPF-event export filter. Raw eBPF telemetry is a detection
     signal, so losing it silently on a transient config-fetch issue is worse than a bounded
     over-collection window; hence fail-*safe*, not fail-closed like the other two.
-  - `httpCaptureTapEnabled` *(pointer; absent ⇒ **deny**, fail-closed)* — the dedicated,
-    live-toggleable switch for whether the node-agent's HTTP-capture tap is *constructed* at
-    all. Distinct from `enabled` above, which is a lossless per-transaction policy decision on
-    an already-existing tap; this field instead controls the tap's existence. Extends
-    HTTP-capture's own on/off surface, so it inherits `enabled`'s fail-closed posture — captured
-    content is potentially PII-bearing.
+  - `httpCaptureTapEnabled` *(Go field `HTTPCaptureTapEnabled`; pointer; absent ⇒ **deny**,
+    fail-closed)* — the dedicated, live-toggleable switch for whether the node-agent's
+    HTTP-capture tap is *constructed* at all. Distinct from `enabled` above, which is a lossless
+    per-transaction policy decision on an already-existing tap; this field instead controls the
+    tap's existence. Extends HTTP-capture's own on/off surface, so it inherits `enabled`'s
+    fail-closed posture — captured content is potentially PII-bearing.
   - `workloadScanEnabled` *(pointer; absent ⇒ **deny**, fail-closed)* — gates the node-agent's
     NA-3 workload scanner (snapshots the overlay upperdir, secret/SA-token mount targets, and
     `/proc/<pid>/environ`; emits identity-material findings at least as sensitive as
     HTTP-capture content, hence fail-closed).
 - **`mergeWithGlobal`** *(pointer; absent ⇒ **true**)* — controls whether a per-customer
-  document is merged with the global default document (customer fields winning on conflict)
-  or resolved as a standalone document. **Not yet branched on**: cadashboardbe's
-  `resolveHTTPCaptureConfig` always merges regardless of this field's current value — it is a
-  documented, forward-looking field for a future per-customer opt-out, not a currently
-  implemented toggle. See `cadashboardbe` `docs/features/ai-sandbox-httpcapture-config.md` for
-  the merge shape (which fields fall back individually to global vs. come from the customer
-  document as a whole).
+  document is merged with the global default document (customer fields winning on conflict) or
+  resolved as a standalone document (the global document is ignored entirely). Set explicitly to
+  `false` on a customer document to opt that customer out of merging.
+
+**Merge granularity, part of this contract (not left to each consumer to decide):** when
+`mergeWithGlobal` is `true` (the default) and both a customer and a global document exist,
+`cadashboardbe`'s `resolveHTTPCaptureConfig` merges them **per field, not per document**, and the
+merge is NOT uniform across every field:
+- The four pointer-typed toggles above (`maskKnownCredentialHeaders`, `otelEventsEnabled`,
+  `httpCaptureTapEnabled`, `workloadScanEnabled`) fall back to the global document's value
+  **individually** when the customer document leaves them `nil` — `nil` is the one unambiguous
+  "not set" signal these fields have. This matters *because* their fail-open/fail-closed
+  polarities differ: a customer document that merely omits `otelEventsEnabled` correctly
+  inherits global's value either way, rather than an omission on one field silently reading as
+  "allow" and on another as "deny" depending on which document happened to be picked wholesale.
+- Every other field (`protocolVersion`, `enabled`, the size/volume caps, `defaultLevel`, `rules`,
+  `extraCredentialHeaders`) comes from the customer document **as a whole** when one exists —
+  these are plain scalars/slices whose Go zero value (`false`/`0`/`""`/empty slice) can't be told
+  apart from "the customer didn't set this," so merging them field-by-field would risk silently
+  overwriting a customer's deliberate zero value (e.g. `enabled: false`) with global's.
+- When `mergeWithGlobal` is explicitly `false` on the customer document, none of the above
+  applies: the customer document is returned exactly as stored, global is never consulted for
+  any field, pointer or scalar.
+
+See `cadashboardbe`'s `docs/features/ai-sandbox-httpcapture-config.md` for the resolution
+function itself.
 
 ## `CaptureRule`
 

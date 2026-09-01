@@ -257,13 +257,13 @@ type CaptureConfig struct {
 	// a transient config-fetch issue is worse than a bounded over-collection window.
 	OTelEventsEnabled *bool `json:"otelEventsEnabled,omitempty" bson:"otelEventsEnabled,omitempty"`
 
-	// HttpCaptureTapEnabled is the backend-driven, live-toggleable switch for whether the
+	// HTTPCaptureTapEnabled is the backend-driven, live-toggleable switch for whether the
 	// HTTP-capture tap is constructed at all (ADR 0009 §5). Pointer so absent ⇒ nil ⇒
 	// deny — fail-closed, the same posture as Enabled: this extends capture's own on/off
 	// surface and captured content is potentially PII-bearing. Distinct from Enabled,
 	// which is a lossless per-transaction policy decision on an already-existing tap;
 	// this field instead controls whether the tap object exists in the first place.
-	HttpCaptureTapEnabled *bool `json:"httpCaptureTapEnabled,omitempty" bson:"httpCaptureTapEnabled,omitempty"`
+	HTTPCaptureTapEnabled *bool `json:"httpCaptureTapEnabled,omitempty" bson:"httpCaptureTapEnabled,omitempty"`
 
 	// WorkloadScanEnabled gates the NA-3 workload scanner (ADR 0009 §6). Pointer so
 	// absent ⇒ nil ⇒ deny — fail-closed: the scanner snapshots the overlay upperdir,
@@ -274,12 +274,9 @@ type CaptureConfig struct {
 	// MergeWithGlobal controls whether a per-customer document is merged with the global
 	// default document (customer fields winning on conflict) or resolved as a standalone
 	// document, when cadashboardbe's resolveHTTPCaptureConfig picks between them. Pointer
-	// so absent ⇒ nil ⇒ true — merging is the default.
-	//
-	// NOT YET BRANCHED ON: resolveHTTPCaptureConfig always merges regardless of this
-	// field's value (see its own doc comment in cadashboardbe). It exists now as a
-	// documented, forward-looking field for a future per-customer opt-out of merging,
-	// not a currently-implemented toggle — setting it to false has no effect yet.
+	// so absent ⇒ nil ⇒ true — merging is the default. Set explicitly to false to opt a
+	// customer document out of merging: resolveHTTPCaptureConfig then returns it exactly
+	// as stored, never consulting the global document for any field.
 	MergeWithGlobal *bool `json:"mergeWithGlobal,omitempty" bson:"mergeWithGlobal,omitempty"`
 }
 
