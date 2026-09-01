@@ -47,6 +47,14 @@ The config the node-agent pulls (via careportsreceiver) and applies, fail-closed
     NA-3 workload scanner (snapshots the overlay upperdir, secret/SA-token mount targets, and
     `/proc/<pid>/environ`; emits identity-material findings at least as sensitive as
     HTTP-capture content, hence fail-closed).
+- **`mergeWithGlobal`** *(pointer; absent ⇒ **true**)* — controls whether a per-customer
+  document is merged with the global default document (customer fields winning on conflict)
+  or resolved as a standalone document. **Not yet branched on**: cadashboardbe's
+  `resolveHTTPCaptureConfig` always merges regardless of this field's current value — it is a
+  documented, forward-looking field for a future per-customer opt-out, not a currently
+  implemented toggle. See `cadashboardbe` `docs/features/ai-sandbox-httpcapture-config.md` for
+  the merge shape (which fields fall back individually to global vs. come from the customer
+  document as a whole).
 
 ## `CaptureRule`
 

@@ -270,6 +270,17 @@ type CaptureConfig struct {
 	// secret/SA-token mount targets, and /proc/<pid>/environ, and emits identity-material
 	// findings at least as sensitive as HTTP-capture content.
 	WorkloadScanEnabled *bool `json:"workloadScanEnabled,omitempty" bson:"workloadScanEnabled,omitempty"`
+
+	// MergeWithGlobal controls whether a per-customer document is merged with the global
+	// default document (customer fields winning on conflict) or resolved as a standalone
+	// document, when cadashboardbe's resolveHTTPCaptureConfig picks between them. Pointer
+	// so absent ⇒ nil ⇒ true — merging is the default.
+	//
+	// NOT YET BRANCHED ON: resolveHTTPCaptureConfig always merges regardless of this
+	// field's value (see its own doc comment in cadashboardbe). It exists now as a
+	// documented, forward-looking field for a future per-customer opt-out of merging,
+	// not a currently-implemented toggle — setting it to false has no effect yet.
+	MergeWithGlobal *bool `json:"mergeWithGlobal,omitempty" bson:"mergeWithGlobal,omitempty"`
 }
 
 // CaptureRule is one first-match-wins upload-policy rule: it matches a transaction by
