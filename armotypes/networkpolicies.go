@@ -17,6 +17,11 @@ const (
 	UnscheduledNodeAgentPods MissingRuntimeInfoReason = 2
 	IncompatibleKernel       MissingRuntimeInfoReason = 3
 	RuncNotFound             MissingRuntimeInfoReason = 4
+	// reasons 5-7 are derived from the state of the workload's own ApplicationProfile,
+	// complementing the node-agent (cluster-level) reasons above
+	ProfileStillLearning MissingRuntimeInfoReason = 5
+	AwaitingScanUpdate   MissingRuntimeInfoReason = 6
+	ProfileTooLarge      MissingRuntimeInfoReason = 7
 )
 
 // NetworkPoliciesWorkload is used store information about workloads
