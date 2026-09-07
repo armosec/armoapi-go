@@ -48,4 +48,25 @@ type Inventory struct {
 	// and ECS carry one; cloud-host rows do not yet project one, so they read
 	// empty until the platform surfaces a host resource_hash.
 	SandboxStatus string `json:"sandboxStatus,omitempty"`
+	// AiClientProviders lists the AI/LLM providers detected on the workload's egress
+	// (e.g. "openai", "anthropic"), sourced from workload_statuses.ai_client_providers.
+	// Non-empty only for agentic workloads. Surfaced for the workload details
+	// "AI usage detected" section (same source as the IsAgentic verdict).
+	AiClientProviders []string `json:"aiClientProviders,omitempty"`
+	// AiLastSeen is when AI/LLM egress was last observed for the workload
+	// (workload_statuses.ai_last_seen — stamped when the detected AI provider union
+	// is non-empty, frozen once AI is no longer seen). nil when never observed.
+	AiLastSeen *time.Time `json:"aiLastSeen,omitempty"`
+	// AiModels are the AI models observed for the workload via the AI sandbox
+	// (aggregated from ai_sandbox_models in the inventory query). Non-empty only for
+	// workloads added to the sandbox; drives the Model rows in the "AI usage detected"
+	// section. Empty otherwise (the Model rows are simply hidden).
+	AiModels []AiModelUsage `json:"aiModels,omitempty"`
+}
+
+// AiModelUsage is one AI model observed for a workload — the model id plus the
+// provider it belongs to (used for the per-model provider glyph in the UI).
+type AiModelUsage struct {
+	ModelID  string `json:"modelId"`
+	Provider string `json:"provider,omitempty"`
 }
