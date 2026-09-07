@@ -29,26 +29,37 @@ here so callers can build patch commands through the typed struct like every oth
 ```go
 const OperatorActionPatch OperatorActionType = "patch"
 
+// PatchBody is a JSON or YAML object, encoded as a string. Its UnmarshalJSON
+// also accepts a raw JSON object directly, storing its JSON text verbatim.
+type PatchBody string
+
 type OperatorActionArgs struct {
     // ... existing fields (Action, Target, Selector, FindingRef, DryRun, TTL, Reason) ...
 
     // Patch is the raw patch body for the "patch" action (required when
-    // Action == OperatorActionPatch). It is a JSON or YAML object, encoded
-    // as a string. Must be object-shaped: RFC 6902 JSON Patch arrays are
-    // not supported.
-    Patch string `json:"patch,omitempty"`
+    // Action == OperatorActionPatch). See PatchBody for its accepted wire
+    // shapes. Must be object-shaped: RFC 6902 JSON Patch arrays are not
+    // supported.
+    Patch PatchBody `json:"patch,omitempty"`
     // PatchType selects the patch action's patch type: "strategic" (the
     // default when empty) or "merge". Ignored for every other action.
     PatchType string `json:"patchType,omitempty"`
 }
 ```
 
+`OperatorActionPatch`'s doc comment deliberately doesn't call the patch "arbitrary" — the type only
+carries the patch body. Validating its shape and safety (size limits, supported target kinds, and
+an escalation-field denylist covering things like `hostNetwork`, `serviceAccountName`, and
+container `image`/`privileged`/`capabilities` changes) is enforced entirely by the operator's
+`PatchRemediator`, not by this package.
+
 ## Scope of this change
 
-Purely the typed contract addition: the new constant, the two new fields, and round-trip test
-coverage (`TestOperatorActionArgsRoundTripPatch` in `apis/operatoraction_test.go`). `IsDryRun`,
-`ToArgs`, and `OperatorActionArgsFromMap` are unchanged — they're already generic (reflect-free
-JSON marshal/unmarshal) and needed no changes to carry the new fields.
+Purely the typed contract addition: the new constant, the two new fields, `PatchBody`'s tolerant
+decoding (see Compatibility below), and test coverage in `apis/operatoraction_test.go`
+(`TestOperatorActionArgsRoundTripPatch`, `TestOperatorActionArgsFromMapPatchAcceptsObjectShape`).
+`IsDryRun`, `ToArgs`, and `OperatorActionArgsFromMap` are unchanged — they're already generic
+(reflect-free JSON marshal/unmarshal) and needed no changes to carry the new fields.
 
 Patch semantics, validation, and safety rails (canonicalizing the patch body, rejecting JSON Patch
 arrays, applying strategic-merge vs. JSON-merge) live entirely in the operator repo
@@ -61,20 +72,17 @@ Additive for serialization and for every non-patch action: both new fields are `
 existing field renamed/retyped/retagged, and commands that don't use `OperatorActionPatch`
 serialize exactly as before.
 
-**Not yet additive for deserializing an existing patch command.** The operator's
-`extractPatchArgs` (`mainhandler/actionhandler.go`) currently accepts `patch` as *either* a JSON
-string *or* a raw JSON object (it `json.Marshal`s the object case back to a string). But
-`handleOperatorAction` parses the whole `Command.Args` map through
-`apis.OperatorActionArgsFromMap` first and hard-errors on failure — so once the operator bumps its
-`armoapi-go` pin to include this `Patch string` field, any producer still sending an
-object-shaped `patch` value will fail that parse (`json: cannot unmarshal object into Go struct
-field ... of type string`) before `extractPatchArgs` ever runs. This wasn't a problem before this
-change because the object-shaped case was simply ignored by the typed parse and only
-`extractPatchArgs` ever looked at it.
+Additive for deserialization too, including an existing patch command. The operator's
+`extractPatchArgs` (`mainhandler/actionhandler.go`) has always accepted `patch` as *either* a JSON
+string *or* a raw JSON object (it `json.Marshal`s the object case back to a string). A plain `Patch
+string` field would have broken that: `handleOperatorAction` parses the whole `Command.Args` map
+through `apis.OperatorActionArgsFromMap` as a single unmarshal *before* `extractPatchArgs` runs, so
+an object-shaped `patch` value would have failed the whole parse — not just the patch field, but
+`target`, `dryRun`, and `reason` along with it — the moment the operator bumped its `armoapi-go`
+pin. `PatchBody.UnmarshalJSON` accepts both shapes for exactly this reason, storing the object
+case's JSON text verbatim, so the operator's dependency bump is a no-op for any existing producer
+regardless of which shape it sends.
 
-**Rollout order:** the `armoapi-go` bump that picks up this schema must land together with (or
-after) switching the operator's `handleOperatorAction`/`extractPatchArgs` to read `args.Patch` /
-`args.PatchType` directly and to require `patch` be sent as a string (dropping the raw-object
-`default:` branch) — or with every `patch`-command producer confirmed to already send `patch` as
-a string. Until that lands, do not bump the operator's `armoapi-go` pin past this schema on a
-branch that also accepts patch commands with an object-shaped `patch` payload.
+That said, the operator's `extractPatchArgs` still duplicates this parsing (it reads `patch`/
+`patchType` off the raw map, not through the typed struct) — collapsing it to read `args.Patch` /
+`args.PatchType` directly is a follow-up in the operator repo, not part of this change.

@@ -1,6 +1,9 @@
 package apis
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+)
 
 // OperatorActionType enumerates the concrete cluster operations that a
 // TypeOperatorAction command can request. It is carried in
@@ -19,12 +22,46 @@ const (
 	OperatorActionCordon OperatorActionType = "cordon"
 	// OperatorActionRevert undoes a previously applied action on a target.
 	OperatorActionRevert OperatorActionType = "revert"
-	// OperatorActionPatch applies an arbitrary Strategic Merge Patch or JSON
+	// OperatorActionPatch applies a targeted Strategic Merge Patch or JSON
 	// Merge Patch to a workload (Args.Patch / Args.PatchType), for callers
 	// that don't have the full workload object and only need to change
-	// specific fields.
+	// specific fields. This type only carries the patch body — validating
+	// its shape and safety (size limits, supported target kinds, and an
+	// escalation-field denylist covering things like hostNetwork,
+	// serviceAccountName, and container image/privileged/capabilities
+	// changes) is enforced entirely by the consuming operator
+	// (kubescape/operator's PatchRemediator), not by this package.
 	OperatorActionPatch OperatorActionType = "patch"
 )
+
+// PatchBody is the wire body for OperatorActionArgs.Patch: a JSON or YAML
+// object, encoded as a string.
+//
+// Its UnmarshalJSON also accepts a raw JSON object directly (not pre-encoded
+// as a string) and stores its JSON text verbatim, so a caller sending an
+// object-shaped "patch" value on the wire — the shape the operator's own
+// extractPatchArgs has always tolerated — still round-trips through
+// OperatorActionArgsFromMap instead of failing its single unmarshal for
+// every field. Marshaling always produces a plain JSON string.
+type PatchBody string
+
+func (p *PatchBody) UnmarshalJSON(data []byte) error {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) == 0 || string(trimmed) == "null" {
+		*p = ""
+		return nil
+	}
+	if trimmed[0] == '"' {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
+			return err
+		}
+		*p = PatchBody(s)
+		return nil
+	}
+	*p = PatchBody(trimmed)
+	return nil
+}
 
 // OperatorActionTarget identifies a single concrete object an action operates
 // on.
@@ -77,10 +114,10 @@ type OperatorActionArgs struct {
 	// Reason is a human-readable justification recorded in the audit trail.
 	Reason string `json:"reason,omitempty"`
 	// Patch is the raw patch body for the "patch" action (required when
-	// Action == OperatorActionPatch). It is a JSON or YAML object, encoded
-	// as a string. Must be object-shaped: RFC 6902 JSON Patch arrays are
-	// not supported.
-	Patch string `json:"patch,omitempty"`
+	// Action == OperatorActionPatch). See PatchBody for its accepted wire
+	// shapes. Must be object-shaped: RFC 6902 JSON Patch arrays are not
+	// supported.
+	Patch PatchBody `json:"patch,omitempty"`
 	// PatchType selects the patch action's patch type: "strategic" (the
 	// default when empty) or "merge". Ignored for every other action.
 	PatchType string `json:"patchType,omitempty"`
