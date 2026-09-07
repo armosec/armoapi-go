@@ -19,6 +19,11 @@ const (
 	OperatorActionCordon OperatorActionType = "cordon"
 	// OperatorActionRevert undoes a previously applied action on a target.
 	OperatorActionRevert OperatorActionType = "revert"
+	// OperatorActionPatch applies an arbitrary Strategic Merge Patch or JSON
+	// Merge Patch to a workload (Args.Patch / Args.PatchType), for callers
+	// that don't have the full workload object and only need to change
+	// specific fields.
+	OperatorActionPatch OperatorActionType = "patch"
 )
 
 // OperatorActionTarget identifies a single concrete object an action operates
@@ -71,6 +76,14 @@ type OperatorActionArgs struct {
 	TTL string `json:"ttl,omitempty"`
 	// Reason is a human-readable justification recorded in the audit trail.
 	Reason string `json:"reason,omitempty"`
+	// Patch is the raw patch body for the "patch" action (required when
+	// Action == OperatorActionPatch). It is a JSON or YAML object, encoded
+	// as a string. Must be object-shaped: RFC 6902 JSON Patch arrays are
+	// not supported.
+	Patch string `json:"patch,omitempty"`
+	// PatchType selects the patch action's patch type: "strategic" (the
+	// default when empty) or "merge". Ignored for every other action.
+	PatchType string `json:"patchType,omitempty"`
 }
 
 // IsDryRun reports whether the action should be treated as a plan-only dry-run.

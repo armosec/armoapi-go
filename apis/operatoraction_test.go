@@ -35,6 +35,26 @@ func TestOperatorActionArgsRoundTrip(t *testing.T) {
 	assert.Equal(t, in, out)
 }
 
+func TestOperatorActionArgsRoundTripPatch(t *testing.T) {
+	in := OperatorActionArgs{
+		Action:    OperatorActionPatch,
+		Target:    &OperatorActionTarget{Kind: "Deployment", Namespace: "payments", Name: "api"},
+		Patch:     `{"spec":{"template":{"spec":{"containers":[{"name":"api","image":"api:v2"}]}}}}`,
+		PatchType: "merge",
+		DryRun:    boolPtr(true),
+		Reason:    "bump image to patched version",
+	}
+
+	m, err := in.ToArgs()
+	require.NoError(t, err)
+	assert.Equal(t, in.Patch, m["patch"], "wire key must be 'patch' — the operator reads it off the raw map")
+	assert.Equal(t, in.PatchType, m["patchType"], "wire key must be 'patchType'")
+
+	out, err := OperatorActionArgsFromMap(m)
+	require.NoError(t, err)
+	assert.Equal(t, in, out)
+}
+
 // A command carrying the typed args through the generic map should be
 // recoverable on the receiving (operator) side.
 func TestOperatorActionArgsViaCommand(t *testing.T) {
