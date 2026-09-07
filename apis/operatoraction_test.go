@@ -91,6 +91,24 @@ func TestOperatorActionArgsFromMapPatchAcceptsObjectShape(t *testing.T) {
 	assert.Equal(t, "strategic", out.PatchType)
 }
 
+// Tolerating an object-shaped "patch" (above) must not widen into tolerating
+// every non-string shape: arrays, numbers, and booleans are still rejected,
+// matching OperatorActionPatchBody's "must be object-shaped" contract.
+func TestOperatorActionArgsFromMapPatchRejectsNonObjectShapes(t *testing.T) {
+	for _, tc := range []interface{}{
+		[]interface{}{"a"},
+		float64(123),
+		true,
+	} {
+		m := map[string]interface{}{
+			"action": string(OperatorActionPatch),
+			"patch":  tc,
+		}
+		_, err := OperatorActionArgsFromMap(m)
+		assert.Errorf(t, err, "patch value %#v must be rejected, not silently accepted", tc)
+	}
+}
+
 // A command carrying the typed args through the generic map should be
 // recoverable on the receiving (operator) side.
 func TestOperatorActionArgsViaCommand(t *testing.T) {

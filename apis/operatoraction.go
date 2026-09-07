@@ -3,6 +3,7 @@ package apis
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 )
 
 // OperatorActionType enumerates the concrete cluster operations that a
@@ -34,18 +35,20 @@ const (
 	OperatorActionPatch OperatorActionType = "patch"
 )
 
-// PatchBody is the wire body for OperatorActionArgs.Patch: a JSON or YAML
-// object, encoded as a string.
+// OperatorActionPatchBody is the wire body for OperatorActionArgs.Patch: a
+// JSON object, encoded as a string.
 //
 // Its UnmarshalJSON also accepts a raw JSON object directly (not pre-encoded
 // as a string) and stores its JSON text verbatim, so a caller sending an
 // object-shaped "patch" value on the wire — the shape the operator's own
 // extractPatchArgs has always tolerated — still round-trips through
 // OperatorActionArgsFromMap instead of failing its single unmarshal for
-// every field. Marshaling always produces a plain JSON string.
-type PatchBody string
+// every field. Any other raw JSON shape (array, number, bool) is rejected,
+// matching the "must be object-shaped" contract below. Marshaling always
+// produces a plain JSON string.
+type OperatorActionPatchBody string
 
-func (p *PatchBody) UnmarshalJSON(data []byte) error {
+func (p *OperatorActionPatchBody) UnmarshalJSON(data []byte) error {
 	trimmed := bytes.TrimSpace(data)
 	if len(trimmed) == 0 || string(trimmed) == "null" {
 		*p = ""
@@ -56,10 +59,13 @@ func (p *PatchBody) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(data, &s); err != nil {
 			return err
 		}
-		*p = PatchBody(s)
+		*p = OperatorActionPatchBody(s)
 		return nil
 	}
-	*p = PatchBody(trimmed)
+	if trimmed[0] != '{' {
+		return fmt.Errorf("apis: patch must be a JSON string or a JSON object, got %q", trimmed)
+	}
+	*p = OperatorActionPatchBody(trimmed)
 	return nil
 }
 
@@ -114,10 +120,10 @@ type OperatorActionArgs struct {
 	// Reason is a human-readable justification recorded in the audit trail.
 	Reason string `json:"reason,omitempty"`
 	// Patch is the raw patch body for the "patch" action (required when
-	// Action == OperatorActionPatch). See PatchBody for its accepted wire
-	// shapes. Must be object-shaped: RFC 6902 JSON Patch arrays are not
-	// supported.
-	Patch PatchBody `json:"patch,omitempty"`
+	// Action == OperatorActionPatch). See OperatorActionPatchBody for its
+	// accepted wire shapes. Must be object-shaped: RFC 6902 JSON Patch
+	// arrays are not supported.
+	Patch OperatorActionPatchBody `json:"patch,omitempty"`
 	// PatchType selects the patch action's patch type: "strategic" (the
 	// default when empty) or "merge". Ignored for every other action.
 	PatchType string `json:"patchType,omitempty"`
