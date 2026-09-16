@@ -159,6 +159,50 @@ type CloudMetadata struct {
 	Zone          string   `json:"zone,omitempty" bson:"zone,omitempty"`
 }
 
+// FrameStatus says how a call-stack frame was recovered and named.
+type FrameStatus string
+
+const (
+	FrameStatusResolved                FrameStatus = "resolved"
+	FrameStatusHeuristic               FrameStatus = "heuristic"
+	FrameStatusHeuristicFP             FrameStatus = "heuristic-fp"
+	FrameStatusUnresolvedNoMapping     FrameStatus = "unresolved-no-mapping"
+	FrameStatusSymbolsUnavailable      FrameStatus = "symbols-unavailable"
+	FrameStatusUnresolvedProcessExited FrameStatus = "unresolved-process-exited"
+	FrameStatusJitUnresolved           FrameStatus = "jit-unresolved"
+	FrameStatusUnwoundLate             FrameStatus = "unwound-late"
+	FrameStatusIdentityRefused         FrameStatus = "identity-refused"
+)
+
+// StackStatus says whether the whole stack is complete, cut, or absent, and why.
+type StackStatus string
+
+const (
+	StackStatusComplete              StackStatus = "complete"
+	StackStatusTruncated             StackStatus = "truncated"
+	StackStatusTruncatedAtCgo        StackStatus = "truncated-at-cgo"
+	StackStatusUnwindRuleUnsupported StackStatus = "unwind-rule-unsupported"
+	StackStatusNotCaptured           StackStatus = "not-captured"
+	StackStatusFingerprintMismatch   StackStatus = "stack-fingerprint-mismatch"
+	StackStatusTidMismatch           StackStatus = "tid-mismatch"
+	StackStatusUncertain             StackStatus = "uncertain"
+)
+
+// FrameRuntime is the machine-readable runtime lane a frame belongs to
+// (Trace.Language stays the display-cased UI value).
+type FrameRuntime string
+
+const (
+	FrameRuntimeNative FrameRuntime = "native"
+	FrameRuntimeGo     FrameRuntime = "go"
+	FrameRuntimePython FrameRuntime = "python"
+	FrameRuntimePHP    FrameRuntime = "php"
+	FrameRuntimePerl   FrameRuntime = "perl"
+	FrameRuntimeRuby   FrameRuntime = "ruby"
+	FrameRuntimeJava   FrameRuntime = "java"
+	FrameRuntimeNode   FrameRuntime = "node"
+)
+
 type StackFrame struct {
 	// Frame ID
 	FrameID string `json:"frameId,omitempty" bson:"frameId,omitempty"`
@@ -178,6 +222,26 @@ type StackFrame struct {
 	NativeCode *bool `json:"nativeCode,omitempty" bson:"nativeCode,omitempty"`
 	// Anomaly flag
 	Anomaly bool `json:"anomaly,omitempty" bson:"anomaly,omitempty"`
+	// How the frame was recovered and named
+	Status FrameStatus `json:"status,omitempty"     bson:"status,omitempty"`
+	// Runtime lane the frame belongs to
+	Runtime FrameRuntime `json:"runtime,omitempty"    bson:"runtime,omitempty"`
+	// Index into Trace.Modules
+	ModuleIdx *int `json:"moduleIdx,omitempty"  bson:"moduleIdx,omitempty"`
+	// Offset of the address inside the module file, hex, same convention as Address
+	FileOffset string `json:"fileOffset,omitempty" bson:"fileOffset,omitempty"`
+	// What named the frame: symtab | cache | deferred
+	Source string `json:"source,omitempty"     bson:"source,omitempty"`
+}
+
+// TraceModule is one entry per distinct executable mapping the frames resolved
+// against. A stack of 64 frames typically spans 2-4 modules, so the identity is
+// kept once per trace and referenced by StackFrame.ModuleIdx.
+type TraceModule struct {
+	Path    string `json:"path,omitempty"    bson:"path,omitempty"`    // as the kernel reported it
+	BuildID string `json:"buildId,omitempty" bson:"buildId,omitempty"` // ELF build-id, hex; empty until captured
+	Inode   uint64 `json:"inode,omitempty"   bson:"inode,omitempty"`   // stays below MaxInt64 by construction; BSON has no unsigned type and the driver errors above it
+	Device  uint64 `json:"device,omitempty"  bson:"device,omitempty"`  // same
 }
 
 type Trace struct {
@@ -189,6 +253,28 @@ type Trace struct {
 	Package string `json:"package,omitempty" bson:"package,omitempty"`
 	// Language
 	Language string `json:"language,omitempty" bson:"language,omitempty"`
+	// Whether the whole stack is complete, cut, or absent
+	Status StackStatus `json:"status,omitempty"             bson:"status,omitempty"`
+	// Set when Status is not-captured, e.g. rate-limited, vma-busy, kernel-unsupported, pipeline-down
+	StatusReason string `json:"statusReason,omitempty"       bson:"statusReason,omitempty"`
+	// Frames recovered before the walk stopped, when Status is truncated
+	TruncatedAt *int `json:"truncatedAt,omitempty"        bson:"truncatedAt,omitempty"`
+	// Executable mappings the frames resolved against
+	Modules []TraceModule `json:"modules,omitempty"            bson:"modules,omitempty"`
+	// Hook the event came from: execve | execveat | openat | open | connect
+	Hook string `json:"hook,omitempty"               bson:"hook,omitempty"`
+	// The per-hook key that matched the stack to the event; not TraceID, which stays unique per alert
+	JoinKey string `json:"joinKey,omitempty"            bson:"joinKey,omitempty"`
+	// Thread ID the stack was walked on
+	Tid uint32 `json:"tid,omitempty"                bson:"tid,omitempty"`
+	// Process start time on the boot clock, nanoseconds
+	ProcessStartBootNs int64 `json:"processStartBootNs,omitempty" bson:"processStartBootNs,omitempty"`
+	// Stack record time on the boot clock, nanoseconds
+	RecordBootNs int64 `json:"recordBootNs,omitempty"       bson:"recordBootNs,omitempty"`
+	// Event time on the boot clock, nanoseconds
+	EventBootNs int64 `json:"eventBootNs,omitempty"        bson:"eventBootNs,omitempty"`
+	// The capture mechanism's wire and vocabulary versions, e.g. "wire/13+vocab/1"; the agent build is AgentVersion
+	MechanismVersion string `json:"mechanismVersion,omitempty"   bson:"mechanismVersion,omitempty"`
 }
 
 type BaseRuntimeAlert struct {
