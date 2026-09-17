@@ -180,9 +180,11 @@ const (
 // CSPM related attributes
 const (
 	AttributeCloudAccountGUID = "cloudAccountGUID"
-	AttributeCloudAccountID   = "accountID"
-	AttributeSubscriptionID   = "subscriptionID"
-	AttributeTenantID         = "tenantID"
+	AttributeCloudAccountID   = "accountID"      // AWS account-level identifier
+	AttributeSubscriptionID   = "subscriptionID" // Azure account-level identifier
+	AttributeGCPProjectID     = "projectID"      // GCP account-level identifier (distinct from Jira's AttributeProjectID)
+	AttributeTenantID         = "tenantID"       // Azure org-level identifier
+	AttributeOrganizationID   = "organizationID" // AWS / GCP org-level identifier
 	AttributeCloudAccountName = "accountName"
 	AttributeFramework        = "framework"
 	AttributeCloudScanID      = "scanID"

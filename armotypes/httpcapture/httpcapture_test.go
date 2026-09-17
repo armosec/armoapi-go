@@ -1,0 +1,228 @@
+package httpcapture
+
+import (
+	"bytes"
+	"encoding/json"
+	"testing"
+
+	"github.com/armosec/armoapi-go/armotypes"
+)
+
+// The wire string values are part of the contract — both sensor and backend match
+// on them, so a rename is a breaking change and must be caught here.
+func TestEnumWireValues(t *testing.T) {
+	if DirectionRequest != "request" || DirectionResponse != "response" {
+		t.Errorf("direction wire values changed: %q %q", DirectionRequest, DirectionResponse)
+	}
+	fid := map[CaptureFidelity]string{
+		FidelityComplete: "complete", FidelityTruncated: "truncated",
+		FidelityTupleMissing: "tuple-missing", FidelityPartial: "partial",
+	}
+	for got, want := range fid {
+		if string(got) != want {
+			t.Errorf("fidelity wire value = %q, want %q", got, want)
+		}
+	}
+	attrs := map[string]string{
+		AttrSuppressedReason: "http.capture.suppressed_reason",
+		AttrSuppressedCount:  "http.capture.suppressed_count",
+	}
+	for got, want := range attrs {
+		if got != want {
+			t.Errorf("suppression attribute key = %q, want %q", got, want)
+		}
+	}
+}
+
+// NewTransactionID must be deterministic in its inputs (same parts → same id) and
+// distinguish connections by the nonce even when every other part repeats — the
+// ssl_ptr-reuse collision the id exists to defeat (spec §5.2).
+func TestNewTransactionID(t *testing.T) {
+	a := NewTransactionID("inst-1", 42, 100, 0xdeadbeef, 1)
+	b := NewTransactionID("inst-1", 42, 100, 0xdeadbeef, 1)
+	if a != b {
+		t.Errorf("same inputs must yield same id: %q vs %q", a, b)
+	}
+	// Every input must independently affect the id — change exactly one from the
+	// baseline at a time, so the test fails if any part is dropped from the id.
+	for _, tc := range []struct {
+		name string
+		id   string
+	}{
+		{"nonce", NewTransactionID("inst-1", 42, 100, 0xdeadbeef, 2)},
+		{"instanceID", NewTransactionID("inst-2", 42, 100, 0xdeadbeef, 1)},
+		{"pid", NewTransactionID("inst-1", 43, 100, 0xdeadbeef, 1)},
+		{"procStartNS", NewTransactionID("inst-1", 42, 101, 0xdeadbeef, 1)},
+		{"sslPtr", NewTransactionID("inst-1", 42, 100, 0xdeadbee0, 1)},
+	} {
+		if tc.id == a {
+			t.Errorf("changing %s must change the transaction id, but both were %q", tc.name, a)
+		}
+	}
+}
+
+// A Fragment round-trips through JSON with the contract field names, and Data
+// (bytes) survives — this is the binary-safe carrier for raw captured payload.
+func TestFragmentJSONRoundTrip(t *testing.T) {
+	in := Fragment{
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "inst-1:2a:64:deadbeef:1",
+		Direction:       DirectionResponse,
+		Part:            PartBody,
+		SequenceNumber:  3,
+		EndOfStream:     true,
+		CapturedAt:      1700000000000000000,
+		Data:            []byte{0x00, 0x01, 0xff, 'h', 'i'}, // non-UTF8: proves bytes carrier
+	}
+	b, err := json.Marshal(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Pin the exact wire shape (field names + order + base64 Data) so a JSON-tag
+	// regression is caught — round-tripping the same Go type alone would not.
+	const wantJSON = `{"protocolVersion":"1.0","transactionId":"inst-1:2a:64:deadbeef:1","direction":"response","part":"body","sequenceNumber":3,"endOfStream":true,"capturedAt":1700000000000000000,"data":"AAH/aGk="}`
+	if string(b) != wantJSON {
+		t.Fatalf("wire JSON =\n  %s\nwant\n  %s", b, wantJSON)
+	}
+	var out Fragment
+	if err := json.Unmarshal(b, &out); err != nil {
+		t.Fatal(err)
+	}
+	if out.ProtocolVersion != in.ProtocolVersion || out.TransactionID != in.TransactionID ||
+		out.Direction != in.Direction || out.Part != in.Part ||
+		out.SequenceNumber != in.SequenceNumber || out.EndOfStream != in.EndOfStream ||
+		out.CapturedAt != in.CapturedAt || string(out.Data) != string(in.Data) {
+		t.Errorf("round-trip mismatch:\n in=%+v\nout=%+v", in, out)
+	}
+}
+
+// SuppressedReason/SuppressedCount are omitted from the wire when zero (the common
+// case — most fragments withhold nothing) and round-trip when set. This is the
+// non-loss signal Fidelity/FidelityReason must never be reused for; a caller
+// accidentally omitting `omitempty` here would silently bloat every fragment on the
+// wire, which is exactly the kind of regression a JSON-shape pin catches.
+func TestFragmentSuppressionFieldsOmitEmptyAndRoundTrip(t *testing.T) {
+	zero := Fragment{
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "t1", Direction: DirectionResponse, Part: PartBody,
+	}
+	b, err := json.Marshal(zero)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bytes.Contains(b, []byte("suppressed")) {
+		t.Fatalf("suppression fields must be omitted when zero, got: %s", b)
+	}
+
+	suppressed := Fragment{
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "t1", Direction: DirectionResponse, Part: PartBody,
+		SuppressedReason: "ws-keepalive", SuppressedCount: 19,
+	}
+	b, err = json.Marshal(suppressed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const wantFragment = `"suppressedReason":"ws-keepalive","suppressedCount":19`
+	if !bytes.Contains(b, []byte(wantFragment)) {
+		t.Fatalf("wire JSON =\n  %s\nwant it to contain\n  %s", b, wantFragment)
+	}
+	var out Fragment
+	if err := json.Unmarshal(b, &out); err != nil {
+		t.Fatal(err)
+	}
+	if out.SuppressedReason != "ws-keepalive" || out.SuppressedCount != 19 {
+		t.Errorf("suppression fields did not round-trip: %+v", out)
+	}
+	// Fidelity must stay untouched by a suppression — the two are orthogonal signals,
+	// and a caller that set one while forgetting the other would silently conflate
+	// "withheld" with "lost".
+	if out.Fidelity != "" || out.FidelityReason != "" {
+		t.Errorf("a suppression must not carry a fidelity mark, got fidelity=%q reason=%q", out.Fidelity, out.FidelityReason)
+	}
+}
+
+// The reused identity (per fragment, "B") and the reused process tree (per
+// transaction, "A") round-trip — proving we compose the existing armotypes structs
+// rather than inventing our own process/cloud attribution.
+func TestReusedIdentityAndProcessTree(t *testing.T) {
+	// Fragment carries the lightweight identity (B).
+	f := Fragment{
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "t1", Direction: DirectionRequest, Part: PartHeaders,
+		CustomerGUID: "cust-abc", SandboxID: "sbx-1",
+		K8s:   &armotypes.RuntimeAlertK8sDetails{PodName: "orders-7c9", WorkloadName: "orders", NodeName: "node-7"},
+		Cloud: &armotypes.CloudMetadata{AccountID: "1234", Region: "eu-central-1"},
+	}
+	var fo Fragment
+	if b, err := json.Marshal(f); err != nil {
+		t.Fatal(err)
+	} else if err := json.Unmarshal(b, &fo); err != nil {
+		t.Fatal(err)
+	}
+	if fo.K8s == nil || fo.K8s.PodName != "orders-7c9" || fo.Cloud == nil || fo.Cloud.Region != "eu-central-1" || fo.CustomerGUID != "cust-abc" {
+		t.Errorf("fragment identity did not round-trip: %+v", fo)
+	}
+
+	// The FIRST fragment (request headers, seq 0) carries the full process lineage
+	// (A): P1 spawned by P2. On other fragments ProcessTree is nil.
+	first := Fragment{
+		ProtocolVersion: CurrentProtocolVersion, TransactionID: "t1",
+		Direction: DirectionRequest, Part: PartHeaders, SequenceNumber: 0,
+		ProcessTree: &armotypes.ProcessTree{ProcessTree: armotypes.Process{
+			PID: 200, Comm: "sandbox-agent",
+			ChildrenMap: map[armotypes.CommPID]*armotypes.Process{
+				{Comm: "python3", PID: 201}: {PID: 201, PPID: 200, Comm: "python3"},
+			},
+		}},
+		ServerAddress: "api.example.com", ServerPort: 443, SensorInstanceID: "node-7",
+	}
+	var firstO Fragment
+	if b, err := json.Marshal(first); err != nil {
+		t.Fatal(err)
+	} else if err := json.Unmarshal(b, &firstO); err != nil {
+		t.Fatal(err)
+	}
+	if firstO.ProcessTree == nil || firstO.ProcessTree.ProcessTree.PID != 200 || firstO.ProcessTree.FindProcessByPID(201) == nil {
+		t.Errorf("process tree/lineage did not round-trip on the first fragment: %+v", firstO.ProcessTree)
+	}
+	if fo.ProcessTree != nil {
+		t.Error("non-first fragment must not carry a process tree")
+	}
+}
+
+// CaptureConfig round-trips the caps + masking controls the backend delivers.
+func TestCaptureConfigRoundTrip(t *testing.T) {
+	mask := false
+	in := CaptureConfig{
+		ProtocolVersion: CurrentProtocolVersion, Enabled: true,
+		MaxFragmentBytes: 1 << 20, MaxTransactionBytes: 8 << 20,
+		MaxTransactionsPerHour: 5000, MaxTransactionsPerSandboxPerHour: 500,
+		MaskKnownCredentialHeaders: &mask, ExtraCredentialHeaders: []string{"x-acme-signature"},
+		DefaultLevel: CaptureLevelHeaders,
+		Rules: []CaptureRule{
+			{Protocol: CaptureProtocolHTTPS, Host: "api.openai.com", PathContains: "/v1/chat/completions", Level: CaptureLevelFull},
+			{Level: CaptureLevelNone},
+		},
+	}
+	b, err := json.Marshal(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out CaptureConfig
+	if err := json.Unmarshal(b, &out); err != nil {
+		t.Fatal(err)
+	}
+	if !out.Enabled || out.MaxTransactionsPerHour != 5000 || out.MaxTransactionsPerSandboxPerHour != 500 ||
+		out.MaxTransactionBytes != 8<<20 ||
+		out.MaskKnownCredentialHeaders == nil || *out.MaskKnownCredentialHeaders != false ||
+		len(out.ExtraCredentialHeaders) != 1 {
+		t.Errorf("config did not round-trip: %+v", out)
+	}
+	if out.DefaultLevel != CaptureLevelHeaders || len(out.Rules) != 2 ||
+		out.Rules[0].Protocol != CaptureProtocolHTTPS || out.Rules[0].Host != "api.openai.com" ||
+		out.Rules[0].PathContains != "/v1/chat/completions" || out.Rules[0].Level != CaptureLevelFull ||
+		out.Rules[1].Level != CaptureLevelNone {
+		t.Errorf("capture policy did not round-trip: %+v", out)
+	}
+}

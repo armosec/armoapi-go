@@ -2,6 +2,7 @@ package armotypes
 
 import (
 	"maps"
+	"regexp"
 	"strings"
 	"time"
 
@@ -25,6 +26,61 @@ type AdvancedScopeEntity struct {
 	Values   string `json:"values" bson:"values"`
 }
 
+// hashScopeEntities are the advanced-scope entities whose value is a hex file hash.
+//
+// Unexported on purpose. An exported map is mutable by any consumer, and this one
+// decides whether a value is folded before it is compared - so a stray write would
+// change matching behaviour globally and silently. Read it through
+// IsHashScopeEntity.
+var hashScopeEntities = map[string]bool{
+	"file.md5":    true,
+	"file.sha1":   true,
+	"file.sha256": true,
+}
+
+// IsHashScopeEntity reports whether an advanced-scope entity's value is a file hash,
+// and therefore must be compared without regard to the case it was typed in.
+func IsHashScopeEntity(entity string) bool {
+	return hashScopeEntities[entity]
+}
+
+// NormalizeHashScopeValues lower-cases the values of hash-scoped entities in place,
+// and leaves every other entity untouched.
+//
+// The exception is matched in postgres-connector by a plain string comparison:
+// operator "in" is an equality, operator "contains" is a LIKE. PostgreSQL folds case
+// for neither. The alert carries a lower-case hash, and a hash copied from VirusTotal
+// or from a threat report is usually upper case, so an unfolded scope would be saved,
+// listed and previewed exactly like a working rule while suppressing nothing.
+//
+// This deliberately differs from the rule in docs/features/cdr-azure-event-shape.md,
+// which says not to normalize casing at any layer and to match case-insensitively
+// instead. That rule exists because an Azure subscription id has a customer-chosen
+// original casing that is displayed and re-used, so rewriting it loses information
+// and a partial rewrite reintroduces mismatches. A hex digest has no original casing
+// to preserve and no information in its case, and unlike the Mongo path there is no
+// case-insensitive operator available on the Postgres comparison - so folding on
+// write is the only option that works there, and it is lossless here.
+//
+// Kept here rather than in each caller so the write paths cannot drift apart: both
+// cadashboardbe, which parses the analyst's request, and event-ingester-service,
+// which persists it, fold through this one function.
+//
+// The entity name is matched exactly. "file.SHA256" is not "file.sha256" and is not
+// folded - but it would not have matched anything anyway, because the SQL compares
+// the stored entity against the alert's flattened key, which is lower case. Nothing
+// validates Entity on the way in, so an unrecognised name is stored and silently
+// matches nothing. That is a gap in the exception API, not in this function; closing
+// it means rejecting unknown entities at the boundary, which would also affect the
+// CDR entities and needs its own decision.
+func NormalizeHashScopeValues(scopes []AdvancedScopeEntity) {
+	for i := range scopes {
+		if IsHashScopeEntity(scopes[i].Entity) {
+			scopes[i].Values = strings.ToLower(scopes[i].Values)
+		}
+	}
+}
+
 type BaseExceptionPolicy struct {
 	PortalBase `json:",inline" bson:"inline"`
 	PolicyType PolicyType `json:"policyType,omitempty" bson:"policyType,omitempty"`
@@ -37,6 +93,18 @@ type BaseExceptionPolicy struct {
 	CreatedBy      string                         `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 	Resources      []identifiers.PortalDesignator `json:"resources,omitempty" bson:"resources,omitempty"`
 	AdvancedScopes []AdvancedScopeEntity          `json:"advancedScopes,omitempty" bson:"advancedScopes,omitempty"`
+}
+
+// AnchoredIgnoreCaseRegexFilter renders a value as a V2List case-insensitive exact
+// match ("^<escaped>$|regex&ignorecase"): an anchored, regex-escaped value with the
+// ignorecase option, which config-service resolves to $regex + $options "i".
+// Exported as the single source of this encoding so consumers that today
+// re-implement it (e.g. event-ingester's BuildGetAccountWithFeatureQuery) can route
+// through it instead of drifting out of sync.
+func AnchoredIgnoreCaseRegexFilter(value string) string {
+	return "^" + regexp.QuoteMeta(value) + "$" +
+		V2ListOperatorSeparator + V2ListRegexOperator +
+		V2ListSubQuerySeparator + V2ListIgnoreCaseOption
 }
 
 // Used by cadashboardbe (countIncidents API) and event-ingester (retroactive resolve on exception creation).
@@ -88,11 +156,25 @@ func GetRuntimeIncidentsRequestFilterFromExceptionPolicy(exceptionPolicy BaseExc
 		// cloudProvider and accountID are filtered against cloudMetadata.* rather than
 		// designators.attributes.* because CDR incidents historically stored these
 		// only in cloudMetadata.
-		if provider, ok := designator.Attributes[identifiers.AttributeCloudProvider]; ok && provider != GlobalRegex {
+		// Hoisted so the accountID branch below can reuse it. Intentionally skips a
+		// present-but-empty provider (the old code would have set the filter to ""):
+		// a no-op improvement, not an accidental behavior change.
+		provider := designator.Attributes[identifiers.AttributeCloudProvider]
+		if provider != "" && provider != GlobalRegex {
 			filter["cloudMetadata.provider"] = provider
 		}
 		if accountID, ok := designator.Attributes[identifiers.AttributeCloudAccountID]; ok && accountID != GlobalRegex {
-			filter["cloudMetadata.account_id"] = accountID
+			// Azure subscription ids arrive with inconsistent casing: incidents derive
+			// them from the uppercase Activity Log resourceId, while onboarding/storage
+			// keep the customer's original casing. Match case-insensitively — the same
+			// anchored-regex + ignorecase mechanism config-service's
+			// BuildGetAccountWithFeatureQuery uses — so an exact-equality miss can't
+			// leave an Azure risk-acceptance ineffective. AWS/GCP keep exact equality.
+			if strings.EqualFold(provider, string(ProviderAzure)) {
+				filter["cloudMetadata.account_id"] = AnchoredIgnoreCaseRegexFilter(accountID)
+			} else {
+				filter["cloudMetadata.account_id"] = accountID
+			}
 		}
 		if instanceID, ok := designator.Attributes[identifiers.AttributeInstanceId]; ok && instanceID != GlobalRegex {
 			filter["designators.attributes.instanceId"] = instanceID
