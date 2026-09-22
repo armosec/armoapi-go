@@ -293,7 +293,11 @@ func KindImpliesAIUse(kind string) bool {
 // awsRegionFromHost pulls the AWS region token out of an `*.<region>.amazonaws.com`
 // or `*.<region>.api.aws` host (e.g. bedrock-runtime.us-east-1.amazonaws.com or
 // bedrock-mantle.us-east-1.api.aws → "us-east-1").
-var awsRegionFromHost = regexp.MustCompile(`\.([a-z]{2,3}-[a-z]+-\d+)\.(?:amazonaws\.com|api\.aws)$`)
+// The middle `(?:-[a-z]+){1,2}` allows the extra segment AWS partition regions carry:
+// standard `us-east-1` / `ap-southeast-2` (one middle segment) AND GovCloud / ISO
+// partitions `us-gov-west-1`, `us-iso-east-1`, `us-isob-east-1` (two). Without it those
+// partition hosts classified as Bedrock/SageMaker but returned an empty region.
+var awsRegionFromHost = regexp.MustCompile(`\.([a-z]{2,3}(?:-[a-z]+){1,2}-\d+)\.(?:amazonaws\.com|api\.aws)$`)
 
 // onAWSDomain reports whether a host sits on one of AWS's OWN service domains:
 // the classic `.amazonaws.com` family or the dual-stack `.api.aws` family

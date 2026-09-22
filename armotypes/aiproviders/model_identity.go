@@ -33,8 +33,10 @@ import (
 var (
 	// modelRegionPrefix matches a leading Bedrock cross-region inference-profile
 	// segment ("us." in "us.anthropic.claude-…"). us-gov before us so the longer
-	// match wins. Mirrors the aggregator's bedrockRegionPrefix.
-	modelRegionPrefix = regexp.MustCompile(`^(us-gov|us|eu|apac)\.`)
+	// match wins. `global` is the global cross-region profile (global.anthropic.claude-…):
+	// without it that id would keep the `global.` segment and fork from the plain
+	// `anthropic.claude-…` identity. Mirrors the aggregator's bedrockRegionPrefix.
+	modelRegionPrefix = regexp.MustCompile(`^(us-gov|us|eu|apac|global)\.`)
 	// modelVendorPrefix matches a leading Bedrock model-vendor namespace. Superset
 	// of the aggregator's bedrockProviderPrefix (adds google/openai for the rare
 	// wire forms that carry them). The captured token IS the vendor.
@@ -71,12 +73,28 @@ var vendorByFamilyPrefix = []struct{ prefix, vendor string }{
 }
 
 // openAIOSeriesFamily matches OpenAI's reasoning-model family root — an `o`
-// immediately followed by a version digit (`o1`, `o1-preview`, `o3-mini`,
+// immediately followed by a version-number run (`o1`, `o1-preview`, `o3-mini`,
 // `o4-mini`, and any future `o5`/`o6`…). A PATTERN, not an enumerated list, so a
-// new generation resolves to `openai` on arrival. `^o\d` is the faithful
-// generalization of the old `o1`/`o3`/`o4` HasPrefix entries; it cannot match a
-// non-OpenAI family that merely starts with "o" (e.g. `olmo-7b` → `o` then `l`).
-var openAIOSeriesFamily = regexp.MustCompile(`^o\d`)
+// new generation resolves to `openai` on arrival. It cannot match a non-OpenAI
+// family that merely starts with "o" (`olmo-7b` → `o` then `l`), and the caller
+// additionally enforces a family boundary after the matched root (afterRootBoundary)
+// so `o7zip` is not misread as an o-series model.
+var openAIOSeriesFamily = regexp.MustCompile(`^o\d+`)
+
+// afterRootBoundary reports whether a recognized family root ends at a real family
+// boundary in m — the end of the string, or a non-letter (a separator like `-`/`.` or a
+// version digit). It rejects a root that merely PREFIXES a longer word: `claudette`
+// (claude+"tte"), `gptfoo` (gpt+"foo"), `commandant` (command+"ant"), `o7zip` (o7+"zip").
+// This keeps the documented rule that an unrecognized vendor is NEVER guessed — a bare
+// strings.HasPrefix would attribute all of those to a known vendor and mint a wrong
+// canonical model-row key. A digit boundary is deliberately allowed (`llama3`, `nova2`).
+func afterRootBoundary(m string, rootLen int) bool {
+	if rootLen >= len(m) {
+		return true
+	}
+	c := m[rootLen]
+	return c < 'a' || c > 'z'
+}
 
 // ModelIdentity is the canonical, new-model-safe decomposition of a raw wire model
 // id into the identity plus its attributes.
@@ -146,13 +164,15 @@ func NormalizeModelIdentity(rawModel, host string) ModelIdentity {
 		m = modelVendorPrefix.ReplaceAllString(m, "")
 	} else {
 		for _, e := range vendorByFamilyPrefix {
-			if strings.HasPrefix(m, e.prefix) {
+			if strings.HasPrefix(m, e.prefix) && afterRootBoundary(m, len(e.prefix)) {
 				id.Vendor = e.vendor
 				break
 			}
 		}
-		if id.Vendor == "" && openAIOSeriesFamily.MatchString(m) {
-			id.Vendor = "openai"
+		if id.Vendor == "" {
+			if root := openAIOSeriesFamily.FindString(m); root != "" && afterRootBoundary(m, len(root)) {
+				id.Vendor = "openai"
+			}
 		}
 	}
 

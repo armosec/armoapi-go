@@ -219,6 +219,11 @@ func TestClassifyEndpoint(t *testing.T) {
 		{"bedrock-agent-runtime.eu-west-1.amazonaws.com", ProviderAWSBedrock, KindInference, "eu-west-1"},
 		{"bedrock-agent.us-west-2.amazonaws.com", ProviderAWSBedrock, KindControlPlane, "us-west-2"},
 		{"bedrock.us-east-1.amazonaws.com", ProviderAWSBedrock, KindControlPlane, "us-east-1"},
+		// AWS partition regions carry an extra segment (GovCloud / ISO) — the region
+		// must still be extracted, not left empty (Copilot review, PR #709).
+		{"bedrock-runtime.us-gov-west-1.amazonaws.com", ProviderAWSBedrock, KindInference, "us-gov-west-1"},
+		{"bedrock-runtime.us-iso-east-1.amazonaws.com", ProviderAWSBedrock, KindInference, "us-iso-east-1"},
+		{"bedrock-runtime.us-isob-east-1.amazonaws.com", ProviderAWSBedrock, KindInference, "us-isob-east-1"},
 		// AWS SageMaker — api.* is the CONTROL plane (CreateEndpoint,
 		// CreateTrainingJob); runtime.* is the data plane that hosts the model.
 		{"api.sagemaker.ap-southeast-2.amazonaws.com", ProviderAWSSageMaker, KindControlPlane, "ap-southeast-2"},

@@ -100,6 +100,49 @@ func TestNormalizeModelIdentity(t *testing.T) {
 			model: "olmo-7b", vendor: "",
 		},
 		{
+			// Bedrock GLOBAL cross-region inference profile: the `global.` prefix must be
+			// recognized and stripped so it unifies with the plain identity (not fork).
+			name:  "bedrock global cross-region profile unifies with plain identity",
+			raw:   "global.anthropic.claude-sonnet-4-5-v1:0",
+			model: "anthropic.claude-sonnet-4-5", vendor: "anthropic",
+			version: "v1:0", region: "global",
+		},
+		// ── Family-boundary near-misses: a root that only PREFIXES a longer word must
+		// NOT be attributed to that vendor (documented "unrecognized vendor is NEVER
+		// guessed"). Each keeps a bare identity.
+		{
+			name:  "gptfoo is not openai (gpt + letter)",
+			raw:   "gptfoo-1",
+			model: "gptfoo-1", vendor: "",
+		},
+		{
+			name:  "claudette is not anthropic (claude + letter)",
+			raw:   "claudette-1",
+			model: "claudette-1", vendor: "",
+		},
+		{
+			name:  "commandant is not cohere (command + letter)",
+			raw:   "commandant-1",
+			model: "commandant-1", vendor: "",
+		},
+		{
+			name:  "o7zip is not an openai o-series model (o7 + letter)",
+			raw:   "o7zip",
+			model: "o7zip", vendor: "",
+		},
+		// ── Boundary POSITIVES: a digit or separator after the root is a real family
+		// member and MUST still resolve.
+		{
+			name:  "llama3 (digit boundary) still resolves to meta",
+			raw:   "llama3",
+			model: "meta.llama3", vendor: "meta",
+		},
+		{
+			name:  "o5-mini (future o-series) still resolves to openai",
+			raw:   "o5-mini",
+			model: "openai.o5-mini", vendor: "openai",
+		},
+		{
 			name:  "empty input yields empty identity",
 			raw:   "",
 			model: "", vendor: "",
