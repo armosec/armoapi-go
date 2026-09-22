@@ -25,12 +25,12 @@ package aiproviders
 // v1 = ADAPTER-BACKED ROUTES ONLY (design review finding #5): registering a route the
 // fold has no normalizer/reassembler/session-extractor for would re-create the
 // promptless-card class through the front door — an (E1) match without an adapter
-// folds an unnamed card. `/v1/completions` (legacy text completions) and
-// `/v1/responses` (OpenAI Responses API) are therefore deliberately NOT registered:
-// isOpenAIChatPath (ingesters/ai_sandbox_ingester/openai_chat.go) excludes them today
-// for exactly that reason, and they join the registry only when their adapters exist.
-// The adapter-backed-only rule is pinned in BOTH directions by unit tests here and by
-// the derive-helper parity test in ingesters/ai_sandbox_ingester.
+// folds an unnamed card. `/v1/completions` (legacy text completions) is therefore
+// deliberately NOT registered — it has no adapter — and joins the registry only when
+// one exists. (`/v1/responses`, the OpenAI Responses API, WAS in that deferred set but
+// GRADUATED into inferenceRoutes below once its adapter landed — see the deferred table
+// at the bottom of this file.) The adapter-backed-only rule is pinned in BOTH directions
+// by unit tests here and by the derive-helper parity test in ingesters/ai_sandbox_ingester.
 //
 // Route knowledge previously lived piecemeal in the derive-side helpers
 // (bedrockModelFromPath, isOpenAIChatPath, isGeminiGeneratePath —

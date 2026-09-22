@@ -87,13 +87,36 @@ func TestHostDomainFamily(t *testing.T) {
 		{"daily-cloudcode-pa.googleapis.com:443", "googleapis.com"}, // port stripped
 		{"bedrock-runtime.us-east-1.amazonaws.com", "amazonaws.com"},
 		{"api.openai.com", "openai.com"},
+		{" api.openai.com:443 ", "openai.com"}, // surrounding whitespace trimmed before port split
 		{"shop.example.com", "example.com"},
 		{"localhost", "localhost"}, // single label returns itself
 		{"", ""},
+		// Kubernetes in-cluster DNS: distinct services must NOT collapse to cluster.local,
+		// else an unrelated in-cluster host would falsely share a family with a recognized
+		// in-cluster AI gateway. The full host is its own family.
+		{"vllm.serving.svc.cluster.local", "vllm.serving.svc.cluster.local"},
+		{"payments.default.svc.cluster.local", "payments.default.svc.cluster.local"},
 	}
 	for _, tc := range cases {
 		if got := HostDomainFamily(tc.host); got != tc.want {
 			t.Errorf("HostDomainFamily(%q) = %q, want %q", tc.host, got, tc.want)
 		}
+	}
+}
+
+// Two distinct in-cluster services must not be grouped into the same family (the
+// cluster.local collapse a naive last-two-labels rule would produce).
+func TestHostDomainFamily_InClusterServicesAreDistinct(t *testing.T) {
+	a := HostDomainFamily("vllm.serving.svc.cluster.local")
+	b := HostDomainFamily("payments.default.svc.cluster.local")
+	if a == b {
+		t.Errorf("distinct in-cluster services must not share a family, both = %q", a)
+	}
+}
+
+// Whitespace around a recognized host+port must not defeat recognition.
+func TestRecognizedForCapture_TrimsSurroundingWhitespace(t *testing.T) {
+	if !RecognizedForCapture(" bedrock-runtime.us-east-1.amazonaws.com:443 ") {
+		t.Error("a recognized host with surrounding whitespace + port must still be recognized")
 	}
 }

@@ -16,7 +16,12 @@ import (
 // carry one — an in-cluster gateway on :8080, or the standard :443), then lowercases and
 // trims a trailing dot. Mirrors ClassifyEndpoint's own port handling so every recognizer
 // in this package agrees that host:port and host are the same host.
+//
+// Surrounding whitespace is trimmed BEFORE the port split (a leading/trailing space would
+// otherwise make net.SplitHostPort fail and leave the port on, so " api.openai.com:443 "
+// would miss recognition).
 func hostForMatch(host string) string {
+	host = strings.TrimSpace(host)
 	if hostOnly, _, err := net.SplitHostPort(host); err == nil {
 		host = hostOnly
 	}
@@ -99,14 +104,26 @@ func RecognizedForCapture(host string) bool {
 // config ("added to an existing provider bucket").
 //
 // A deliberate simplification of the public-suffix list (golang.org/x/net/publicsuffix):
-// the last-two-labels rule is correct for every domain the catalog matches on
+// the last-two-labels rule is correct for every PUBLIC domain the catalog matches on
 // (googleapis.com, amazonaws.com, openai.com, azure.com, anthropic.com, …), all of which
 // are plain .com registrable domains, and this package intentionally stays dependency-free
 // (stdlib only). A host with fewer than two labels returns itself.
+//
+// Kubernetes in-cluster service DNS is the one shape the last-two-labels rule gets wrong:
+// vllm.serving.svc.cluster.local and payments.default.svc.cluster.local would both
+// collapse to "cluster.local", so an unrelated in-cluster service would falsely share a
+// family with a recognized in-cluster AI gateway (vllm/ollama/litellm ARE catalog-matched
+// on their .svc.cluster.local component). For a *.svc.cluster.local host the family key is
+// therefore the FULL host (service.namespace preserved), so two distinct in-cluster
+// services never share a family — an in-cluster host only "shares a bucket" with itself.
 func HostDomainFamily(host string) string {
 	h := hostForMatch(host)
 	if h == "" {
 		return ""
+	}
+	// In-cluster service DNS: keep the whole host as its own family (see doc above).
+	if strings.HasSuffix(h, ".svc.cluster.local") || strings.HasSuffix(h, ".cluster.local") {
+		return h
 	}
 	labels := strings.Split(h, ".")
 	if len(labels) < 2 {
