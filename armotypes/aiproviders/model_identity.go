@@ -93,7 +93,13 @@ func afterRootBoundary(m string, rootLen int) bool {
 		return true
 	}
 	c := m[rootLen]
-	return c < 'a' || c > 'z'
+	// A boundary is a real separator or a version digit — an ASCII non-letter. A
+	// non-ASCII byte (>= 0x80, a multibyte-rune continuation such as an accented
+	// letter) is treated as NON-boundary, so a root immediately followed by one is
+	// rejected rather than falsely attributed — the conservative default that keeps
+	// the "unrecognized vendor is NEVER guessed" rule (wire model ids are ASCII, so
+	// this is a belt-and-braces guard, not a reachable case).
+	return c < 0x80 && (c < 'a' || c > 'z')
 }
 
 // ModelIdentity is the canonical, new-model-safe decomposition of a raw wire model
