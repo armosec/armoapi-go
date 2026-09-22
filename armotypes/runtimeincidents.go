@@ -157,6 +157,8 @@ type CloudMetadata struct {
 	ResourceGroup string   `json:"resource_group,omitempty" bson:"resource_group,omitempty"` // Azure Resource Group
 	Services      []string `json:"services,omitempty" bson:"services,omitempty"`
 	Zone          string   `json:"zone,omitempty" bson:"zone,omitempty"`
+
+	KubernetesHostIdentity *KubernetesHostIdentity `json:"kubernetes_host_identity,omitempty" bson:"kubernetes_host_identity,omitempty"`
 }
 
 type StackFrame struct {
