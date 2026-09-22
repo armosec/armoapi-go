@@ -105,17 +105,30 @@ func RecognizedForCapture(host string) bool {
 //
 // A deliberate simplification of the public-suffix list (golang.org/x/net/publicsuffix):
 // the last-two-labels rule is correct for every PUBLIC domain the catalog matches on
-// (googleapis.com, amazonaws.com, openai.com, azure.com, anthropic.com, …), all of which
-// are plain .com registrable domains, and this package intentionally stays dependency-free
-// (stdlib only). A host with fewer than two labels returns itself.
+// (googleapis.com, openai.com, anthropic.com, …), and this package intentionally stays
+// dependency-free (stdlib only). A host with fewer than two labels returns itself.
 //
-// Kubernetes in-cluster service DNS is the one shape the last-two-labels rule gets wrong:
-// vllm.serving.svc.cluster.local and payments.default.svc.cluster.local would both
-// collapse to "cluster.local", so an unrelated in-cluster service would falsely share a
-// family with a recognized in-cluster AI gateway (vllm/ollama/litellm ARE catalog-matched
-// on their .svc.cluster.local component). For a *.svc.cluster.local host the family key is
-// therefore the FULL host (service.namespace preserved), so two distinct in-cluster
-// services never share a family — an in-cluster host only "shares a bucket" with itself.
+// Two shapes the bare last-two-labels rule gets wrong, both handled below:
+//
+//   - Kubernetes in-cluster service DNS: vllm.serving.svc.cluster.local and
+//     payments.default.svc.cluster.local would both collapse to "cluster.local", so an
+//     unrelated in-cluster service would falsely share a family with a recognized
+//     in-cluster AI gateway (vllm/ollama/litellm ARE catalog-matched on their
+//     .svc.cluster.local component). The family key is the FULL host, so two distinct
+//     in-cluster services never share a bucket.
+//
+//   - Mega-cloud umbrella domains (amazonaws.com / api.aws / azure.com) host hundreds of
+//     UNRELATED services under one registrable domain — S3, DynamoDB, STS routinely sit in
+//     the same capture config as Bedrock. Collapsing all of amazonaws.com into one family
+//     would make s3.<region>.amazonaws.com falsely "share a bucket" with a Bedrock anchor
+//     and fire a spurious capture-warning. For these, the family includes the leading
+//     SERVICE label (s3.amazonaws.com vs bedrock-runtime.amazonaws.com), so distinct AWS
+//     services are distinct families. googleapis.com is DELIBERATELY excluded from this
+//     rule and stays coarse: Google's AI hosts are an exact catalog whitelist, so the
+//     coarse registrable-domain family is the only thing that catches a NOVEL Google AI
+//     host (the SUB-8712 daily-cloudcode / antigravity motivating case). AWS/Azure need no
+//     such coarse family — their AI hosts are prefix/suffix-matched, so a novel AI host is
+//     already RecognizedForCapture and never a warning candidate.
 func HostDomainFamily(host string) string {
 	h := hostForMatch(host)
 	if h == "" {
@@ -128,6 +141,13 @@ func HostDomainFamily(host string) string {
 	labels := strings.Split(h, ".")
 	if len(labels) < 2 {
 		return h
+	}
+	// Mega-cloud umbrella domains: group by <service-label>.<registrable-domain> so
+	// unrelated services under one cloud don't collapse into one family (see doc above).
+	for _, umbrella := range []string{"amazonaws.com", "api.aws", "azure.com"} {
+		if strings.HasSuffix(h, "."+umbrella) {
+			return labels[0] + "." + umbrella
+		}
 	}
 	return strings.Join(labels[len(labels)-2:], ".")
 }
