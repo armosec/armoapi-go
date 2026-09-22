@@ -531,7 +531,9 @@ func ClassifyEndpoint(host string) (provider, kind, region string, ok bool) {
 	// A captured L7 host / Host header may carry a :port — an in-cluster gateway
 	// on :8080, or api.openai.com:443. Strip it so classification is port-agnostic
 	// (a host:port is the same host). IPv6-safe via SplitHostPort; a host with no
-	// port errors and is left unchanged.
+	// port errors and is left unchanged. Trim surrounding whitespace first, or a
+	// leading/trailing space makes SplitHostPort fail and leaves the port on.
+	host = strings.TrimSpace(host)
 	if hostOnly, _, err := net.SplitHostPort(host); err == nil {
 		host = hostOnly
 	}

@@ -24,7 +24,7 @@ warning — so the two can never drift on which hosts are "recognized".
 ## Core matcher (moved verbatim)
 
 - `ClassifyEndpoint(host) (provider, kind, region, ok)` — the provider PLUS endpoint kind
-  (`inference` / `control-plane` / `model-host` / `gateway` / `llmops`) and AWS region.
+  (`inference` / `control-plane` / `model-host` / `gateway` / `llmops` / `telemetry-sink`) and AWS region.
   **The one to call.**
 - `KindImpliesAIUse(kind) bool` — does this endpoint kind mean the caller actually USES
   AI? (Excludes `control-plane` management APIs.)
