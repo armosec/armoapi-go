@@ -63,7 +63,7 @@ Keeping the *raw* identity, not only the resolved symbol, is the point. A stack
 captured before its symbols were available can be re-symbolized later from the
 build-id, which a resolved-name-only record cannot.
 
-### Addresses stay hex strings — the BSON uint64 trap
+### Addresses and file identity stay hex strings — the BSON uint64 trap
 
 BSON has no unsigned integer type. The driver encodes `uint64` as a signed 64-bit
 integer and returns `value out of range` for anything above `math.MaxInt64`. A
@@ -71,12 +71,12 @@ virtual address routinely exceeds that bound, so it can never be stored as a
 number:
 
 - `Address` and `FileOffset` are hex strings.
-- `TraceModule.Inode` and `Device` are `uint64` **only because they stay below
-  `MaxInt64` by construction**.
+- `TraceModule.Inode` and `Device` are hex strings too. An inode number has no
+  safe bound: some filesystems set its top bits (overlayfs with `xino`).
 
-`TestTraceModule_InodeStaysBelowMaxInt64` pins both halves: `MaxInt64` marshals,
-`MaxUint64` must error. BSON encoding is per-document, so one out-of-range field
-fails the whole incident, not just that field. See
+`TestTraceModule_FullRangeIdentityRoundTrips` stores a `MaxUint64` inode and
+device and reads them back. BSON encoding is per-document, so one out-of-range
+numeric field would fail the whole incident, not just that field. See
 [CDR types are storage shapes, not just wire shapes](cdr-types-cross-bson.md) for
 the two outages this rule comes from.
 

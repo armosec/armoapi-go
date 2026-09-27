@@ -2,8 +2,8 @@ package armotypes
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
-	"strings"
 	"testing"
 	"time"
 
@@ -67,14 +67,14 @@ func fullTrace() Trace {
 			{
 				Path:    "/usr/lib/x86_64-linux-gnu/libssl.so.3",
 				BuildID: "3f8a1c2d4e5b6079",
-				Inode:   1179649,
-				Device:  66306,
+				Inode:   "0x120001",
+				Device:  "0x10302",
 			},
 			{
 				Path:    "/usr/local/bin/server",
 				BuildID: "aa11bb22cc33dd44",
-				Inode:   2228226,
-				Device:  66306,
+				Inode:   "0x220002",
+				Device:  "0x10302",
 			},
 		},
 		Hook:               "execve",
@@ -289,18 +289,22 @@ func TestTrace_ForwardCompatibleWithOldConsumer(t *testing.T) {
 	assertOldShapeIntact(t, oldFromBSON)
 }
 
-// TestTraceModule_InodeStaysBelowMaxInt64 is the reason Address and FileOffset
-// are hex strings rather than uint64. BSON has no unsigned integer type, so the
-// driver encodes uint64 as a signed 64-bit integer and returns
-// "value out of range" for anything above math.MaxInt64. Inode and Device stay
-// below that bound by construction; a virtual address does not, which is why it
-// never enters the document as a number.
-func TestTraceModule_InodeStaysBelowMaxInt64(t *testing.T) {
-	_, err := bson.Marshal(TraceModule{Path: "/usr/local/bin/server", Inode: math.MaxInt64})
-	require.NoError(t, err, "MaxInt64 is the highest inode BSON can carry")
-
-	_, err = bson.Marshal(TraceModule{Path: "/usr/local/bin/server", Inode: math.MaxUint64})
-	require.Error(t, err, "above MaxInt64 the driver must refuse, not truncate")
-	assert.True(t, strings.Contains(err.Error(), "out of range") || strings.Contains(err.Error(), "overflow"),
-		"unexpected driver error for an out-of-range uint64: %v", err)
+// TestTraceModule_FullRangeIdentityRoundTrips is the reason Inode and Device,
+// like Address and FileOffset, are hex strings rather than uint64. BSON has no
+// unsigned integer type, so the driver encodes uint64 as a signed 64-bit
+// integer and returns "value out of range" for anything above math.MaxInt64 --
+// and that error fails the whole incident document, not just the field. Some
+// filesystems set the top bits of an inode number (overlayfs with xino), so no
+// bound can be assumed. As strings, the full 64-bit range stores and reads back.
+func TestTraceModule_FullRangeIdentityRoundTrips(t *testing.T) {
+	in := TraceModule{
+		Path:   "/usr/local/bin/server",
+		Inode:  fmt.Sprintf("0x%x", uint64(math.MaxUint64)),
+		Device: fmt.Sprintf("0x%x", uint64(math.MaxUint64)),
+	}
+	b, err := bson.Marshal(in)
+	require.NoError(t, err, "an inode above MaxInt64 must not fail the document")
+	var out TraceModule
+	require.NoError(t, bson.Unmarshal(b, &out))
+	assert.Equal(t, in, out)
 }

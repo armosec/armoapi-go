@@ -240,8 +240,8 @@ type StackFrame struct {
 type TraceModule struct {
 	Path    string `json:"path,omitempty"    bson:"path,omitempty"`    // as the kernel reported it
 	BuildID string `json:"buildId,omitempty" bson:"buildId,omitempty"` // ELF build-id, hex; empty until captured
-	Inode   uint64 `json:"inode,omitempty"   bson:"inode,omitempty"`   // stays below MaxInt64 by construction; BSON has no unsigned type and the driver errors above it
-	Device  uint64 `json:"device,omitempty"  bson:"device,omitempty"`  // same
+	Inode   string `json:"inode,omitempty"   bson:"inode,omitempty"`   // hex, same convention as Address: BSON has no unsigned type and a uint64 above MaxInt64 fails the whole document
+	Device  string `json:"device,omitempty"  bson:"device,omitempty"`  // hex, same
 }
 
 type Trace struct {
