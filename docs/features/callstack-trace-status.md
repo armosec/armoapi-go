@@ -109,4 +109,15 @@ the surrounding struct already uses the camelCase convention.
 
 `private-node-agent` produces these fields. `event-ingester-service`,
 `config-service` and `cadashboardbe` carry and store them. Each bumps
-independently; until it does, it sees exactly the payload it saw before.
+independently; until it does, it decodes the payload without error and
+ignores the new fields.
+
+Decode compatibility is not preservation compatibility. An old-shape
+intermediary that re-encodes the alert through its own typed struct — to
+relay it or write it back — drops any field it does not know, including
+`status`, `modules`, and `joinKey`. Today this carries no risk: no backend
+or frontend service reads the new fields yet. They are populated by the
+agent now so upcoming phases can consume them, but nothing decodes,
+forwards, or re-encodes them in a way that could lose data. Before a
+consumer starts relying on these fields, its re-encode path must either
+upgrade first or prove it preserves unknown fields.

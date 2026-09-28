@@ -170,6 +170,44 @@ func TestTraceBSONKeys(t *testing.T) {
 	}
 }
 
+// TestTraceJSONKeys pins the wire key of each new field, the JSON analogue of
+// TestTraceBSONKeys. A round trip through the same updated Go type still
+// succeeds after a json tag is renamed or removed, because encoding/json
+// unmarshals unknown fields as zero values; asserting the literal key is the
+// only way to pin the documented wire contract.
+func TestTraceJSONKeys(t *testing.T) {
+	raw, err := json.Marshal(fullTrace())
+	require.NoError(t, err)
+	var traceFields map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(raw, &traceFields))
+
+	for _, key := range []string{
+		"status", "statusReason", "truncatedAt", "modules", "hook", "joinKey",
+		"tid", "processStartBootNs", "recordBootNs", "eventBootNs", "mechanismVersion",
+	} {
+		_, ok := traceFields[key]
+		assert.True(t, ok, "trace must be encoded under key %q", key)
+	}
+
+	frameRaw, err := json.Marshal(fullTrace().Stack[0])
+	require.NoError(t, err)
+	var frameFields map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(frameRaw, &frameFields))
+	for _, key := range []string{"status", "runtime", "moduleIdx", "fileOffset", "source"} {
+		_, ok := frameFields[key]
+		assert.True(t, ok, "stack frame must be encoded under key %q", key)
+	}
+
+	moduleRaw, err := json.Marshal(fullTrace().Modules[0])
+	require.NoError(t, err)
+	var moduleFields map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(moduleRaw, &moduleFields))
+	for _, key := range []string{"path", "buildId", "inode", "device"} {
+		_, ok := moduleFields[key]
+		assert.True(t, ok, "trace module must be encoded under key %q", key)
+	}
+}
+
 // oldShapeGoldenJSON is the exact JSON that the code at origin/main produced
 // for the alert built in TestRuntimeAlertTrace_OldShapeIsByteIdentical. It was
 // captured before this change and must never be regenerated to make a test
