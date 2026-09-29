@@ -150,7 +150,7 @@ func AzureIdentityKey(tenantID, clientID string) (string, bool) {
 	return joinIdentityKey(AiSandboxIdentityTagAzureIdentity, body), true
 }
 
-// OpaqueIdentityKey is the TOTAL fallback for a principal we observed but can not
+// OpaqueIdentityKey is the TOTAL fallback for a principal we observed but cannot
 // classify into a known kind. Any non-empty raw principal yields a stable
 // unknown:<body> key (the body is sha256-hashed when it exceeds
 // identityKeyMaxBodyLen) — so an unrecognized identity is captured, deduped and

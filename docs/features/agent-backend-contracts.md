@@ -31,10 +31,18 @@ depend on it.
 
 ## Moved verbatim (SUB-8699)
 
-The files are copied byte-for-byte from `armosec-infra` `main` (unchanged since v0.0.594).
-The only change is the import of `armosec-infra/ecs` in `ecs/operator`, which now points
-at `armoapi-go/armotypes/ecs`, so the JSON wire format is identical to the `armosec-infra`
-copies. Compared with the agents' current pins (ecs-operator v0.0.499, private-node-agent
+The code is copied verbatim from `armosec-infra` `main` (unchanged since v0.0.594). The only
+edits are the import of `armosec-infra/ecs` in `ecs/operator`, which now points at
+`armoapi-go/armotypes/ecs`, and comment-only fixes from review. The JSON wire format is
+identical to the `armosec-infra` copies.
+
+Known pre-existing quirks, deliberately **not** changed in the move because either change would
+alter the wire contract: `EcsClusterResource` is an alias of `EcsResource`, so the cluster
+`Unmarshal()` can be called on any resource and doesn't check `ResourceType`; and `resourceType` has no
+`omitempty`, so cluster payloads carry `"resourceType":""`. Fix them once the backend imports
+these packages (after the monorepo alias PR), when the change lands in one place.
+
+Compared with the agents' current pins (ecs-operator v0.0.499, private-node-agent
 v0.0.592), the only differences are additions: `TaskType`/`ClassifyTaskType` and the
 `bearer-session` identity kind. The rest of `armosec-infra/aisandbox` (identity records, display
 labels, permissions, observed credentials) is backend-only and did **not** move.

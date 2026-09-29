@@ -35,7 +35,7 @@ func NewClusterResource(cluster types.Cluster) (EcsClusterResource, error) {
 	}, nil
 }
 
-// NewServiceResource creates a ResourceData from an AWS ECS Service
+// NewServiceResource creates an EcsResource from an AWS ECS Service
 func NewServiceResource(service types.Service) (EcsResource, error) {
 	payload, err := json.Marshal(service)
 	if err != nil {
@@ -55,7 +55,7 @@ func NewServiceResource(service types.Service) (EcsResource, error) {
 	}, nil
 }
 
-// NewTaskResource creates a ResourceData from an AWS ECS Task
+// NewTaskResource creates an EcsResource from an AWS ECS Task
 func NewTaskResource(task types.Task) (EcsResource, error) {
 	payload, err := json.Marshal(task)
 	if err != nil {
@@ -75,7 +75,7 @@ func NewTaskResource(task types.Task) (EcsResource, error) {
 	}, nil
 }
 
-// NewTaskDefinitionResource creates a ResourceData from an AWS ECS TaskDefinition
+// NewTaskDefinitionResource creates an EcsResource from an AWS ECS TaskDefinition
 func NewTaskDefinitionResource(taskDef types.TaskDefinition) (EcsResource, error) {
 	payload, err := json.Marshal(taskDef)
 	if err != nil {
@@ -96,10 +96,12 @@ func NewTaskDefinitionResource(taskDef types.TaskDefinition) (EcsResource, error
 }
 
 // ============================================================================
-// Unmarshal ResourceData payload to AWS SDK types (for backend)
+// Unmarshal an EcsResource payload back to AWS SDK types (for backend)
 // ============================================================================
 
-// UnmarshalCluster extracts the AWS Cluster from a ResourceData payload
+// Unmarshal extracts the AWS Cluster from an EcsClusterResource payload
+// It does not check ResourceType: EcsClusterResource is an alias of EcsResource,
+// so callers must only invoke it on cluster payloads (OperatorKeepAliveEvent.Cluster).
 func (r *EcsClusterResource) Unmarshal() (*types.Cluster, error) {
 	var cluster types.Cluster
 	if err := json.Unmarshal(r.Payload, &cluster); err != nil {
@@ -108,7 +110,7 @@ func (r *EcsClusterResource) Unmarshal() (*types.Cluster, error) {
 	return &cluster, nil
 }
 
-// UnmarshalService extracts the AWS Service from a ResourceData payload
+// UnmarshalService extracts the AWS Service from an EcsResource payload
 func (r *EcsResource) UnmarshalService() (*types.Service, error) {
 	if r.ResourceType != ecs.ResourceTypeService {
 		return nil, fmt.Errorf("resource type mismatch: expected %s, got %s", ecs.ResourceTypeService, r.ResourceType)
@@ -121,7 +123,7 @@ func (r *EcsResource) UnmarshalService() (*types.Service, error) {
 	return &service, nil
 }
 
-// UnmarshalTask extracts the AWS Task from a ResourceData payload
+// UnmarshalTask extracts the AWS Task from an EcsResource payload
 func (r *EcsResource) UnmarshalTask() (*types.Task, error) {
 	if r.ResourceType != ecs.ResourceTypeTask {
 		return nil, fmt.Errorf("resource type mismatch: expected %s, got %s", ecs.ResourceTypeTask, r.ResourceType)
@@ -134,7 +136,7 @@ func (r *EcsResource) UnmarshalTask() (*types.Task, error) {
 	return &task, nil
 }
 
-// UnmarshalTaskDefinition extracts the AWS TaskDefinition from a ResourceData payload
+// UnmarshalTaskDefinition extracts the AWS TaskDefinition from an EcsResource payload
 func (r *EcsResource) UnmarshalTaskDefinition() (*types.TaskDefinition, error) {
 	if r.ResourceType != ecs.ResourceTypeTaskDefinition {
 		return nil, fmt.Errorf("resource type mismatch: expected %s, got %s", ecs.ResourceTypeTaskDefinition, r.ResourceType)

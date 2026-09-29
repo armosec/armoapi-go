@@ -30,7 +30,7 @@ const (
 // ChunkingInfo represents pagination/chunking information for splitting large requests
 type ChunkingInfo struct {
 	ChunkID     string `json:"chunkId"`     // UUID identifying a chunked request (same for all chunks)
-	ChunkIndex  int    `json:"chunkIndex"`  // 0-based index of this chunkd
+	ChunkIndex  int    `json:"chunkIndex"`  // 0-based index of this chunk
 	TotalChunks int    `json:"totalChunks"` // Total number of chunks
 }
 
@@ -80,7 +80,7 @@ type OperatorResourcesEvent struct {
 // EcsResource represents information about an ECS resource (for operator events)
 type EcsResource struct {
 	ResourceARN  string              `json:"resourceArn"`
-	ResourceType ecs.EcsResourceType `json:"resourceType"` // service, task, task_definition
+	ResourceType ecs.EcsResourceType `json:"resourceType"` // Service, Task, TaskDefinition
 	Payload      json.RawMessage     `json:"payload"`      // Raw AWS SDK JSON
 	Checksum     string              `json:"checksum"`
 }
