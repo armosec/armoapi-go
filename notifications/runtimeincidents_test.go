@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TestNewRuntimeIncidentActorJSON(t *testing.T) {
@@ -32,5 +34,30 @@ func TestNewRuntimeIncidentActorOmittedWhenEmpty(t *testing.T) {
 		if strings.Contains(string(data), key) {
 			t.Errorf("expected %s to be omitted, got %s", key, data)
 		}
+	}
+}
+
+func TestNewRuntimeIncidentActorBSONRoundTrip(t *testing.T) {
+	in := NewRuntimeIncident{UserName: "alice@example.com", UserGroups: []string{"devs"}}
+	data, err := bson.Marshal(in)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	var raw bson.M
+	if err := bson.Unmarshal(data, &raw); err != nil {
+		t.Fatalf("unmarshal raw: %v", err)
+	}
+	if raw["userName"] != "alice@example.com" {
+		t.Errorf(`bson key "userName" = %v, want %q`, raw["userName"], "alice@example.com")
+	}
+	if _, ok := raw["userGroups"]; !ok {
+		t.Errorf(`bson key "userGroups" missing in %v`, raw)
+	}
+	var out NewRuntimeIncident
+	if err := bson.Unmarshal(data, &out); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if out.UserName != in.UserName || !reflect.DeepEqual(out.UserGroups, in.UserGroups) {
+		t.Errorf("round trip = %+v, want %+v", out, in)
 	}
 }

@@ -29,8 +29,8 @@ dropped before any alert channel could show it.
 Two fields on `NewRuntimeIncident`:
 
 ```go
-UserName   string   `json:"userName,omitempty"`
-UserGroups []string `json:"userGroups,omitempty"`
+UserName   string   `json:"userName,omitempty" bson:"userName,omitempty"`
+UserGroups []string `json:"userGroups,omitempty" bson:"userGroups,omitempty"`
 ```
 
 Nothing existing changed. No field was renamed or removed.
@@ -53,12 +53,12 @@ network) and CDR alerts leave both fields empty, and `omitempty` keeps those
 payloads byte-identical to before. `TestNewRuntimeIncidentActorOmittedWhenEmpty`
 pins this. Templates should render the actor row only when `UserName` is set.
 
-## No bson tags
+## bson tags
 
-`AGENTS.md` asks for `json` and `bson` tags together. `NewRuntimeIncident` is a
-notification payload that is never stored in MongoDB, and none of its existing
-fields carry `bson` tags, so the new fields follow the struct and use `json`
-only.
+Both fields carry `bson` tags with the same names as their `json` tags, per
+`AGENTS.md`. The notification travels as JSON today, but matching names keep
+the actor readable under the same keys if the payload is ever stored in
+MongoDB. `TestNewRuntimeIncidentActorBSONRoundTrip` pins the bson names.
 
 ## What this does not cover
 

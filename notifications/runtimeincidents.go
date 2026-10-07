@@ -24,8 +24,8 @@ type NewRuntimeIncident struct {
 	Classification      string                       `json:"classification,omitempty"`
 	// UserName and UserGroups identify the Kubernetes user behind the incident
 	// (admission alerts only, e.g. exec to pod)
-	UserName   string   `json:"userName,omitempty"`
-	UserGroups []string `json:"userGroups,omitempty"`
+	UserName   string   `json:"userName,omitempty" bson:"userName,omitempty"`
+	UserGroups []string `json:"userGroups,omitempty" bson:"userGroups,omitempty"`
 }
 
 type RuntimeIncidentResponse struct {
