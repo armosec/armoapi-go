@@ -22,6 +22,10 @@ type NewRuntimeIncident struct {
 	ReportTime          time.Time                    `json:"reportTime"`
 	PolicyGUIDToName    map[string]string            `json:"policyGUIDToName,omitempty"`
 	Classification      string                       `json:"classification,omitempty"`
+	// UserName and UserGroups identify the Kubernetes user behind the incident
+	// (admission alerts only, e.g. exec to pod)
+	UserName   string   `json:"userName,omitempty"`
+	UserGroups []string `json:"userGroups,omitempty"`
 }
 
 type RuntimeIncidentResponse struct {
