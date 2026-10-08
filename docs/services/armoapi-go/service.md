@@ -103,16 +103,28 @@ identically (no duplicated `deriveEntityType`):
 ```go
 // server-wins precedence: server -> "MCP Server", else client -> "AI Agent", else ""
 entityType := armotypes.AgenticEntityType(clientProviders, serverProviders)
-// binary verdict: any client OR server provider
+// provider-based verdict: any client OR server provider
 agentic := armotypes.IsAgentic(clientProviders, serverProviders)
 ```
 
 `EntityTypeAIAgent` / `EntityTypeMCPServer` are the exact `entity_type` strings
-(kept in sync with postgres-connector `services/aisandbox/view.go`). The discovery
-DTO field `Inventory.IsAgentic` (`bool`, `json:"isAgentic,omitempty"`) is the
-binary agentic verdict; it is derived from `workload_statuses` providers via
-`armotypes.IsAgentic`, so it does **not** depend on the `ai_sandboxes` tables.
-The inventory (`/api/v1/inventory`) is the discovery surface that carries the badge.
+(kept in sync with postgres-connector `services/aisandbox/view.go`).
+
+The discovery DTO field `Inventory.IsAgentic` (`bool`, `json:"isAgentic,omitempty"`)
+is the binary verdict behind the inventory AI indicator and the `isAgentic` filter.
+Sandbox membership (`Inventory.SandboxStatus`) picks the evidence:
+
+| Workload | Agentic when | `Inventory.AiDetectionSource` |
+|---|---|---|
+| `in_sandbox` | the AI sandbox captured it calling gen-AI models over HTTP | `http` |
+| `pending` or not in the sandbox | `AiClientProviders` non-empty (egress DNS to AI providers) | `network` |
+| `pending` or not in the sandbox | else `AiServerProviders` non-empty (own name matches AI serving software) | `workload-name` |
+
+`AiDetectionSource` is empty when the workload is not agentic. `AiClientProviders` and
+`AiServerProviders` (`workload_statuses` providers) are served separately so a UI can
+tell the two provider-based sources apart. postgres-connector computes all of this in
+the inventory query. The inventory (`/api/v1/inventory`) is the discovery surface that
+carries the indicator.
 
 The discovery DTO also carries `Inventory.SandboxStatus` (`string`,
 `json:"sandboxStatus,omitempty"`) — the AI-Sandbox "add to sandbox" apply-lifecycle

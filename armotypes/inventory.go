@@ -25,11 +25,11 @@ type Inventory struct {
 	LaunchType         string     `json:"launchType,omitempty"`
 	HostType           string     `json:"hostType,omitempty"`
 	ResourceHash       string     `json:"resourceHash,omitempty"`
-	// IsAgentic is the binary agentic verdict for the inventory/discovery badge.
-	// It is derived from workload_statuses providers (ai_client_providers /
-	// ai_server_providers) via armotypes.IsAgentic and is sandbox-table-independent
-	// — it does NOT depend on the ai_sandboxes tables, so the discovery badge keeps
-	// working regardless of the ai_sandboxes agentic-verdict migration state.
+	// IsAgentic is the binary verdict behind the inventory AI indicator and the
+	// isAgentic filter. Sandbox membership picks the evidence: a workload in the AI
+	// sandbox (SandboxStatus "in_sandbox") is agentic only when the sandbox captured
+	// it calling gen-AI models over HTTP; any other workload is agentic when it has
+	// AI client or AI server providers (see AiDetectionSource).
 	IsAgentic bool `json:"isAgentic,omitempty"`
 	// SandboxStatus is the AI-sandbox "add to sandbox" lifecycle status of the
 	// workload: "pending" or "in_sandbox" (empty = not-in-sandbox). It is DERIVED
@@ -48,25 +48,15 @@ type Inventory struct {
 	// and ECS carry one; cloud-host rows do not yet project one, so they read
 	// empty until the platform surfaces a host resource_hash.
 	SandboxStatus string `json:"sandboxStatus,omitempty"`
-	// AiClientProviders lists the AI/LLM providers detected on the workload's egress
-	// (e.g. "openai", "anthropic"), sourced from workload_statuses.ai_client_providers.
-	// Non-empty only for agentic workloads. Surfaced for the workload details
-	// "AI usage detected" section (same source as the IsAgentic verdict).
+	// AiClientProviders lists the AI/LLM providers the workload's egress DNS points
+	// at (e.g. "openai", "anthropic"), from workload_statuses.ai_client_providers.
 	AiClientProviders []string `json:"aiClientProviders,omitempty"`
-	// AiLastSeen is when AI/LLM egress was last observed for the workload
-	// (workload_statuses.ai_last_seen — stamped when the detected AI provider union
-	// is non-empty, frozen once AI is no longer seen). nil when never observed.
-	AiLastSeen *time.Time `json:"aiLastSeen,omitempty"`
-	// AiModels are the AI models observed for the workload via the AI sandbox
-	// (aggregated from ai_sandbox_models in the inventory query). Non-empty only for
-	// workloads added to the sandbox; drives the Model rows in the "AI usage detected"
-	// section. Empty otherwise (the Model rows are simply hidden).
-	AiModels []AiModelUsage `json:"aiModels,omitempty"`
-}
-
-// AiModelUsage is one AI model observed for a workload — the model id plus the
-// provider it belongs to (used for the per-model provider glyph in the UI).
-type AiModelUsage struct {
-	ModelID  string `json:"modelId"`
-	Provider string `json:"provider,omitempty"`
+	// AiServerProviders lists the self-hosted AI serving software the workload's
+	// own name matches (e.g. "vllm", "ollama"), from
+	// workload_statuses.ai_server_providers.
+	AiServerProviders []string `json:"aiServerProviders,omitempty"`
+	// AiDetectionSource is the evidence behind IsAgentic: "http" (the AI sandbox
+	// captured gen-AI model calls), "network" (AiClientProviders) or
+	// "workload-name" (AiServerProviders). Empty when the workload is not agentic.
+	AiDetectionSource string `json:"aiDetectionSource,omitempty"`
 }
