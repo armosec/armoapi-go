@@ -74,8 +74,14 @@ func TestAzureActivityLogRoundTrip(t *testing.T) {
 	if e.Claims["idtyp"] != "user" {
 		t.Errorf("claims.idtyp = %q", e.Claims["idtyp"])
 	}
-	if e.Properties["message"] != "Microsoft.Resources/subscriptions/resourcegroups/write" {
-		t.Errorf("properties.message = %v", e.Properties["message"])
+	// Properties is carried raw, so read it by decoding the bag rather than
+	// indexing the field.
+	var props map[string]any
+	if err := json.Unmarshal(e.Properties, &props); err != nil {
+		t.Fatalf("properties: %v", err)
+	}
+	if props["message"] != "Microsoft.Resources/subscriptions/resourcegroups/write" {
+		t.Errorf("properties.message = %v", props["message"])
 	}
 
 	// Round-trip back to JSON.

@@ -1,6 +1,7 @@
 package httpcapture
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 
@@ -20,6 +21,15 @@ func TestEnumWireValues(t *testing.T) {
 	for got, want := range fid {
 		if string(got) != want {
 			t.Errorf("fidelity wire value = %q, want %q", got, want)
+		}
+	}
+	attrs := map[string]string{
+		AttrSuppressedReason: "http.capture.suppressed_reason",
+		AttrSuppressedCount:  "http.capture.suppressed_count",
+	}
+	for got, want := range attrs {
+		if got != want {
+			t.Errorf("suppression attribute key = %q, want %q", got, want)
 		}
 	}
 }
@@ -86,6 +96,52 @@ func TestFragmentJSONRoundTrip(t *testing.T) {
 	}
 }
 
+// SuppressedReason/SuppressedCount are omitted from the wire when zero (the common
+// case — most fragments withhold nothing) and round-trip when set. This is the
+// non-loss signal Fidelity/FidelityReason must never be reused for; a caller
+// accidentally omitting `omitempty` here would silently bloat every fragment on the
+// wire, which is exactly the kind of regression a JSON-shape pin catches.
+func TestFragmentSuppressionFieldsOmitEmptyAndRoundTrip(t *testing.T) {
+	zero := Fragment{
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "t1", Direction: DirectionResponse, Part: PartBody,
+	}
+	b, err := json.Marshal(zero)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bytes.Contains(b, []byte("suppressed")) {
+		t.Fatalf("suppression fields must be omitted when zero, got: %s", b)
+	}
+
+	suppressed := Fragment{
+		ProtocolVersion: CurrentProtocolVersion,
+		TransactionID:   "t1", Direction: DirectionResponse, Part: PartBody,
+		SuppressedReason: "ws-keepalive", SuppressedCount: 19,
+	}
+	b, err = json.Marshal(suppressed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const wantFragment = `"suppressedReason":"ws-keepalive","suppressedCount":19`
+	if !bytes.Contains(b, []byte(wantFragment)) {
+		t.Fatalf("wire JSON =\n  %s\nwant it to contain\n  %s", b, wantFragment)
+	}
+	var out Fragment
+	if err := json.Unmarshal(b, &out); err != nil {
+		t.Fatal(err)
+	}
+	if out.SuppressedReason != "ws-keepalive" || out.SuppressedCount != 19 {
+		t.Errorf("suppression fields did not round-trip: %+v", out)
+	}
+	// Fidelity must stay untouched by a suppression — the two are orthogonal signals,
+	// and a caller that set one while forgetting the other would silently conflate
+	// "withheld" with "lost".
+	if out.Fidelity != "" || out.FidelityReason != "" {
+		t.Errorf("a suppression must not carry a fidelity mark, got fidelity=%q reason=%q", out.Fidelity, out.FidelityReason)
+	}
+}
+
 // The reused identity (per fragment, "B") and the reused process tree (per
 // transaction, "A") round-trip — proving we compose the existing armotypes structs
 // rather than inventing our own process/cloud attribution.
@@ -143,6 +199,11 @@ func TestCaptureConfigRoundTrip(t *testing.T) {
 		MaxFragmentBytes: 1 << 20, MaxTransactionBytes: 8 << 20,
 		MaxTransactionsPerHour: 5000, MaxTransactionsPerSandboxPerHour: 500,
 		MaskKnownCredentialHeaders: &mask, ExtraCredentialHeaders: []string{"x-acme-signature"},
+		DefaultLevel: CaptureLevelHeaders,
+		Rules: []CaptureRule{
+			{Protocol: CaptureProtocolHTTPS, Host: "api.openai.com", PathContains: "/v1/chat/completions", Level: CaptureLevelFull},
+			{Level: CaptureLevelNone},
+		},
 	}
 	b, err := json.Marshal(in)
 	if err != nil {
@@ -157,5 +218,11 @@ func TestCaptureConfigRoundTrip(t *testing.T) {
 		out.MaskKnownCredentialHeaders == nil || *out.MaskKnownCredentialHeaders != false ||
 		len(out.ExtraCredentialHeaders) != 1 {
 		t.Errorf("config did not round-trip: %+v", out)
+	}
+	if out.DefaultLevel != CaptureLevelHeaders || len(out.Rules) != 2 ||
+		out.Rules[0].Protocol != CaptureProtocolHTTPS || out.Rules[0].Host != "api.openai.com" ||
+		out.Rules[0].PathContains != "/v1/chat/completions" || out.Rules[0].Level != CaptureLevelFull ||
+		out.Rules[1].Level != CaptureLevelNone {
+		t.Errorf("capture policy did not round-trip: %+v", out)
 	}
 }

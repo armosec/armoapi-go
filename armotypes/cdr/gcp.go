@@ -141,7 +141,22 @@ type GcpAuditLogPayload struct {
 	// spec also accepts a bare number (3) on parse. json.Number accepts BOTH forms;
 	// a plain string would fail the whole decode on a bare number — a dropped event
 	// for a field nothing depends on.
-	NumResponseItems json.Number `json:"numResponseItems,omitempty"`
+	//
+	// The bson tag is REQUIRED, not decoration. Most audit events omit this field
+	// (only list/query methods return items), leaving the zero json.Number — the
+	// empty string. The driver encodes json.Number by parsing it, and "" parses as
+	// neither int nor float, so it errors; because BSON encoding is not per-field,
+	// that error fails the WHOLE document write. The json tag's omitempty does not
+	// help: the driver ignores json tags unless useJSONStructTags is set, which it
+	// is not by default. Without bson omitempty, no GCP CDR incident can persist.
+	//
+	// The tag deliberately names NO field. A bson tag sets the stored key, and
+	// these types carry none, so every other field here is stored under the
+	// driver's default — the lowercased Go name, "numresponseitems". Spelling the
+	// name here would rename the field to "numresponseItems" casing, orphaning any
+	// value already stored and making this the one camelCase key among its
+	// siblings. Renaming a stored field is a migration, not a side effect of a fix.
+	NumResponseItems json.Number `json:"numResponseItems,omitempty" bson:",omitempty"`
 	// Request is the operation-specific request bag; shape varies by method.
 	Request map[string]interface{} `json:"request,omitempty"`
 	// Response is the operation-specific response bag; for create-style methods

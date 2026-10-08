@@ -29,6 +29,8 @@ Canonical shared type library for the Armosec platform. Defines domain types, co
 | `apis` | Command dispatch, websocket scan commands, connector interfaces, pagination |
 | `armotypes` | Core domain types: clusters, configs, policies, incidents, risk factors, registries |
 | `armotypes/cdr` | Cloud Detection & Response alert types |
+| `armotypes/ecs`, `armotypes/ecs/operator` | ECS wire types + AWS SDK converters shared with ecs-operator |
+| `armotypes/aisandbox` | AI-Sandbox `identity_key` format + constructors shared with private-node-agent |
 | `identifiers` | Workload/resource designator system (WLID, SID, PortalDesignator) |
 | `containerscan` | Container vulnerability scan report interfaces and v1 implementation |
 | `notifications` | Alert channel configuration, collaboration integrations (Jira, Linear, Slack) |

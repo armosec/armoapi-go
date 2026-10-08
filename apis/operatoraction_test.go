@@ -35,6 +35,80 @@ func TestOperatorActionArgsRoundTrip(t *testing.T) {
 	assert.Equal(t, in, out)
 }
 
+func TestOperatorActionArgsRoundTripPatch(t *testing.T) {
+	in := OperatorActionArgs{
+		Action:    OperatorActionPatch,
+		Target:    &OperatorActionTarget{Kind: "Deployment", Namespace: "payments", Name: "api"},
+		Patch:     `{"spec":{"template":{"spec":{"containers":[{"name":"api","securityContext":{"seccompProfile":{"type":"RuntimeDefault"}}}]}}}}`,
+		PatchType: "merge",
+		DryRun:    boolPtr(true),
+		Reason:    "enforce RuntimeDefault seccompProfile",
+	}
+
+	m, err := in.ToArgs()
+	require.NoError(t, err)
+	assert.Equal(t, string(in.Patch), m["patch"], "wire key must be 'patch' — the operator reads it off the raw map")
+	assert.Equal(t, in.PatchType, m["patchType"], "wire key must be 'patchType'")
+
+	out, err := OperatorActionArgsFromMap(m)
+	require.NoError(t, err)
+	assert.Equal(t, in, out)
+}
+
+// The operator's own extractPatchArgs has always accepted "patch" as either a
+// JSON string or a raw JSON object (re-marshaling the object case back to a
+// string). OperatorActionArgsFromMap must tolerate the same, or an
+// object-shaped "patch" value fails the whole args parse — not just the
+// patch field — since it's a single json.Unmarshal for the entire struct.
+func TestOperatorActionArgsFromMapPatchAcceptsObjectShape(t *testing.T) {
+	m := map[string]interface{}{
+		"action": string(OperatorActionPatch),
+		"target": map[string]interface{}{"kind": "Deployment", "namespace": "payments", "name": "api"},
+		"patch": map[string]interface{}{
+			"spec": map[string]interface{}{
+				"template": map[string]interface{}{
+					"spec": map[string]interface{}{
+						"containers": []interface{}{
+							map[string]interface{}{
+								"name": "api",
+								"securityContext": map[string]interface{}{
+									"seccompProfile": map[string]interface{}{"type": "RuntimeDefault"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		"patchType": "strategic",
+	}
+
+	out, err := OperatorActionArgsFromMap(m)
+	require.NoError(t, err, "object-shaped patch must not fail the whole args parse")
+	assert.Equal(t, OperatorActionPatch, out.Action)
+	assert.Equal(t, "Deployment", out.Target.Kind, "other fields must still parse alongside an object-shaped patch")
+	assert.JSONEq(t, `{"spec":{"template":{"spec":{"containers":[{"name":"api","securityContext":{"seccompProfile":{"type":"RuntimeDefault"}}}]}}}}`, string(out.Patch))
+	assert.Equal(t, "strategic", out.PatchType)
+}
+
+// Tolerating an object-shaped "patch" (above) must not widen into tolerating
+// every non-string shape: arrays, numbers, and booleans are still rejected,
+// matching OperatorActionPatchBody's "must be object-shaped" contract.
+func TestOperatorActionArgsFromMapPatchRejectsNonObjectShapes(t *testing.T) {
+	for _, tc := range []interface{}{
+		[]interface{}{"a"},
+		float64(123),
+		true,
+	} {
+		m := map[string]interface{}{
+			"action": string(OperatorActionPatch),
+			"patch":  tc,
+		}
+		_, err := OperatorActionArgsFromMap(m)
+		assert.Errorf(t, err, "patch value %#v must be rejected, not silently accepted", tc)
+	}
+}
+
 // A command carrying the typed args through the generic map should be
 // recoverable on the receiving (operator) side.
 func TestOperatorActionArgsViaCommand(t *testing.T) {

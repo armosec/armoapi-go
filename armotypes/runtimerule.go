@@ -91,6 +91,22 @@ type RuntimeRule struct {
 	// sourced from the rule's README.md in the rulelibrary repo. Empty for
 	// customer-authored rules.
 	Documentation string `json:"documentation,omitempty" yaml:"documentation,omitempty" bson:"documentation,omitempty"`
+	// Variants holds version-gated alternative bodies for this rule, so one rule ID/name can
+	// serve different CEL bodies across agent-capability generations instead of forking
+	// identity. The top-level Expressions field above always mirrors the lowest-MinAgentVersion
+	// variant, so any reader that doesn't resolve Variants (console, K8s connector, policy
+	// validation, incident-enrichment) still gets a working base body. Agent-facing resolver
+	// responses omit this field entirely and project the resolved variant into Expressions
+	// instead - see ResolveVariantExpressions.
+	Variants []RuleVariant `json:"variants,omitempty" yaml:"variants,omitempty" bson:"variants,omitempty"`
+}
+
+// RuleVariant is a version-gated alternative rule body. MinAgentVersion is a bare semver (not a
+// constraint string like AgentVersionRequirement), so "pick the highest satisfied variant" has a
+// well-defined total order - see ValidateVariants and ResolveVariantExpressions.
+type RuleVariant struct {
+	MinAgentVersion string          `json:"minAgentVersion" yaml:"minAgentVersion" bson:"minAgentVersion"`
+	Expressions     RuleExpressions `json:"expressions" yaml:"expressions" bson:"expressions"`
 }
 
 type RuleExpressions struct {

@@ -46,6 +46,9 @@ func TestIdentifiersFlatten(t *testing.T) {
 				File: &FileEntity{
 					Name:      "file.txt",
 					Directory: "/tmp",
+					MD5:       "d41d8cd98f00b204e9800998ecf8427e",
+					SHA1:      "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+					SHA256:    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				},
 				Dns: &DnsEntity{
 					Domain: "example.com",
@@ -87,6 +90,17 @@ func TestIdentifiersFlatten(t *testing.T) {
 				Http: &HttpEntity{
 					Method:  "POST",
 					Payload: "data",
+				},
+			},
+		},
+		{
+			// The shape a malware alert produces: a name and a hash, with no
+			// directory, which is what a bare file path yields.
+			Name: "File entity with a name and a hash, no directory",
+			Identifiers: &Identifiers{
+				File: &FileEntity{
+					Name:   "mirai",
+					SHA256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				},
 			},
 		},
@@ -147,4 +161,28 @@ func TestIdentifiersFlatten(t *testing.T) {
 		assert.Empty(t, diff, "expected to have no diff")
 
 	}
+}
+
+// The Flatten test above derives its expectation from the json tags, so it cannot
+// fail if a key string changes on both sides at once. These keys are a cross-service
+// contract: they are the entity names stored in exception rows and queried as Mongo
+// paths, so a rename is a silent data break. Pin the literals.
+func TestFileIdentifierKeysAreStable(t *testing.T) {
+	flattened := (&Identifiers{
+		File: &FileEntity{
+			Name:      "mirai.elf",
+			Directory: "/tmp",
+			MD5:       "5d41402abc4b2a76b9719d911017c592",
+			SHA1:      "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d",
+			SHA256:    "9f2b1e1d3c4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4",
+		},
+	}).Flatten()
+
+	assert.Equal(t, map[string]string{
+		"file.name":      "mirai.elf",
+		"file.directory": "/tmp",
+		"file.md5":       "5d41402abc4b2a76b9719d911017c592",
+		"file.sha1":      "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d",
+		"file.sha256":    "9f2b1e1d3c4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4",
+	}, flattened)
 }

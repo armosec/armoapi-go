@@ -50,11 +50,17 @@ const (
 	FidelityPartial      CaptureFidelity = "partial"       // a fragment was lost / reassembly timed out
 )
 
-// DefaultMaxFragmentBytes is the default per-fragment payload cap. It sits well
-// under the ~4 MB OTLP/gRPC message ceiling to leave headroom for the record
-// envelope and for the ~33% base64 expansion a bytes value incurs when a LogRecord
-// is JSON-encoded; 1 MiB of raw payload encodes to well under 4 MB (spec §5.10).
-const DefaultMaxFragmentBytes = 1 << 20 // 1 MiB
+// DefaultMaxFragmentBytes is the default per-fragment payload cap. Two limits bind: the ~1 MB
+// Kinesis Firehose per-RECORD limit (one fragment = one JSON record on the fragment->Iceberg
+// hop) and the ~4 MB OTLP/gRPC message ceiling (a batch of records). A bytes value incurs ~33%
+// base64 expansion when the LogRecord is JSON-encoded, so 256 KiB of raw payload encodes to
+// ~350 KB: safely under the 1 MB Firehose record cap. That also bounds the per-record
+// contribution to an OTLP batch (~350 KB vs ~1.4 MB at 1 MiB), so a reasonably bounded batch
+// fits the 4 MB ceiling -- though the exporter, not this cap, owns the batch bound. 1 MiB was
+// unsafe on the Firehose axis: ~1.4 MB per record exceeds the 1 MB limit and jams the delivery
+// stream. Real fragments are tiny (p50 ~140 B, max ~145 KB observed), so this cap only ever
+// clips rare jumbo bodies.
+const DefaultMaxFragmentBytes = 1 << 18 // 256 KiB
 
 // CurrentProtocolVersion is the wire-contract version stamped on every record and
 // every config response "from day one" (spec §5.10): with two sensor types and a
@@ -74,15 +80,17 @@ const CurrentProtocolVersion = "1.0"
 // (resource attrs + record attrs + Body + a worked example) is documented in
 // private-node-agent docs/features/http-capture.md §3.1 "OTEL LogRecord encoding".
 const (
-	AttrTransactionID   = "http.capture.transaction_id"
-	AttrSequenceNumber  = "http.capture.sequence_number"
-	AttrDirection       = "http.capture.direction"
-	AttrEndOfStream     = "http.capture.end_of_stream"
-	AttrCaptureFidelity = "http.capture.fidelity"
-	AttrFidelityReason  = "http.capture.fidelity_reason"
-	AttrProtocolVersion = "http.capture.protocol_version"
-	AttrPart            = "http.capture.part"
-	AttrCapturedAt      = "http.capture.captured_at"
+	AttrTransactionID    = "http.capture.transaction_id"
+	AttrSequenceNumber   = "http.capture.sequence_number"
+	AttrDirection        = "http.capture.direction"
+	AttrEndOfStream      = "http.capture.end_of_stream"
+	AttrCaptureFidelity  = "http.capture.fidelity"
+	AttrFidelityReason   = "http.capture.fidelity_reason"
+	AttrProtocolVersion  = "http.capture.protocol_version"
+	AttrPart             = "http.capture.part"
+	AttrCapturedAt       = "http.capture.captured_at"
+	AttrSuppressedReason = "http.capture.suppressed_reason"
+	AttrSuppressedCount  = "http.capture.suppressed_count"
 )
 
 // Fragment is one unit on the wire (spec §5.2): a slice of one direction of one
@@ -152,6 +160,36 @@ type Fragment struct {
 	// EndOfStream=true AND Fidelity=FidelityTruncated.
 	Fidelity       CaptureFidelity `json:"fidelity,omitempty"`
 	FidelityReason string          `json:"fidelityReason,omitempty"`
+
+	// SuppressedReason + SuppressedCount are a NON-LOSS signal, deliberately separate
+	// from Fidelity/FidelityReason above. Fidelity always means "content was lost" — a
+	// capture gap the backend must treat as a defect. A suppression is the opposite: a
+	// sensor-side POLICY decision to withhold items it chose not to upload (e.g. a
+	// periodic keepalive/heartbeat pattern with no analytical value). Conflating the
+	// two would misreport deliberate noise reduction as a capture defect, which is
+	// exactly the mistake this pair of fields exists to prevent.
+	//
+	// SuppressedReason is a short, sensor-defined tag identifying WHAT was withheld
+	// (e.g. "ws-keepalive"); SuppressedCount is how many items were withheld under
+	// that reason, scoped to this fragment's transaction. Both empty/zero ⇒ nothing
+	// was withheld. A sensor emitting more than one reason for the same transaction
+	// uses more than one non-suppressed fragment to carry them — this pair is not a
+	// map, deliberately, to keep the wire shape simple for the first (and likely only)
+	// consumer of it.
+	//
+	// Sequence-number contract: suppression NEVER creates a SequenceNumber gap. A
+	// withheld item never reaches the fragment stream in the first place, so
+	// SequenceNumber stays contiguous (0..N, unbroken) across whatever fragments ARE
+	// emitted — there are simply fewer of them. The backend must not infer
+	// FidelityPartial, or any other loss signal, from a SuppressedCount > 0; the
+	// sensor-side reference implementation (private-node-agent, pkg/wscapture) proves
+	// this by construction: a suppressed item returns before the call that would
+	// assign it a SequenceNumber, so the counter backing SequenceNumber is simply
+	// never incremented for it. See private-node-agent's
+	// docs/features/ws-keepalive-filtering.md for the motivating case (first, and as
+	// of this writing only, consumer of this pair).
+	SuppressedReason string `json:"suppressedReason,omitempty"`
+	SuppressedCount  uint32 `json:"suppressedCount,omitempty"`
 }
 
 // CaptureConfig is the backend-supplied capture configuration the sensor polls
@@ -160,17 +198,31 @@ type Fragment struct {
 // and fails closed (captures nothing) with no config. The per-target upload-policy
 // rules (host/path → full|headers|none) are the agent's uploadpolicy types today and
 // migrate into this package next.
+// Capture levels — the wire values for CaptureRule.Level and CaptureConfig.DefaultLevel.
+// Exported so consumers pin them instead of duplicating the string literals.
+const (
+	CaptureLevelNone    = "none"    // drop the transaction entirely
+	CaptureLevelHeaders = "headers" // headers only, body dropped
+	CaptureLevelFull    = "full"    // headers + request/response body
+)
+
+// Capture-rule protocols — the wire values for CaptureRule.Protocol ("" = any).
+const (
+	CaptureProtocolHTTP  = "http"
+	CaptureProtocolHTTPS = "https"
+)
+
 type CaptureConfig struct {
-	ProtocolVersion string `json:"protocolVersion"`
+	ProtocolVersion string `json:"protocolVersion" bson:"protocolVersion"`
 	// Enabled is the master switch; false ⇒ the sensor captures nothing.
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" bson:"enabled"`
 
 	// Size caps in bytes (0 ⇒ use the agent default). MaxFragmentBytes bounds one
 	// fragment; MaxTransactionBytes bounds a whole transaction — on hit the body is
 	// truncated (headers are still sent) and the terminal fragment is marked
 	// EndOfStream + FidelityTruncated.
-	MaxFragmentBytes    int64 `json:"maxFragmentBytes,omitempty"`
-	MaxTransactionBytes int64 `json:"maxTransactionBytes,omitempty"`
+	MaxFragmentBytes    int64 `json:"maxFragmentBytes,omitempty" bson:"maxFragmentBytes,omitempty"`
+	MaxTransactionBytes int64 `json:"maxTransactionBytes,omitempty" bson:"maxTransactionBytes,omitempty"`
 
 	// Transaction volume caps (0 ⇒ agent default). Both count whole transactions over a
 	// rolling window; when either is exhausted the agent uploads NOTHING for further
@@ -183,14 +235,68 @@ type CaptureConfig struct {
 	//     other sandboxes. Agent-local (a sandbox instance lives on one node, so this
 	//     agent sees all of its traffic); a restart is a new sandbox_id with a fresh
 	//     budget, which is correct for a fairness cap.
-	MaxTransactionsPerHour           int64 `json:"maxTransactionsPerHour,omitempty"`
-	MaxTransactionsPerSandboxPerHour int64 `json:"maxTransactionsPerSandboxPerHour,omitempty"`
+	MaxTransactionsPerHour           int64 `json:"maxTransactionsPerHour,omitempty" bson:"maxTransactionsPerHour,omitempty"`
+	MaxTransactionsPerSandboxPerHour int64 `json:"maxTransactionsPerSandboxPerHour,omitempty" bson:"maxTransactionsPerSandboxPerHour,omitempty"`
 
 	// Credential-header masking (§5.6). MaskKnownCredentialHeaders is a pointer so
 	// absent ⇒ default true (fail-safe: mask). ExtraCredentialHeaders adds names to
 	// the masked set. Masking is a one-way (irreversible) fingerprint.
-	MaskKnownCredentialHeaders *bool    `json:"maskKnownCredentialHeaders,omitempty"`
-	ExtraCredentialHeaders     []string `json:"extraCredentialHeaders,omitempty"`
+	MaskKnownCredentialHeaders *bool    `json:"maskKnownCredentialHeaders,omitempty" bson:"maskKnownCredentialHeaders,omitempty"`
+	ExtraCredentialHeaders     []string `json:"extraCredentialHeaders,omitempty" bson:"extraCredentialHeaders,omitempty"`
+
+	// Capture policy — migrated here from the node-agent's uploadpolicy so config-service,
+	// the dashboard, and the agent share one schema. DefaultLevel is the capture level applied
+	// when no rule matches (CaptureLevel*); absent ⇒ "none" (fail-closed). Rules is the
+	// ordered, FIRST-MATCH-WINS upload policy. bson tags match json so config-service can store
+	// the embedded config in MongoDB with the same field names it serves over REST.
+	DefaultLevel string        `json:"defaultLevel,omitempty" bson:"defaultLevel,omitempty"`
+	Rules        []CaptureRule `json:"rules,omitempty" bson:"rules,omitempty"`
+
+	// OTelEventsEnabled gates raw eBPF-event OTel export at dispatch time (ADR 0009 §3).
+	// Pointer so absent ⇒ nil ⇒ allow — fail-safe: losing a detection signal silently on
+	// a transient config-fetch issue is worse than a bounded over-collection window.
+	OTelEventsEnabled *bool `json:"otelEventsEnabled,omitempty" bson:"otelEventsEnabled,omitempty"`
+
+	// HTTPCaptureTapEnabled is the backend-driven, live-toggleable switch for whether the
+	// HTTP-capture tap is constructed at all (ADR 0009 §5). Pointer so absent ⇒ nil ⇒
+	// deny — fail-closed, the same posture as Enabled: this extends capture's own on/off
+	// surface and captured content is potentially PII-bearing. Distinct from Enabled,
+	// which is a lossless per-transaction policy decision on an already-existing tap;
+	// this field instead controls whether the tap object exists in the first place.
+	HTTPCaptureTapEnabled *bool `json:"httpCaptureTapEnabled,omitempty" bson:"httpCaptureTapEnabled,omitempty"`
+
+	// WorkloadScanEnabled gates the NA-3 workload scanner (ADR 0009 §6). Pointer so
+	// absent ⇒ nil ⇒ deny — fail-closed: the scanner snapshots the overlay upperdir,
+	// secret/SA-token mount targets, and /proc/<pid>/environ, and emits identity-material
+	// findings at least as sensitive as HTTP-capture content.
+	WorkloadScanEnabled *bool `json:"workloadScanEnabled,omitempty" bson:"workloadScanEnabled,omitempty"`
+
+	// MergeWithGlobal controls whether a per-customer document is merged with the global
+	// default document (customer fields winning on conflict) or resolved as a standalone
+	// document, when cadashboardbe's resolveHTTPCaptureConfig picks between them. Pointer
+	// so absent ⇒ nil ⇒ true — merging is the default. Set explicitly to false to opt a
+	// customer document out of merging: resolveHTTPCaptureConfig then returns it exactly
+	// as stored, never consulting the global document for any field.
+	MergeWithGlobal *bool `json:"mergeWithGlobal,omitempty" bson:"mergeWithGlobal,omitempty"`
+}
+
+// CaptureRule is one first-match-wins upload-policy rule: it matches a transaction by
+// protocol / host / path (every set field is AND-ed; an empty field matches anything) and
+// applies Level. Migrated from the node-agent's uploadpolicy.Rule so config-service, the
+// dashboard, and the agent share one schema; the agent maps Level (the wire string) to its
+// internal level on parse.
+type CaptureRule struct {
+	// Protocol scopes the rule to CaptureProtocolHTTP | CaptureProtocolHTTPS | "" (any).
+	Protocol string `json:"protocol,omitempty" bson:"protocol,omitempty"`
+	// Host matches an exact host or a dot-anchored subdomain of it; "" = any.
+	Host string `json:"host,omitempty" bson:"host,omitempty"`
+	// HostPrefix / HostSuffix are required leading / trailing substrings of the host; "" = any.
+	HostPrefix string `json:"hostPrefix,omitempty" bson:"hostPrefix,omitempty"`
+	HostSuffix string `json:"hostSuffix,omitempty" bson:"hostSuffix,omitempty"`
+	// PathContains is a case-sensitive substring of the request path; "" = any.
+	PathContains string `json:"pathContains,omitempty" bson:"pathContains,omitempty"`
+	// Level is the wire capture level: CaptureLevelNone | CaptureLevelHeaders | CaptureLevelFull.
+	Level string `json:"level" bson:"level"`
 }
 
 // NewTransactionID composes a globally-unique transaction id from readily-available
