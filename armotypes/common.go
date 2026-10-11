@@ -60,8 +60,10 @@ func AgenticEntityType(clientProviders, serverProviders []string) string {
 	return ""
 }
 
-// IsAgentic is the binary (yes/no) agentic verdict used by the inventory badge.
-// A subject is agentic when it has any AI client OR any AI server provider.
+// IsAgentic is the provider-based (yes/no) agentic verdict: a subject is agentic
+// when it has any AI client OR any AI server provider. The inventory indicator
+// uses it for workloads outside the AI sandbox; inside the sandbox the captured
+// HTTP model calls decide instead (see Inventory.IsAgentic).
 func IsAgentic(clientProviders, serverProviders []string) bool {
 	return len(clientProviders) > 0 || len(serverProviders) > 0
 }
