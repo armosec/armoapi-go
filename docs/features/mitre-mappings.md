@@ -1,3 +1,10 @@
+---
+type: feature
+status: active
+owner: "@armosec/backend"
+scope: repo
+---
+
 # Paired MITRE mappings (NAUT-1586)
 
 RuntimeRule.mitreMappings is an optional list of {tactic, technique} objects.
