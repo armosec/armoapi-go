@@ -42,6 +42,10 @@ enums, following `EventType` and `StateScope` in `runtimerule.go`. The wire
 format is a plain string, so adding the type costs nothing on the wire and makes
 a producer convert explicitly instead of passing an arbitrary value.
 
+`FrameRuntime` values: `native`, `go`, `python`, `php`, `perl`, `ruby`, `java`,
+`node` and `dotnet`. A frame's runtime is its lane in the producer;
+`Trace.Language` stays the display value (for example `.NET` for `dotnet`).
+
 ## Three decisions worth knowing
 
 ### Status is decomposed, not one string

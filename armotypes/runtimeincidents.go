@@ -201,6 +201,7 @@ const (
 	FrameRuntimeRuby   FrameRuntime = "ruby"
 	FrameRuntimeJava   FrameRuntime = "java"
 	FrameRuntimeNode   FrameRuntime = "node"
+	FrameRuntimeDotnet FrameRuntime = "dotnet"
 )
 
 type StackFrame struct {
