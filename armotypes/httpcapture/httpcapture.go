@@ -91,7 +91,41 @@ const (
 	AttrCapturedAt       = "http.capture.captured_at"
 	AttrSuppressedReason = "http.capture.suppressed_reason"
 	AttrSuppressedCount  = "http.capture.suppressed_count"
+	// AttrCaptureSource names the sensor tap that produced the fragment (see
+	// CaptureSource). Optional: older sensors omit it.
+	AttrCaptureSource = "http.capture.source"
 )
+
+// CaptureSource identifies which capture tap produced a fragment. It lets the
+// backend attribute capture-quality issues to a specific uprobe family.
+type CaptureSource string
+
+const (
+	// CaptureSourceSSL is the OpenSSL/BoringSSL uprobe tap.
+	CaptureSourceSSL CaptureSource = "ssl"
+	// CaptureSourceGoTLS is the Go crypto/tls uprobe tap.
+	CaptureSourceGoTLS CaptureSource = "gotls"
+	// CaptureSourceCleartext is the plain-socket (non-TLS) tap.
+	CaptureSourceCleartext CaptureSource = "cleartext"
+)
+
+// Valid reports whether s is a known capture source.
+func (s CaptureSource) Valid() bool {
+	switch s {
+	case CaptureSourceSSL, CaptureSourceGoTLS, CaptureSourceCleartext:
+		return true
+	}
+	return false
+}
+
+// NormalizeCaptureSource returns the known CaptureSource for raw, or "" when raw
+// is empty or not a known value.
+func NormalizeCaptureSource(raw string) CaptureSource {
+	if s := CaptureSource(raw); s.Valid() {
+		return s
+	}
+	return ""
+}
 
 // Fragment is one unit on the wire (spec §5.2): a slice of one direction of one
 // logical HTTP transaction. It is smaller than a whole request/response — a sensor

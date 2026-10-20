@@ -226,3 +226,31 @@ func TestCaptureConfigRoundTrip(t *testing.T) {
 		t.Errorf("capture policy did not round-trip: %+v", out)
 	}
 }
+
+func TestCaptureSource(t *testing.T) {
+	if AttrCaptureSource != "http.capture.source" {
+		t.Errorf("AttrCaptureSource = %q", AttrCaptureSource)
+	}
+	wire := map[CaptureSource]string{
+		CaptureSourceSSL: "ssl", CaptureSourceGoTLS: "gotls", CaptureSourceCleartext: "cleartext",
+	}
+	for got, want := range wire {
+		if string(got) != want {
+			t.Errorf("capture source wire value = %q, want %q", got, want)
+		}
+		if !got.Valid() {
+			t.Errorf("%q should be valid", got)
+		}
+		if n := NormalizeCaptureSource(want); n != got {
+			t.Errorf("NormalizeCaptureSource(%q) = %q, want %q", want, n, got)
+		}
+	}
+	for _, raw := range []string{"", "SSL", "openssl", "bogus"} {
+		if CaptureSource(raw).Valid() {
+			t.Errorf("%q should be invalid", raw)
+		}
+		if n := NormalizeCaptureSource(raw); n != "" {
+			t.Errorf("NormalizeCaptureSource(%q) = %q, want empty", raw, n)
+		}
+	}
+}
