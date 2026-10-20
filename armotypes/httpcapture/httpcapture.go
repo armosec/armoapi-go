@@ -96,8 +96,9 @@ const (
 	AttrCaptureSource = "http.capture.source"
 )
 
-// CaptureSource identifies which capture tap produced a fragment. It lets the
-// backend attribute capture-quality issues to a specific uprobe family.
+// CaptureSource identifies which capture tap produced a fragment (a TLS uprobe
+// family or the plain-socket tap). It lets the backend attribute capture-quality
+// issues to the capture source that produced the data.
 type CaptureSource string
 
 const (
