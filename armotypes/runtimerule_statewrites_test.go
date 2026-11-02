@@ -16,6 +16,9 @@ var nodeAgentEventTypes = []string{
 	"exec", "open", "dns", "network", "http", "syscall", "capabilities",
 	"ptrace", "bpf", "kmod", "symlink", "hardlink", "unshare", "iouring",
 	"ssh", "randomx", "procfs", "fork", "exit", "all",
+	// Rule-selection names derived from a tracer stream, not streams themselves
+	// (node-agent/pkg/utils/events.go: RuleEventType).
+	"dnsQuery",
 }
 
 func TestEventType_CoversNodeAgentEventSet(t *testing.T) {
@@ -23,6 +26,18 @@ func TestEventType_CoversNodeAgentEventSet(t *testing.T) {
 		assert.True(t, IsKnownEventType(EventType(want)),
 			"armotypes has no EventType constant for node-agent event type %q", want)
 	}
+}
+
+// "dnsQuery" is how a rule opts in to forwarded DNS queries and error
+// responses. It was accepted in ruleExpression (never validated there) but
+// rejected in stateWrites, so no write leg could be driven by a query under any
+// spelling. "dns" keeps meaning answered responses; nothing changes for existing
+// rules.
+func TestEventType_DNSQueryIsKnownAndMayDriveAWrite(t *testing.T) {
+	assert.True(t, IsKnownEventType(EventTypeDNSQuery))
+	assert.True(t, IsValidStateWriteEventType(EventTypeDNSQuery))
+	assert.True(t, IsKnownEventType(EventTypeDNS), "dns stays valid alongside dnsQuery")
+	assert.NotEqual(t, EventTypeDNS, EventTypeDNSQuery)
 }
 
 func TestEventType_K8sAdmissionStillKnown(t *testing.T) {

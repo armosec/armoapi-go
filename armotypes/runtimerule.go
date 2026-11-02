@@ -211,12 +211,24 @@ const (
 	EventTypeFork    EventType = "fork"
 	EventTypeExit    EventType = "exit"
 
+	// EventTypeDNSQuery is the rule-selection name for a DNS event that is a
+	// forwarded query or an error response (NXDOMAIN and the like) rather than
+	// an answered response. node-agent forwards both kinds on the "dns" tracer
+	// stream but renames the first to "dnsQuery" when selecting rule expressions,
+	// so that rules written against "dns" keep matching answered responses only
+	// and a rule opts in to queries explicitly. It is a rule-facing name, not a
+	// tracer stream; a rule may use it in both ruleExpression and stateWrites.
+	EventTypeDNSQuery EventType = "dnsQuery"
+
 	// EventTypeAll is a wildcard used by rule bindings, not a real event stream.
 	EventTypeAll EventType = "all"
 )
 
 // knownEventTypes is the authoritative set of event types the rule contract
-// accepts. Kept in sync with node-agent's utils.EventType.
+// accepts. Kept in sync with node-agent's utils.EventType, plus the rule-facing
+// names node-agent derives from a tracer stream (EventTypeDNSQuery). Only ever
+// extended: removing a name would turn rules already stored against it into
+// load failures.
 var knownEventTypes = map[EventType]struct{}{
 	EventTypeExec: {}, EventTypeOpen: {}, EventTypeCapabilities: {},
 	EventTypeDNS: {}, EventTypeNetwork: {}, EventTypeSyscall: {},
@@ -224,7 +236,8 @@ var knownEventTypes = map[EventType]struct{}{
 	EventTypeHTTP: {}, EventTypeK8sAdmission: {}, EventTypePtrace: {},
 	EventTypeBPF: {}, EventTypeKmod: {}, EventTypeUnshare: {},
 	EventTypeIoUring: {}, EventTypeRandomX: {}, EventTypeProcfs: {},
-	EventTypeFork: {}, EventTypeExit: {}, EventTypeAll: {},
+	EventTypeFork: {}, EventTypeExit: {}, EventTypeDNSQuery: {},
+	EventTypeAll: {},
 }
 
 // IsKnownEventType reports whether e is a recognised event type, including the

@@ -41,7 +41,7 @@ property is exactly what the first leg of every correlation rule needs.
 
 | Field | Meaning |
 |---|---|
-| `eventType` | The stream driving this write. Need not appear in `expressions.ruleExpression` — that is what allows remembering on `exec` and alerting on `network`. |
+| `eventType` | The stream driving this write. Need not appear in `expressions.ruleExpression` — that is what allows remembering on `exec` and alerting on `network`. Accepts the same names as `ruleExpression`, including `dnsQuery`, node-agent's rule-facing name for forwarded DNS queries and error responses (`dns` stays answered responses only). |
 | `when` | CEL boolean guard. Empty means always write. A guard may itself read state, which is how multi-step sequences are expressed without a new construct. |
 | `scope` | `container` / `pod` / `node` (node-agent) or `identity` (operator). |
 | `name` | *What kind of fact.* A string literal, never an expression, so it stays statically analysable and safe as a metric label. |
