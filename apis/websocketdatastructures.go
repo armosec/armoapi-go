@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/armosec/armoapi-go/identifiers"
-	"github.com/docker/docker/api/types/registry"
+	"github.com/moby/moby/api/types/registry"
 )
 
 // Commands contains a collection of commands for the in-cluster components
