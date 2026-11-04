@@ -7,6 +7,7 @@ related_code:
   - armotypes/cdr/azure.go
   - armotypes/cdr/azure_shapes_test.go
   - armotypes/cdr/azure_properties_bson_test.go
+  - armotypes/cdr/eventdata_accessors.go
 ---
 
 # Azure Activity Log event shape (two delivery paths)
@@ -25,6 +26,7 @@ Reading the wrong fields yields silent emptiness, not an error.
 | `claims` | nested under `identity` | top level |
 | `operationName`, `category` | plain **strings** (upper-cased) | `{value, localizedValue}` objects |
 | Extras | `RoleLocation`, `Stamp`, `ReleaseVersion`, `VmSku` | — |
+| `location` | **absent** | **absent** |
 
 Both are captured as fixtures in `azure_shapes_test.go`.
 
@@ -174,6 +176,15 @@ carry no detection or attribution value. Unknown fields are ignored on decode, s
 adding them is unnecessary; detection rules are evaluated against the **raw**
 record JSON, not this struct, so a rule can still reference anything the export
 sends.
+
+## No region in either shape
+
+Neither shape carries a `location` key: an export of VM, network and run-command
+operations (2026-11) had none, and neither does a REST record. So `Location` is
+empty and `EventData.Region()` returns "" for Azure. Even where it is present,
+Microsoft's schema describes `location` as where the event was processed, not
+the resource's region, and no field of the record is documented as the
+resource's region.
 
 ## Subscription-id casing and identity matching
 

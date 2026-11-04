@@ -38,8 +38,9 @@ func (e EventData) SourceIP() string {
 }
 
 // Region returns the cloud region of whichever provider event is set, or "".
-// Azure uses the Activity Log's `location` (often "global" for control-plane
-// operations); GCP uses the first of the resource's current locations.
+// Azure uses the Activity Log's `location`, which the records we receive do not
+// carry, so it is "" for Azure in practice (see AzureActivityLogEvent.Location);
+// GCP uses the first of the resource's current locations.
 func (e EventData) Region() string {
 	switch {
 	case e.AWSCloudTrail != nil:

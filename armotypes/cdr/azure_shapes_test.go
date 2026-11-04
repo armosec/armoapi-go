@@ -45,7 +45,6 @@ const eventHubShape = `{
     }
   },
   "level": "Information",
-  "location": "global",
   "properties": { "statusCode": "OK", "eventCategory": "Administrative" },
   "tenantId": "dddddddd-1111-2222-3333-444444444444"
 }`
