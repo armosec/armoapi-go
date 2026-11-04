@@ -65,6 +65,28 @@ func RuleSeverityToString(severity int) string {
 	}
 }
 
+// MitreMapping preserves the relationship between an ATT&CK tactic and technique.
+type MitreMapping struct {
+	Tactic    string `json:"tactic" yaml:"tactic" bson:"tactic"`
+	Technique string `json:"technique" yaml:"technique" bson:"technique"`
+}
+
+// EffectiveMitreMappings reads paired mappings, falling back to legacy scalar metadata.
+// A non-empty list is authoritative; scalar fields remain a compatibility projection.
+func EffectiveMitreMappings(mappings []MitreMapping, tactic, technique string) []MitreMapping {
+	if len(mappings) > 0 {
+		return mappings
+	}
+	if tactic == "" && technique == "" {
+		return nil
+	}
+	return []MitreMapping{{Tactic: tactic, Technique: technique}}
+}
+
+func (r RuntimeRule) GetMitreMappings() []MitreMapping {
+	return EffectiveMitreMappings(r.MitreMappings, r.MitreTactic, r.MitreTechnique)
+}
+
 type RuntimeRule struct {
 	Enabled     bool            `json:"enabled" yaml:"enabled" bson:"enabled"`
 	ID          string          `json:"id" yaml:"id" bson:"id"`
@@ -83,6 +105,7 @@ type RuntimeRule struct {
 	State                   map[string]any       `json:"state,omitempty" yaml:"state,omitempty" bson:"state,omitempty"`
 	AgentVersionRequirement string               `json:"agentVersionRequirement" yaml:"agentVersionRequirement" bson:"agentVersionRequirement"`
 	IsTriggerAlert          bool                 `json:"isTriggerAlert" yaml:"isTriggerAlert" bson:"isTriggerAlert"`
+	MitreMappings           []MitreMapping       `json:"mitreMappings,omitempty" yaml:"mitreMappings,omitempty" bson:"mitreMappings,omitempty"`
 	MitreTactic             string               `json:"mitreTactic" bson:"mitreTactic"`
 	MitreTechnique          string               `json:"mitreTechnique" bson:"mitreTechnique"`
 	Category                string               `json:"category" bson:"category"`
