@@ -12,7 +12,6 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.71.0
 	github.com/coreos/go-oidc/v3 v3.14.1
-	github.com/docker/docker v28.3.3+incompatible
 	github.com/francoispqt/gojay v1.2.13
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
@@ -20,6 +19,7 @@ require (
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/knqyf263/go-deb-version v0.0.0-20241115132648-6f4aee6ccd23
 	github.com/masahiro331/go-mvn-version v0.0.0-20250131095131-f4974fa13b8a
+	github.com/moby/moby/api v1.56.0
 	github.com/stretchr/testify v1.11.1
 	github.com/stripe/stripe-go/v74 v74.30.0
 	go.mongodb.org/mongo-driver v1.17.1
@@ -122,6 +122,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v28.3.3+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
+	github.com/docker/docker v28.3.3+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.3 // indirect
 	github.com/docker/go-connections v0.6.0 // indirect
 	github.com/docker/go-events v0.0.0-20250114142523-c867878c5e32 // indirect

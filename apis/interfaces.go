@@ -3,7 +3,7 @@ package apis
 import (
 	"net/http"
 
-	"github.com/docker/docker/api/types/registry"
+	"github.com/moby/moby/api/types/registry"
 )
 
 // Connector - interface for any connector (BE/Portal and so on)
