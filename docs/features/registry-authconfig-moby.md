@@ -57,5 +57,10 @@ import "github.com/moby/moby/api/types/registry"
 ```
 
 Remove any use of `AuthConfig.Email`. Then run `go mod tidy`. `docker/docker` may remain
-as `// indirect` through other dependencies. That is harmless for `govulncheck -mode=binary`,
-which only considers linked packages.
+as `// indirect` through other dependencies. `govulncheck -mode=binary` only considers
+packages linked into the binary, so an indirect `go.mod` entry by itself does not fail the
+check. A transitive dependency can still link a `docker/docker` package, though. To
+confirm none is linked, run `go list -deps <main package> | grep docker/docker`, which
+should print nothing. This change only removes the import from `apis`. Other armoapi-go
+packages (for example `package_versions`, through grype) still reach `docker/docker`, so a
+consumer that links those is not cleared by this change.
