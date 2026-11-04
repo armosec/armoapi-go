@@ -64,9 +64,12 @@ type AzureActivityLogEvent struct {
 	// Caller is the identity that performed the operation (UPN or object ID).
 	Caller string `json:"caller,omitempty"`
 	Level  string `json:"level,omitempty"`
-	// Location is the Azure region the operation acted in — the analog of AWS
-	// awsRegion. Often "global" for control-plane operations (subscription /
-	// resource-group scope), a region (e.g. "eastus") for regional resources.
+	// Location is the record's "location" key. Neither shape carried it when
+	// checked in 2026-11: a diagnostic-settings export of VM, network and
+	// run-command operations had no "location" key, and neither did the REST
+	// shape, so it is empty in practice. Microsoft's schema describes the field
+	// as where the event was processed, not the resource's region. Kept for
+	// decoding compatibility; it is not the analog of AWS awsRegion.
 	Location string `json:"location,omitempty"`
 	// Channels is the Activity Log channel (e.g. "Operation").
 	Channels string `json:"channels,omitempty"`
