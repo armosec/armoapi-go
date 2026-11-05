@@ -145,3 +145,47 @@ func TestIsValidStateWriteEventType_RejectsUnknown(t *testing.T) {
 	assert.False(t, IsValidStateWriteEventType(EventType("nonsense")))
 	assert.False(t, IsValidStateWriteEventType(EventType("")))
 }
+
+func TestStateWrite_CounterFields_YAMLRoundTrip(t *testing.T) {
+	in := "eventType: network\nscope: container\nname: ssh_out\nincrement: 1\nttl: 1m\n"
+	var w StateWrite
+	require.NoError(t, yaml.Unmarshal([]byte(in), &w))
+	require.NotNil(t, w.Increment)
+	assert.Equal(t, 1, *w.Increment)
+	assert.Nil(t, w.Clear)
+
+	clear := true
+	out, err := yaml.Marshal(StateWrite{EventType: EventTypeNetwork, Scope: StateScopeContainer, Name: "ssh_out", Clear: &clear, TTL: "1m"})
+	require.NoError(t, err)
+	assert.Contains(t, string(out), "clear: true")
+	assert.NotContains(t, string(out), "increment")
+}
+
+func TestStateWrite_CounterFields_OmittedWhenZero(t *testing.T) {
+	b, err := json.Marshal(StateWrite{EventType: EventTypeExec, Scope: StateScopeContainer, Name: "x", TTL: "1m"})
+	require.NoError(t, err)
+	assert.NotContains(t, string(b), `"increment"`)
+	assert.NotContains(t, string(b), `"clear"`)
+}
+
+// An explicit zero is a value, not an absence: the consuming engine must be
+// able to reject `increment: 0` and `clear: false` instead of silently
+// treating them as a set.
+func TestStateWrite_CounterFields_ExplicitZeroIsPreserved(t *testing.T) {
+	var w StateWrite
+	require.NoError(t, yaml.Unmarshal([]byte("eventType: exec\nscope: container\nname: x\nincrement: 0\nclear: false\nttl: 1m\n"), &w))
+	require.NotNil(t, w.Increment)
+	require.NotNil(t, w.Clear)
+	assert.Equal(t, 0, *w.Increment)
+	assert.False(t, *w.Clear)
+
+	var j StateWrite
+	require.NoError(t, json.Unmarshal([]byte(`{"eventType":"exec","scope":"container","name":"x","increment":0,"clear":false,"ttl":"1m"}`), &j))
+	require.NotNil(t, j.Increment)
+	require.NotNil(t, j.Clear)
+
+	b, err := json.Marshal(j)
+	require.NoError(t, err)
+	assert.Contains(t, string(b), `"increment":0`)
+	assert.Contains(t, string(b), `"clear":false`)
+}
