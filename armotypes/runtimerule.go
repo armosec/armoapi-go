@@ -168,6 +168,17 @@ type StateWrite struct {
 	// provenance. Enforced by the consuming engine at rule load.
 	Value map[string]any `json:"value,omitempty" yaml:"value,omitempty" bson:"value,omitempty"`
 
+	// Increment makes this write a counter: create the entry with count 1 or
+	// add 1 to it. Mutually exclusive with Value and Clear. Only the value 1 is
+	// accepted today; an integer rather than a bool so an amount can follow
+	// without a schema change. Enforced by the consuming engine at rule load.
+	Increment int `json:"increment,omitempty" yaml:"increment,omitempty" bson:"increment,omitempty"`
+
+	// Clear deletes the entry under Name/Key if present. Mutually exclusive
+	// with Value and Increment. An entry with neither Increment nor Clear is a
+	// plain set: last write wins, TTL refreshed.
+	Clear bool `json:"clear,omitempty" yaml:"clear,omitempty" bson:"clear,omitempty"`
+
 	// TTL is a Go duration string ("10m", "30m"). The consuming engine clamps
 	// it to its configured maxTTL at load, so no rule can pin memory
 	// indefinitely.

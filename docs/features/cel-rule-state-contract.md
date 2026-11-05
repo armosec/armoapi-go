@@ -48,6 +48,10 @@ property is exactly what the first leg of every correlation rule needs.
 | `key` | *Who the fact is about.* A CEL string expression. **Optional** — omit for a fact true of the whole scope, which yields one entry per scope. |
 | `value` | Optional author extras as CEL expressions. Keys must not begin with `_`, which is reserved for engine-stamped provenance. |
 | `ttl` | Go duration string. The consuming engine clamps it to its configured maximum at load, so no rule can pin memory indefinitely. |
+| `increment` | Integer, only `1` is accepted. Makes the write a counter: create the entry with count 1 or add 1 to it. Exclusive with `value` and `clear`. |
+| `clear` | Boolean. Deletes the entry under `name`/`key` if present. Exclusive with `value` and `increment`. |
+
+An entry with neither `increment` nor `clear` is a plain set, with or without `value`: last write wins and the TTL is refreshed. The consuming engine rejects an entry that mixes the three operations at rule load; the contract carries the fields, not the validation.
 
 ### `name` vs `key`
 

@@ -145,3 +145,23 @@ func TestIsValidStateWriteEventType_RejectsUnknown(t *testing.T) {
 	assert.False(t, IsValidStateWriteEventType(EventType("nonsense")))
 	assert.False(t, IsValidStateWriteEventType(EventType("")))
 }
+
+func TestStateWrite_CounterFields_YAMLRoundTrip(t *testing.T) {
+	in := "eventType: network\nscope: container\nname: ssh_out\nincrement: 1\nttl: 1m\n"
+	var w StateWrite
+	require.NoError(t, yaml.Unmarshal([]byte(in), &w))
+	assert.Equal(t, 1, w.Increment)
+	assert.False(t, w.Clear)
+
+	out, err := yaml.Marshal(StateWrite{EventType: EventTypeNetwork, Scope: StateScopeContainer, Name: "ssh_out", Clear: true, TTL: "1m"})
+	require.NoError(t, err)
+	assert.Contains(t, string(out), "clear: true")
+	assert.NotContains(t, string(out), "increment")
+}
+
+func TestStateWrite_CounterFields_OmittedWhenZero(t *testing.T) {
+	b, err := json.Marshal(StateWrite{EventType: EventTypeExec, Scope: StateScopeContainer, Name: "x", TTL: "1m"})
+	require.NoError(t, err)
+	assert.NotContains(t, string(b), `"increment"`)
+	assert.NotContains(t, string(b), `"clear"`)
+}
