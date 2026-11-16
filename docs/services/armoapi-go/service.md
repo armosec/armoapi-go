@@ -26,9 +26,6 @@ This is a **pure type/utility library** with no runtime services (no HTTP server
 | `containerscan` | Container vulnerability scan report interfaces defining the contract between scanner and consumers |
 | `containerscan/v1` | Concrete implementation of the `containerscan` interfaces |
 | `armotypes` (ticketing) | `TicketManager` type and provider constants (`TicketManagerJira`, `TicketManagerLinear`, `TicketManagerGitHub`), `Ticket` struct |
-| `notifications` | Alert channel configuration, collaboration integrations (Jira, Linear, Slack, GitHub), SIEM, and incident notification types |
-| `broadcastevents` | Platform analytics and audit event types with factory constructors |
-| `package_versions` | Multi-format package version parsing and comparison (semver, APK, deb, RPM, Maven, PEP440, Go modules) |
 | `scanfailure` | Scan failure report types, reason codes, and human-readable failure descriptions |
 
 ## Import Patterns
@@ -41,8 +38,6 @@ import (
     "github.com/armosec/armoapi-go/armotypes"
     "github.com/armosec/armoapi-go/identifiers"
     "github.com/armosec/armoapi-go/containerscan"
-    "github.com/armosec/armoapi-go/notifications"
-    "github.com/armosec/armoapi-go/package_versions"
 )
 ```
 
@@ -72,15 +67,6 @@ designator := identifiers.PortalDesignator{
         identifiers.AttributeNamespace: "default",
     },
 }
-```
-
-### Version Comparison
-
-Always use the approved entry points for version comparison:
-
-```go
-v, err := package_versions.NewVersion("1.2.3")
-v2, err := package_versions.NewVersionFromPkgType("1.2.3-r0", "apk")
 ```
 
 ### Domain Types with PortalBase
@@ -177,6 +163,5 @@ No external services or credentials are required for tests.
 1. All exported struct fields crossing service boundaries must have both `json` and `bson` struct tags
 2. Interfaces in `containerscan/` are stability contracts; adding methods is a breaking change
 3. New domain types should embed `PortalBase` for consistent metadata handling
-4. Version comparison must use `package_versions.NewVersion()` or `NewVersionFromPkgType()`
-5. High-throughput types should implement `gojay.MarshalerJSONObject` for performance
-6. Test data belongs in `fixtures/` or `testdata/` subdirectories within each package
+4. High-throughput types should implement `gojay.MarshalerJSONObject` for performance
+5. Test data belongs in `fixtures/` or `testdata/` subdirectories within each package
