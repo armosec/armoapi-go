@@ -61,6 +61,5 @@ as `// indirect` through other dependencies. `govulncheck -mode=binary` only con
 packages linked into the binary, so an indirect `go.mod` entry by itself does not fail the
 check. A transitive dependency can still link a `docker/docker` package, though. To
 confirm none is linked, run `go list -deps <main package> | grep docker/docker`, which
-should print nothing. This change only removes the import from `apis`. Other armoapi-go
-packages (for example `package_versions`, through grype) still reach `docker/docker`, so a
-consumer that links those is not cleared by this change.
+should print nothing. This change only removes the import from `apis`. `package_versions`, which reached
+`docker/docker` through grype, left this module in SUB-9866.

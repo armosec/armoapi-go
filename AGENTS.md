@@ -33,9 +33,6 @@ Canonical shared type library for the Armosec platform. Defines domain types, co
 | `armotypes/aisandbox` | AI-Sandbox `identity_key` format + constructors shared with private-node-agent |
 | `identifiers` | Workload/resource designator system (WLID, SID, PortalDesignator) |
 | `containerscan` | Container vulnerability scan report interfaces and v1 implementation |
-| `notifications` | Alert channel configuration, collaboration integrations (Jira, Linear, Slack) |
-| `broadcastevents` | Platform analytics/audit event types |
-| `package_versions` | Multi-format package version parsing (semver, APK, deb, RPM, Maven, PEP440) |
 | `scanfailure` | Scan failure report types and reason codes |
 
 ## Consumers
@@ -44,11 +41,15 @@ event-ingester-service, cadashboardbe, config-service, kubevuln, kubescape, node
 
 ## Conventions
 
+- This repo is the contract with agents and other outside consumers. A type that only
+  backend services use belongs in `armosec/backend` (`internal/armosec-infra/apitypes`), not
+  here. `notifications`, `broadcastevents`, `package_versions` and `armotypes/aiproviders`
+  moved there in SUB-9864 and were removed from this repo in SUB-9866.
+
 - All types use `json` struct tags for REST/Elasticsearch and `bson` tags for MongoDB serialization. Both must be maintained together.
 - Interfaces in `containerscan/` decouple consuming services from concrete implementations (v1). Do not add methods to interfaces without checking all consumers.
 - The `identifiers` package defines `PortalDesignator` — the universal resource-addressing type. Attribute constants (`AttributeCluster`, `AttributeNamespace`) must stay backward-compatible.
 - New types in `armotypes` must include a `PortalBase` embed for consistent metadata (GUID, name, attributes).
-- `package_versions.NewVersion()` / `NewVersionFromPkgType()` are the only approved entry points for version comparison. Do not use raw string comparison on versions.
 - No database connections or runtime dependencies — this is a pure type/utility library.
 - Releases are automated via `.github/workflows/release.yaml` on tag push (`v0.0.XXX`).
 - High-performance JSON paths use `gojay` marshalling; standard `encoding/json` for everything else.

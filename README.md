@@ -12,9 +12,6 @@ Canonical shared type library for the Armosec platform. Defines domain types, co
 | `armotypes` | Core platform domain types (clusters, configs, policies, incidents, risks) |
 | `identifiers` | Workload/resource designator system (WLID, SID, PortalDesignator) |
 | `containerscan` | Container vulnerability scan report interfaces and implementations |
-| `notifications` | Alert channel and collaboration configuration types |
-| `broadcastevents` | Platform analytics/audit event types |
-| `package_versions` | Multi-format package version parsing and comparison |
 | `scanfailure` | Scan failure report types and reason codes |
 
 ## Usage

@@ -43,23 +43,6 @@ armoapi-go/
 │   ├── commonadapters.go        # Severity mapping, adapter logic
 │   ├── consts.go                # Severity levels, scan status constants
 │   └── v1/                      # Concrete implementation of interfaces
-├── notifications/           # Alert & collaboration configuration
-│   ├── alertchannelapi.go   # AlertChannelAPI, AlertConfig
-│   ├── collaborationconfig.go # CollaborationConfig (Jira, Linear, etc.)
-│   ├── integrationhealth.go # Integration token-health attributes + helpers
-│   └── runtimeincidents.go  # Runtime incident notification types
-├── broadcastevents/         # Platform event types for analytics pipeline
-│   ├── events.go            # EventBase, LoginEvent, HelmInstalledEvent
-│   └── factory.go           # Event factory/constructor helpers
-├── package_versions/        # Multi-format version comparison
-│   ├── version.go           # Version interface, NewVersion(), NewVersionFromPkgType()
-│   ├── semantic_version.go  # Semver implementation
-│   ├── apk_version.go       # Alpine APK version comparison
-│   ├── deb_version.go       # Debian version comparison
-│   ├── rpm_version.go       # RPM version comparison
-│   ├── maven_version.go     # Maven version comparison
-│   ├── pep440_version.go    # Python PEP440 version comparison
-│   └── golang_version.go    # Go module version comparison
 └── scanfailure/             # Scan failure reporting
     └── types.go             # ScanFailureReport, reason codes, ReasonFriendlyText()
 ```
@@ -98,7 +81,6 @@ Tags follow `v0.0.XXX` pattern. Push a tag to trigger `.github/workflows/release
 - **Struct tags**: Every exported struct field that crosses a service boundary must have both `json` and `bson` tags. The `json` tag is the wire format name.
 - **PortalBase embedding**: Domain entities stored in MongoDB embed `PortalBase` for GUID, name, cluster, and attribute metadata.
 - **Interface-based contracts**: `containerscan/` defines interfaces; `containerscan/v1/` provides the implementation. Consumers depend on the interface package only.
-- **Version comparison**: All version comparison must go through `package_versions.NewVersion()` or `NewVersionFromPkgType()`. Raw string comparison is incorrect for non-semver formats.
 - **No runtime dependencies**: This library must not import HTTP servers, database drivers, or message brokers. It is a pure type + utility library.
 - **Gojay for hot paths**: Types that are marshalled at high throughput (scan results, events) implement `gojay.MarshalerJSONObject` for zero-allocation encoding.
 - **Test fixtures**: Test data lives in `fixtures/` or `testdata/` subdirectories within each package.
