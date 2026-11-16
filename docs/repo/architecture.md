@@ -43,20 +43,6 @@ armoapi-go/
 │   ├── commonadapters.go        # Severity mapping, adapter logic
 │   ├── consts.go                # Severity levels, scan status constants
 │   └── v1/                      # Concrete implementation of interfaces
-│   ├── alertchannelapi.go   # AlertChannelAPI, AlertConfig
-│   ├── collaborationconfig.go # CollaborationConfig (Jira, Linear, etc.)
-│   ├── integrationhealth.go # Integration token-health attributes + helpers
-│   └── runtimeincidents.go  # Runtime incident notification types
-│   ├── events.go            # EventBase, LoginEvent, HelmInstalledEvent
-│   └── factory.go           # Event factory/constructor helpers
-│   ├── version.go           # Version interface, NewVersion(), NewVersionFromPkgType()
-│   ├── semantic_version.go  # Semver implementation
-│   ├── apk_version.go       # Alpine APK version comparison
-│   ├── deb_version.go       # Debian version comparison
-│   ├── rpm_version.go       # RPM version comparison
-│   ├── maven_version.go     # Maven version comparison
-│   ├── pep440_version.go    # Python PEP440 version comparison
-│   └── golang_version.go    # Go module version comparison
 └── scanfailure/             # Scan failure reporting
     └── types.go             # ScanFailureReport, reason codes, ReasonFriendlyText()
 ```
