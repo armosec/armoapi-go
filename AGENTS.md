@@ -31,6 +31,7 @@ Canonical shared type library for the Armosec platform. Defines domain types, co
 | `armotypes/cdr` | Cloud Detection & Response alert types |
 | `armotypes/ecs`, `armotypes/ecs/operator` | ECS wire types + AWS SDK converters shared with ecs-operator |
 | `armotypes/aisandbox` | AI-Sandbox `identity_key` format + constructors shared with private-node-agent |
+| `armotypes/monitoredunits` | Monitored units message (sensor coverage) shared with private-node-agent. See `docs/features/monitored-units.md` |
 | `identifiers` | Workload/resource designator system (WLID, SID, PortalDesignator) |
 | `containerscan` | Container vulnerability scan report interfaces and v1 implementation |
 | `scanfailure` | Scan failure report types and reason codes |

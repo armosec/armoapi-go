@@ -122,3 +122,41 @@ func TestIsClusterBasedHostType(t *testing.T) {
 	assert.True(t, IsClusterBasedHostType(""), "empty string should be treated as cluster-based (defaults to kubernetes)")
 	assert.False(t, IsClusterBasedHostType("unknown"), "unknown type should not be cluster-based")
 }
+
+// workloadLabels: a nil map is dropped, and an empty map is sent as {}. A
+// consumer tells an old sender from an owner with no labels by this.
+func TestRuntimeAlertWorkloadLabelsJSON(t *testing.T) {
+	out, err := json.Marshal(RuntimeAlertK8sDetails{WorkloadKind: "Pod"})
+	assert.NoError(t, err)
+	assert.NotContains(t, string(out), "workloadLabels")
+
+	out, err = json.Marshal(RuntimeAlertK8sDetails{WorkloadKind: "Job", WorkloadLabels: map[string]string{}})
+	assert.NoError(t, err)
+	assert.Contains(t, string(out), `"workloadLabels":{}`)
+
+	var decoded RuntimeAlertK8sDetails
+	assert.NoError(t, json.Unmarshal(out, &decoded))
+	assert.NotNil(t, decoded.WorkloadLabels)
+
+	out, err = json.Marshal(RuntimeAlertK8sDetails{WorkloadKind: "Job", WorkloadLabels: map[string]string{"runner-pod": "r1"}})
+	assert.NoError(t, err)
+	assert.Contains(t, string(out), `"workloadLabels":{"runner-pod":"r1"}`)
+}
+
+func TestRuntimeAlertCIIdentityJSON(t *testing.T) {
+	out, err := json.Marshal(RuntimeAlert{})
+	assert.NoError(t, err)
+	assert.NotContains(t, string(out), `"ci"`)
+
+	alert := RuntimeAlert{CI: &CIIdentity{
+		Provider: CIProviderGitHub,
+		GitHub:   &GitHubCIIdentity{RunnerName: "vm-runner-7", RunID: 9912, Attempt: 2, Job: "build"},
+	}}
+	out, err = json.Marshal(alert)
+	assert.NoError(t, err)
+	assert.Contains(t, string(out), `"ci":{"provider":"github","github":{"runnerName":"vm-runner-7","runId":9912,"attempt":2,"job":"build"}}`)
+
+	var decoded RuntimeAlert
+	assert.NoError(t, json.Unmarshal(out, &decoded))
+	assert.Equal(t, alert.CI, decoded.CI)
+}

@@ -390,6 +390,18 @@ type RuntimeAlertK8sDetails struct {
 	WorkloadNamespace string            `json:"workloadNamespace,omitempty" bson:"workloadNamespace,omitempty"`
 	WorkloadKind      string            `json:"workloadKind,omitempty" bson:"workloadKind,omitempty"`
 	WorkloadUID       string            `json:"workloadUID,omitempty" bson:"workloadUID,omitempty"`
+	// WorkloadLabels holds the labels of the pod's owner workload, the one named
+	// in WorkloadKind and WorkloadName (for example the Job of a Job pod).
+	//
+	// Nil when the workload is the pod itself: its labels are in PodLabels.
+	// Non-nil whenever the workload is not the pod, also when the owner has no
+	// labels (an empty map). The JSON tag is omitzero and not omitempty, so an
+	// empty map is sent as {} and only a nil map is dropped. A consumer relies on
+	// this: a workload that is not the pod, with no workloadLabels field, means
+	// that the sender predates the field.
+	//
+	// The bson tag keeps omitempty, so the difference is lost in storage.
+	WorkloadLabels map[string]string `json:"workloadLabels,omitzero" bson:"workloadLabels,omitempty"`
 }
 
 type RuntimeAlertECSDetails struct {
@@ -471,8 +483,11 @@ type RuntimeAlert struct {
 	HttpRuleAlert          `json:",inline" bson:"inline"`
 	NetworkScanAlert       `json:"networkscan,inline" bson:"networkscan"`
 	CorrelationAlert       `json:",inline" bson:"inline"`
-	AlertType              AlertType           `json:"alertType" bson:"alertType"`
-	AlertSourcePlatform    AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
+	// CI is the CI identity that the sensor reports about itself. Optional
+	// enrichment, nil when the sensor does not know it. See CIIdentity.
+	CI                  *CIIdentity         `json:"ci,omitempty" bson:"ci,omitempty"`
+	AlertType           AlertType           `json:"alertType" bson:"alertType"`
+	AlertSourcePlatform AlertSourcePlatform `json:"alertSourcePlatform" bson:"alertSourcePlatform"`
 	// Rule ID
 	RuleID string `json:"ruleID,omitempty" bson:"ruleID,omitempty"`
 	// IsTriggerAlert indicates if this alert is a trigger alert
