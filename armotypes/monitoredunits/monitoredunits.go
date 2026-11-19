@@ -89,13 +89,25 @@ type Message struct {
 	// IntervalSeconds is the interval of the periodic list, as configured on
 	// this sensor.
 	IntervalSeconds int `json:"intervalSeconds"`
-	// Entries holds start and stop entries. It may be empty.
+	// Entries holds start and stop entries. It may be empty. It is always sent
+	// as a list: a nil slice is encoded as [].
 	Entries []Entry `json:"entries"`
 	// MonitoredUnitIDs holds the IDs of all units that this sensor run monitors
-	// now. It is set only in a periodic list. Nil means that the message is not
-	// a periodic list. An empty list means that the sensor is alive and monitors
-	// nothing. Use IsPeriodicList and SetMonitoredUnitIDs.
-	MonitoredUnitIDs *[]string `json:"monitoredUnitIds,omitempty"`
+	// now. It is set only in a periodic list. A nil slice means that the message
+	// is not a periodic list, and the field is not sent. A non-nil empty slice
+	// means that the sensor is alive and monitors nothing, and is sent as [].
+	// Use IsPeriodicList and SetMonitoredUnitIDs.
+	MonitoredUnitIDs []string `json:"monitoredUnitIds,omitzero"`
+}
+
+// MarshalJSON encodes a nil Entries as [] and not as null, because the field
+// is a list on the wire also when it is empty.
+func (m Message) MarshalJSON() ([]byte, error) {
+	type plain Message // drops the method, so the call below does not recurse
+	if m.Entries == nil {
+		m.Entries = []Entry{}
+	}
+	return json.Marshal(plain(m))
 }
 
 // IsPeriodicList reports whether the message carries the list of monitored
@@ -110,7 +122,7 @@ func (m *Message) SetMonitoredUnitIDs(ids []string) {
 	if ids == nil {
 		ids = []string{}
 	}
-	m.MonitoredUnitIDs = &ids
+	m.MonitoredUnitIDs = ids
 }
 
 // Entry is the start or the stop of the monitoring of one unit.
@@ -171,7 +183,8 @@ func NewK8sPodUnit(podUID string, startedAt time.Time, attrs K8sPodAttributes) (
 }
 
 // K8sPodAttributes decodes the attributes of a UnitKindK8sPod unit. It returns
-// an error for another kind, and for a unit with no attributes (a stop entry).
+// an error for another kind, and for a unit with no attributes (a stop entry),
+// also when the attributes are a JSON null.
 func (u Unit) K8sPodAttributes() (*K8sPodAttributes, error) {
 	if u.Kind != UnitKindK8sPod {
 		return nil, fmt.Errorf("unit kind is %q, not %q", u.Kind, UnitKindK8sPod)
@@ -179,9 +192,14 @@ func (u Unit) K8sPodAttributes() (*K8sPodAttributes, error) {
 	if len(u.Attributes) == 0 {
 		return nil, fmt.Errorf("unit %q has no attributes", u.ID)
 	}
-	var attrs K8sPodAttributes
+	// Decode into a pointer: a JSON null leaves it nil, and is not mistaken for
+	// an object with no fields.
+	var attrs *K8sPodAttributes
 	if err := json.Unmarshal(u.Attributes, &attrs); err != nil {
 		return nil, fmt.Errorf("decode k8s-pod attributes: %w", err)
 	}
-	return &attrs, nil
+	if attrs == nil {
+		return nil, fmt.Errorf("unit %q has no attributes", u.ID)
+	}
+	return attrs, nil
 }

@@ -22,7 +22,7 @@ func readGolden(t *testing.T, name string) []byte {
 // The golden files are the examples of the wire contract. Decoding and encoding
 // one must give the same JSON: no field is lost, renamed or added.
 func TestGoldenRoundTrip(t *testing.T) {
-	for _, name := range []string{"start_entry.json", "periodic_list_with_stop.json"} {
+	for _, name := range []string{"start_entry.json", "periodic_list_with_stop.json", "periodic_list_only.json"} {
 		t.Run(name, func(t *testing.T) {
 			golden := readGolden(t, name)
 			var msg Message
@@ -97,14 +97,14 @@ func TestPeriodicListAbsentVersusEmpty(t *testing.T) {
 	var decoded Message
 	require.NoError(t, json.Unmarshal(out, &decoded))
 	require.True(t, decoded.IsPeriodicList())
-	assert.Empty(t, *decoded.MonitoredUnitIDs)
+	assert.Empty(t, decoded.MonitoredUnitIDs)
 
 	var absent Message
 	require.NoError(t, json.Unmarshal([]byte(`{"schemaVersion":1}`), &absent))
 	assert.False(t, absent.IsPeriodicList())
 }
 
-// A step pod whose owner has no labels still sends workloadLabels, as {}.
+// A pod whose owner workload has no labels still sends workloadLabels, as {}.
 func TestWorkloadLabelsEmptyIsKeptNilIsDropped(t *testing.T) {
 	started := time.Date(2026, 11, 18, 10, 0, 1, 0, time.UTC)
 
@@ -156,4 +156,39 @@ func TestEntryCIIdentity(t *testing.T) {
 	out, err := json.Marshal(e)
 	require.NoError(t, err)
 	assert.JSONEq(t, in, string(out))
+}
+
+// A periodic list with no start or stop entry sends entries as [], not null.
+func TestListOnlyMessageSendsEmptyEntries(t *testing.T) {
+	var msg Message
+	msg.SetMonitoredUnitIDs(nil)
+
+	for name, v := range map[string]any{"value": msg, "pointer": &msg} {
+		t.Run(name, func(t *testing.T) {
+			out, err := json.Marshal(v)
+			require.NoError(t, err)
+			assert.Contains(t, string(out), `"entries":[]`)
+			assert.Contains(t, string(out), `"monitoredUnitIds":[]`)
+			assert.NotContains(t, string(out), "null")
+		})
+	}
+}
+
+// A JSON null in monitoredUnitIds is the same as an absent field.
+func TestMonitoredUnitIDsNullIsNotAPeriodicList(t *testing.T) {
+	var msg Message
+	require.NoError(t, json.Unmarshal([]byte(`{"schemaVersion":1,"monitoredUnitIds":null}`), &msg))
+	assert.False(t, msg.IsPeriodicList())
+}
+
+// attributes: null is a unit with no attributes, not a pod with empty ones.
+func TestK8sPodAttributesRejectsNull(t *testing.T) {
+	var u Unit
+	require.NoError(t, json.Unmarshal([]byte(`{"kind":"k8s-pod","id":"uid-1","attributes":null}`), &u))
+	_, err := u.K8sPodAttributes()
+	assert.ErrorContains(t, err, "no attributes")
+
+	u = Unit{Kind: UnitKindK8sPod, ID: "uid-1", Attributes: json.RawMessage("null")}
+	_, err = u.K8sPodAttributes()
+	assert.ErrorContains(t, err, "no attributes")
 }

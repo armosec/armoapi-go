@@ -57,10 +57,14 @@ the body is the only cluster identity that the consumer uses: a `k8s-pod` entry 
 without it is dropped, and the receiver rejects a request whose `clusterName` query parameter
 differs from it.
 
-**Absent list and empty list are different.** `MonitoredUnitIDs` is a pointer to a slice:
+**Absent list and empty list are different.** `MonitoredUnitIDs` is a slice with the JSON tag
+`omitzero`:
 
-- nil (the field is absent): the message is not a periodic list;
-- an empty list (`[]`): the sensor is alive and monitors nothing.
+- a nil slice (the field is absent): the message is not a periodic list;
+- a non-nil empty slice (`[]`): the sensor is alive and monitors nothing.
+
+`Entries` is always sent as a list. `Message` has a `MarshalJSON` that encodes a nil `Entries`
+as `[]`, so a periodic list with no entries does not send `null`.
 
 Use `SetMonitoredUnitIDs` to build a periodic list and `IsPeriodicList` to test for one.
 
@@ -90,7 +94,8 @@ Reasons:
 | `ReasonTimeout` | `timeout` | stop | consumer only. A sensor never sends it |
 
 `NewK8sPodUnit` builds the unit of a start entry. `Unit.K8sPodAttributes()` decodes the
-attributes, and returns an error for another kind or for a unit with no attributes.
+attributes, and returns an error for another kind or for a unit with no attributes (absent, or a
+JSON `null`).
 
 ### Compatibility rules
 
