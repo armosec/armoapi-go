@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "agentVersion": "v0.3.90",
+  "agentStartedAt": "2026-11-18T08:00:00Z",
+  "clusterName": "ci-cluster",
+  "node": "ip-10-0-1-23.ec2.internal",
+  "sentAt": "2026-11-18T10:07:30Z",
+  "intervalSeconds": 30,
+  "entries": [
+    {
+      "type": "stop",
+      "reason": "unit-ended",
+      "unit": { "kind": "k8s-pod", "id": "7f3e9c1a-5a0e-4c52-9d0b-1f2a3b4c5d6e" },
+      "monitoredUntil": "2026-11-18T10:07:12Z"
+    }
+  ],
+  "monitoredUnitIds": [
+    "0b6c2f0e-11aa-4e0f-8f43-6d1f0f6f2a10",
+    "c41d7a55-9b1e-4a38-b0e2-2f7d0a9e4b77"
+  ]
+}

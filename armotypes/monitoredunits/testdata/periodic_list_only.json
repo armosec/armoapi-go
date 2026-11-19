@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "agentVersion": "v0.3.90",
+  "agentStartedAt": "2026-11-18T08:00:00Z",
+  "clusterName": "ci-cluster",
+  "node": "ip-10-0-1-23.ec2.internal",
+  "sentAt": "2026-11-18T10:08:00Z",
+  "intervalSeconds": 30,
+  "entries": [],
+  "monitoredUnitIds": []
+}

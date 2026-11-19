@@ -32,6 +32,7 @@ armoapi-go/
 │   │   └── gcp.go           # GcpAuditLogEvent, GCP-specific types
 │   ├── ecs/                 # ECS wire enums; operator/ = EcsResource + AWS SDK converters (ecs-operator contract)
 │   ├── aisandbox/           # AI-Sandbox identity_key format + constructors (private-node-agent contract)
+│   ├── monitoredunits/      # Monitored units message: which units a sensor monitors, and when (private-node-agent contract)
 │   └── common/              # Shared runtime sub-types (ProcessEntity, FileEntity)
 ├── identifiers/             # Resource designator system
 │   ├── designators.go       # PortalDesignator, DesignatorType, constants
