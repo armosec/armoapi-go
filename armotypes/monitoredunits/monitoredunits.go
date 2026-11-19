@@ -74,7 +74,9 @@ type Message struct {
 	// AgentStartedAt is when this sensor process started. It identifies the
 	// sensor run: a change tells the consumer that the sensor restarted.
 	AgentStartedAt time.Time `json:"agentStartedAt"`
-	// ClusterName is the Kubernetes cluster of the sensor. Empty when the sensor
+	// ClusterName is the Kubernetes cluster of the sensor. A sensor in a cluster
+	// must set it: it is the only cluster identity that the consumer uses, and a
+	// k8s-pod entry of a message without it is dropped. Empty when the sensor
 	// does not run in a cluster.
 	ClusterName string `json:"clusterName,omitempty"`
 	// Node is the node name in a cluster, or the host name elsewhere.

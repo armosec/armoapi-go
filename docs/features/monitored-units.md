@@ -43,7 +43,7 @@ design.
 | `SchemaVersion` | `schemaVersion` | `SchemaVersion` (1). Raised only by a change that breaks an existing field |
 | `AgentVersion` | `agentVersion` | Version of the sensor |
 | `AgentStartedAt` | `agentStartedAt` | When the sensor process started. It identifies the sensor run |
-| `ClusterName` | `clusterName` | The Kubernetes cluster of the sensor. Absent outside a cluster |
+| `ClusterName` | `clusterName` | The Kubernetes cluster of the sensor. Required from a sensor in a cluster. Absent outside a cluster |
 | `Node` | `node` | Node name in a cluster, host name elsewhere |
 | `CloudMetadata` | `cloudMetadata` | The machine of the sensor: provider, account, region, instance. Optional. The existing `armotypes.CloudMetadata`, so its fields are snake_case as on other messages |
 | `SentAt` | `sentAt` | When the message was sent |
@@ -52,7 +52,10 @@ design.
 | `MonitoredUnitIDs` | `monitoredUnitIds` | Only in a periodic list. See below |
 
 The message carries the cluster and the machine itself. A consumer behind a queue does not
-depend on the HTTP query parameters of the request that delivered the message.
+depend on the HTTP query parameters of the request that delivered the message. `ClusterName` in
+the body is the only cluster identity that the consumer uses: a `k8s-pod` entry of a message
+without it is dropped, and the receiver rejects a request whose `clusterName` query parameter
+differs from it.
 
 **Absent list and empty list are different.** `MonitoredUnitIDs` is a pointer to a slice:
 
