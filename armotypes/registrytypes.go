@@ -94,6 +94,10 @@ type BaseContainerImageRegistry struct {
 	ManageStatusMessage string               `json:"manageStatusMessage,omitempty" bson:"manageStatusMessage"`
 	ScanStatus          RegistryScanStatus   `json:"scanStatus,omitempty" bson:"scanStatus"`
 	ScanStatusMessage   string               `json:"scanStatusMessage,omitempty" bson:"scanStatusMessage"`
+	// ScanAllRepositories makes each scan list the registry's repositories at run time
+	// instead of using Repositories. Repositories still holds the list saved at setup, so an
+	// operator that predates this field keeps scanning it.
+	ScanAllRepositories bool `json:"scanAllRepositories,omitempty" bson:"scanAllRepositories"`
 }
 
 const RegistryScanStatusesKindPath = "registrystatuses"
